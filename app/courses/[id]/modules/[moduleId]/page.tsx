@@ -23,44 +23,26 @@ import {
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
-// Mock module data
-const mockModuleData = {
-  1: {
-    id: 1,
-    title: "Introduction to Web Development",
-    description: "Learn the fundamentals of web development and what you'll build in this course",
-    duration: "30 min",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    courseId: 1,
-    courseTitle: "Web Development Fundamentals",
-    isCompleted: true,
-    nextModuleId: 2,
-    previousModuleId: null,
-  },
-  2: {
-    id: 2,
-    title: "HTML Basics",
-    description: "Master HTML tags, elements, and semantic markup",
-    duration: "45 min",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    courseId: 1,
-    courseTitle: "Web Development Fundamentals",
-    isCompleted: true,
-    nextModuleId: 3,
-    previousModuleId: 1,
-  },
-  3: {
-    id: 3,
-    title: "CSS Fundamentals",
-    description: "Learn CSS styling, selectors, and the box model",
-    duration: "50 min",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    courseId: 1,
-    courseTitle: "Web Development Fundamentals",
-    isCompleted: false,
-    nextModuleId: 4,
-    previousModuleId: 2,
-  },
+interface Module {
+  id: string
+  courseId: string
+  title: string
+  description: string
+  videoUrl?: string
+  durationSeconds: number
+  orderIndex: number
+  createdAt: string
+  updatedAt: string
+}
+
+interface Course {
+  id: string
+  title: string
+  description: string
+  thumbnailUrl?: string
+  isPublished: boolean
+  createdAt: string
+  updatedAt: string
 }
 
 export default function ModuleVideoPage() {
@@ -70,8 +52,11 @@ export default function ModuleVideoPage() {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const courseId = params.id as string
-  const moduleId = Number.parseInt(params.moduleId as string)
-  const module = mockModuleData[moduleId as keyof typeof mockModuleData]
+  const moduleId = params.moduleId as string
+  const [module, setModule] = useState<Module | null>(null)
+  const [course, setCourse] = useState<Course | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isCompleted, setIsCompleted] = useState(false)
 
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
@@ -80,6 +65,48 @@ export default function ModuleVideoPage() {
   const [watchProgress, setWatchProgress] = useState(0)
   const [hasCompletedThreshold, setHasCompletedThreshold] = useState(false)
   const [showControls, setShowControls] = useState(true)
+
+  // Load module and course data
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        // Load module data
+        const moduleRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/courses/${courseId}/modules/${moduleId}`, {
+          credentials: "include",
+        })
+        if (moduleRes.ok) {
+          const moduleData = await moduleRes.json()
+          setModule(moduleData)
+        }
+
+        // Load course data
+        const courseRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/courses/${courseId}`, {
+          credentials: "include",
+        })
+        if (courseRes.ok) {
+          const courseData = await courseRes.json()
+          setCourse(courseData)
+        }
+
+        // Check if module is completed
+        const progressRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${moduleId}/progress`, {
+          credentials: "include",
+        })
+        if (progressRes.ok) {
+          const progressData = await progressRes.json()
+          setIsCompleted(progressData.status === "COMPLETED")
+        }
+      } catch (error) {
+        console.error("Error loading data:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    if (courseId && moduleId) {
+      loadData()
+    }
+  }, [courseId, moduleId])
 
   useEffect(() => {
     const video = videoRef.current
@@ -120,14 +147,21 @@ export default function ModuleVideoPage() {
   }, [hasCompletedThreshold])
 
   const handleModuleComplete = async () => {
-    // TODO: Call Spring Boot backend: POST /api/progress/complete
-    // Body: { courseId, moduleId, watchPercentage: watchProgress }
-    console.log("[v0] Module completed:", { courseId, moduleId, watchProgress })
-
-    toast({
-      title: "Module Completed!",
-      description: "Great job! Your progress has been saved.",
-    })
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${moduleId}/complete`, {
+        method: "POST",
+        credentials: "include",
+      })
+      if (res.ok) {
+        setIsCompleted(true)
+        toast({
+          title: "Module Completed!",
+          description: "Great job! Your progress has been saved.",
+        })
+      }
+    } catch (error) {
+      console.error("Error completing module:", error)
+    }
   }
 
   const togglePlay = () => {
@@ -176,6 +210,17 @@ export default function ModuleVideoPage() {
     return `${mins}:${secs.toString().padStart(2, "0")}`
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading module...</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!module) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -221,7 +266,7 @@ export default function ModuleVideoPage() {
             >
               <video
                 ref={videoRef}
-                src={module.videoUrl}
+                src={module.videoUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
                 className="w-full h-full"
                 onClick={togglePlay}
                 onPlay={() => setIsPlaying(true)}
@@ -285,8 +330,8 @@ export default function ModuleVideoPage() {
             {/* Module Info */}
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Badge variant="secondary">{module.courseTitle}</Badge>
-                {module.isCompleted && (
+                <Badge variant="secondary">{course?.title || "Course"}</Badge>
+                {isCompleted && (
                   <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/20">
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Completed
@@ -295,6 +340,9 @@ export default function ModuleVideoPage() {
               </div>
               <h1 className="text-3xl font-bold mb-2 font-[family-name:var(--font-space-grotesk)]">{module.title}</h1>
               <p className="text-muted-foreground text-lg leading-relaxed">{module.description}</p>
+              <div className="mt-2 text-sm text-muted-foreground">
+                Duration: {Math.floor(module.durationSeconds / 60)} min
+              </div>
             </div>
 
             {/* Watch Progress */}
@@ -322,72 +370,36 @@ export default function ModuleVideoPage() {
 
             {/* Navigation */}
             <div className="flex items-center justify-between">
-              {module.previousModuleId ? (
-                <Button variant="outline" asChild>
-                  <Link href={`/courses/${courseId}/modules/${module.previousModuleId}`}>
-                    <ChevronLeft className="h-4 w-4 mr-2" />
-                    Previous Module
-                  </Link>
-                </Button>
-              ) : (
-                <div />
-              )}
-              {module.nextModuleId && (
-                <Button asChild>
-                  <Link href={`/courses/${courseId}/modules/${module.nextModuleId}`}>
-                    Next Module
-                    <ChevronRight className="h-4 w-4 ml-2" />
-                  </Link>
-                </Button>
-              )}
+              <Button variant="outline" asChild>
+                <Link href={`/courses/${courseId}`}>
+                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  Back to Course
+                </Link>
+              </Button>
             </div>
           </div>
 
-          {/* Sidebar - Course Modules */}
+          {/* Sidebar - Course Info */}
           <div className="lg:col-span-1">
             <Card className="sticky top-24">
               <CardHeader>
-                <CardTitle>Course Modules</CardTitle>
-                <CardDescription>Track your progress through the course</CardDescription>
+                <CardTitle>Course Information</CardTitle>
+                <CardDescription>About this course</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  {[
-                    { id: 1, title: "Introduction to Web Development", completed: true, current: moduleId === 1 },
-                    { id: 2, title: "HTML Basics", completed: true, current: moduleId === 2 },
-                    { id: 3, title: "CSS Fundamentals", completed: false, current: moduleId === 3 },
-                    { id: 4, title: "CSS Layouts with Flexbox", completed: false, current: false },
-                    { id: 5, title: "CSS Grid System", completed: false, current: false },
-                  ].map((mod) => (
-                    <Link
-                      key={mod.id}
-                      href={`/courses/${courseId}/modules/${mod.id}`}
-                      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                        mod.current
-                          ? "bg-primary/10 border border-primary/20"
-                          : "hover:bg-muted border border-transparent"
-                      }`}
-                    >
-                      <div
-                        className={`h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          mod.completed
-                            ? "bg-secondary text-secondary-foreground"
-                            : mod.current
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {mod.completed ? (
-                          <CheckCircle className="h-4 w-4" />
-                        ) : (
-                          <span className="text-sm">{mod.id}</span>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium line-clamp-2">{mod.title}</div>
-                      </div>
-                    </Link>
-                  ))}
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold mb-2">{course?.title || "Course"}</h3>
+                    <p className="text-sm text-muted-foreground">{course?.description || "Course description"}</p>
+                  </div>
+                  <div className="pt-4 border-t">
+                    <Button asChild className="w-full">
+                      <Link href={`/courses/${courseId}`}>
+                        <ChevronLeft className="h-4 w-4 mr-2" />
+                        Back to Course
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

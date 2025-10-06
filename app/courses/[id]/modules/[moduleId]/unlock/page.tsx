@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -13,10 +13,16 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { PlayCircle, ChevronLeft, Lock, AlertCircle, Key } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
-// Mock module data
-const mockModules = {
-  6: { id: 6, title: "JavaScript Basics", duration: "60 min" },
-  7: { id: 7, title: "DOM Manipulation", duration: "50 min" },
+interface Module {
+  id: string
+  courseId: string
+  title: string
+  description: string
+  videoUrl?: string
+  durationSeconds: number
+  orderIndex: number
+  createdAt: string
+  updatedAt: string
 }
 
 export default function UnlockModulePage() {
@@ -24,43 +30,73 @@ export default function UnlockModulePage() {
   const router = useRouter()
   const { toast } = useToast()
   const courseId = params.id as string
-  const moduleId = Number.parseInt(params.moduleId as string)
-  const module = mockModules[moduleId as keyof typeof mockModules]
+  const moduleId = params.moduleId as string
+  const [module, setModule] = useState<Module | null>(null)
+  const [isLoadingModule, setIsLoadingModule] = useState(true)
 
   const [accessCode, setAccessCode] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+
+  // Load module data
+  useEffect(() => {
+    const loadModule = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/courses/${courseId}/modules/${moduleId}`, {
+          credentials: "include",
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setModule(data)
+        } else {
+          console.error("Failed to load module")
+        }
+      } catch (error) {
+        console.error("Error loading module:", error)
+      } finally {
+        setIsLoadingModule(false)
+      }
+    }
+    
+    if (courseId && moduleId) {
+      loadModule()
+    }
+  }, [courseId, moduleId])
 
   const handleUnlockModule = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setIsLoading(true)
 
-    // TODO: Call Spring Boot backend: POST /api/modules/unlock
-    // Body: { accessCode, courseId, moduleId }
-    // Backend should verify:
-    // 1. Code exists and is valid
-    // 2. Code is for this specific module
-    // 3. Code hasn't been used yet
-    // 4. Mark code as used and associate with current user
-    console.log("[v0] Unlocking module with access code:", accessCode)
-
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${moduleId}/codes/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ code: accessCode })
+      })
       setIsLoading(false)
-
-      // Simulate success (in real app, check response from backend)
-      if (accessCode.length >= 6) {
-        toast({
-          title: "Module Unlocked!",
-          description: "You can now access this module",
-        })
-        // Redirect to module video page
+      if (res.ok) {
+        toast({ title: "Module Unlocked!", description: "You can now access this module" })
         router.push(`/courses/${courseId}/modules/${moduleId}`)
       } else {
         setError("Invalid or expired access code. Please contact your instructor.")
       }
-    }, 1000)
+    } catch (err) {
+      setIsLoading(false)
+      setError("Network error. Please try again.")
+    }
+  }
+
+  if (isLoadingModule) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading module...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!module) {
@@ -110,7 +146,14 @@ export default function UnlockModulePage() {
           <Card>
             <CardHeader>
               <CardTitle>{module.title}</CardTitle>
-              <CardDescription>Duration: {module.duration}</CardDescription>
+              <CardDescription>
+                Duration: {Math.floor(module.durationSeconds / 60)} min
+                {module.description && (
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    {module.description}
+                  </div>
+                )}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleUnlockModule} className="space-y-4">

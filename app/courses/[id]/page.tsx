@@ -1,45 +1,73 @@
 "use client"
 import Link from "next/link"
 import { useParams } from "next/navigation"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { PlayCircle, CheckCircle, Lock, ChevronLeft, BookOpen, Clock, Award, LogOut } from "lucide-react"
+import { PlayCircle, CheckCircle, Lock, ChevronLeft, BookOpen, Clock, Award } from "lucide-react"
+import { useUser } from "../../hooks/useUser"
+import UserDropdown from "../../components/UserDropdown"
 
-// Mock data - will be replaced with API calls to Spring Boot backend
-const mockCourseDetails = {
-  1: {
-    id: 1,
-    title: "Web Development Fundamentals",
-    description: "Master HTML, CSS, and JavaScript from scratch with hands-on projects and real-world examples",
-    thumbnail: "/web-development-code.png",
-    totalModules: 12,
-    completedModules: 5,
-    duration: "8 hours",
-    level: "Beginner",
-    instructor: "John Smith",
-    modules: [
-      { id: 1, title: "Introduction to Web Development", duration: "30 min", isUnlocked: true, isCompleted: true },
-      { id: 2, title: "HTML Basics", duration: "45 min", isUnlocked: true, isCompleted: true },
-      { id: 3, title: "CSS Fundamentals", duration: "50 min", isUnlocked: true, isCompleted: true },
-      { id: 4, title: "CSS Layouts with Flexbox", duration: "40 min", isUnlocked: true, isCompleted: true },
-      { id: 5, title: "CSS Grid System", duration: "45 min", isUnlocked: true, isCompleted: true },
-      { id: 6, title: "JavaScript Basics", duration: "60 min", isUnlocked: false, isCompleted: false },
-      { id: 7, title: "DOM Manipulation", duration: "50 min", isUnlocked: false, isCompleted: false },
-      { id: 8, title: "Events and Event Handling", duration: "45 min", isUnlocked: false, isCompleted: false },
-      { id: 9, title: "Async JavaScript", duration: "55 min", isUnlocked: false, isCompleted: false },
-      { id: 10, title: "Working with APIs", duration: "50 min", isUnlocked: false, isCompleted: false },
-      { id: 11, title: "Project: Build a Todo App", duration: "90 min", isUnlocked: false, isCompleted: false },
-      { id: 12, title: "Final Project & Certification", duration: "120 min", isUnlocked: false, isCompleted: false },
-    ],
-  },
-}
+type ModuleDto = { id: string; title: string; durationSeconds: number; orderIndex: number; status: string }
+type CourseDetail = { id: string; title: string; description: string; thumbnailUrl?: string; modules: ModuleDto[] }
 
 export default function CourseDetailPage() {
   const params = useParams()
-  const courseId = Number.parseInt(params.id as string)
-  const course = mockCourseDetails[courseId as keyof typeof mockCourseDetails]
+  const courseId = params.id as string
+  const [course, setCourse] = useState<CourseDetail | null>(null)
+  const [completed, setCompleted] = useState(0)
+  const [isEnrolled, setIsEnrolled] = useState(false)
+  const [isEnrolling, setIsEnrolling] = useState(false)
+  const { user } = useUser()
+
+  useEffect(() => {
+    const load = async () => {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}`, { credentials: "include" })
+      if (res.ok) {
+        const data = await res.json()
+        setCourse(data)
+        const c = data.modules.filter((m: ModuleDto) => m.status === "COMPLETED").length
+        setCompleted(c)
+        // Check if user is enrolled (if they can access the course details, they're enrolled)
+        setIsEnrolled(true)
+      } else if (res.status === 403) {
+        // User is not enrolled
+        setIsEnrolled(false)
+        // Load course details from public API
+        const publicRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/courses/${courseId}`)
+        if (publicRes.ok) {
+          const data = await publicRes.json()
+          setCourse(data)
+        }
+      }
+    }
+    load()
+  }, [courseId])
+
+  const handleEnroll = async () => {
+    setIsEnrolling(true)
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}/enroll`, {
+        method: "POST",
+        credentials: "include"
+      })
+      if (res.ok) {
+        setIsEnrolled(true)
+        // Reload the course data to get modules
+        const courseRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}`, { credentials: "include" })
+        if (courseRes.ok) {
+          const data = await courseRes.json()
+          setCourse(data)
+        }
+      }
+    } catch (error) {
+      console.error("Enrollment failed:", error)
+    } finally {
+      setIsEnrolling(false)
+    }
+  }
 
   if (!course) {
     return (
@@ -54,12 +82,10 @@ export default function CourseDetailPage() {
     )
   }
 
-  const progress = (course.completedModules / course.totalModules) * 100
-  const nextModule = course.modules.find((m) => !m.isCompleted)
+  const totalModules = course.modules.length
+  const progress = totalModules === 0 ? 0 : (completed / totalModules) * 100
+  const nextModule = course.modules.find((m) => m.status !== "COMPLETED")
 
-  const handleSignOut = () => {
-    console.log("[v0] Sign out - will call Spring Boot backend to clear session")
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -73,10 +99,7 @@ export default function CourseDetailPage() {
             <span className="font-bold text-xl font-[family-name:var(--font-space-grotesk)]">The Xperience</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
+            {user && <UserDropdown user={user} />}
           </div>
         </div>
       </header>
@@ -107,10 +130,27 @@ export default function CourseDetailPage() {
               </div>
               <h1 className="text-4xl font-bold mb-4 font-[family-name:var(--font-space-grotesk)]">{course.title}</h1>
               <p className="text-lg text-muted-foreground leading-relaxed">{course.description}</p>
+              
+              {/* Enrollment Button */}
+              {!isEnrolled && (
+                <div className="mt-6">
+                  <Button 
+                    onClick={handleEnroll} 
+                    disabled={isEnrolling}
+                    size="lg"
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    {isEnrolling ? "Enrolling..." : "Enroll in Course"}
+                  </Button>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Start your learning journey with this course
+                  </p>
+                </div>
+              )}
             </div>
 
             <img
-              src={course.thumbnail || "/placeholder.svg"}
+              src={course.thumbnailUrl || "/placeholder.svg"}
               alt={course.title}
               className="w-full aspect-video object-cover rounded-lg"
             />
@@ -133,7 +173,7 @@ export default function CourseDetailPage() {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Your Progress</span>
                     <span className="font-medium">
-                      {course.completedModules}/{course.totalModules} modules completed
+                          {completed}/{totalModules} modules completed
                     </span>
                   </div>
                   <Progress value={progress} className="h-2" />
@@ -160,7 +200,7 @@ export default function CourseDetailPage() {
                         <span>{nextModule.duration}</span>
                       </div>
                     </div>
-                    {nextModule.isUnlocked ? (
+                    {nextModule.status === "IN_PROGRESS" || nextModule.status === "COMPLETED" ? (
                       <Button className="w-full" size="lg" asChild>
                         <Link href={`/courses/${course.id}/modules/${nextModule.id}`}>
                           <PlayCircle className="h-4 w-4 mr-2" />
@@ -195,29 +235,25 @@ export default function CourseDetailPage() {
             {course.modules.map((module, index) => (
               <Card
                 key={module.id}
-                className={`transition-all ${module.isUnlocked ? "hover:shadow-md cursor-pointer" : "opacity-60"}`}
+                className={`transition-all ${module.status !== "LOCKED" ? "hover:shadow-md cursor-pointer" : "opacity-60"}`}
               >
                 <Link
-                  href={
-                    module.isUnlocked
-                      ? `/courses/${course.id}/modules/${module.id}`
-                      : `/courses/${course.id}/modules/${module.id}/unlock`
-                  }
+                  href={module.status !== "LOCKED" ? `/courses/${course.id}/modules/${module.id}` : `/courses/${course.id}/modules/${module.id}/unlock`}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center gap-4">
                       <div
                         className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          module.isCompleted
+                          module.status === "COMPLETED"
                             ? "bg-secondary text-secondary-foreground"
-                            : module.isUnlocked
+                            : module.status !== "LOCKED"
                               ? "bg-primary/10 text-primary"
                               : "bg-muted text-muted-foreground"
                         }`}
                       >
-                        {module.isCompleted ? (
+                        {module.status === "COMPLETED" ? (
                           <CheckCircle className="h-5 w-5" />
-                        ) : module.isUnlocked ? (
+                        ) : module.status !== "LOCKED" ? (
                           <PlayCircle className="h-5 w-5" />
                         ) : (
                           <Lock className="h-5 w-5" />
@@ -226,14 +262,14 @@ export default function CourseDetailPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-sm text-muted-foreground">Module {index + 1}</span>
-                          {module.isCompleted && <Badge variant="secondary">Completed</Badge>}
-                          {!module.isUnlocked && <Badge variant="outline">Locked</Badge>}
+                          {module.status === "COMPLETED" && <Badge variant="secondary">Completed</Badge>}
+                          {module.status === "LOCKED" && <Badge variant="outline">Locked</Badge>}
                         </div>
                         <div className="font-medium">{module.title}</div>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Clock className="h-4 w-4" />
-                        <span>{module.duration}</span>
+                        <span>{Math.round(module.durationSeconds / 60)} min</span>
                       </div>
                     </div>
                   </CardContent>

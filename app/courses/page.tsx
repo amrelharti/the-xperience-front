@@ -7,90 +7,54 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
-import { PlayCircle, Search, BookOpen, Clock, CheckCircle, LogOut } from "lucide-react"
+import { PlayCircle, Search, BookOpen, Clock, CheckCircle } from "lucide-react"
+import RequireAuth from "@/app/components/RequireAuth"
+import { useEffect } from "react"
+import { useUser } from "../hooks/useUser"
+import UserDropdown from "../components/UserDropdown"
 
-// Mock data - will be replaced with API calls to Spring Boot backend
-const mockCourses = [
-  {
-    id: 1,
-    title: "Web Development Fundamentals",
-    description: "Master HTML, CSS, and JavaScript from scratch with hands-on projects",
-    thumbnail: "/web-development-code.png",
-    totalModules: 12,
-    completedModules: 5,
-    duration: "8 hours",
-    level: "Beginner",
-  },
-  {
-    id: 2,
-    title: "Advanced React Patterns",
-    description: "Learn modern React patterns, hooks, and best practices for scalable applications",
-    thumbnail: "/react-javascript-code.png",
-    totalModules: 10,
-    completedModules: 0,
-    duration: "6 hours",
-    level: "Advanced",
-  },
-  {
-    id: 3,
-    title: "Full-Stack Development",
-    description: "Build complete applications with modern tech stack including Node.js and databases",
-    thumbnail: "/fullstack-development.png",
-    totalModules: 15,
-    completedModules: 15,
-    duration: "12 hours",
-    level: "Intermediate",
-  },
-  {
-    id: 4,
-    title: "UI/UX Design Principles",
-    description: "Create beautiful and intuitive user interfaces with modern design principles",
-    thumbnail: "/ui-ux-design-concept.png",
-    totalModules: 8,
-    completedModules: 3,
-    duration: "5 hours",
-    level: "Beginner",
-  },
-  {
-    id: 5,
-    title: "Database Design & SQL",
-    description: "Master database design, SQL queries, and optimization techniques",
-    thumbnail: "/database-sql.jpg",
-    totalModules: 10,
-    completedModules: 0,
-    duration: "7 hours",
-    level: "Intermediate",
-  },
-  {
-    id: 6,
-    title: "API Development with REST",
-    description: "Build robust RESTful APIs with authentication and best practices",
-    thumbnail: "/api-rest-development.jpg",
-    totalModules: 9,
-    completedModules: 2,
-    duration: "6 hours",
-    level: "Intermediate",
-  },
-]
+type CourseItem = {
+  id: string
+  title: string
+  description: string
+  thumbnailUrl?: string
+  isPublished?: boolean
+  progress?: { completedModules: number; totalModules: number; percent: number }
+}
 
 export default function CoursesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null)
+  const [courses, setCourses] = useState<CourseItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const { user, isLoading: userLoading } = useUser()
 
-  const filteredCourses = mockCourses.filter((course) => {
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses`, { credentials: "include" })
+        if (res.ok) {
+          const data = await res.json()
+          setCourses(data)
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const filteredCourses = courses.filter((course) => {
     const matchesSearch =
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.description.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesLevel = !selectedLevel || course.level === selectedLevel
+    const matchesLevel = !selectedLevel // level not from API yet
     return matchesSearch && matchesLevel
   })
 
-  const handleSignOut = () => {
-    // TODO: Implement sign out - clear JWT cookie via backend
-    console.log("[v0] Sign out - will call Spring Boot backend to clear session")
-  }
 
   return (
+    <RequireAuth>
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -102,10 +66,7 @@ export default function CoursesPage() {
             <span className="font-bold text-xl font-[family-name:var(--font-space-grotesk)]">The Xperience</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
+            {user && <UserDropdown user={user} />}
           </div>
         </div>
       </header>
@@ -163,16 +124,18 @@ export default function CoursesPage() {
         {/* Courses Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course) => {
-            const progress = (course.completedModules / course.totalModules) * 100
-            const isCompleted = course.completedModules === course.totalModules
-            const isStarted = course.completedModules > 0
+            const completed = course.progress?.completedModules || 0
+            const total = course.progress?.totalModules || 0
+            const progress = course.progress?.percent || 0
+            const isCompleted = total > 0 && completed === total
+            const isStarted = completed > 0
 
             return (
               <Link key={course.id} href={`/courses/${course.id}`}>
                 <Card className="h-full hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
                   <div className="relative">
                     <img
-                      src={course.thumbnail || "/placeholder.svg"}
+                      src={course.thumbnailUrl || "/placeholder.svg"}
                       alt={course.title}
                       className="w-full aspect-video object-cover rounded-t-lg"
                     />
@@ -193,21 +156,19 @@ export default function CoursesPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <BookOpen className="h-4 w-4" />
-                        <span>{course.totalModules} modules</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{course.duration}</span>
-                      </div>
+                      {total > 0 && (
+                        <div className="flex items-center gap-1">
+                          <BookOpen className="h-4 w-4" />
+                          <span>{total} modules</span>
+                        </div>
+                      )}
                     </div>
                     {isStarted && (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-muted-foreground">Progress</span>
                           <span className="font-medium">
-                            {course.completedModules}/{course.totalModules}
+                            {completed}/{total}
                           </span>
                         </div>
                         <Progress value={progress} className="h-2" />
@@ -220,6 +181,11 @@ export default function CoursesPage() {
           })}
         </div>
 
+        {loading && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">Loading courses...</p>
+          </div>
+        )}
         {filteredCourses.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">No courses found matching your criteria.</p>
@@ -227,5 +193,6 @@ export default function CoursesPage() {
         )}
       </div>
     </div>
+    </RequireAuth>
   )
 }
