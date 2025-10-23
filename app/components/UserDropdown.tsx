@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, memo } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { User, Settings, BookOpen, LogOut, ChevronDown } from "lucide-react"
+import { User, Settings, BookOpen, LogOut, ChevronDown, MessageSquare, Trophy } from "lucide-react"
+import { useUser } from "../hooks/useUser"
 
 interface UserDropdownProps {
-  user: {
+  user?: {
     id: string
     name: string
     email: string
@@ -16,10 +17,11 @@ interface UserDropdownProps {
   }
 }
 
-export default function UserDropdown({ user }: UserDropdownProps) {
+function UserDropdown({ user }: UserDropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const { refreshUser } = useUser()
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -33,25 +35,37 @@ export default function UserDropdown({ user }: UserDropdownProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  // Don't render if user is not available
+  if (!user) {
+    return null
+  }
+
   const handleSignOut = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/logout`, {
+      console.log("Starting logout process...")
+      
+      const res = await fetch(`/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       })
 
+      console.log("Logout response:", res.status)
+      
       if (res.ok || res.status === 204) {
-        // Redirect to landing page
-        window.location.href = "/"
+        console.log("Logout successful, clearing user state")
+        // Refresh user state to clear it
+        refreshUser()
+        // Force a hard refresh to clear all state
+        window.location.reload()
       } else {
         console.error("Sign out failed:", res.status, res.statusText)
-        // Still redirect even if backend fails
-        window.location.href = "/"
+        // Still redirect
+        window.location.reload()
       }
     } catch (error) {
       console.error("Sign out error:", error)
-      // Still redirect even if there's an error
-      window.location.href = "/"
+      // Still redirect
+      window.location.reload()
     }
   }
 
@@ -73,20 +87,20 @@ export default function UserDropdown({ user }: UserDropdownProps) {
         className="flex items-center gap-2 px-3 py-2 hover:bg-accent"
       >
         <div className="flex items-center gap-2">
-          {user.imageUrl ? (
+          {user?.imageUrl ? (
             <img
               src={user.imageUrl}
-              alt={user.name}
+              alt={user?.name || ''}
               className="h-6 w-6 rounded-full object-cover"
             />
           ) : (
             <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center">
               <span className="text-xs font-medium text-primary-foreground">
-                {getInitials(user.name)}
+                {getInitials(user?.name || '')}
               </span>
             </div>
           )}
-          <span className="hidden sm:inline text-sm font-medium">{user.name}</span>
+          <span className="hidden sm:inline text-sm font-medium">{user?.name || ''}</span>
         </div>
         <ChevronDown className="h-4 w-4" />
       </Button>
@@ -97,24 +111,24 @@ export default function UserDropdown({ user }: UserDropdownProps) {
             {/* User Info Header */}
             <div className="px-4 py-3 border-b border-border">
               <div className="flex items-center gap-3">
-                {user.imageUrl ? (
+                {user?.imageUrl ? (
                   <img
                     src={user.imageUrl}
-                    alt={user.name}
+                    alt={user?.name || ''}
                     className="h-10 w-10 rounded-full object-cover"
                   />
                 ) : (
                   <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
                     <span className="text-sm font-medium text-primary-foreground">
-                      {getInitials(user.name)}
+                      {getInitials(user?.name || '')}
                     </span>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                  <p className="text-sm font-medium text-foreground truncate">{user?.name || ''}</p>
+                  <p className="text-xs text-muted-foreground truncate">{user?.email || ''}</p>
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary mt-1">
-                    {user.role}
+                    {user?.role || ''}
                   </span>
                 </div>
               </div>
@@ -131,7 +145,25 @@ export default function UserDropdown({ user }: UserDropdownProps) {
                 Edit Profile
               </Link>
 
-              {user.role === "ADMIN" ? (
+              <Link
+                href={user?.role === "ADMIN" ? "/admin/feed" : "/feed"}
+                className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                <MessageSquare className="h-4 w-4" />
+                {user?.role === "ADMIN" ? "Admin Feed" : "Feed"}
+              </Link>
+
+              <Link
+                href={user?.role === "ADMIN" ? "/admin/leaderboard" : "/leaderboard"}
+                className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                <Trophy className="h-4 w-4" />
+                {user?.role === "ADMIN" ? "Admin Leaderboard" : "Leaderboard"}
+              </Link>
+
+              {user?.role === "ADMIN" ? (
                 <Link
                   href="/admin"
                   className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
@@ -168,3 +200,5 @@ export default function UserDropdown({ user }: UserDropdownProps) {
     </div>
   )
 }
+
+export default memo(UserDropdown);

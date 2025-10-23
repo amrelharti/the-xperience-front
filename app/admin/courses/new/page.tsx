@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PlayCircle, ChevronLeft, Save } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import ImageUpload from "@/components/ui/image-upload"
 
 export default function NewCoursePage() {
   const router = useRouter()
@@ -147,17 +148,13 @@ export default function NewCoursePage() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="thumbnail">Thumbnail URL</Label>
-                  <Input
-                    id="thumbnail"
-                    type="url"
-                    placeholder="https://example.com/image.jpg"
-                    value={formData.thumbnail}
-                    onChange={(e) => handleChange("thumbnail", e.target.value)}
-                  />
-                  <p className="text-sm text-muted-foreground">Optional: Provide a URL for the course thumbnail</p>
-                </div>
+                <ImageUpload
+                  value={formData.thumbnail}
+                  onChange={(url) => handleChange("thumbnail", url)}
+                  label="Course Thumbnail"
+                  placeholder="Enter image URL or upload a file"
+                  description="Upload a thumbnail image for your course (recommended: 1200×675px)"
+                />
               </CardContent>
             </Card>
 

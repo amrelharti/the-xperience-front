@@ -11,6 +11,7 @@ import { PlayCircle, Mail, Lock } from "lucide-react"
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [signInMethod, setSignInMethod] = useState<"google" | "email">("google")
+  const [error, setError] = useState("")
   const [emailForm, setEmailForm] = useState({
     email: "",
     password: ""
@@ -18,116 +19,189 @@ export default function SignInPage() {
   const gsiDivRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-    if (!clientId || clientId.includes("YOUR_GOOGLE_CLIENT_ID")) {
-      console.error("Google Client ID not configured. Please set NEXT_PUBLIC_GOOGLE_CLIENT_ID in .env.local")
-      // Show a message to the user
-      alert("Google Client ID not configured. Please check the console for instructions.")
+    // Hardcoded Google Client ID for testing
+    const clientId = "128297296458-8nj8i8ej0mcrq5drskb2iargscjl3s59.apps.googleusercontent.com"
+    console.log("Google Client ID:", clientId)
+    
+    if (!clientId || clientId.includes("YOUR_ACTUAL_GOOGLE_CLIENT_ID")) {
+      console.warn("Please replace YOUR_ACTUAL_GOOGLE_CLIENT_ID with your real Google Client ID")
       return
     }
 
-    // Load Google Identity Services script and render the One Tap/Button
-    const existing = document.getElementById("google-identity-services") as HTMLScriptElement | null
-    if (!existing) {
-      const s = document.createElement("script")
-      s.src = "https://accounts.google.com/gsi/client"
-      s.async = true
-      s.defer = true
-      s.id = "google-identity-services"
-      s.onload = initGSI
-      document.body.appendChild(s)
-    } else {
-      initGSI()
-    }
+    // Load Google Identity Services script
+    const loadGoogleScript = () => {
+      return new Promise<void>((resolve, reject) => {
+        const existing = document.getElementById("google-identity-services") as HTMLScriptElement | null
+        if (existing) {
+          resolve()
+          return
+        }
 
-    function initGSI() {
-      // @ts-ignore
-      if (!window.google) return
-      // @ts-ignore
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: async (response: any) => {
-          const idToken = response?.credential
-          if (!idToken) return
-          setIsLoading(true)
-          try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/google`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({ idToken }),
-            })
-            setIsLoading(false)
-            if (res.ok) {
-              const user = await res.json()
-              // Redirect admins to admin page, others to courses
-              if (user.role === "ADMIN") {
-                window.location.href = "/admin"
-              } else {
-                window.location.href = "/courses"
-              }
-            } else {
-              console.error("Google sign-in failed")
-              alert("Sign-in failed. Please try again.")
-            }
-          } catch (e) {
-            setIsLoading(false)
-            alert("Network error. Please try again.")
-          }
-        },
+        const script = document.createElement("script")
+        script.src = "https://accounts.google.com/gsi/client"
+        script.async = true
+        script.defer = true
+        script.id = "google-identity-services"
+        
+        script.onload = () => {
+          console.log("Google script loaded successfully")
+          resolve()
+        }
+        
+        script.onerror = () => {
+          console.error("Failed to load Google script")
+          reject(new Error("Failed to load Google script"))
+        }
+        
+        document.body.appendChild(script)
       })
-      renderGoogleButton()
     }
 
-    function renderGoogleButton() {
+    const initGoogleSignIn = async () => {
+      try {
+        await loadGoogleScript()
+        
+        // Wait a bit for the script to initialize
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        // @ts-ignore
+        if (!window.google?.accounts?.id) {
+          console.error("Google Identity Services not available")
+          return
+        }
+
+        console.log("Initializing Google Sign-In with client ID:", clientId)
+        
+        // @ts-ignore
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response: any) => {
+            console.log("Google sign-in callback triggered")
+            const idToken = response?.credential
+            if (!idToken) {
+              console.error("No ID token received")
+              return
+            }
+            
+            setIsLoading(true)
+            setError("") // Clear any previous errors
+            try {
+              const res = await fetch(`http://localhost:8080/api/auth/google`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ idToken }),
+              })
+              
+              if (res.ok) {
+                const user = await res.json()
+                console.log("Google sign-in successful:", user)
+                // Redirect admins to admin page, others to home (modules page)
+                if (user.role === "ADMIN") {
+                  window.location.href = "/admin"
+                } else {
+                  window.location.href = "/"
+                }
+              } else {
+                const errorData = await res.json()
+                console.error("Google sign-in failed:", errorData)
+                
+                // Handle specific error types
+                if (errorData.error === "user_not_found") {
+                  setError("Your account is not registered. Please contact an administrator to create an account for you.")
+                } else if (errorData.error === "invalid_audience") {
+                  setError("Authentication failed. Please try again.")
+                } else if (errorData.error === "invalid_id_token") {
+                  setError("Invalid authentication token. Please try again.")
+                } else {
+                  setError("Sign-in failed. Please try again.")
+                }
+              }
+            } catch (e) {
+              console.error("Google sign-in error:", e)
+              setError("Network error. Please check your connection and try again.")
+            } finally {
+              setIsLoading(false)
+            }
+          },
+        })
+        
+        renderGoogleButton()
+      } catch (error) {
+        console.error("Error initializing Google Sign-In:", error)
+      }
+    }
+
+    const renderGoogleButton = () => {
+      console.log("Rendering Google button, signInMethod:", signInMethod)
       if (gsiDivRef.current && signInMethod === "google") {
         // Clear any existing content
         gsiDivRef.current.innerHTML = ""
+        
         // @ts-ignore
         if (window.google?.accounts?.id) {
-          // @ts-ignore
-          window.google.accounts.id.renderButton(gsiDivRef.current, { theme: "filled_blue", size: "large", type: "standard", shape: "pill" })
+          console.log("Rendering Google button")
+          try {
+            // @ts-ignore
+            window.google.accounts.id.renderButton(gsiDivRef.current, { 
+              theme: "filled_blue", 
+              size: "large", 
+              type: "standard", 
+              shape: "pill" 
+            })
+          } catch (error) {
+            console.error("Error rendering Google button:", error)
+          }
+        } else {
+          console.log("Google accounts.id not available for button rendering")
         }
       }
     }
 
-    // Re-render Google button when sign-in method changes
-    renderGoogleButton()
+    // Initialize Google Sign-In
+    initGoogleSignIn()
+
+    // Re-render button when sign-in method changes
+    if (signInMethod === "google") {
+      // Small delay to ensure the method change has been processed
+      setTimeout(renderGoogleButton, 100)
+    }
   }, [signInMethod])
 
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("") // Clear any previous errors
     
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/email`, {
+      const res = await fetch(`http://localhost:8080/api/auth/email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(emailForm),
       })
       
-            if (res.ok) {
-              const user = await res.json()
-              console.log("Email sign-in successful, user data:", user)
-              console.log("User role:", user.role)
-              // Redirect admins to admin page, others to courses
-              if (user.role === "ADMIN") {
-                console.log("Redirecting admin to /admin")
-                window.location.href = "/admin"
-              } else {
-                console.log("Redirecting user to /courses")
-                window.location.href = "/courses"
-              }
-            } else {
-              const error = await res.text()
-              console.error("Email sign-in failed:", error)
-              alert("Sign-in failed. Please check your credentials.")
-            }
+      if (res.ok) {
+        const user = await res.json()
+        console.log("Email sign-in successful, user data:", user)
+        console.log("User role:", user.role)
+        // Redirect admins to admin page, others to home (modules page)
+        if (user.role === "ADMIN") {
+          console.log("Redirecting admin to /admin")
+          window.location.href = "/admin"
+        } else {
+          console.log("Redirecting user to /")
+          window.location.href = "/"
+        }
+      } else {
+        const errorData = await res.json()
+        console.error("Email sign-in failed:", errorData)
+        setError("Invalid credentials. Please check your email and password.")
+      }
     } catch (error) {
       console.error("Email sign-in error:", error)
-      alert("Network error. Please try again.")
+      setError("Network error. Please check your connection and try again.")
     } finally {
       setIsLoading(false)
     }
@@ -178,6 +252,23 @@ export default function SignInPage() {
                 Email
               </button>
             </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-4 w-4 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="font-medium">Sign-in Failed</p>
+                    <p className="mt-1">{error}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Google Sign-in */}
             {signInMethod === "google" && (

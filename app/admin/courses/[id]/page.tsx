@@ -13,17 +13,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PlayCircle, ChevronLeft, Save } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import ImageUpload from "@/components/ui/image-upload"
 
-// Mock data
-const mockCourse = {
-  id: 1,
-  title: "Web Development Fundamentals",
-  description: "Master HTML, CSS, and JavaScript from scratch with hands-on projects",
-  level: "Beginner",
-  duration: "8 hours",
-  instructor: "John Smith",
-  thumbnail: "/web-development-code.png",
-}
+// Course data will be loaded from the backend
 
 export default function EditCoursePage() {
   const params = useParams()
@@ -33,12 +25,12 @@ export default function EditCoursePage() {
   const [isLoading, setIsLoading] = useState(false)
 
   const [formData, setFormData] = useState({
-    title: mockCourse.title,
-    description: mockCourse.description,
-    level: mockCourse.level,
-    duration: mockCourse.duration,
-    instructor: mockCourse.instructor,
-    thumbnail: mockCourse.thumbnail,
+    title: "",
+    description: "",
+    level: "",
+    duration: "",
+    instructor: "",
+    thumbnail: "",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -160,17 +152,13 @@ export default function EditCoursePage() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="thumbnail">Thumbnail URL</Label>
-                  <Input
-                    id="thumbnail"
-                    type="url"
-                    placeholder="https://example.com/image.jpg"
-                    value={formData.thumbnail}
-                    onChange={(e) => handleChange("thumbnail", e.target.value)}
-                  />
-                  <p className="text-sm text-muted-foreground">Optional: Provide a URL for the course thumbnail</p>
-                </div>
+                <ImageUpload
+                  value={formData.thumbnail}
+                  onChange={(url) => handleChange("thumbnail", url)}
+                  label="Course Thumbnail"
+                  placeholder="Enter image URL or upload a file"
+                  description="Upload a thumbnail image for your course (recommended: 1200×675px)"
+                />
               </CardContent>
             </Card>
 

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { PlayCircle, User, Mail, Calendar, Edit, Save, X, Camera, Lock, Eye, EyeOff } from "lucide-react"
+import { PlayCircle, User, Mail, Calendar, Edit, Save, X } from "lucide-react"
 import { useUser } from "../hooks/useUser"
 import UserDropdown from "../components/UserDropdown"
 import RequireAuth from "../components/RequireAuth"
@@ -16,20 +16,11 @@ import { useToast } from "@/hooks/use-toast"
 export default function ProfilePage() {
   const { user, isLoading } = useUser()
   const [isEditing, setIsEditing] = useState(false)
-  const [isChangingPassword, setIsChangingPassword] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
   const [editForm, setEditForm] = useState({
     name: "",
     email: "",
     imageUrl: ""
   })
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: ""
-  })
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -48,7 +39,6 @@ export default function ProfilePage() {
 
   const handleCancel = () => {
     setIsEditing(false)
-    setIsChangingPassword(false)
     if (user) {
       setEditForm({
         name: user.name,
@@ -56,22 +46,32 @@ export default function ProfilePage() {
         imageUrl: user.imageUrl || ""
       })
     }
-    setPasswordForm({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: ""
-    })
-    setImageFile(null)
-    setImagePreview(null)
   }
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/profile`, {
+      // Extract JWT token from cookies
+      let jwtToken = null;
+      const cookies = document.cookie.split(';');
+      for (const cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'SESSION' && value) {
+          jwtToken = value;
+          break;
+        }
+      }
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      
+      if (jwtToken) {
+        headers['Authorization'] = `Bearer ${jwtToken}`;
+      }
+
+      const res = await fetch('http://localhost:8080/api/profile', {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         credentials: "include",
         body: JSON.stringify(editForm)
       })
@@ -101,78 +101,7 @@ export default function ProfilePage() {
     }
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setImageFile(file)
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
 
-  const handlePasswordChange = async () => {
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "New passwords don't match",
-        variant: "destructive",
-      })
-      return
-    }
-
-    if (passwordForm.newPassword.length < 6) {
-      toast({
-        title: "Error",
-        description: "Password must be at least 6 characters long",
-        variant: "destructive",
-      })
-      return
-    }
-
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/profile/password`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          currentPassword: passwordForm.currentPassword,
-          newPassword: passwordForm.newPassword
-        })
-      })
-
-      if (res.ok) {
-        toast({
-          title: "Success",
-          description: "Password updated successfully",
-        })
-        setIsChangingPassword(false)
-        setPasswordForm({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: ""
-        })
-      } else {
-        const error = await res.json()
-        toast({
-          title: "Error",
-          description: error.error || "Failed to update password",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      console.error("Error updating password:", error)
-      toast({
-        title: "Error",
-        description: "Failed to update password",
-        variant: "destructive",
-      })
-    }
-  }
 
   const getInitials = (name: string) => {
     return name
@@ -262,36 +191,17 @@ export default function ProfilePage() {
                 <CardContent className="space-y-6">
                   {/* Profile Picture */}
                   <div className="flex items-center gap-4">
-                    <div className="relative">
-                      <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center">
-                        {imagePreview ? (
-                          <img
-                            src={imagePreview}
-                            alt={user.name}
-                            className="h-20 w-20 rounded-full object-cover"
-                          />
-                        ) : user.imageUrl ? (
-                          <img
-                            src={user.imageUrl}
-                            alt={user.name}
-                            className="h-20 w-20 rounded-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-2xl font-medium text-primary-foreground">
-                            {getInitials(user.name)}
-                          </span>
-                        )}
-                      </div>
-                      {isEditing && (
-                        <label className="absolute -bottom-1 -right-1 h-6 w-6 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
-                          <Camera className="h-3 w-3 text-primary-foreground" />
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="hidden"
-                          />
-                        </label>
+                    <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center">
+                      {user.imageUrl ? (
+                        <img
+                          src={user.imageUrl}
+                          alt={user.name}
+                          className="h-20 w-20 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-2xl font-medium text-primary-foreground">
+                          {getInitials(user.name)}
+                        </span>
                       )}
                     </div>
                     <div>
@@ -339,82 +249,6 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  {/* Password Change Section */}
-                  <div className="border-t pt-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h4 className="font-semibold flex items-center gap-2">
-                          <Lock className="h-4 w-4" />
-                          Password
-                        </h4>
-                        <p className="text-sm text-muted-foreground">Change your account password</p>
-                      </div>
-                      {!isChangingPassword && (
-                        <Button variant="outline" size="sm" onClick={() => setIsChangingPassword(true)}>
-                          Change Password
-                        </Button>
-                      )}
-                    </div>
-
-                    {isChangingPassword && (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="currentPassword">Current Password</Label>
-                          <div className="relative">
-                            <Input
-                              id="currentPassword"
-                              type={showPassword ? "text" : "password"}
-                              value={passwordForm.currentPassword}
-                              onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                              placeholder="Enter current password"
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="newPassword">New Password</Label>
-                          <Input
-                            id="newPassword"
-                            type="password"
-                            value={passwordForm.newPassword}
-                            onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                            placeholder="Enter new password"
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                          <Input
-                            id="confirmPassword"
-                            type="password"
-                            value={passwordForm.confirmPassword}
-                            onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                            placeholder="Confirm new password"
-                          />
-                        </div>
-
-                        <div className="flex gap-2">
-                          <Button onClick={handlePasswordChange}>
-                            <Save className="h-4 w-4 mr-2" />
-                            Update Password
-                          </Button>
-                          <Button variant="outline" onClick={() => setIsChangingPassword(false)}>
-                            <X className="h-4 w-4 mr-2" />
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
 
                   {/* Action Buttons */}
                   {isEditing && (
@@ -471,7 +305,7 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <Button variant="outline" className="w-full justify-start" asChild>
-                    <Link href="/courses">
+                    <Link href="/classes">
                       <PlayCircle className="h-4 w-4 mr-2" />
                       My Courses
                     </Link>

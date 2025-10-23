@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,6 +12,7 @@ import RequireAuth from "@/app/components/RequireAuth"
 import { useEffect } from "react"
 import { useUser } from "../hooks/useUser"
 import UserDropdown from "../components/UserDropdown"
+import NextImage from "next/image"
 
 type CourseItem = {
   id: string
@@ -19,6 +20,7 @@ type CourseItem = {
   description: string
   thumbnailUrl?: string
   isPublished?: boolean
+  level?: string
   progress?: { completedModules: number; totalModules: number; percent: number }
 }
 
@@ -44,13 +46,13 @@ export default function CoursesPage() {
     load()
   }, [])
 
-  const filteredCourses = courses.filter((course) => {
+  const filteredCourses = useMemo(() => courses.filter((course) => {
     const matchesSearch =
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.description.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesLevel = !selectedLevel // level not from API yet
     return matchesSearch && matchesLevel
-  })
+  }), [courses, searchQuery, selectedLevel])
 
 
   return (
@@ -134,11 +136,24 @@ export default function CoursesPage() {
               <Link key={course.id} href={`/courses/${course.id}`}>
                 <Card className="h-full hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
                   <div className="relative">
-                    <img
-                      src={course.thumbnailUrl || "/placeholder.svg"}
-                      alt={course.title}
-                      className="w-full aspect-video object-cover rounded-t-lg"
-                    />
+                    <div className="relative w-full h-48 overflow-hidden rounded-t-lg bg-muted">
+                      {course.thumbnailUrl ? (
+                        <NextImage
+                          src={course.thumbnailUrl}
+                          alt={course.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+                          <div className="text-center">
+                            <BookOpen className="h-12 w-12 mx-auto text-primary/50 mb-2" />
+                            <p className="text-sm text-muted-foreground">No thumbnail</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     <Badge className="absolute top-2 right-2" variant="secondary">
                       {course.level}
                     </Badge>

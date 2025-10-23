@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { PlayCircle, Plus, Search, BookOpen, ArrowLeft, Edit, MoreVertical, LogOut, ExternalLink, Key, Copy, Trash2 } from "lucide-react"
+import { PlayCircle, Plus, Search, BookOpen, ArrowLeft, Edit, MoreVertical, LogOut, ExternalLink, Key, Copy, Trash2, MessageSquare, Video } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -47,7 +47,7 @@ export default function CourseModulesPage() {
   const params = useParams()
   const router = useRouter()
   const courseId = params.id as string
-  
+
   const [course, setCourse] = useState<Course | null>(null)
   const [modules, setModules] = useState<Module[]>([])
   const [searchQuery, setSearchQuery] = useState("")
@@ -128,7 +128,7 @@ export default function CourseModulesPage() {
       }
     } catch (error) {
       console.error("Error loading modules:", error)
-      toast({
+    toast({
         title: "Error",
         description: "Failed to load modules",
         variant: "destructive",
@@ -162,11 +162,20 @@ export default function CourseModulesPage() {
     }
   }, [])
 
-  const filteredModules = modules.filter(
+  const filteredModules = useMemo(() => modules.filter(
     (module) =>
       module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       module.description.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+  ), [modules, searchQuery])
+
+  const formatDuration = useCallback((seconds: number) => {
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`
+    }
+    return `${minutes}m`
+  }, [])
 
   const handleCreateModule = async () => {
     try {
@@ -233,9 +242,9 @@ export default function CourseModulesPage() {
       })
       
       if (res.ok) {
-        toast({
-          title: "Module Updated",
-          description: "The module has been successfully updated",
+    toast({
+      title: "Module Updated",
+      description: "The module has been successfully updated",
         })
         setEditModuleOpen(false)
         setSelectedModule(null)
@@ -365,10 +374,10 @@ export default function CourseModulesPage() {
         })
         
         if (res.ok) {
-          toast({
-            title: "Module Deleted",
-            description: "The module has been successfully deleted",
-          })
+    toast({
+      title: "Module Deleted",
+      description: "The module has been successfully deleted",
+    })
           loadModules()
         } else {
           toast({
@@ -410,15 +419,6 @@ export default function CourseModulesPage() {
     }
   }
 
-  const formatDuration = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`
-    }
-    return `${minutes}m`
-  }
-
   if (isLoading) {
     return (
       <RequireAdmin>
@@ -451,7 +451,7 @@ export default function CourseModulesPage() {
   return (
     <RequireAdmin>
       <div className="min-h-screen bg-background">
-        {/* Header */}
+      {/* Header */}
         <header className="border-b bg-gradient-to-r from-blue-50 to-purple-50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container mx-auto px-4 h-20 flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -480,10 +480,10 @@ export default function CourseModulesPage() {
                 Sign Out
               </Button>
             </div>
-          </div>
-        </header>
+        </div>
+      </header>
 
-        <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
           {/* Course Info Card */}
           <Card className="mb-8 border-l-4 border-l-blue-500">
             <CardContent className="p-6">
@@ -511,7 +511,7 @@ export default function CourseModulesPage() {
                     />
                   </div>
                 )}
-              </div>
+          </div>
             </CardContent>
           </Card>
 
@@ -525,12 +525,12 @@ export default function CourseModulesPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
-            </div>
+                </div>
             <Button onClick={() => setCreateModuleOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Module
-            </Button>
-          </div>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Module
+                </Button>
+              </div>
 
           {/* Modules Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -539,27 +539,38 @@ export default function CourseModulesPage() {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
-                      <div className="flex-1">
+                    <div className="flex-1">
                         <h3 className="font-semibold text-lg line-clamp-2">{module.title}</h3>
                         <p className="text-sm text-muted-foreground line-clamp-3 mt-1 leading-relaxed">
                           {module.description}
                         </p>
                       </div>
-                      <div className="relative ml-4">
-                        <Button 
-                          variant="ghost" 
+                      <div className="flex items-center gap-2 ml-4">
+                        <Button
                           size="sm"
-                          className="h-8 w-8 p-0 rounded-full hover:bg-gray-100"
                           onClick={() => {
-                            console.log("Dropdown trigger clicked for module:", module.id)
-                            const menu = document.getElementById(`module-menu-${module.id}`)
-                            if (menu) {
-                              menu.classList.toggle('hidden')
-                            }
+                            console.log("Manage Module clicked for module:", module.id)
+                            router.push(`/admin/courses/${courseId}/modules/${module.id}`)
                           }}
                         >
-                          <MoreVertical className="h-4 w-4" />
+                          <PlayCircle className="h-4 w-4 mr-2" />
+                          Manage Module
                         </Button>
+                        <div className="relative">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                              className="h-8 w-8 p-0 rounded-full hover:bg-gray-100"
+                            onClick={() => {
+                                console.log("Dropdown trigger clicked for module:", module.id)
+                                const menu = document.getElementById(`module-menu-${module.id}`)
+                                if (menu) {
+                                  menu.classList.toggle('hidden')
+                                }
+                              }}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                          </Button>
                         <div 
                           id={`module-menu-${module.id}`}
                           className="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50"
@@ -572,7 +583,7 @@ export default function CourseModulesPage() {
                                 document.getElementById(`module-menu-${module.id}`)?.classList.add('hidden')
                               }}
                             >
-                              <Edit className="h-4 w-4 mr-3 text-blue-600" />
+                              <Edit className="h-4 w-4 mr-3 text-orange-600" />
                               <span className="font-medium">Edit Module</span>
                             </div>
                             <div 
@@ -586,9 +597,20 @@ export default function CourseModulesPage() {
                               <Key className="h-4 w-4 mr-3 text-green-600" />
                               <span className="font-medium">Access Codes</span>
                             </div>
+                            <div 
+                              className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center border-b border-gray-100"
+                              onClick={() => {
+                                console.log("Create Homework clicked for module:", module.id)
+                                router.push(`/homework/new?moduleId=${module.id}`)
+                                document.getElementById(`module-menu-${module.id}`)?.classList.add('hidden')
+                              }}
+                            >
+                              <MessageSquare className="h-4 w-4 mr-3 text-purple-600" />
+                              <span className="font-medium">Create Homework</span>
+                            </div>
                           <div 
                             className="px-4 py-3 hover:bg-red-50 cursor-pointer flex items-center text-red-600"
-                            onClick={() => {
+                        onClick={() => {
                               console.log("Delete Module clicked for module:", module.id)
                               handleDeleteModule(module.id)
                               document.getElementById(`module-menu-${module.id}`)?.classList.add('hidden')
@@ -600,8 +622,8 @@ export default function CourseModulesPage() {
                             <span className="font-medium">Delete Module</span>
                           </div>
                         </div>
-                      </div>
                     </div>
+                  </div>
 
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <div className="flex items-center space-x-4">
@@ -620,9 +642,41 @@ export default function CourseModulesPage() {
                         </a>
                       )}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-200">
+                      <div className="text-sm text-muted-foreground">
+                        Module {module.orderIndex + 1}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                          onClick={() => {
+                            console.log("Live Session Management clicked for module:", module.id)
+                            router.push(`/admin/trainings/${courseId}/modules/${module.id}`)
+                          }}
+                        >
+                          <Video className="h-4 w-4 mr-2" />
+                          Live Session Management
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => {
+                            console.log("Manage Courses clicked for module:", module.id)
+                            router.push(`/admin/courses/${courseId}/modules/${module.id}/courses`)
+                          }}
+                        >
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          Manage Courses
+                        </Button>
+                      </div>
+                    </div>
+              </div>
+            </CardContent>
+          </Card>
             ))}
           </div>
 
@@ -637,29 +691,29 @@ export default function CourseModulesPage() {
                 <Plus className="h-4 w-4 mr-2" />
                 Add Module
               </Button>
-            </div>
-          )}
         </div>
+          )}
+      </div>
 
         {/* Create Module Dialog */}
         <Dialog open={createModuleOpen} onOpenChange={setCreateModuleOpen}>
           <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
+          <DialogHeader>
               <DialogTitle>Add Module & Video</DialogTitle>
               <DialogDescription>
                 Add a new module with video content to "{course.title}".
               </DialogDescription>
-            </DialogHeader>
+          </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="moduleTitle">Module Title</Label>
-                <Input
+              <Input
                   id="moduleTitle"
-                  value={newModule.title}
-                  onChange={(e) => setNewModule({ ...newModule, title: e.target.value })}
+                value={newModule.title}
+                onChange={(e) => setNewModule({ ...newModule, title: e.target.value })}
                   placeholder="e.g., Introduction to HTML, CSS Basics, JavaScript Fundamentals"
-                />
-              </div>
+              />
+            </div>
               <div className="grid gap-2">
                 <Label htmlFor="moduleDescription">Module Description</Label>
                 <Textarea
@@ -668,14 +722,14 @@ export default function CourseModulesPage() {
                   onChange={(e) => setNewModule({ ...newModule, description: e.target.value })}
                   placeholder="Describe what students will learn in this module..."
                   rows={3}
-                />
-              </div>
+              />
+            </div>
               <div className="grid gap-2">
                 <Label htmlFor="videoUrl">Video URL *</Label>
-                <Input
+              <Input
                   id="videoUrl"
-                  value={newModule.videoUrl}
-                  onChange={(e) => setNewModule({ ...newModule, videoUrl: e.target.value })}
+                value={newModule.videoUrl}
+                onChange={(e) => setNewModule({ ...newModule, videoUrl: e.target.value })}
                   placeholder="https://youtube.com/watch?v=... or https://vimeo.com/... or direct video file URL"
                 />
                 <p className="text-xs text-muted-foreground">
@@ -705,41 +759,41 @@ export default function CourseModulesPage() {
                   />
                   <p className="text-xs text-muted-foreground">Order in which this module appears (1, 2, 3...)</p>
                 </div>
-              </div>
             </div>
-            <DialogFooter>
+          </div>
+          <DialogFooter>
               <Button variant="outline" onClick={() => setCreateModuleOpen(false)}>
-                Cancel
-              </Button>
+              Cancel
+            </Button>
               <Button 
                 onClick={handleCreateModule} 
                 disabled={!newModule.title || !newModule.description || !newModule.videoUrl}
               >
                 Add Module & Video
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-        {/* Edit Module Dialog */}
+      {/* Edit Module Dialog */}
         <Dialog open={editModuleOpen} onOpenChange={setEditModuleOpen}>
           <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Edit Module</DialogTitle>
+          <DialogHeader>
+            <DialogTitle>Edit Module</DialogTitle>
               <DialogDescription>
                 Update the module information and video content.
               </DialogDescription>
-            </DialogHeader>
+          </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="editModuleTitle">Module Title</Label>
-                <Input
+              <Input
                   id="editModuleTitle"
                   value={editModule.title}
                   onChange={(e) => setEditModule({ ...editModule, title: e.target.value })}
                   placeholder="e.g., Introduction to HTML, CSS Basics, JavaScript Fundamentals"
-                />
-              </div>
+              />
+            </div>
               <div className="grid gap-2">
                 <Label htmlFor="editModuleDescription">Module Description</Label>
                 <Textarea
@@ -748,8 +802,8 @@ export default function CourseModulesPage() {
                   onChange={(e) => setEditModule({ ...editModule, description: e.target.value })}
                   placeholder="Describe what students will learn in this module..."
                   rows={3}
-                />
-              </div>
+              />
+            </div>
               <div className="grid gap-2">
                 <Label htmlFor="editVideoUrl">Video URL *</Label>
                 <Input
@@ -786,31 +840,31 @@ export default function CourseModulesPage() {
                   <p className="text-xs text-muted-foreground">Order in which this module appears (1, 2, 3...)</p>
                 </div>
               </div>
-            </div>
-            <DialogFooter>
+          </div>
+          <DialogFooter>
               <Button variant="outline" onClick={() => setEditModuleOpen(false)}>
-                Cancel
-              </Button>
+              Cancel
+            </Button>
               <Button 
                 onClick={handleUpdateModule} 
                 disabled={!editModule.title || !editModule.description || !editModule.videoUrl}
               >
                 Update Module
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
         {/* Access Codes Dialog */}
         <Dialog open={accessCodesOpen} onOpenChange={setAccessCodesOpen}>
           <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
+          <DialogHeader>
               <DialogTitle>Access Codes for "{selectedModule?.title}"</DialogTitle>
               <DialogDescription>
                 Generate and manage access codes for this module. Students will use these codes to unlock the module.
               </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-6">
+          </DialogHeader>
+          <div className="space-y-6">
               {/* Generate New Codes */}
               <div className="space-y-4">
                 <div className="flex items-center space-x-4">
@@ -829,9 +883,9 @@ export default function CourseModulesPage() {
                   <Button onClick={handleGenerateCodes} className="mt-6">
                     <Key className="h-4 w-4 mr-2" />
                     Generate Codes
-                  </Button>
+                    </Button>
+                  </div>
                 </div>
-              </div>
 
               {/* Generated Codes */}
               {generatedCodes.length > 0 && (
@@ -879,10 +933,10 @@ export default function CourseModulesPage() {
                               Created: {new Date(code.createdAt).toLocaleString()}
                               {code.consumedAt && (
                                 <span> • Used: {new Date(code.consumedAt).toLocaleString()}</span>
-                              )}
-                            </div>
-                          </div>
+                          )}
                         </div>
+                        </div>
+                      </div>
                         {!code.used && (
                           <Button
                             variant="ghost"
@@ -893,19 +947,19 @@ export default function CourseModulesPage() {
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  ))}
               </div>
+                )}
             </div>
-            <DialogFooter>
+          </div>
+          <DialogFooter>
               <Button variant="outline" onClick={() => setAccessCodesOpen(false)}>
-                Close
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
         {/* Delete Confirmation Dialog */}
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -926,7 +980,7 @@ export default function CourseModulesPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+    </div>
     </RequireAdmin>
   )
 }

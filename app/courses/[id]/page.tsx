@@ -1,283 +1,642 @@
 "use client"
-import Link from "next/link"
+
+import { useState, useEffect, useCallback } from "react"
 import { useParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { PlayCircle, CheckCircle, Lock, ChevronLeft, BookOpen, Clock, Award } from "lucide-react"
+import { Input } from "@/components/ui/input"
 import { useUser } from "../../hooks/useUser"
-import UserDropdown from "../../components/UserDropdown"
+import { 
+  PlayCircle, 
+  Clock, 
+  Users, 
+  Calendar, 
+  CheckCircle, 
+  Lock, 
+  ArrowLeft,
+  BookOpen,
+  Star,
+  Award
+} from "lucide-react"
+import NextImage from "next/image"
+import LiveSessionCard from "@/components/LiveSessionCard"
 
-type ModuleDto = { id: string; title: string; durationSeconds: number; orderIndex: number; status: string }
-type CourseDetail = { id: string; title: string; description: string; thumbnailUrl?: string; modules: ModuleDto[] }
+interface Training {
+  id: string
+  title: string
+  description: string
+  thumbnailUrl?: string
+  modules?: TrainingModule[]
+}
 
-export default function CourseDetailPage() {
-  const params = useParams()
-  const courseId = params.id as string
-  const [course, setCourse] = useState<CourseDetail | null>(null)
-  const [completed, setCompleted] = useState(0)
+interface TrainingModule {
+  id: string
+  title: string
+  description: string
+  orderIndex: number
+  isActive: boolean
+  hasAccess: boolean
+  status: "LOCKED" | "UNLOCKED"
+  coursesCount: number
+  progress?: number // Add progress percentage
+}
+
+interface ModuleDetailPageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
+  const { user, isLoading: userLoading } = useUser()
+  const [training, setTraining] = useState<Training | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [isEnrolled, setIsEnrolled] = useState(false)
-  const [isEnrolling, setIsEnrolling] = useState(false)
-  const { user } = useUser()
+  const [showClassSelection, setShowClassSelection] = useState(false)
+  const [availableClasses, setAvailableClasses] = useState<any[]>([])
+  const [selectedClassId, setSelectedClassId] = useState<string>("")
+  const [loadingClasses, setLoadingClasses] = useState(false)
+  const [enrollmentCode, setEnrollmentCode] = useState("")
+  const [unlockingModule, setUnlockingModule] = useState<string | null>(null)
+  const [moduleAccessCode, setModuleAccessCode] = useState("")
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false)
 
+  // Check authentication when component mounts
   useEffect(() => {
-    const load = async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}`, { credentials: "include" })
-      if (res.ok) {
-        const data = await res.json()
-        setCourse(data)
-        const c = data.modules.filter((m: ModuleDto) => m.status === "COMPLETED").length
-        setCompleted(c)
-        // Check if user is enrolled (if they can access the course details, they're enrolled)
-        setIsEnrolled(true)
-      } else if (res.status === 403) {
-        // User is not enrolled
-        setIsEnrolled(false)
-        // Load course details from public API
-        const publicRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/courses/${courseId}`)
-        if (publicRes.ok) {
-          const data = await publicRes.json()
-          setCourse(data)
+    if (!userLoading && !user) {
+      window.location.href = "/auth/signin"
+    }
+  }, [user, userLoading])
+
+  const loadModuleProgress = useCallback(async (trainingData: Training) => {
+    if (!user || !trainingData?.modules) return
+
+    try {
+      // Load progress for each module
+      const progressPromises = trainingData.modules.map(async (module) => {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${module.id}/training-progress`, {
+            credentials: "include"
+          })
+          if (response.ok) {
+            const progressData = await response.json()
+            return { moduleId: module.id, progress: progressData.progress || 0 }
+          }
+        } catch (error) {
+          console.log(`Failed to load progress for module ${module.id}:`, error)
+        }
+        return { moduleId: module.id, progress: 0 }
+      })
+
+      const progressResults = await Promise.all(progressPromises)
+      
+      // Update training with progress data
+      setTraining(prevTraining => {
+        if (!prevTraining?.modules) return prevTraining
+        
+        const updatedModules = prevTraining.modules.map(module => {
+          const progressData = progressResults.find(p => p.moduleId === module.id)
+          return {
+            ...module,
+            progress: progressData?.progress || 0
+          }
+        })
+        
+        return {
+          ...prevTraining,
+          modules: updatedModules
+        }
+      })
+    } catch (error) {
+      console.log("Error loading module progress:", error)
+    }
+  }, [user])
+
+  const load = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Load training details with modules
+      const trainingResponse = await fetch(`/api/courses/${params.id}`)
+      if (!trainingResponse.ok) {
+        throw new Error("Failed to load training")
+      }
+      const trainingData = await trainingResponse.json()
+      console.log("Training data from API:", trainingData)
+      setTraining(trainingData)
+
+      // Check if user is enrolled (only if authenticated)
+      let enrolled = false
+      if (user && user.id) {
+        try {
+          const enrollmentsResponse = await fetch("/api/classes/my-classes")
+          if (enrollmentsResponse.ok) {
+            const enrollments = await enrollmentsResponse.json()
+            enrolled = enrollments.some((enrollment: any) => 
+              enrollment.moduleId === params.id // moduleId is actually trainingId in backend
+            )
+            setIsEnrolled(enrolled)
+          }
+        } catch (enrollError) {
+          console.log("Error loading enrolled classes:", enrollError)
         }
       }
-    }
-    load()
-  }, [courseId])
 
-  const handleEnroll = async () => {
-    setIsEnrolling(true)
+      // Load progress if user is enrolled
+      if (enrolled && user && trainingData?.modules) {
+        await loadModuleProgress(trainingData)
+      }
+    } catch (err) {
+      console.error("Error loading training:", err)
+      setError(err instanceof Error ? err.message : "An error occurred")
+    } finally {
+      setLoading(false)
+    }
+  }, [params.id, user?.id])
+
+  const handleUnlockModule = async (moduleId: string) => {
+    setUnlockingModule(moduleId)
+    setShowUnlockDialog(true)
+  }
+
+  const submitUnlockCode = async () => {
+    if (!unlockingModule || !moduleAccessCode) {
+      alert("Please enter an access code")
+      return
+    }
+
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}/enroll`, {
+      const response = await fetch(`/api/training-modules/${unlockingModule}/unlock`, {
         method: "POST",
-        credentials: "include"
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ code: moduleAccessCode }),
       })
-      if (res.ok) {
-        setIsEnrolled(true)
-        // Reload the course data to get modules
-        const courseRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}`, { credentials: "include" })
-        if (courseRes.ok) {
-          const data = await courseRes.json()
-          setCourse(data)
-        }
+
+      if (response.ok) {
+        alert("Module unlocked successfully!")
+        setShowUnlockDialog(false)
+        setModuleAccessCode("")
+        setUnlockingModule(null)
+        // Reload to update module access status
+        load()
+      } else {
+        const errorData = await response.json()
+        alert(`Unlock failed: ${errorData.error || "Invalid or used code"}`)
       }
     } catch (error) {
-      console.error("Enrollment failed:", error)
-    } finally {
-      setIsEnrolling(false)
+      console.error("Error unlocking module:", error)
+      alert("Network error. Please try again.")
     }
   }
 
-  if (!course) {
+  const loadAvailableClasses = async () => {
+    try {
+      setLoadingClasses(true)
+      const response = await fetch(`/api/classes/module/${params.id}`)
+      if (response.ok) {
+        const classes = await response.json()
+        setAvailableClasses(classes)
+        setShowClassSelection(true)
+      } else {
+        console.error("Failed to load classes")
+      }
+    } catch (error) {
+      console.error("Error loading classes:", error)
+    } finally {
+      setLoadingClasses(false)
+    }
+  }
+
+  const handleEnroll = async () => {
+    if (!selectedClassId || !enrollmentCode) {
+      alert("Please select a class and enter an enrollment code")
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/classes/${selectedClassId}/enroll-with-code`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code: enrollmentCode }),
+      })
+
+      if (response.ok) {
+        alert("Successfully enrolled in class!")
+        setIsEnrolled(true)
+        setShowClassSelection(false)
+        // Reload the page to update the UI
+        window.location.reload()
+      } else {
+        const errorData = await response.json()
+        alert(`Enrollment failed: ${errorData.error || "Unknown error"}`)
+      }
+    } catch (error) {
+      console.error("Error enrolling:", error)
+      alert("Network error. Please try again.")
+    }
+  }
+
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+
+  // Show loading while checking authentication
+  if (userLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Course not found</h1>
-          <Button asChild>
-            <Link href="/courses">Back to Courses</Link>
-          </Button>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-lg">Loading...</div>
+          </div>
         </div>
       </div>
     )
   }
 
-  const totalModules = course.modules.length
-  const progress = totalModules === 0 ? 0 : (completed / totalModules) * 100
-  const nextModule = course.modules.find((m) => m.status !== "COMPLETED")
+  // Don't render if not authenticated
+  if (!user) {
+    return null
+  }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-muted rounded w-1/4 mb-4"></div>
+            <div className="h-4 bg-muted rounded w-1/2 mb-8"></div>
+            <div className="space-y-4">
+              <div className="h-32 bg-muted rounded"></div>
+              <div className="h-32 bg-muted rounded"></div>
+              <div className="h-32 bg-muted rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-destructive mb-4">Error</h1>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <Button onClick={load}>Try Again</Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!training) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Training Not Found</h1>
+            <p className="text-muted-foreground mb-4">The training you're looking for doesn't exist.</p>
+            <Button asChild>
+              <Link href="/courses">Back to Trainings</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const totalModules = training.modules?.length || 0
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <PlayCircle className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-xl font-[family-name:var(--font-space-grotesk)]">The Xperience</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            {user && <UserDropdown user={user} />}
-          </div>
-        </div>
-      </header>
-
       <div className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <Button variant="ghost" asChild className="mb-6">
-          <Link href="/courses">
-            <ChevronLeft className="h-4 w-4 mr-2" />
-            Back to Courses
-          </Link>
-        </Button>
+        {/* Header */}
+        <div className="mb-8">
+          <Button variant="ghost" asChild className="mb-4">
+            <Link href="/" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Trainings
+            </Link>
+          </Button>
 
-        {/* Course Header */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-8">
-          <div className="lg:col-span-2 space-y-6">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Badge variant="secondary">{course.level}</Badge>
-                <Badge variant="outline">
-                  <BookOpen className="h-3 w-3 mr-1" />
-                  {course.totalModules} modules
-                </Badge>
-                <Badge variant="outline">
-                  <Clock className="h-3 w-3 mr-1" />
-                  {course.duration}
-                </Badge>
-              </div>
-              <h1 className="text-4xl font-bold mb-4 font-[family-name:var(--font-space-grotesk)]">{course.title}</h1>
-              <p className="text-lg text-muted-foreground leading-relaxed">{course.description}</p>
-              
-              {/* Enrollment Button */}
-              {!isEnrolled && (
-                <div className="mt-6">
-                  <Button 
-                    onClick={handleEnroll} 
-                    disabled={isEnrolling}
-                    size="lg"
-                    className="bg-primary hover:bg-primary/90"
-                  >
-                    {isEnrolling ? "Enrolling..." : "Enroll in Course"}
-                  </Button>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Start your learning journey with this course
-                  </p>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              {/* Training Thumbnail */}
+              {training.thumbnailUrl && (
+                <div className="relative h-48 w-full max-w-2xl rounded-lg overflow-hidden mb-6 bg-muted">
+                  <NextImage
+                    src={training.thumbnailUrl}
+                    alt={training.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 672px"
+                  />
                 </div>
               )}
+              
+              <h1 className="text-4xl font-bold mb-2 font-[family-name:var(--font-space-grotesk)]">
+                {training.title}
+              </h1>
+              <p className="text-xl text-muted-foreground mb-4">
+                {training.description}
+              </p>
+
+              <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  <span>{totalModules} modules</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  <span>Sequential learning</span>
+                </div>
+              </div>
             </div>
 
-            <img
-              src={course.thumbnailUrl || "/placeholder.svg"}
-              alt={course.title}
-              className="w-full aspect-video object-cover rounded-lg"
-            />
+            <div className="ml-8">
+              {isEnrolled ? (
+                <div className="text-center">
+                  <Badge variant="secondary" className="mb-2">
+                    <CheckCircle className="h-4 w-4 mr-1" />
+                    Enrolled
+                  </Badge>
+                  <p className="text-sm text-muted-foreground">You're enrolled in this training</p>
+                </div>
+              ) : (
+                <Button 
+                  size="lg" 
+                  onClick={loadAvailableClasses}
+                  disabled={loadingClasses}
+                  className="min-w-[200px]"
+                >
+                  {loadingClasses ? "Loading..." : "Enroll in Training"}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
 
-            <Card>
+        {/* Enrollment Status */}
+        {isEnrolled && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Award className="h-5 w-5" />
+                Enrollment Status
+              </CardTitle>
+            </CardHeader>
+              <CardContent>
+              <p className="text-muted-foreground">
+                You are currently enrolled in this training. You can access all modules and track your progress.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Training Modules */}
+        {isEnrolled && training.modules && training.modules.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-6 font-[family-name:var(--font-space-grotesk)]">
+              Training Modules (Sequential Access)
+            </h2>
+            <div className="space-y-4">
+              {training.modules
+                .sort((a, b) => a.orderIndex - b.orderIndex)
+                .map((module, index) => {
+                const isLocked = module.status === "LOCKED"
+                const isUnlocked = module.status === "UNLOCKED" || module.hasAccess
+                
+                // Check if previous module is unlocked (for modules after Module 1)
+                const previousModuleUnlocked = index === 0 || training.modules!
+                  .sort((a, b) => a.orderIndex - b.orderIndex)[index - 1]?.hasAccess
+                
+                const canUnlock = index === 0 || previousModuleUnlocked // Module 1 is always unlockable
+                const showLockMessage = isLocked && !canUnlock
+                
+                return (
+                  <Card key={module.id} className={`hover:shadow-md transition-shadow ${isLocked && !canUnlock ? 'opacity-60' : ''}`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        {/* Module Number/Status */}
+                        <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          isUnlocked ? 'bg-green-100 text-green-600' :
+                          canUnlock ? 'bg-blue-100 text-blue-600' :
+                          'bg-gray-100 text-gray-400'
+                        }`}>
+                          {isUnlocked ? (
+                            <CheckCircle className="h-6 w-6" />
+                          ) : isLocked ? (
+                            <Lock className="h-6 w-6" />
+                          ) : (
+                            <span className="font-bold text-lg">{module.orderIndex}</span>
+                          )}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-lg">Module {module.orderIndex}: {module.title}</h3>
+                            {isUnlocked && <Badge className="bg-green-100 text-green-800">Unlocked</Badge>}
+                            {isLocked && canUnlock && <Badge className="bg-blue-100 text-blue-800">Ready to Unlock</Badge>}
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">{module.description}</p>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                              <PlayCircle className="h-4 w-4" />
+                              <span>{module.coursesCount} courses</span>
+                            </div>
+                            {!module.isActive && (
+                              <Badge variant="secondary">Inactive</Badge>
+                            )}
+                          </div>
+                          
+                          {/* Progress Bar */}
+                          {isUnlocked && module.progress !== undefined && (
+                            <div className="mt-3">
+                              <div className="flex items-center justify-between text-sm mb-1">
+                                <span className="text-muted-foreground">Progress</span>
+                                <span className="font-medium">{module.progress}%</span>
+                              </div>
+                              <Progress value={module.progress} className="h-2" />
+                            </div>
+                          )}
+                        </div>
+                        
+                        {isLocked ? (
+                          <div className="flex flex-col items-end gap-2">
+                            {showLockMessage ? (
+                              <div className="text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
+                                <div className="flex items-center gap-2">
+                                  <Lock className="h-4 w-4" />
+                                  <span>Complete Module {index} first</span>
+                                </div>
+                              </div>
+                            ) : (
+                              <Button
+                                onClick={() => handleUnlockModule(module.id)}
+                                disabled={!canUnlock}
+                                size="sm"
+                                variant="outline"
+                              >
+                                <Lock className="h-4 w-4 mr-2" />
+                                Unlock Module
+                              </Button>
+                            )}
+                          </div>
+                        ) : (
+                          <Button asChild>
+                            <Link href={`/courses/${params.id}/modules/${module.id}`}>
+                              <PlayCircle className="h-4 w-4 mr-2" />
+                              View Module
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Unlock Module Dialog */}
+        {showUnlockDialog && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Card className="w-full max-w-md mx-4">
               <CardHeader>
-                <CardTitle>About this course</CardTitle>
+                <CardTitle>Unlock Module</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Award className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <div className="font-medium">Instructor</div>
-                    <div className="text-sm text-muted-foreground">{course.instructor}</div>
-                  </div>
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  Enter the access code to unlock this module and access its courses.
+                </p>
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Your Progress</span>
-                    <span className="font-medium">
-                          {completed}/{totalModules} modules completed
-                    </span>
-                  </div>
-                  <Progress value={progress} className="h-2" />
+                  <label htmlFor="moduleAccessCode" className="text-sm font-medium">
+                    Access Code
+                  </label>
+                  <Input
+                    id="moduleAccessCode"
+                    type="text"
+                    value={moduleAccessCode}
+                    onChange={(e) => setModuleAccessCode(e.target.value)}
+                    placeholder="Enter module access code"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <Button onClick={submitUnlockCode} disabled={!moduleAccessCode}>
+                    Unlock
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowUnlockDialog(false)
+                      setModuleAccessCode("")
+                      setUnlockingModule(null)
+                    }}
+                  >
+                    Cancel
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           </div>
+        )}
 
-          {/* Sidebar - Next Module */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-24">
+        {/* Class Selection Modal */}
+        {showClassSelection && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Card className="w-full max-w-2xl mx-4">
               <CardHeader>
-                <CardTitle>Continue Learning</CardTitle>
-                <CardDescription>Pick up where you left off</CardDescription>
+                <CardTitle>Select a Class</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {nextModule ? (
+                {availableClasses.length > 0 ? (
                   <>
-                    <div className="space-y-2">
-                      <div className="text-sm text-muted-foreground">Next Module</div>
-                      <div className="font-medium">{nextModule.title}</div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="h-4 w-4" />
-                        <span>{nextModule.duration}</span>
-                      </div>
+                    <div className="space-y-3">
+                      {availableClasses.map((classItem) => (
+                        <div
+                          key={classItem.id}
+                          className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                            selectedClassId === classItem.id
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-primary/50"
+                          }`}
+                          onClick={() => setSelectedClassId(classItem.id)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`h-4 w-4 rounded-full border-2 ${
+                              selectedClassId === classItem.id
+                                ? "border-primary bg-primary"
+                                : "border-muted-foreground"
+                            }`} />
+                            <div className="flex-1">
+                              <h3 className="font-medium">{classItem.name}</h3>
+                              <p className="text-sm text-muted-foreground">{classItem.description}</p>
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="h-4 w-4" />
+                                  <span>{new Date(classItem.startDate).toLocaleDateString()} - {new Date(classItem.endDate).toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Users className="h-4 w-4" />
+                                  <span>{classItem.currentEnrollments}/{classItem.maxStudents || "∞"} students</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    {nextModule.status === "IN_PROGRESS" || nextModule.status === "COMPLETED" ? (
-                      <Button className="w-full" size="lg" asChild>
-                        <Link href={`/courses/${course.id}/modules/${nextModule.id}`}>
-                          <PlayCircle className="h-4 w-4 mr-2" />
-                          Start Module
-                        </Link>
+
+                    <div className="space-y-2">
+                      <label htmlFor="enrollmentCode" className="text-sm font-medium">
+                        Enrollment Code
+                      </label>
+                      <input
+                        id="enrollmentCode"
+                        type="text"
+                        value={enrollmentCode}
+                        onChange={(e) => setEnrollmentCode(e.target.value)}
+                        placeholder="Enter enrollment code"
+                        className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                      />
+                    </div>
+
+                    <div className="flex gap-3">
+                      <Button onClick={handleEnroll} disabled={!selectedClassId || !enrollmentCode}>
+                        Enroll
                       </Button>
-                    ) : (
-                      <Button className="w-full" size="lg" asChild>
-                        <Link href={`/courses/${course.id}/modules/${nextModule.id}/unlock`}>
-                          <Lock className="h-4 w-4 mr-2" />
-                          Unlock Module
-                        </Link>
+                      <Button variant="outline" onClick={() => setShowClassSelection(false)}>
+                        Cancel
                       </Button>
-                    )}
+                    </div>
                   </>
                 ) : (
-                  <div className="text-center py-4">
-                    <CheckCircle className="h-12 w-12 text-secondary mx-auto mb-2" />
-                    <div className="font-medium mb-1">Course Completed!</div>
-                    <div className="text-sm text-muted-foreground">Congratulations on finishing this course</div>
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">No classes available for this training.</p>
+                    <Button variant="outline" onClick={() => setShowClassSelection(false)} className="mt-4">
+                      Close
+                    </Button>
                   </div>
                 )}
               </CardContent>
             </Card>
           </div>
-        </div>
+        )}
 
-        {/* Modules List */}
-        <div>
-          <h2 className="text-2xl font-bold mb-6 font-[family-name:var(--font-space-grotesk)]">Course Modules</h2>
-          <div className="space-y-3">
-            {course.modules.map((module, index) => (
-              <Card
-                key={module.id}
-                className={`transition-all ${module.status !== "LOCKED" ? "hover:shadow-md cursor-pointer" : "opacity-60"}`}
-              >
-                <Link
-                  href={module.status !== "LOCKED" ? `/courses/${course.id}/modules/${module.id}` : `/courses/${course.id}/modules/${module.id}/unlock`}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          module.status === "COMPLETED"
-                            ? "bg-secondary text-secondary-foreground"
-                            : module.status !== "LOCKED"
-                              ? "bg-primary/10 text-primary"
-                              : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {module.status === "COMPLETED" ? (
-                          <CheckCircle className="h-5 w-5" />
-                        ) : module.status !== "LOCKED" ? (
-                          <PlayCircle className="h-5 w-5" />
-                        ) : (
-                          <Lock className="h-5 w-5" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm text-muted-foreground">Module {index + 1}</span>
-                          {module.status === "COMPLETED" && <Badge variant="secondary">Completed</Badge>}
-                          {module.status === "LOCKED" && <Badge variant="outline">Locked</Badge>}
-                        </div>
-                        <div className="font-medium">{module.title}</div>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="h-4 w-4" />
-                        <span>{Math.round(module.durationSeconds / 60)} min</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Link>
-              </Card>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   )
