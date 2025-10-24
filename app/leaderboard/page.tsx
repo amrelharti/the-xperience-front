@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -36,12 +37,37 @@ export default function LeaderboardPage() {
   const [allClasses, setAllClasses] = useState<Class[]>([])
   const [loading, setLoading] = useState(true)
   const [myRank, setMyRank] = useState<number | null>(null)
+  const [selectedTraining, setSelectedTraining] = useState<string>("")
+  const [selectedClass, setSelectedClass] = useState<string>("")
   const { user } = useUser()
   const { toast } = useToast()
+  const searchParams = useSearchParams()
 
-  // Auto-load user's class and leaderboard
+  // Handle URL parameters for training and class filtering
   useEffect(() => {
-    loadMyClassAndLeaderboard()
+    const trainingParam = searchParams.get('training')
+    const classParam = searchParams.get('class')
+    
+    console.log("🔍 Leaderboard URL parameters detected:", { trainingParam, classParam })
+    
+    if (trainingParam && classParam) {
+      // If both training and class parameters are provided, use them directly
+      console.log("📊 Loading leaderboard for training:", trainingParam, "class:", classParam)
+      setSelectedTraining(trainingParam)
+      setSelectedClass(classParam)
+      loadLeaderboardForClass(classParam, trainingParam)
+    } else {
+      // Otherwise, load user's default class and leaderboard
+      console.log("📊 Loading default leaderboard")
+      loadMyClassAndLeaderboard()
+    }
+  }, [user, searchParams])
+
+  // Auto-load user's class and leaderboard (fallback)
+  useEffect(() => {
+    if (!selectedTraining && !selectedClass) {
+      loadMyClassAndLeaderboard()
+    }
   }, [user])
 
   const loadMyClassAndLeaderboard = async () => {
@@ -114,15 +140,20 @@ export default function LeaderboardPage() {
     }
   }
 
-  const loadLeaderboardForClass = async (classId: string) => {
+  const loadLeaderboardForClass = async (classId: string, trainingId?: string) => {
     try {
       setLoading(true)
-      console.log("🔍 Loading leaderboard for class:", classId)
+      console.log("🔍 Loading leaderboard for class:", classId, "training:", trainingId)
       
-      const leaderboardRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/leaderboard/class/${classId}?limit=50`,
-        { credentials: "include" }
-      )
+      // Build URL with optional training parameter
+      let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/leaderboard/class/${classId}?limit=50`
+      if (trainingId) {
+        url += `&training=${trainingId}`
+        console.log("📚 Added training filter to URL:", trainingId)
+      }
+      
+      console.log("🌐 Fetching leaderboard from URL:", url)
+      const leaderboardRes = await fetch(url, { credentials: "include" })
       
       if (leaderboardRes.ok) {
         const data = await leaderboardRes.json()
@@ -223,6 +254,7 @@ export default function LeaderboardPage() {
             <p className="text-muted-foreground text-lg">
               {myClass ? `${myClass.name} - ` : ""}Top performers based on assignment ratings
             </p>
+            
           </div>
 
           {/* Class Selector - Only show if user has multiple classes */}

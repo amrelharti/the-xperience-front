@@ -19,7 +19,9 @@ import {
   ArrowLeft,
   BookOpen,
   Star,
-  Award
+  Award,
+  MessageSquare,
+  Trophy
 } from "lucide-react"
 import NextImage from "next/image"
 import LiveSessionCard from "@/components/LiveSessionCard"
@@ -72,14 +74,44 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     }
   }, [user, userLoading])
 
-  const loadModuleProgress = useCallback(async (trainingData: Training) => {
+  const loadModuleProgress = useCallback(async (trainingData: Training, classId?: string) => {
     if (!user || !trainingData?.modules) return
 
     try {
-      // Load progress for each module
+      // Get user's enrolled classes if classId not provided
+      let selectedClassId = classId
+      if (!selectedClassId) {
+        const enrollmentsResponse = await fetch("/api/classes/my-classes")
+        if (enrollmentsResponse.ok) {
+          const enrollments = await enrollmentsResponse.json()
+          // Find all classes for this training
+          const trainingClasses = enrollments.filter((enrollment: any) => 
+            enrollment.moduleId === params.id // moduleId is actually trainingId in backend
+          )
+          
+          if (trainingClasses.length === 0) {
+            console.log("No classes found for this training")
+            return
+          } else if (trainingClasses.length === 1) {
+            // Only one class - use it automatically
+            selectedClassId = trainingClasses[0].id
+          } else {
+            // Multiple classes - use the first one for now (class selector can be added later)
+            selectedClassId = trainingClasses[0].id
+            console.log(`Multiple classes found for training, using: ${selectedClassId}`)
+          }
+        }
+      }
+
+      if (!selectedClassId) {
+        console.log("No class ID found for progress tracking")
+        return
+      }
+
+      // Load progress for each module with class context
       const progressPromises = trainingData.modules.map(async (module) => {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${module.id}/training-progress`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${module.id}/training-progress?classId=${selectedClassId}`, {
             credentials: "include"
           })
           if (response.ok) {
@@ -114,7 +146,35 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     } catch (error) {
       console.log("Error loading module progress:", error)
     }
-  }, [user])
+  }, [user, params.id])
+
+  const loadAvailableClasses = useCallback(async () => {
+    try {
+      setLoadingClasses(true)
+      console.log("🔍 Loading available classes for training:", params.id)
+      const response = await fetch(`/api/classes/module/${params.id}`)
+      if (response.ok) {
+        const newClasses = await response.json()
+        console.log("📚 Available classes from API:", newClasses)
+        // Combine user's existing enrollments with new available classes
+        setAvailableClasses(prevClasses => {
+          const existingClassIds = prevClasses.map(c => c.id)
+          const uniqueNewClasses = newClasses.filter((newClass: any) => !existingClassIds.includes(newClass.id))
+          console.log("🔄 Combining classes - existing:", prevClasses.length, "new:", uniqueNewClasses.length)
+          const combined = [...prevClasses, ...uniqueNewClasses]
+          console.log("📋 Final combined classes:", combined)
+          return combined
+        })
+        // Don't set showClassSelection here - let the caller decide
+      } else {
+        console.error("Failed to load classes")
+      }
+    } catch (error) {
+      console.error("Error loading classes:", error)
+    } finally {
+      setLoadingClasses(false)
+    }
+  }, [params.id])
 
   const load = useCallback(async () => {
     try {
@@ -130,21 +190,65 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       console.log("Training data from API:", trainingData)
       setTraining(trainingData)
 
-      // Check if user is enrolled (only if authenticated)
+      // Check if user is enrolled in ACTIVE classes only (only if authenticated)
       let enrolled = false
+      let availableClasses = []
       if (user && user.id) {
         try {
           const enrollmentsResponse = await fetch("/api/classes/my-classes")
           if (enrollmentsResponse.ok) {
             const enrollments = await enrollmentsResponse.json()
-            enrolled = enrollments.some((enrollment: any) => 
+            // Filter for this training and only active classes
+            const trainingEnrollments = enrollments.filter((enrollment: any) => 
               enrollment.moduleId === params.id // moduleId is actually trainingId in backend
             )
+            
+            // Check if user has any active enrollments for this training
+            const activeEnrollments = trainingEnrollments.filter((enrollment: any) => 
+              enrollment.isActive && !enrollment.isArchived
+            )
+            
+            enrolled = activeEnrollments.length > 0
+            availableClasses = trainingEnrollments // Store all enrollments for class selection
             setIsEnrolled(enrolled)
+            setAvailableClasses(availableClasses)
+            
+            // Smart class selection logic
+            if (trainingEnrollments.length > 1) {
+              // Check if student has a saved preference for this training
+              const savedClassId = localStorage.getItem(`selectedClass_${params.id}`)
+              const savedClass = savedClassId ? trainingEnrollments.find(c => c.id === savedClassId) : null
+              
+              if (savedClass) {
+                // Student has a saved preference, use it
+                setSelectedClassId(savedClassId)
+                setIsEnrolled(true)
+                // Don't show modal, just use the saved class
+              } else {
+                // No saved preference, show class selection modal
+                setShowClassSelection(true)
+                // Load available classes to populate the modal
+                await loadAvailableClasses()
+              }
+            } else if (trainingEnrollments.length === 1) {
+              // Only one class available, auto-select it
+              const singleClass = trainingEnrollments[0]
+              setSelectedClassId(singleClass.id)
+              setIsEnrolled(true)
+              // Save the selection
+              localStorage.setItem(`selectedClass_${params.id}`, singleClass.id)
+            }
           }
         } catch (enrollError) {
           console.log("Error loading enrolled classes:", enrollError)
         }
+      }
+
+      // If user is not enrolled in any classes for this training, load available classes and show modal
+      if (!enrolled && user && user.id) {
+        console.log("🔍 User not enrolled, loading available classes")
+        setShowClassSelection(true)
+        await loadAvailableClasses()
       }
 
       // Load progress if user is enrolled
@@ -157,7 +261,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     } finally {
       setLoading(false)
     }
-  }, [params.id, user?.id])
+  }, [params.id, user?.id, loadModuleProgress, loadAvailableClasses])
 
   const handleUnlockModule = async (moduleId: string) => {
     setUnlockingModule(moduleId)
@@ -197,60 +301,61 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     }
   }
 
-  const loadAvailableClasses = async () => {
-    try {
-      setLoadingClasses(true)
-      const response = await fetch(`/api/classes/module/${params.id}`)
-      if (response.ok) {
-        const classes = await response.json()
-        setAvailableClasses(classes)
-        setShowClassSelection(true)
-      } else {
-        console.error("Failed to load classes")
-      }
-    } catch (error) {
-      console.error("Error loading classes:", error)
-    } finally {
-      setLoadingClasses(false)
-    }
-  }
-
   const handleEnroll = async () => {
-    if (!selectedClassId || !enrollmentCode) {
-      alert("Please select a class and enter an enrollment code")
+    if (!selectedClassId) {
+      alert("Please select a class")
       return
     }
 
-    try {
-      const response = await fetch(`/api/classes/${selectedClassId}/enroll-with-code`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: enrollmentCode }),
-      })
-
-      if (response.ok) {
-        alert("Successfully enrolled in class!")
-        setIsEnrolled(true)
-        setShowClassSelection(false)
-        // Reload the page to update the UI
-        window.location.reload()
-      } else {
-        const errorData = await response.json()
-        alert(`Enrollment failed: ${errorData.error || "Unknown error"}`)
+    const selectedClass = availableClasses.find(c => c.id === selectedClassId)
+    
+    // Check if this is a new class that requires enrollment
+    if (selectedClass && selectedClass.isActive && !selectedClass.isArchived && !selectedClass.isEnrolled) {
+      // This is a new class, enrollment code is required
+      if (!enrollmentCode) {
+        alert("Please enter an enrollment code")
+        return
       }
-    } catch (error) {
-      console.error("Error enrolling:", error)
-      alert("Network error. Please try again.")
+
+      try {
+        const response = await fetch(`/api/classes/${selectedClassId}/enroll-with-code`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ code: enrollmentCode }),
+        })
+
+        if (response.ok) {
+          alert("Successfully enrolled in class!")
+          setIsEnrolled(true)
+          setShowClassSelection(false)
+          // Save the student's choice for this training
+          localStorage.setItem(`selectedClass_${params.id}`, selectedClassId)
+          // Reload the page to update the UI
+          window.location.reload()
+        } else {
+          const errorData = await response.json()
+          alert(`Enrollment failed: ${errorData.error || "Unknown error"}`)
+        }
+      } catch (error) {
+        console.error("Error enrolling:", error)
+        alert("Network error. Please try again.")
+      }
+    } else {
+      // This is an already enrolled class, just continue
+      setIsEnrolled(true)
+      setShowClassSelection(false)
+      // Save the student's choice for this training
+      localStorage.setItem(`selectedClass_${params.id}`, selectedClassId)
+      // Reload the page to update the UI
+      window.location.reload()
     }
   }
-
 
   useEffect(() => {
     load()
   }, [load])
-
 
   // Show loading while checking authentication
   if (userLoading) {
@@ -332,187 +437,174 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             </Link>
           </Button>
 
-          <div className="flex items-start justify-between">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Training Info */}
             <div className="flex-1">
-              {/* Training Thumbnail */}
-              {training.thumbnailUrl && (
-                <div className="relative h-48 w-full max-w-2xl rounded-lg overflow-hidden mb-6 bg-muted">
-                  <NextImage
-                    src={training.thumbnailUrl}
-                    alt={training.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 672px"
-                  />
-                </div>
-              )}
-              
-              <h1 className="text-4xl font-bold mb-2 font-[family-name:var(--font-space-grotesk)]">
-                {training.title}
-              </h1>
-              <p className="text-xl text-muted-foreground mb-4">
-                {training.description}
-              </p>
-
-              <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  <span>{totalModules} modules</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  <span>Sequential learning</span>
+              <div className="flex items-start gap-4 mb-4">
+                {training.thumbnailUrl && (
+                  <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                    <NextImage
+                      src={training.thumbnailUrl}
+                      alt={training.title}
+                      width={96}
+                      height={96}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <h1 className="text-3xl font-bold mb-2">{training.title}</h1>
+                  <p className="text-muted-foreground mb-4">{training.description}</p>
+                  
+                  {/* Progress Overview */}
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <BookOpen className="h-4 w-4" />
+                      <span>{totalModules} modules</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Award className="h-4 w-4" />
+                      <span>Training Program</span>
+                    </div>
+                  </div>
+                  
+                  {/* Class-Specific Social Features - only show if enrolled and has selected class */}
+                  {isEnrolled && selectedClassId && (
+                    <div className="mt-4">
+                      <div className="flex items-center gap-3">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          asChild
+                          className="flex items-center gap-2"
+                          onClick={() => {
+                            console.log("🔗 Navigating to feed with training:", params.id, "class:", selectedClassId)
+                          }}
+                        >
+                          <Link href={`/feed?training=${params.id}&class=${selectedClassId}`}>
+                            <MessageSquare className="h-4 w-4" />
+                            Class Feed
+                          </Link>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          asChild
+                          className="flex items-center gap-2"
+                          onClick={() => {
+                            console.log("🔗 Navigating to leaderboard with training:", params.id, "class:", selectedClassId)
+                          }}
+                        >
+                          <Link href={`/leaderboard?training=${params.id}&class=${selectedClassId}`}>
+                            <Trophy className="h-4 w-4" />
+                            Class Leaderboard
+                          </Link>
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        View posts and rankings for your current class
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Switch Class Button - only show if multiple classes available */}
+                  {availableClasses.length > 1 && isEnrolled && (
+                    <div className="mt-4">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={async () => {
+                          // Clear saved preference to show class selection modal
+                          localStorage.removeItem(`selectedClass_${params.id}`)
+                          setShowClassSelection(true)
+                          // Load available classes to populate the modal
+                          await loadAvailableClasses()
+                        }}
+                        className="flex items-center gap-2"
+                      >
+                        <Users className="h-4 w-4" />
+                        Switch Class
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-
-            <div className="ml-8">
-              {isEnrolled ? (
-                <div className="text-center">
-                  <Badge variant="secondary" className="mb-2">
-                    <CheckCircle className="h-4 w-4 mr-1" />
-                    Enrolled
-                  </Badge>
-                  <p className="text-sm text-muted-foreground">You're enrolled in this training</p>
-                </div>
-              ) : (
-                <Button 
-                  size="lg" 
-                  onClick={loadAvailableClasses}
-                  disabled={loadingClasses}
-                  className="min-w-[200px]"
-                >
-                  {loadingClasses ? "Loading..." : "Enroll in Training"}
-                </Button>
-              )}
             </div>
           </div>
         </div>
 
-        {/* Enrollment Status */}
-        {isEnrolled && (
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Award className="h-5 w-5" />
-                Enrollment Status
-              </CardTitle>
-            </CardHeader>
-              <CardContent>
-              <p className="text-muted-foreground">
-                You are currently enrolled in this training. You can access all modules and track your progress.
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Training Modules */}
-        {isEnrolled && training.modules && training.modules.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-6 font-[family-name:var(--font-space-grotesk)]">
-              Training Modules (Sequential Access)
-            </h2>
-            <div className="space-y-4">
-              {training.modules
-                .sort((a, b) => a.orderIndex - b.orderIndex)
-                .map((module, index) => {
-                const isLocked = module.status === "LOCKED"
-                const isUnlocked = module.status === "UNLOCKED" || module.hasAccess
-                
-                // Check if previous module is unlocked (for modules after Module 1)
-                const previousModuleUnlocked = index === 0 || training.modules!
-                  .sort((a, b) => a.orderIndex - b.orderIndex)[index - 1]?.hasAccess
-                
-                const canUnlock = index === 0 || previousModuleUnlocked // Module 1 is always unlockable
-                const showLockMessage = isLocked && !canUnlock
-                
-                return (
-                  <Card key={module.id} className={`hover:shadow-md transition-shadow ${isLocked && !canUnlock ? 'opacity-60' : ''}`}>
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4">
-                        {/* Module Number/Status */}
-                        <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          isUnlocked ? 'bg-green-100 text-green-600' :
-                          canUnlock ? 'bg-blue-100 text-blue-600' :
-                          'bg-gray-100 text-gray-400'
-                        }`}>
-                          {isUnlocked ? (
-                            <CheckCircle className="h-6 w-6" />
-                          ) : isLocked ? (
-                            <Lock className="h-6 w-6" />
-                          ) : (
-                            <span className="font-bold text-lg">{module.orderIndex}</span>
-                          )}
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-lg">Module {module.orderIndex}: {module.title}</h3>
-                            {isUnlocked && <Badge className="bg-green-100 text-green-800">Unlocked</Badge>}
-                            {isLocked && canUnlock && <Badge className="bg-blue-100 text-blue-800">Ready to Unlock</Badge>}
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2">{module.description}</p>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <PlayCircle className="h-4 w-4" />
-                              <span>{module.coursesCount} courses</span>
-                            </div>
-                            {!module.isActive && (
-                              <Badge variant="secondary">Inactive</Badge>
-                            )}
-                          </div>
-                          
-                          {/* Progress Bar */}
-                          {isUnlocked && module.progress !== undefined && (
-                            <div className="mt-3">
-                              <div className="flex items-center justify-between text-sm mb-1">
-                                <span className="text-muted-foreground">Progress</span>
-                                <span className="font-medium">{module.progress}%</span>
-                              </div>
-                              <Progress value={module.progress} className="h-2" />
-                            </div>
-                          )}
-                        </div>
-                        
-                        {isLocked ? (
-                          <div className="flex flex-col items-end gap-2">
-                            {showLockMessage ? (
-                              <div className="text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
-                                <div className="flex items-center gap-2">
-                                  <Lock className="h-4 w-4" />
-                                  <span>Complete Module {index} first</span>
-                                </div>
-                              </div>
-                            ) : (
-                              <Button
-                                onClick={() => handleUnlockModule(module.id)}
-                                disabled={!canUnlock}
-                                size="sm"
-                                variant="outline"
-                              >
-                                <Lock className="h-4 w-4 mr-2" />
-                                Unlock Module
-                              </Button>
-                            )}
-                          </div>
+        {/* Modules List */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold mb-6">Training Modules</h2>
+          {training.modules?.map((module, index) => (
+            <Card key={module.id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary font-bold">
+                      {index + 1}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-xl font-semibold">{module.title}</h3>
+                        {module.status === "LOCKED" ? (
+                          <Lock className="h-4 w-4 text-muted-foreground" />
                         ) : (
-                          <Button asChild>
-                            <Link href={`/courses/${params.id}/modules/${module.id}`}>
-                              <PlayCircle className="h-4 w-4 mr-2" />
-                              View Module
-                            </Link>
-                          </Button>
+                          <CheckCircle className="h-4 w-4 text-green-500" />
                         )}
                       </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
-          </div>
-        )}
+                      <p className="text-muted-foreground mb-3">{module.description}</p>
+                      
+                      {/* Progress Bar */}
+                      {module.progress !== undefined && (
+                        <div className="mb-3">
+                          <div className="flex items-center justify-between text-sm mb-1">
+                            <span className="text-muted-foreground">Progress</span>
+                            <span className="font-medium">{module.progress}%</span>
+                          </div>
+                          <Progress value={module.progress} className="h-2" />
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <BookOpen className="h-4 w-4" />
+                          <span>{module.coursesCount} courses</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Users className="h-4 w-4" />
+                          <span>Live sessions</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    {module.status === "LOCKED" ? (
+                      <Button
+                        variant="outline"
+                        onClick={() => handleUnlockModule(module.id)}
+                        disabled={!isEnrolled}
+                      >
+                        <Lock className="h-4 w-4 mr-2" />
+                        Unlock Module
+                      </Button>
+                    ) : (
+                      <Button asChild>
+                        <Link href={`/courses/${params.id}/modules/${module.id}`}>
+                          <PlayCircle className="h-4 w-4 mr-2" />
+                          Start Module
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-        {/* Unlock Module Dialog */}
+        {/* Unlock Dialog */}
         {showUnlockDialog && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <Card className="w-full max-w-md mx-4">
@@ -520,27 +612,25 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                 <CardTitle>Unlock Module</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Enter the access code to unlock this module and access its courses.
-                </p>
-                <div className="space-y-2">
-                  <label htmlFor="moduleAccessCode" className="text-sm font-medium">
+                <div>
+                  <label htmlFor="accessCode" className="text-sm font-medium">
                     Access Code
                   </label>
                   <Input
-                    id="moduleAccessCode"
+                    id="accessCode"
                     type="text"
                     value={moduleAccessCode}
                     onChange={(e) => setModuleAccessCode(e.target.value)}
-                    placeholder="Enter module access code"
+                    placeholder="Enter access code"
+                    className="mt-1"
                   />
                 </div>
                 <div className="flex gap-3">
-                  <Button onClick={submitUnlockCode} disabled={!moduleAccessCode}>
+                  <Button onClick={submitUnlockCode} className="flex-1">
                     Unlock
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => {
                       setShowUnlockDialog(false)
                       setModuleAccessCode("")
@@ -565,59 +655,146 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
               <CardContent className="space-y-4">
                 {availableClasses.length > 0 ? (
                   <>
-                    <div className="space-y-3">
-                      {availableClasses.map((classItem) => (
-                        <div
-                          key={classItem.id}
-                          className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                            selectedClassId === classItem.id
-                              ? "border-primary bg-primary/5"
-                              : "border-border hover:border-primary/50"
-                          }`}
-                          onClick={() => setSelectedClassId(classItem.id)}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`h-4 w-4 rounded-full border-2 ${
-                              selectedClassId === classItem.id
-                                ? "border-primary bg-primary"
-                                : "border-muted-foreground"
-                            }`} />
-                            <div className="flex-1">
-                              <h3 className="font-medium">{classItem.name}</h3>
-                              <p className="text-sm text-muted-foreground">{classItem.description}</p>
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
-                                <div className="flex items-center gap-1">
-                                  <Calendar className="h-4 w-4" />
-                                  <span>{new Date(classItem.startDate).toLocaleDateString()} - {new Date(classItem.endDate).toLocaleDateString()}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Users className="h-4 w-4" />
-                                  <span>{classItem.currentEnrollments}/{classItem.maxStudents || "∞"} students</span>
+                    <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        You can access your archived classes or enroll in a new one. Contact the admin for more information.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {/* Archived Classes Section */}
+                      {availableClasses.filter((classItem) => !classItem.isActive && classItem.isArchived).length > 0 && (
+                        <div>
+                          <h3 className="text-sm font-medium text-blue-600 mb-2">📚 Your Previous Classes (Archived)</h3>
+                          <p className="text-xs text-muted-foreground mb-3">
+                            Continue your training progress in classes you were enrolled in
+                          </p>
+                          <div className="space-y-2">
+                            {availableClasses.filter((classItem) => !classItem.isActive && classItem.isArchived).map((classItem) => (
+                              <div
+                                key={classItem.id}
+                                className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                                  selectedClassId === classItem.id
+                                    ? "border-blue-500 bg-blue-50"
+                                    : "border-blue-200 bg-blue-25 hover:border-blue-300"
+                                }`}
+                                onClick={() => setSelectedClassId(classItem.id)}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`h-4 w-4 rounded-full border-2 ${
+                                    selectedClassId === classItem.id
+                                      ? "border-blue-500 bg-blue-500"
+                                      : "border-blue-300"
+                                  }`}></div>
+                                  <div>
+                                    <p className="font-medium text-blue-900">{classItem.name}</p>
+                                    <p className="text-sm text-blue-700">{classItem.description}</p>
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800 mt-1">
+                                      Archived
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
+                            ))}
                           </div>
                         </div>
-                      ))}
+                      )}
+
+                      {/* Active Classes Section */}
+                      {availableClasses.filter((classItem) => classItem.isActive && !classItem.isArchived).length > 0 && (
+                        <div>
+                          <h3 className="text-sm font-medium text-green-600 mb-2">🆕 Available Active Classes</h3>
+                          <p className="text-xs text-muted-foreground mb-3">
+                            Enroll in new active classes for this training
+                          </p>
+                          <div className="space-y-2">
+                            {availableClasses.filter((classItem) => classItem.isActive && !classItem.isArchived).map((classItem) => (
+                              <div
+                                key={classItem.id}
+                                className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                                  selectedClassId === classItem.id
+                                    ? "border-green-500 bg-green-50"
+                                    : "border-green-200 bg-green-25 hover:border-green-300"
+                                }`}
+                                onClick={() => setSelectedClassId(classItem.id)}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`h-4 w-4 rounded-full border-2 ${
+                                    selectedClassId === classItem.id
+                                      ? "border-green-500 bg-green-500"
+                                      : "border-green-300"
+                                  }`}></div>
+                                  <div>
+                                    <p className="font-medium text-green-900">{classItem.name}</p>
+                                    <p className="text-sm text-green-700">{classItem.description}</p>
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 mt-1">
+                                      Active
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* No Classes Available */}
+                      {availableClasses.filter((classItem) => classItem.isActive && !classItem.isArchived).length === 0 && 
+                       availableClasses.filter((classItem) => !classItem.isActive && classItem.isArchived).length === 0 && (
+                        <div className="text-center py-6">
+                          <p className="text-gray-600 mb-4">No classes available for this training.</p>
+                          <Button onClick={loadAvailableClasses} variant="outline">
+                            Load Available Classes for Enrollment
+                          </Button>
+                        </div>
+                      )}
                     </div>
 
-                    <div className="space-y-2">
-                      <label htmlFor="enrollmentCode" className="text-sm font-medium">
-                        Enrollment Code
-                      </label>
-                      <input
-                        id="enrollmentCode"
-                        type="text"
-                        value={enrollmentCode}
-                        onChange={(e) => setEnrollmentCode(e.target.value)}
-                        placeholder="Enter enrollment code"
-                        className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                    </div>
+                    {/* Show enrollment code only for new active classes that student is NOT enrolled in */}
+                    {selectedClassId && (() => {
+                      const selectedClass = availableClasses.find(c => c.id === selectedClassId)
+                      console.log("🔍 Selected class for enrollment check:", selectedClass)
+                      console.log("🔍 Class properties - isActive:", selectedClass?.isActive, "isArchived:", selectedClass?.isArchived, "isEnrolled:", selectedClass?.isEnrolled)
+                      // Check if this is a new class that requires enrollment (not already enrolled)
+                      // We need to check if the class has an enrollment property or if it's a new class
+                      const shouldShowEnrollmentCode = selectedClass && selectedClass.isActive && !selectedClass.isArchived && !selectedClass.isEnrolled
+                      console.log("🔍 Should show enrollment code:", shouldShowEnrollmentCode)
+                      return shouldShowEnrollmentCode
+                    })() && (
+                      <div className="space-y-2">
+                        <label htmlFor="enrollmentCode" className="text-sm font-medium">
+                          Enrollment Code
+                        </label>
+                        <input
+                          id="enrollmentCode"
+                          type="text"
+                          value={enrollmentCode}
+                          onChange={(e) => setEnrollmentCode(e.target.value)}
+                          placeholder="Enter enrollment code"
+                          className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                        />
+                      </div>
+                    )}
 
                     <div className="flex gap-3">
-                      <Button onClick={handleEnroll} disabled={!selectedClassId || !enrollmentCode}>
-                        Enroll
+                      <Button 
+                        onClick={handleEnroll} 
+                        disabled={!selectedClassId || (() => {
+                          const selectedClass = availableClasses.find(c => c.id === selectedClassId)
+                          return selectedClass && selectedClass.isActive && !selectedClass.isArchived && !selectedClass.isEnrolled && !enrollmentCode
+                        })()}
+                        className="flex-1"
+                      >
+                        {(() => {
+                          const selectedClass = availableClasses.find(c => c.id === selectedClassId)
+                          console.log("🔍 Button text logic - selectedClass:", selectedClass)
+                          console.log("🔍 Button text logic - isActive:", selectedClass?.isActive, "isArchived:", selectedClass?.isArchived, "isEnrolled:", selectedClass?.isEnrolled)
+                          // Show "Enroll" for new classes, "Continue Training" for enrolled classes
+                          const isNewClass = selectedClass && selectedClass.isActive && !selectedClass.isArchived && !selectedClass.isEnrolled
+                          const buttonText = isNewClass ? "Enroll" : "Continue Training"
+                          console.log("🔍 Button text result:", buttonText)
+                          return buttonText
+                        })()}
                       </Button>
                       <Button variant="outline" onClick={() => setShowClassSelection(false)}>
                         Cancel

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -59,30 +60,84 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [filterType, setFilterType] = useState("all")
+  const [filterTraining, setFilterTraining] = useState("all")
   const [filterModule, setFilterModule] = useState("all")
   const [filterClass, setFilterClass] = useState("all")
-  const [modules, setModules] = useState<Array<{id: string, title: string}>>([])
+  const [trainings, setTrainings] = useState<Array<{id: string, title: string}>>([])
+  const [trainingModules, setTrainingModules] = useState<Array<{id: string, title: string, trainingId: string}>>([])
   const [classes, setClasses] = useState<Array<{id: string, name: string}>>([])
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+  const [urlParamsProcessed, setUrlParamsProcessed] = useState(false)
   const { user } = useUser()
   const { toast } = useToast()
+  const searchParams = useSearchParams()
   
   // Debounce search query to avoid excessive API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 500)
+  
+  // Handle URL parameters for training and class filtering
+  useEffect(() => {
+    const trainingParam = searchParams.get('training')
+    const classParam = searchParams.get('class')
+    
+    console.log("🔍 URL parameters detected:", { trainingParam, classParam })
+    
+    if (trainingParam) {
+      // If training parameter is provided, filter by that training
+      console.log("📚 Setting filterTraining to:", trainingParam)
+      setFilterTraining(trainingParam)
+    }
+    
+    if (classParam) {
+      // If class parameter is provided, filter by that class
+      console.log("🏫 Setting filterClass to:", classParam)
+      setFilterClass(classParam)
+    }
+    
+    // Mark URL parameters as processed
+    setUrlParamsProcessed(true)
+  }, [searchParams])
 
   useEffect(() => {
-    loadPosts()
-  }, [currentPage, debouncedSearchQuery, filterType, filterModule, filterClass])
+    // Only load posts after URL parameters have been processed
+    if (urlParamsProcessed) {
+      loadPosts()
+    }
+  }, [currentPage, debouncedSearchQuery, filterType, filterTraining, filterModule, filterClass, urlParamsProcessed])
   
   useEffect(() => {
-    loadModules()
+    loadTrainings()
     loadClasses()
+    loadAllTrainingModules()
   }, [])
+
+  // Load training modules for the specific training from URL parameter
+  useEffect(() => {
+    const trainingParam = searchParams.get('training')
+    if (trainingParam) {
+      loadTrainingModulesForTraining(trainingParam)
+    }
+  }, [searchParams])
 
   const loadPosts = async () => {
     try {
       setLoading(true)
+      console.log("🔍 Loading posts with filters:", {
+        filterTraining,
+        filterModule,
+        filterClass,
+        filterType,
+        searchQuery: debouncedSearchQuery
+      })
+      
+      console.log("🔍 Filter values check:", {
+        "filterTraining !== 'all'": filterTraining !== "all",
+        "filterModule !== 'all'": filterModule !== "all",
+        "filterClass !== 'all'": filterClass !== "all",
+        "filterType !== 'all'": filterType !== "all"
+      })
+      
       const params = new URLSearchParams({
         page: currentPage.toString(),
         size: "10"
@@ -96,12 +151,19 @@ export default function FeedPage() {
       }
       if (filterModule !== "all") {
         params.append("moduleId", filterModule)
+        console.log("📚 Adding module filter:", filterModule)
       }
       if (filterClass !== "all") {
         params.append("classId", filterClass)
+        console.log("🏫 Adding classId filter:", filterClass)
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/feed?${params}`, {
+      const finalUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/feed?${params}`
+      console.log("🌐 Final API URL:", finalUrl)
+      console.log("📋 Final parameters:", params.toString())
+      console.log("🔍 Request timestamp:", new Date().toISOString())
+      
+      const res = await fetch(finalUrl, {
         credentials: "include"
       })
       
@@ -122,20 +184,84 @@ export default function FeedPage() {
     }
   }
 
-  const loadModules = async () => {
+  const loadTrainings = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules`, {
+      // Load all trainings
+      const trainingsRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses`, {
         credentials: "include"
       })
       
-      if (res.ok) {
-        const data = await res.json()
-        setModules(data)
+      if (trainingsRes.ok) {
+        const trainingsData = await trainingsRes.json()
+        console.log("📚 Loaded trainings:", trainingsData.length)
+        setTrainings(trainingsData)
       }
     } catch (error) {
-      console.error("Error loading modules:", error)
+      console.error("Error loading trainings:", error)
     }
   }
+
+  const loadAllTrainingModules = async () => {
+    try {
+      // Load all trainings first
+      const trainingsRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses`, {
+        credentials: "include"
+      })
+      
+      if (trainingsRes.ok) {
+        const trainings = await trainingsRes.json()
+        console.log("📚 Loaded trainings:", trainings.length)
+        
+        // Then load modules for each training
+        const allModules = []
+        for (const training of trainings) {
+          try {
+            const modulesRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${training.id}`, {
+              credentials: "include"
+            })
+            if (modulesRes.ok) {
+              const trainingData = await modulesRes.json()
+              if (trainingData.modules) {
+                // Add training context to each module
+                const modulesWithTraining = trainingData.modules.map((module: any) => ({
+                  ...module,
+                  trainingTitle: training.title,
+                  trainingId: training.id
+                }))
+                allModules.push(...modulesWithTraining)
+              }
+            }
+          } catch (error) {
+            console.error(`Error loading modules for training ${training.id}:`, error)
+          }
+        }
+        
+        console.log("📚 Total training modules loaded:", allModules.length)
+        setTrainingModules(allModules)
+      }
+    } catch (error) {
+      console.error("Error loading all training modules:", error)
+    }
+  }
+
+  const loadTrainingModulesForTraining = async (trainingId: string) => {
+    try {
+      const modulesRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${trainingId}`, {
+        credentials: "include"
+      })
+      
+      if (modulesRes.ok) {
+        const trainingData = await modulesRes.json()
+        if (trainingData.modules) {
+          console.log("📚 Loaded modules for specific training:", trainingData.modules.length)
+          setTrainingModules(trainingData.modules)
+        }
+      }
+    } catch (error) {
+      console.error("Error loading training modules for specific training:", error)
+    }
+  }
+
 
   const loadClasses = async () => {
     try {
@@ -224,6 +350,7 @@ export default function FeedPage() {
               <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2 font-[family-name:var(--font-space-grotesk)]">Feed</h1>
             <p className="text-muted-foreground text-lg">Share your thoughts, ask questions, and connect with the community</p>
+            
           </div>
 
           {/* Create Post Button */}
@@ -271,26 +398,13 @@ export default function FeedPage() {
                 </Select>
                 <Select value={filterModule} onValueChange={setFilterModule}>
                   <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Module" />
+                    <SelectValue placeholder="Training Module" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Modules</SelectItem>
-                    {modules.map((module) => (
+                    {trainingModules.map((module) => (
                       <SelectItem key={module.id} value={module.id}>
                         {module.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={filterClass} onValueChange={setFilterClass}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Class" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Classes</SelectItem>
-                    {classes.map((classItem) => (
-                      <SelectItem key={classItem.id} value={classItem.id}>
-                        {classItem.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

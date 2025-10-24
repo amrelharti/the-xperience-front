@@ -40,6 +40,7 @@ export default function ClassManagementPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [showCreateClass, setShowCreateClass] = useState(false)
   const [showInactive, setShowInactive] = useState(false)
+  const [showArchived, setShowArchived] = useState(false)
   const [newClass, setNewClass] = useState({
     name: "",
     description: "",
@@ -69,6 +70,7 @@ export default function ClassManagementPage() {
       if (res.ok) {
         const classesData = await res.json()
         console.log("✅ Classes loaded:", classesData.length, "classes")
+        console.log("📋 Classes data:", classesData)
         setClasses(classesData)
       } else {
         console.error("❌ Failed to load classes:", res.status)
@@ -155,15 +157,25 @@ export default function ClassManagementPage() {
     }
   }
 
-  const handleToggleClassStatus = async (classId: string, isActive: boolean) => {
+  const handleToggleClassStatus = async (classId: string, newIsActive: boolean, newIsArchived: boolean) => {
     try {
-      console.log(`🔄 Toggling class ${classId} from ${isActive ? 'active' : 'inactive'} to ${!isActive ? 'active' : 'inactive'}`)
+      let newState = "";
+      
+      if (newIsActive) {
+        newState = "active";
+      } else if (newIsArchived) {
+        newState = "archived";
+      } else {
+        newState = "inactive";
+      }
+      
+      console.log(`🔄 Changing class ${classId} to ${newState} state`)
       
       const res = await fetch(`/api/classes/${classId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ isActive: !isActive })
+        body: JSON.stringify({ isActive: newIsActive, isArchived: newIsArchived })
       })
       
       console.log(`📡 Response status: ${res.status}`)
@@ -241,13 +253,18 @@ export default function ClassManagementPage() {
       classItem.moduleName.toLowerCase().includes(searchTerm.toLowerCase())
     )
     
-    // Separate active and inactive classes
-    const activeClasses = searchFiltered.filter(classItem => classItem.isActive)
-    const inactiveClasses = searchFiltered.filter(classItem => !classItem.isActive)
+    // Separate classes by state
+    const activeClasses = searchFiltered.filter(classItem => classItem.isActive && !classItem.isArchived)
+    const archivedClasses = searchFiltered.filter(classItem => !classItem.isActive && classItem.isArchived)
+    const inactiveClasses = searchFiltered.filter(classItem => !classItem.isActive && !classItem.isArchived)
     
-    // Show active classes by default, include inactive if toggle is on
-    return showInactive ? [...activeClasses, ...inactiveClasses] : activeClasses
-  }, [classes, searchTerm, showInactive])
+    // Show active classes by default, include others if toggles are on
+    let result = activeClasses
+    if (showArchived) result = [...result, ...archivedClasses]
+    if (showInactive) result = [...result, ...inactiveClasses]
+    
+    return result
+  }, [classes, searchTerm, showInactive, showArchived])
 
   if (loading) {
     return (
@@ -398,16 +415,29 @@ export default function ClassManagementPage() {
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">{filteredClasses.length}</div>
                 <div className="text-sm text-gray-600">
-                  {showInactive ? 'All Classes' : 'Active Classes'}
+                  {(() => {
+                    if (showArchived && showInactive) return 'All Classes'
+                    if (showArchived) return 'Active + Archived'
+                    if (showInactive) return 'Active + Inactive'
+                    return 'Active Classes Only'
+                  })()}
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowInactive(!showInactive)}
-                  className="mt-2"
-                >
-                  {showInactive ? 'Hide Inactive' : 'Show Inactive'}
-                </Button>
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    variant={showArchived ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setShowArchived(!showArchived)}
+                  >
+                    {showArchived ? 'Hide Archived' : 'Show Archived'}
+                  </Button>
+                  <Button
+                    variant={showInactive ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setShowInactive(!showInactive)}
+                  >
+                    {showInactive ? 'Hide Inactive' : 'Show Inactive'}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -424,32 +454,42 @@ export default function ClassManagementPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {filteredClasses.map((classItem) => (
+              {filteredClasses.map((classItem) => {
+                console.log(`Class ${classItem.name}: isActive=${classItem.isActive}, isArchived=${classItem.isArchived}`)
+                return (
                 <div 
                   key={classItem.id} 
                   className={`flex items-center justify-between p-4 border rounded-lg ${
-                    classItem.isActive 
+                    classItem.isActive && !classItem.isArchived
                       ? 'hover:bg-gray-50' 
-                      : 'bg-gray-100 opacity-75'
+                      : !classItem.isActive && classItem.isArchived
+                        ? 'bg-blue-50 border-blue-200'
+                        : 'bg-gray-100 opacity-75'
                   }`}
                 >
                   <div className="flex items-center space-x-4">
                     <div className={`h-16 w-16 rounded-lg flex items-center justify-center ${
-                      classItem.isActive 
+                      classItem.isActive && !classItem.isArchived
                         ? 'bg-purple-100' 
-                        : 'bg-gray-200'
+                        : !classItem.isActive && classItem.isArchived
+                          ? 'bg-blue-100'
+                          : 'bg-gray-200'
                     }`}>
                       <GraduationCap className={`h-8 w-8 ${
-                        classItem.isActive 
+                        classItem.isActive && !classItem.isArchived
                           ? 'text-purple-600' 
-                          : 'text-gray-500'
+                          : !classItem.isActive && classItem.isArchived
+                            ? 'text-blue-600'
+                            : 'text-gray-500'
                       }`} />
                     </div>
                     <div className="flex-1">
                       <p className={`font-medium ${
-                        classItem.isActive 
+                        classItem.isActive && !classItem.isArchived
                           ? 'text-gray-900' 
-                          : 'text-gray-600'
+                          : !classItem.isActive && classItem.isArchived
+                            ? 'text-blue-900'
+                            : 'text-gray-600'
                       }`}>
                         {classItem.name}
                       </p>
@@ -461,11 +501,17 @@ export default function ClassManagementPage() {
                         {classItem.description}
                       </p>
                       <div className="flex items-center space-x-2">
-                        <Badge variant={classItem.isActive ? "default" : "secondary"}>
-                          {classItem.isActive ? "Active" : "Inactive"}
+                        <Badge variant={
+                          classItem.isActive && !classItem.isArchived ? "default" : 
+                          !classItem.isActive && classItem.isArchived ? "secondary" : 
+                          "destructive"
+                        }>
+                          {classItem.isActive && !classItem.isArchived ? "Active" : 
+                           !classItem.isActive && classItem.isArchived ? "Archived" : 
+                           "Inactive"}
                         </Badge>
                         <span className={`text-xs ${
-                          classItem.isActive 
+                          classItem.isActive && !classItem.isArchived
                             ? 'text-gray-500' 
                             : 'text-gray-400'
                         }`}>
@@ -493,13 +539,32 @@ export default function ClassManagementPage() {
                     >
                       <Key className="h-4 w-4" />
                     </Button>
-                    <Button
-                      size="sm"
-                      variant={classItem.isActive ? "default" : "outline"}
-                      onClick={() => handleToggleClassStatus(classItem.id, classItem.isActive)}
-                    >
-                      {classItem.isActive ? "Active" : "Inactive"}
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant={classItem.isActive ? "default" : "outline"}
+                        onClick={() => handleToggleClassStatus(classItem.id, true, false)} // Set to Active
+                        disabled={classItem.isActive}
+                      >
+                        Active
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={classItem.isArchived ? "secondary" : "outline"}
+                        onClick={() => handleToggleClassStatus(classItem.id, false, true)} // Set to Archived
+                        disabled={classItem.isArchived}
+                      >
+                        Archived
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={!classItem.isActive && !classItem.isArchived ? "destructive" : "outline"}
+                        onClick={() => handleToggleClassStatus(classItem.id, false, false)} // Set to Inactive
+                        disabled={!classItem.isActive && !classItem.isArchived}
+                      >
+                        Inactive
+                      </Button>
+                    </div>
                     <Button
                       size="sm"
                       variant="outline"
@@ -517,7 +582,8 @@ export default function ClassManagementPage() {
                     </Button>
                   </div>
                 </div>
-              ))}
+                )
+              })}
               {filteredClasses.length === 0 && (
                 <div className="text-center py-8">
                   <GraduationCap className="h-12 w-12 text-gray-400 mx-auto mb-4" />
