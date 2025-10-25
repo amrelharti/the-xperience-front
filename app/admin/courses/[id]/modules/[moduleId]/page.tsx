@@ -32,8 +32,8 @@ import {
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import RequireAdmin from "@/app/components/RequireAdmin"
-import { useUser } from "../../../../hooks/useUser"
-import UserDropdown from "../../../../components/UserDropdown"
+import { useUser } from "@/app/hooks/useUser"
+import UserDropdown from "@/app/components/UserDropdown"
 
 interface Course {
   id: string

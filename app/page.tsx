@@ -60,8 +60,6 @@ export default function TrainingsPage() {
         if (publicResponse.ok) {
           const data = await publicResponse.json();
           setModules(data);
-        } else {
-          console.error("Public courses failed:", publicResponse.status, publicResponse.statusText);
         }
         setLoading(false);
         return;
@@ -76,7 +74,8 @@ export default function TrainingsPage() {
       ]);
 
       if (coursesResponse.ok) {
-        const coursesData = await coursesResponse.json();
+        const responseData = await coursesResponse.json();
+        const coursesData = responseData.courses || [];
 
         // If we got enrolled classes data, merge it
         if (enrolledClassesResponse && enrolledClassesResponse.ok) {
@@ -102,7 +101,7 @@ export default function TrainingsPage() {
           setModules(coursesData);
         }
       } else {
-        console.error("Courses endpoint failed with status:", coursesResponse.status);
+        // Courses endpoint failed, trying public endpoint
         // Fallback to public endpoint
         const publicResponse = await fetch(`/api/public/courses`);
         if (publicResponse.ok) {
@@ -115,7 +114,7 @@ export default function TrainingsPage() {
     } finally {
       setLoading(false);
     }
-  }, [user, userLoading]);
+  }, [user?.id, user?.authenticated, userLoading]);
 
   useEffect(() => {
     loadModules();
@@ -171,7 +170,6 @@ export default function TrainingsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {console.log("Rendering modules, count:", modules.length, "loading:", loading)}
           {modules.length === 0 ? (
             <div className="col-span-full text-center py-12">
               <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />

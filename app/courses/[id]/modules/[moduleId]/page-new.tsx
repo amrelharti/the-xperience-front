@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -33,11 +33,13 @@ interface Course {
 export default function ModuleDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
   const { user, isLoading: userLoading } = useUser()
   
   const trainingId = params.id as string
   const moduleId = params.moduleId as string
+  const classId = searchParams.get('class')
   
   const [module, setModule] = useState<TrainingModule | null>(null)
   const [loading, setLoading] = useState(true)
@@ -218,7 +220,7 @@ export default function ModuleDetailPage() {
                         </div>
                       </div>
                       <Button asChild>
-                        <Link href={`/courses/${trainingId}/courses/${course.id}`}>
+                        <Link href={`/courses/${trainingId}/courses/${course.id}${classId ? `?class=${classId}` : ''}`}>
                           <PlayCircle className="h-4 w-4 mr-2" />
                           Watch
                         </Link>

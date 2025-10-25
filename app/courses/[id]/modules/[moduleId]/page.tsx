@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -33,11 +33,16 @@ interface Course {
 export default function ModuleDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
   const { user, isLoading: userLoading } = useUser()
 
   const trainingId = params.id as string
   const moduleId = params.moduleId as string
+  const classIdParam = searchParams.get('class')
+  
+  // State to store the actual classId (may come from URL or user enrollments)
+  const [classId, setClassId] = useState<string | null>(classIdParam)
   
   const [module, setModule] = useState<TrainingModule | null>(null)
   const [loading, setLoading] = useState(true)
@@ -45,6 +50,7 @@ export default function ModuleDetailPage() {
   const [liveSession, setLiveSession] = useState<any>(null)
   const [isAttended, setIsAttended] = useState(false)
   const [loadingLiveSession, setLoadingLiveSession] = useState(true)
+  const [moduleProgress, setModuleProgress] = useState(0)
 
   useEffect(() => {
     if (!userLoading && !user) {
@@ -52,12 +58,55 @@ export default function ModuleDetailPage() {
     }
   }, [user, userLoading])
 
+  // Load classId from my-classes if not in URL
+  useEffect(() => {
+    const urlClassId = searchParams.get('class')
+    console.log("🔍 Module page - URL classId:", urlClassId)
+    
+    if (urlClassId) {
+      setClassId(urlClassId)
+    } else if (user) {
+      // Try to get classId from my-classes
+      console.log("🔍 Module page - No classId in URL, fetching from my-classes...")
+      fetch('/api/classes/my-classes')
+        .then(res => res.json())
+        .then(classesData => {
+          if (classesData && classesData.length > 0) {
+            // Find class for this training
+            const matchingClasses = classesData.filter((c: any) => {
+              return c.moduleId === trainingId
+            })
+            
+            if (matchingClasses.length > 0) {
+              // Prefer active classes over archived ones
+              let trainingClass = matchingClasses.find((c: any) => c.isActive && !c.isArchived)
+              if (!trainingClass) {
+                trainingClass = matchingClasses[0]
+              }
+              
+              if (trainingClass) {
+                console.log("✅ Module page - Found classId from my-classes:", trainingClass.id)
+                setClassId(trainingClass.id)
+              }
+            }
+          }
+        })
+        .catch(err => console.error("❌ Module page - Error fetching my-classes:", err))
+    }
+  }, [searchParams, user, trainingId])
+
   useEffect(() => {
     if (user && moduleId) {
       loadModuleData()
-      loadLiveSession()
     }
   }, [moduleId, user])
+
+  useEffect(() => {
+    if (moduleId && classId) {
+      loadLiveSession()
+      loadModuleProgress()
+    }
+  }, [classId, moduleId])
 
   const loadModuleData = async () => {
     try {
@@ -82,7 +131,7 @@ export default function ModuleDetailPage() {
     } catch (err) {
       console.error("❌ Error loading module:", err)
       setError("An error occurred")
-    } finally {
+      } finally {
       setLoading(false)
     }
   }
@@ -103,14 +152,16 @@ export default function ModuleDetailPage() {
         } else {
           setLiveSession(data)
           
-          // Check attendance
-          const attendanceResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${moduleId}/live-session/attend`, {
-            credentials: "include"
-          })
-          
-          if (attendanceResponse.ok) {
-            const attendanceData = await attendanceResponse.json()
-            setIsAttended(attendanceData.attended || false)
+          // Check attendance only if classId is available
+          if (classId) {
+            const attendanceResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${moduleId}/live-session/attend?classId=${classId}`, {
+              credentials: "include"
+            })
+            
+            if (attendanceResponse.ok) {
+              const attendanceData = await attendanceResponse.json()
+              setIsAttended(attendanceData.attended || false)
+            }
           }
         }
       } else {
@@ -124,14 +175,53 @@ export default function ModuleDetailPage() {
     }
   }
 
+  const loadModuleProgress = async () => {
+    if (!classId) {
+      console.log("❌ No classId for loading progress")
+      return
+    }
+    
+    try {
+      console.log("📊 Loading module progress for classId:", classId)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${moduleId}/training-progress?classId=${classId}`, {
+        credentials: "include"
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        console.log("📊 Module progress data:", data)
+        setModuleProgress(data.progress || 0)
+      }
+    } catch (error) {
+      console.error("❌ Error loading module progress:", error)
+    }
+  }
+
   const handleAttendanceToggle = async (attended: boolean) => {
     try {
+      if (!classId) {
+        toast({
+          title: "Error",
+          description: "Class ID is missing. Please go back and select a class.",
+          variant: "destructive"
+        })
+        return
+      }
+
       if (attended) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${moduleId}/live-session/attend`, {
+        if (!liveSession?.id) {
+          toast({
+            title: "Error",
+            description: "Live session not found",
+            variant: "destructive"
+          })
+          return
+        }
+        
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sessions/${liveSession.id}/attend?classId=${classId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({})
+          credentials: "include"
         })
         
         if (response.ok) {
@@ -140,6 +230,33 @@ export default function ModuleDetailPage() {
             title: "Attendance Recorded",
             description: "Your attendance has been marked"
           })
+          // Reload progress after marking attendance
+          await loadModuleProgress()
+        }
+      } else {
+        if (!liveSession?.id) {
+          toast({
+            title: "Error",
+            description: "Live session not found",
+            variant: "destructive"
+          })
+          return
+        }
+        
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/sessions/${liveSession.id}/attend?classId=${classId}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include"
+        })
+        
+        if (response.ok) {
+          setIsAttended(false)
+          toast({
+            title: "Attendance Removed",
+            description: "Your attendance has been unmarked"
+          })
+          // Reload progress after unmarking attendance
+          await loadModuleProgress()
         }
       }
     } catch (error) {
@@ -210,11 +327,6 @@ export default function ModuleDetailPage() {
             </div>
 
         {/* Courses List */}
-        {console.log("🔍 Rendering courses check:", { 
-          hasCourses: !!module.courses, 
-          coursesLength: module.courses?.length || 0,
-          courses: module.courses 
-        })}
         {module.courses && module.courses.length > 0 && (
           <div className="mb-8">
             <h2 className="text-2xl font-bold mb-6">Video Lessons</h2>
@@ -239,17 +351,17 @@ export default function ModuleDetailPage() {
             </div>
                   </div>
                         <Button asChild>
-                          <Link href={`/courses/${trainingId}/courses/${course.id}`}>
+                          <Link href={`/courses/${trainingId}/courses/${course.id}${classId ? `?class=${classId}` : ''}`}>
                             <PlayCircle className="h-4 w-4 mr-2" />
                             Watch
-                          </Link>
-                        </Button>
-                  </div>
+                      </Link>
+                    </Button>
+                </div>
               </CardContent>
             </Card>
                 ))}
-            </div>
           </div>
+        </div>
         )}
 
 
@@ -269,7 +381,8 @@ export default function ModuleDetailPage() {
               }}
               isAttended={isAttended}
               onAttendanceToggle={handleAttendanceToggle}
-              currentProgress={0}
+              currentProgress={moduleProgress}
+              classId={classId}
             />
           </div>
         )}

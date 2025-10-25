@@ -9,6 +9,8 @@ interface VimeoPlayerProps {
   className?: string
   onLoad?: () => void
   onError?: (error: string) => void
+  onEnded?: () => void
+  onPlayTimeUpdate?: (playTimeSeconds: number) => void
 }
 
 export default function VimeoPlayer({ 
@@ -16,7 +18,9 @@ export default function VimeoPlayer({
   title, 
   className = "", 
   onLoad,
-  onError 
+  onError,
+  onEnded,
+  onPlayTimeUpdate
 }: VimeoPlayerProps) {
   const { user } = useUser()
   const [signedUrl, setSignedUrl] = useState<string | null>(null)
@@ -65,6 +69,89 @@ export default function VimeoPlayer({
       loadSignedUrl()
     }
   }, [user?.id, videoId, loadSignedUrl])
+
+  // Listen for Vimeo player events and track play time
+  const [totalPlayTime, setTotalPlayTime] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [lastPlaySecond, setLastPlaySecond] = useState(0)
+  
+  useEffect(() => {
+    if (!onEnded) return
+    
+    let videoDuration = 0
+    let hasTriggeredEnded = false // Prevent multiple calls
+    let playTimeAccumulated = 0
+    let lastKnownSecond = 0
+    
+    const handleMessage = (event: MessageEvent) => {
+      console.log("📬 Vimeo message received from:", event.origin, "data:", event.data)
+      if (event.origin !== 'https://player.vimeo.com') return
+      
+      const data = event.data
+      if (typeof data === 'string') {
+        try {
+          const parsed = JSON.parse(data)
+          console.log("📺 Parsed Vimeo event:", parsed.event)
+          
+          if (parsed.event === 'finish') {
+            console.log("✅ Video finished! Calling onEnded callback")
+            if (!hasTriggeredEnded) {
+              hasTriggeredEnded = true
+              onEnded()
+            }
+          } else if (parsed.event === 'ended') {
+            console.log("🏁 Video ended! Calling onEnded callback")
+            if (!hasTriggeredEnded) {
+              hasTriggeredEnded = true
+              onEnded()
+            }
+          } else if (parsed.event === 'playProgress' && parsed.data) {
+            // Track play progress and trigger onEnded when we reach the end
+            const { seconds, duration, percent } = parsed.data
+            videoDuration = duration || 0
+            
+            console.log("📊 playProgress data:", parsed.data)
+            
+            // Track play time
+            if (seconds > lastKnownSecond) {
+              playTimeAccumulated += (seconds - lastKnownSecond)
+              lastKnownSecond = seconds
+              
+              console.log("⏱️ Updating play time:", playTimeAccumulated, "onPlayTimeUpdate exists:", !!onPlayTimeUpdate)
+              
+              // Notify parent of play time
+              if (onPlayTimeUpdate) {
+                onPlayTimeUpdate(playTimeAccumulated)
+              }
+            }
+            
+            console.log("▶️ Play progress:", { seconds, duration, playTime: playTimeAccumulated })
+            
+            // If we're within 2 seconds of the end OR at 95%+, consider it finished
+            if (duration > 0) {
+              const secondsRemaining = duration - seconds
+              const hasReachedEnd = secondsRemaining <= 2 || percent >= 0.95
+              
+              if (hasReachedEnd && !hasTriggeredEnded) {
+                console.log("⏰ Video reached end! Calling onEnded callback", { seconds, duration, percent, secondsRemaining })
+                hasTriggeredEnded = true
+                onEnded()
+              }
+            }
+          } else if (parsed.event === 'pause') {
+            console.log("⏸️ Video paused")
+          } else if (parsed.event === 'play') {
+            console.log("▶️ Video playing")
+          }
+        } catch (e) {
+          // Ignore non-JSON messages
+        }
+      }
+    }
+
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [onEnded])
 
   // Flash email watermark to 100% opacity for 7 seconds every 2 minutes
   useEffect(() => {

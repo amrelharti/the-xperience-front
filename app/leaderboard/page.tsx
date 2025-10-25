@@ -48,17 +48,13 @@ export default function LeaderboardPage() {
     const trainingParam = searchParams.get('training')
     const classParam = searchParams.get('class')
     
-    console.log("🔍 Leaderboard URL parameters detected:", { trainingParam, classParam })
-    
     if (trainingParam && classParam) {
       // If both training and class parameters are provided, use them directly
-      console.log("📊 Loading leaderboard for training:", trainingParam, "class:", classParam)
       setSelectedTraining(trainingParam)
       setSelectedClass(classParam)
       loadLeaderboardForClass(classParam, trainingParam)
     } else {
       // Otherwise, load user's default class and leaderboard
-      console.log("📊 Loading default leaderboard")
       loadMyClassAndLeaderboard()
     }
   }, [user, searchParams])
@@ -75,7 +71,6 @@ export default function LeaderboardPage() {
     
     try {
       setLoading(true)
-      console.log("🔍 Loading user's class leaderboard automatically...")
       
       // Get user's enrolled classes
       const classesRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/classes/my-classes`, {
@@ -87,7 +82,6 @@ export default function LeaderboardPage() {
       }
       
       const classes = await classesRes.json()
-      console.log("📚 User enrolled in", classes.length, "classes")
       
       if (classes.length === 0) {
         toast({
@@ -105,7 +99,6 @@ export default function LeaderboardPage() {
       // Automatically use first class
       const userClass = classes[0]
       setMyClass(userClass)
-      console.log("✅ Auto-selected class:", userClass.name)
       
       // Load leaderboard for this class
       const leaderboardRes = await fetch(
@@ -116,7 +109,6 @@ export default function LeaderboardPage() {
       if (leaderboardRes.ok) {
         const data = await leaderboardRes.json()
         setLeaderboard(data.leaderboard || [])
-        console.log("🏆 Loaded", data.leaderboard?.length || 0, "students in leaderboard")
         
         // Find my rank
         const myUserId = user.id
@@ -143,22 +135,18 @@ export default function LeaderboardPage() {
   const loadLeaderboardForClass = async (classId: string, trainingId?: string) => {
     try {
       setLoading(true)
-      console.log("🔍 Loading leaderboard for class:", classId, "training:", trainingId)
       
       // Build URL with optional training parameter
       let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/leaderboard/class/${classId}?limit=50`
       if (trainingId) {
         url += `&training=${trainingId}`
-        console.log("📚 Added training filter to URL:", trainingId)
       }
       
-      console.log("🌐 Fetching leaderboard from URL:", url)
       const leaderboardRes = await fetch(url, { credentials: "include" })
       
       if (leaderboardRes.ok) {
         const data = await leaderboardRes.json()
         setLeaderboard(data.leaderboard || [])
-        console.log("🏆 Loaded", data.leaderboard?.length || 0, "students in leaderboard")
         
         // Find my rank
         const myUserId = user?.id

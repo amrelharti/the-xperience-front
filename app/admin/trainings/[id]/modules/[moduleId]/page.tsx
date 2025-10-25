@@ -140,11 +140,36 @@ export default function AdminModuleDetailsPage() {
 
   const handleSaveLiveSession = async () => {
     try {
+      // Validate required fields
+      if (!liveSessionForm.startsAt) {
+        toast({
+          title: "Error",
+          description: "Please fill in the start date and time",
+          variant: "destructive"
+        })
+        return
+      }
+
+      const startsAtDate = new Date(liveSessionForm.startsAt)
+
+      if (isNaN(startsAtDate.getTime())) {
+        toast({
+          title: "Error",
+          description: "Invalid date format. Please check the date and try again.",
+          variant: "destructive"
+        })
+        return
+      }
+
+      // Calculate endsAt from startsAt + durationMinutes
+      const endsAtDate = new Date(startsAtDate)
+      endsAtDate.setMinutes(endsAtDate.getMinutes() + liveSessionForm.durationMinutes)
+
       const formData = {
         ...liveSessionForm,
         moduleId: moduleId,
-        startsAt: new Date(liveSessionForm.startsAt).toISOString(),
-        endsAt: new Date(liveSessionForm.endsAt).toISOString()
+        startsAt: startsAtDate.toISOString(),
+        endsAt: endsAtDate.toISOString()
       }
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${moduleId}/live-session`, {
@@ -206,7 +231,7 @@ export default function AdminModuleDetailsPage() {
         title: liveSession.title,
         description: liveSession.description,
         startsAt: new Date(liveSession.startsAt).toISOString().slice(0, 16),
-        endsAt: new Date(liveSession.endsAt).toISOString().slice(0, 16),
+        endsAt: "", // Will be calculated from startsAt + durationMinutes
         location: liveSession.location,
         meetingUrl: liveSession.meetingUrl,
         meetingPassword: liveSession.meetingPassword,
@@ -219,7 +244,7 @@ export default function AdminModuleDetailsPage() {
         title: "",
         description: "",
         startsAt: "",
-        endsAt: "",
+        endsAt: "", // Will be calculated from startsAt + durationMinutes
         location: "",
         meetingUrl: "",
         meetingPassword: "",

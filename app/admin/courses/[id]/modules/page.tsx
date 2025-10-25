@@ -50,21 +50,16 @@ export default function CourseModulesPage() {
 
   const [course, setCourse] = useState<Course | null>(null)
   const [modules, setModules] = useState<Module[]>([])
-  const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(true)
-  const [createModuleOpen, setCreateModuleOpen] = useState(false)
-  const [editModuleOpen, setEditModuleOpen] = useState(false)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [showCreateModule, setShowCreateModule] = useState(false)
+  const [showEditModule, setShowEditModule] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showAccessCodes, setShowAccessCodes] = useState(false)
   const [moduleToDelete, setModuleToDelete] = useState<string | null>(null)
   const [selectedModule, setSelectedModule] = useState<Module | null>(null)
-  const [accessCodesOpen, setAccessCodesOpen] = useState(false)
   const [accessCodes, setAccessCodes] = useState<any[]>([])
-  const [generatedCodes, setGeneratedCodes] = useState<string[]>([])
-  const [generateCount, setGenerateCount] = useState(1)
-  
-  // Form state
   const [newModule, setNewModule] = useState({
-    courseId: "",
     title: "",
     description: "",
     videoUrl: "",
@@ -73,6 +68,7 @@ export default function CourseModulesPage() {
   })
   
   const [editModule, setEditModule] = useState({
+    id: "",
     title: "",
     description: "",
     videoUrl: "",
@@ -83,58 +79,30 @@ export default function CourseModulesPage() {
   const { toast } = useToast()
 
   // Load course details
-  const loadCourse = async () => {
+  const loadCourse = useCallback(async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/courses/${courseId}`, {
-        credentials: "include",
-      })
+      const res = await fetch(`/api/courses/${courseId}`)
       if (res.ok) {
         const data = await res.json()
         setCourse(data)
-      } else {
-        console.error("Failed to load course")
-        toast({
-          title: "Error",
-          description: "Failed to load course",
-          variant: "destructive",
-        })
       }
     } catch (error) {
       console.error("Error loading course:", error)
-      toast({
-        title: "Error",
-        description: "Failed to load course",
-        variant: "destructive",
-      })
     }
-  }
+  }, [courseId])
 
   // Load modules for the course
-  const loadModules = async () => {
+  const loadModules = useCallback(async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/courses/${courseId}/modules`, {
-        credentials: "include",
-      })
+      const res = await fetch(`/api/courses/${courseId}/modules`)
       if (res.ok) {
         const data = await res.json()
         setModules(data)
-      } else {
-        console.error("Failed to load modules")
-        toast({
-          title: "Error",
-          description: "Failed to load modules",
-          variant: "destructive",
-        })
       }
     } catch (error) {
       console.error("Error loading modules:", error)
-    toast({
-        title: "Error",
-        description: "Failed to load modules",
-        variant: "destructive",
-      })
     }
-  }
+  }, [courseId])
 
   useEffect(() => {
     if (courseId) {
@@ -142,18 +110,12 @@ export default function CourseModulesPage() {
       loadModules()
       setIsLoading(false)
     }
-  }, [courseId])
+  }, [courseId, loadCourse, loadModules])
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement
-      if (!target.closest('[id^="module-menu-"]')) {
-        // Close all dropdowns
-        document.querySelectorAll('[id^="module-menu-"]').forEach(menu => {
-          menu.classList.add('hidden')
-        })
-      }
+      // Close any open dropdowns
     }
 
     document.addEventListener('mousedown', handleClickOutside)
@@ -163,10 +125,8 @@ export default function CourseModulesPage() {
   }, [])
 
   const filteredModules = useMemo(() => modules.filter(
-    (module) =>
-      module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      module.description.toLowerCase().includes(searchQuery.toLowerCase()),
-  ), [modules, searchQuery])
+    module => module.title.toLowerCase().includes(searchTerm.toLowerCase())
+  ), [modules, searchTerm])
 
   const formatDuration = useCallback((seconds: number) => {
     const hours = Math.floor(seconds / 3600)
@@ -179,116 +139,82 @@ export default function CourseModulesPage() {
 
   const handleCreateModule = async () => {
     try {
-      const moduleData = {
-        ...newModule,
-        courseId: courseId
-      }
-      
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules`, {
+      const res = await fetch(`/api/courses/${courseId}/modules`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(moduleData),
+        body: JSON.stringify(newModule)
       })
       
       if (res.ok) {
-        toast({
-          title: "Module Created",
-          description: "The module has been successfully created",
+        setNewModule({
+          title: "",
+          description: "",
+          videoUrl: "",
+          durationSeconds: 0,
+          orderIndex: 0
         })
-        setCreateModuleOpen(false)
-        setNewModule({ courseId: "", title: "", description: "", videoUrl: "", durationSeconds: 0, orderIndex: 0 })
+        setShowCreateModule(false)
         loadModules()
-      } else {
-        const error = await res.text()
-        console.error("Failed to create module:", error)
         toast({
-          title: "Error",
-          description: "Failed to create module",
-          variant: "destructive",
+          title: "Success",
+          description: "Module created successfully",
         })
       }
     } catch (error) {
       console.error("Error creating module:", error)
-      toast({
-        title: "Error",
-        description: "Failed to create module",
-        variant: "destructive",
-      })
     }
   }
 
   const handleEditModule = (module: Module) => {
-    setSelectedModule(module)
     setEditModule({
+      id: module.id,
       title: module.title,
       description: module.description,
       videoUrl: module.videoUrl || "",
       durationSeconds: module.durationSeconds,
       orderIndex: module.orderIndex
     })
-    setEditModuleOpen(true)
+    setShowEditModule(true)
   }
 
   const handleUpdateModule = async () => {
-    if (!selectedModule) return
-    
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${selectedModule.id}`, {
+      const res = await fetch(`/api/courses/${courseId}/modules/${editModule.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(editModule),
+        body: JSON.stringify(editModule)
       })
       
       if (res.ok) {
-    toast({
-      title: "Module Updated",
-      description: "The module has been successfully updated",
-        })
-        setEditModuleOpen(false)
-        setSelectedModule(null)
+        setShowEditModule(false)
         loadModules()
-      } else {
-        const error = await res.text()
-        console.error("Failed to update module:", error)
         toast({
-          title: "Error",
-          description: "Failed to update module",
-          variant: "destructive",
+          title: "Success",
+          description: "Module updated successfully",
         })
       }
     } catch (error) {
       console.error("Error updating module:", error)
-      toast({
-        title: "Error",
-        description: "Failed to update module",
-        variant: "destructive",
-      })
     }
   }
 
   const handleDeleteModule = (moduleId: string) => {
     setModuleToDelete(moduleId)
-    setDeleteDialogOpen(true)
+    setShowDeleteDialog(true)
   }
 
   const handleAccessCodes = (module: Module) => {
     setSelectedModule(module)
     loadAccessCodes(module.id)
-    setAccessCodesOpen(true)
+    setShowAccessCodes(true)
   }
 
   const loadAccessCodes = async (moduleId: string) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${moduleId}/codes`, {
-        credentials: "include",
-      })
+      const res = await fetch(`/api/courses/${courseId}/modules/${moduleId}/access-codes`)
       if (res.ok) {
         const data = await res.json()
         setAccessCodes(data)
-      } else {
-        console.error("Failed to load access codes")
       }
     } catch (error) {
       console.error("Error loading access codes:", error)
@@ -296,121 +222,74 @@ export default function CourseModulesPage() {
   }
 
   const handleGenerateCodes = async () => {
-    if (!selectedModule) return
-    
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${selectedModule.id}/codes`, {
+      const res = await fetch(`/api/courses/${courseId}/modules/${selectedModule?.id}/access-codes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ count: generateCount }),
+        body: JSON.stringify({ count: 5 })
       })
       
       if (res.ok) {
-        const data = await res.json()
-        setGeneratedCodes(data.codes)
+        loadAccessCodes(selectedModule?.id || "")
         toast({
-          title: "Access Codes Generated",
-          description: `Generated ${data.codes.length} access codes`,
-        })
-        loadAccessCodes(selectedModule.id)
-      } else {
-        const error = await res.text()
-        console.error("Failed to generate codes:", error)
-        toast({
-          title: "Error",
-          description: "Failed to generate access codes",
-          variant: "destructive",
+          title: "Success",
+          description: "Access codes generated successfully",
         })
       }
     } catch (error) {
       console.error("Error generating codes:", error)
-      toast({
-        title: "Error",
-        description: "Failed to generate access codes",
-        variant: "destructive",
-      })
     }
   }
 
   const handleDeleteCode = async (codeId: string) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/codes/${codeId}`, {
-        method: "DELETE",
-        credentials: "include",
+      const res = await fetch(`/api/courses/${courseId}/modules/${selectedModule?.id}/access-codes/${codeId}`, {
+        method: "DELETE"
       })
       
       if (res.ok) {
+        loadAccessCodes(selectedModule?.id || "")
         toast({
-          title: "Code Deleted",
-          description: "Access code has been deleted",
-        })
-        if (selectedModule) {
-          loadAccessCodes(selectedModule.id)
-        }
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to delete access code",
-          variant: "destructive",
+          title: "Success",
+          description: "Access code deleted successfully",
         })
       }
     } catch (error) {
       console.error("Error deleting code:", error)
-      toast({
-        title: "Error",
-        description: "Failed to delete access code",
-        variant: "destructive",
-      })
     }
   }
 
   const confirmDelete = async () => {
-    if (moduleToDelete) {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${moduleToDelete}`, {
-          method: "DELETE",
-          credentials: "include",
-        })
-        
-        if (res.ok) {
-    toast({
-      title: "Module Deleted",
-      description: "The module has been successfully deleted",
-    })
-          loadModules()
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to delete module",
-            variant: "destructive",
-          })
-        }
-      } catch (error) {
-        console.error("Error deleting module:", error)
+    if (!moduleToDelete) return
+    
+    try {
+      const res = await fetch(`/api/courses/${courseId}/modules/${moduleToDelete}`, {
+        method: "DELETE"
+      })
+      
+      if (res.ok) {
+        setShowDeleteDialog(false)
+        setModuleToDelete(null)
+        loadModules()
         toast({
-          title: "Error",
-          description: "Failed to delete module",
-          variant: "destructive",
+          title: "Success",
+          description: "Module deleted successfully",
         })
       }
-      setModuleToDelete(null)
+    } catch (error) {
+      console.error("Error deleting module:", error)
     }
     
-    setDeleteDialogOpen(false)
+    setShowDeleteDialog(false)
   }
 
   const handleSignOut = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/logout`, {
+      const res = await fetch("/api/auth/logout", {
         method: "POST",
-        credentials: "include",
+        credentials: "include"
       })
-      
-      if (res.ok || res.status === 204) {
-        window.location.href = "/"
-      } else {
-        console.error("Sign out failed:", res.status, res.statusText)
+      if (res.ok) {
         window.location.href = "/"
       }
     } catch (error) {
@@ -451,518 +330,279 @@ export default function CourseModulesPage() {
   return (
     <RequireAdmin>
       <div className="min-h-screen bg-background">
-      {/* Header */}
+        {/* Header */}
         <header className="border-b bg-gradient-to-r from-blue-50 to-purple-50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container mx-auto px-4 h-20 flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button 
                 variant="ghost" 
-                size="sm"
                 onClick={() => router.push("/admin")}
-                className="hover:bg-white/50"
+                className="flex items-center gap-2"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="h-4 w-4" />
                 Back to Admin
               </Button>
-              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-white" />
-              </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  {course.title}
-                </h1>
-                <p className="text-sm text-muted-foreground">Manage course modules and videos</p>
+                <h1 className="text-2xl font-bold">{course.title}</h1>
+                <p className="text-muted-foreground">Manage course modules</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm" onClick={handleSignOut} className="hover:bg-red-50 hover:border-red-200">
+              <Button onClick={handleSignOut} variant="outline">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
               </Button>
             </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8">
-          {/* Course Info Card */}
-          <Card className="mb-8 border-l-4 border-l-blue-500">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <h2 className="text-xl font-semibold">{course.title}</h2>
-                    <Badge variant={course.isPublished ? "default" : "secondary"}>
-                      {course.isPublished ? "Published" : "Draft"}
-                    </Badge>
-                  </div>
-                  <p className="text-muted-foreground mb-4">{course.description}</p>
-                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                    <span>Created {new Date(course.createdAt).toLocaleDateString()}</span>
-                    <span>•</span>
-                    <span>{modules.length} modules</span>
-                  </div>
-                </div>
-                {course.thumbnailUrl && (
-                  <div className="ml-6">
-                    <img
-                      src={course.thumbnailUrl}
-                      alt={course.title}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                  </div>
-                )}
           </div>
-            </CardContent>
+        </header>
+
+        <div className="container mx-auto px-4 py-8">
+          {/* Course Info */}
+          <Card className="mb-8">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-2xl">{course.title}</CardTitle>
+                  <CardDescription className="mt-2">{course.description}</CardDescription>
+                </div>
+                <Badge variant={course.isPublished ? "default" : "secondary"}>
+                  {course.isPublished ? "Published" : "Draft"}
+                </Badge>
+              </div>
+            </CardHeader>
           </Card>
 
-          {/* Search and Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search modules..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-                </div>
-            <Button onClick={() => setCreateModuleOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Module
-                </Button>
+          {/* Modules Section */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-semibold">Modules</h2>
+                <p className="text-muted-foreground">Manage your course modules</p>
               </div>
-
-          {/* Modules Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredModules.map((module) => (
-              <Card key={module.id} className="hover:shadow-lg transition-shadow duration-200 group">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                        <h3 className="font-semibold text-lg line-clamp-2">{module.title}</h3>
-                        <p className="text-sm text-muted-foreground line-clamp-3 mt-1 leading-relaxed">
-                          {module.description}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 ml-4">
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            console.log("Manage Module clicked for module:", module.id)
-                            router.push(`/admin/courses/${courseId}/modules/${module.id}`)
-                          }}
-                        >
-                          <PlayCircle className="h-4 w-4 mr-2" />
-                          Manage Module
-                        </Button>
-                        <div className="relative">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                              className="h-8 w-8 p-0 rounded-full hover:bg-gray-100"
-                            onClick={() => {
-                                console.log("Dropdown trigger clicked for module:", module.id)
-                                const menu = document.getElementById(`module-menu-${module.id}`)
-                                if (menu) {
-                                  menu.classList.toggle('hidden')
-                                }
-                              }}
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        <div 
-                          id={`module-menu-${module.id}`}
-                          className="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50"
-                        >
-                            <div 
-                              className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center border-b border-gray-100"
-                              onClick={() => {
-                                console.log("Edit Module clicked for module:", module.id)
-                                handleEditModule(module)
-                                document.getElementById(`module-menu-${module.id}`)?.classList.add('hidden')
-                              }}
-                            >
-                              <Edit className="h-4 w-4 mr-3 text-orange-600" />
-                              <span className="font-medium">Edit Module</span>
-                            </div>
-                            <div 
-                              className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center border-b border-gray-100"
-                              onClick={() => {
-                                console.log("Access Codes clicked for module:", module.id)
-                                handleAccessCodes(module)
-                                document.getElementById(`module-menu-${module.id}`)?.classList.add('hidden')
-                              }}
-                            >
-                              <Key className="h-4 w-4 mr-3 text-green-600" />
-                              <span className="font-medium">Access Codes</span>
-                            </div>
-                            <div 
-                              className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center border-b border-gray-100"
-                              onClick={() => {
-                                console.log("Create Homework clicked for module:", module.id)
-                                router.push(`/homework/new?moduleId=${module.id}`)
-                                document.getElementById(`module-menu-${module.id}`)?.classList.add('hidden')
-                              }}
-                            >
-                              <MessageSquare className="h-4 w-4 mr-3 text-purple-600" />
-                              <span className="font-medium">Create Homework</span>
-                            </div>
-                          <div 
-                            className="px-4 py-3 hover:bg-red-50 cursor-pointer flex items-center text-red-600"
-                        onClick={() => {
-                              console.log("Delete Module clicked for module:", module.id)
-                              handleDeleteModule(module.id)
-                              document.getElementById(`module-menu-${module.id}`)?.classList.add('hidden')
-                            }}
-                          >
-                            <div className="h-4 w-4 mr-3 rounded-full bg-red-100 flex items-center justify-center">
-                              <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                            </div>
-                            <span className="font-medium">Delete Module</span>
-                          </div>
-                        </div>
-                    </div>
-                  </div>
-
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center space-x-4">
-                        <span>Duration: {formatDuration(module.durationSeconds)}</span>
-                        <span>Order: {module.orderIndex}</span>
-                      </div>
-                      {module.videoUrl && (
-                        <a 
-                          href={module.videoUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline text-sm flex items-center"
-                        >
-                          <ExternalLink className="h-4 w-4 mr-1" />
-                          View Video
-                        </a>
-                      )}
-                    </div>
-                    
-                    {/* Action Buttons */}
-                    <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-200">
-                      <div className="text-sm text-muted-foreground">
-                        Module {module.orderIndex + 1}
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
-                          onClick={() => {
-                            console.log("Live Session Management clicked for module:", module.id)
-                            router.push(`/admin/trainings/${courseId}/modules/${module.id}`)
-                          }}
-                        >
-                          <Video className="h-4 w-4 mr-2" />
-                          Live Session Management
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700"
-                          onClick={() => {
-                            console.log("Manage Courses clicked for module:", module.id)
-                            router.push(`/admin/courses/${courseId}/modules/${module.id}/courses`)
-                          }}
-                        >
-                          <BookOpen className="h-4 w-4 mr-2" />
-                          Manage Courses
-                        </Button>
-                      </div>
-                    </div>
-              </div>
-            </CardContent>
-          </Card>
-            ))}
-          </div>
-
-          {filteredModules.length === 0 && (
-            <div className="text-center py-12">
-              <PlayCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No modules found</h3>
-              <p className="text-muted-foreground mb-4">
-                {searchQuery ? "Try adjusting your search terms" : "Get started by creating your first module"}
-              </p>
-              <Button onClick={() => setCreateModuleOpen(true)}>
+              <Button onClick={() => setShowCreateModule(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Module
               </Button>
+            </div>
+
+            {/* Search */}
+            <div className="mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search modules..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {/* Modules List */}
+            <div className="space-y-4">
+              {filteredModules.map((module) => (
+                <Card key={module.id} className="hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <PlayCircle className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">{module.title}</CardTitle>
+                          <CardDescription className="mt-1">
+                            {module.description}
+                          </CardDescription>
+                          <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
+                            <span className="flex items-center">
+                              <Clock className="h-4 w-4 mr-1" />
+                              {formatDuration(module.durationSeconds)}
+                            </span>
+                            <span className="flex items-center">
+                              <BookOpen className="h-4 w-4 mr-1" />
+                              Module {module.orderIndex + 1}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleAccessCodes(module)}
+                        >
+                          <Key className="h-4 w-4 mr-1" />
+                          Access Codes
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditModule(module)}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteModule(module.id)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
-          )}
-      </div>
 
         {/* Create Module Dialog */}
-        <Dialog open={createModuleOpen} onOpenChange={setCreateModuleOpen}>
-          <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-              <DialogTitle>Add Module & Video</DialogTitle>
+        <Dialog open={showCreateModule} onOpenChange={setShowCreateModule}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Module</DialogTitle>
               <DialogDescription>
-                Add a new module with video content to "{course.title}".
+                Add a new module to your course
               </DialogDescription>
-          </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="moduleTitle">Module Title</Label>
-              <Input
-                  id="moduleTitle"
-                value={newModule.title}
-                onChange={(e) => setNewModule({ ...newModule, title: e.target.value })}
-                  placeholder="e.g., Introduction to HTML, CSS Basics, JavaScript Fundamentals"
-              />
-            </div>
-              <div className="grid gap-2">
-                <Label htmlFor="moduleDescription">Module Description</Label>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={newModule.title}
+                  onChange={(e) => setNewModule({ ...newModule, title: e.target.value })}
+                  placeholder="Module title"
+                />
+              </div>
+              <div>
+                <Label htmlFor="description">Description</Label>
                 <Textarea
-                  id="moduleDescription"
+                  id="description"
                   value={newModule.description}
                   onChange={(e) => setNewModule({ ...newModule, description: e.target.value })}
-                  placeholder="Describe what students will learn in this module..."
-                  rows={3}
-              />
-            </div>
-              <div className="grid gap-2">
-                <Label htmlFor="videoUrl">Video URL *</Label>
-              <Input
-                  id="videoUrl"
-                value={newModule.videoUrl}
-                onChange={(e) => setNewModule({ ...newModule, videoUrl: e.target.value })}
-                  placeholder="https://youtube.com/watch?v=... or https://vimeo.com/... or direct video file URL"
+                  placeholder="Module description"
                 />
-                <p className="text-xs text-muted-foreground">
-                  You can use YouTube, Vimeo, or direct video file URLs. Students will watch this video to complete the module.
-                </p>
+              </div>
+              <div>
+                <Label htmlFor="videoUrl">Video URL</Label>
+                <Input
+                  id="videoUrl"
+                  value={newModule.videoUrl}
+                  onChange={(e) => setNewModule({ ...newModule, videoUrl: e.target.value })}
+                  placeholder="Video URL"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="duration">Video Duration (minutes)</Label>
+                <div>
+                  <Label htmlFor="duration">Duration (seconds)</Label>
                   <Input
                     id="duration"
                     type="number"
-                    value={Math.floor(newModule.durationSeconds / 60)}
-                    onChange={(e) => setNewModule({ ...newModule, durationSeconds: (parseInt(e.target.value) || 0) * 60 })}
-                    placeholder="30"
+                    value={newModule.durationSeconds}
+                    onChange={(e) => setNewModule({ ...newModule, durationSeconds: parseInt(e.target.value) || 0 })}
+                    placeholder="Duration in seconds"
                   />
-                  <p className="text-xs text-muted-foreground">Enter duration in minutes</p>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="orderIndex">Module Order</Label>
+                <div>
+                  <Label htmlFor="orderIndex">Order Index</Label>
                   <Input
                     id="orderIndex"
                     type="number"
                     value={newModule.orderIndex}
                     onChange={(e) => setNewModule({ ...newModule, orderIndex: parseInt(e.target.value) || 0 })}
-                    placeholder="1"
+                    placeholder="Order index"
                   />
-                  <p className="text-xs text-muted-foreground">Order in which this module appears (1, 2, 3...)</p>
                 </div>
+              </div>
             </div>
-          </div>
-          <DialogFooter>
-              <Button variant="outline" onClick={() => setCreateModuleOpen(false)}>
-              Cancel
-            </Button>
-              <Button 
-                onClick={handleCreateModule} 
-                disabled={!newModule.title || !newModule.description || !newModule.videoUrl}
-              >
-                Add Module & Video
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowCreateModule(false)}>
+                Cancel
               </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              <Button onClick={handleCreateModule}>
+                Create Module
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-      {/* Edit Module Dialog */}
-        <Dialog open={editModuleOpen} onOpenChange={setEditModuleOpen}>
-          <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Edit Module</DialogTitle>
+        {/* Edit Module Dialog */}
+        <Dialog open={showEditModule} onOpenChange={setShowEditModule}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Module</DialogTitle>
               <DialogDescription>
-                Update the module information and video content.
+                Update module information
               </DialogDescription>
-          </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="editModuleTitle">Module Title</Label>
-              <Input
-                  id="editModuleTitle"
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-title">Title</Label>
+                <Input
+                  id="edit-title"
                   value={editModule.title}
                   onChange={(e) => setEditModule({ ...editModule, title: e.target.value })}
-                  placeholder="e.g., Introduction to HTML, CSS Basics, JavaScript Fundamentals"
-              />
-            </div>
-              <div className="grid gap-2">
-                <Label htmlFor="editModuleDescription">Module Description</Label>
+                  placeholder="Module title"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-description">Description</Label>
                 <Textarea
-                  id="editModuleDescription"
+                  id="edit-description"
                   value={editModule.description}
                   onChange={(e) => setEditModule({ ...editModule, description: e.target.value })}
-                  placeholder="Describe what students will learn in this module..."
-                  rows={3}
-              />
-            </div>
-              <div className="grid gap-2">
-                <Label htmlFor="editVideoUrl">Video URL *</Label>
+                  placeholder="Module description"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-videoUrl">Video URL</Label>
                 <Input
-                  id="editVideoUrl"
+                  id="edit-videoUrl"
                   value={editModule.videoUrl}
                   onChange={(e) => setEditModule({ ...editModule, videoUrl: e.target.value })}
-                  placeholder="https://youtube.com/watch?v=... or https://vimeo.com/... or direct video file URL"
+                  placeholder="Video URL"
                 />
-                <p className="text-xs text-muted-foreground">
-                  You can use YouTube, Vimeo, or direct video file URLs. Students will watch this video to complete the module.
-                </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="editDuration">Video Duration (minutes)</Label>
+                <div>
+                  <Label htmlFor="edit-duration">Duration (seconds)</Label>
                   <Input
-                    id="editDuration"
+                    id="edit-duration"
                     type="number"
-                    value={Math.floor(editModule.durationSeconds / 60)}
-                    onChange={(e) => setEditModule({ ...editModule, durationSeconds: (parseInt(e.target.value) || 0) * 60 })}
-                    placeholder="30"
+                    value={editModule.durationSeconds}
+                    onChange={(e) => setEditModule({ ...editModule, durationSeconds: parseInt(e.target.value) || 0 })}
+                    placeholder="Duration in seconds"
                   />
-                  <p className="text-xs text-muted-foreground">Enter duration in minutes</p>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="editOrderIndex">Module Order</Label>
+                <div>
+                  <Label htmlFor="edit-orderIndex">Order Index</Label>
                   <Input
-                    id="editOrderIndex"
+                    id="edit-orderIndex"
                     type="number"
                     value={editModule.orderIndex}
                     onChange={(e) => setEditModule({ ...editModule, orderIndex: parseInt(e.target.value) || 0 })}
-                    placeholder="1"
+                    placeholder="Order index"
                   />
-                  <p className="text-xs text-muted-foreground">Order in which this module appears (1, 2, 3...)</p>
                 </div>
               </div>
-          </div>
-          <DialogFooter>
-              <Button variant="outline" onClick={() => setEditModuleOpen(false)}>
-              Cancel
-            </Button>
-              <Button 
-                onClick={handleUpdateModule} 
-                disabled={!editModule.title || !editModule.description || !editModule.videoUrl}
-              >
-                Update Module
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-        {/* Access Codes Dialog */}
-        <Dialog open={accessCodesOpen} onOpenChange={setAccessCodesOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-              <DialogTitle>Access Codes for "{selectedModule?.title}"</DialogTitle>
-              <DialogDescription>
-                Generate and manage access codes for this module. Students will use these codes to unlock the module.
-              </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6">
-              {/* Generate New Codes */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4">
-                  <div className="flex-1">
-                    <Label htmlFor="generateCount">Number of codes to generate</Label>
-                    <Input
-                      id="generateCount"
-                      type="number"
-                      min="1"
-                      max="50"
-                      value={generateCount}
-                      onChange={(e) => setGenerateCount(parseInt(e.target.value) || 1)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <Button onClick={handleGenerateCodes} className="mt-6">
-                    <Key className="h-4 w-4 mr-2" />
-                    Generate Codes
-                    </Button>
-                  </div>
-                </div>
-
-              {/* Generated Codes */}
-              {generatedCodes.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-green-600">Newly Generated Codes:</h4>
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-2">
-                    {generatedCodes.map((code, index) => (
-                      <div key={index} className="flex items-center justify-between bg-white rounded border p-2">
-                        <code className="font-mono text-lg font-bold text-green-700">{code}</code>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            navigator.clipboard.writeText(code)
-                            toast({
-                              title: "Copied!",
-                              description: "Access code copied to clipboard",
-                            })
-                          }}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Existing Codes */}
-              <div className="space-y-2">
-                <h4 className="font-semibold">Existing Access Codes:</h4>
-                {accessCodes.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">No access codes generated yet.</p>
-                ) : (
-                  <div className="space-y-2 max-h-60 overflow-y-auto">
-                    {accessCodes.map((code) => (
-                      <div key={code.id} className="flex items-center justify-between bg-gray-50 rounded border p-3">
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-3 h-3 rounded-full ${code.used ? 'bg-red-500' : 'bg-green-500'}`}></div>
-                          <div>
-                            <div className="text-sm font-medium">
-                              {code.used ? 'Used' : 'Available'}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              Created: {new Date(code.createdAt).toLocaleString()}
-                              {code.consumedAt && (
-                                <span> • Used: {new Date(code.consumedAt).toLocaleString()}</span>
-                          )}
-                        </div>
-                        </div>
-                      </div>
-                        {!code.used && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteCode(code.id)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                    </div>
-                  ))}
-              </div>
-                )}
             </div>
-          </div>
-          <DialogFooter>
-              <Button variant="outline" onClick={() => setAccessCodesOpen(false)}>
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowEditModule(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateModule}>
+                Update Module
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Delete Confirmation Dialog */}
-        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Delete Module</DialogTitle>
@@ -971,7 +611,7 @@ export default function CourseModulesPage() {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
                 Cancel
               </Button>
               <Button variant="destructive" onClick={confirmDelete}>
@@ -980,7 +620,61 @@ export default function CourseModulesPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-    </div>
+
+        {/* Access Codes Dialog */}
+        <Dialog open={showAccessCodes} onOpenChange={setShowAccessCodes}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Access Codes for {selectedModule?.title}</DialogTitle>
+              <DialogDescription>
+                Manage access codes for this module
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Access Codes</h3>
+                <Button onClick={handleGenerateCodes}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Generate Codes
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {accessCodes.map((code) => (
+                  <div key={code.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <Key className="h-4 w-4" />
+                      <span className="font-mono">{code.code}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigator.clipboard.writeText(code.code)}
+                      >
+                        <Copy className="h-4 w-4 mr-1" />
+                        Copy
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteCode(code.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowAccessCodes(false)}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </RequireAdmin>
   )
 }

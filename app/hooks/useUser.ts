@@ -36,18 +36,15 @@ export function useUser() {
       
       if (res.ok) {
         const userData = await res.json()
-        console.log("User data received:", userData)
         if (userData.authenticated && userData.id) {
           setUser(userData)
           // Update cache
           userCache = { user: userData, timestamp: Date.now() }
         } else {
-          console.log("User not authenticated, clearing user state")
           setUser(null)
           userCache = { user: null, timestamp: Date.now() }
         }
       } else {
-        console.log("Failed to fetch user from frontend API, trying direct backend call")
         
         // Fallback: try direct backend call with Bearer token
         const cookies = document.cookie.split(';');
@@ -69,18 +66,15 @@ export function useUser() {
           
           if (backendRes.ok) {
             const userData = await backendRes.json()
-            console.log("User data received from backend:", userData)
             if (userData.authenticated && userData.id) {
               setUser(userData)
             } else {
               setUser(null)
             }
           } else {
-            console.log("Failed to fetch user from backend, clearing user state")
             setUser(null)
           }
         } else {
-          console.log("No JWT token found, clearing user state")
           setUser(null)
         }
       }

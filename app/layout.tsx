@@ -4,6 +4,8 @@ import { Space_Grotesk, DM_Sans } from "next/font/google"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
+import ErrorBoundary from "@/components/ErrorBoundary"
+import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
 const spaceGrotesk = Space_Grotesk({
@@ -32,7 +34,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${spaceGrotesk.variable} ${GeistMono.variable} font-sans antialiased`}>
-        <Suspense fallback={null}>{children}</Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={null}>{children}</Suspense>
+        </ErrorBoundary>
+        <Toaster />
         <Analytics />
       </body>
     </html>

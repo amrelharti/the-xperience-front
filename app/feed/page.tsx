@@ -26,6 +26,8 @@ import { useDebounce } from "@/app/hooks/useDebounce"
 import UserDropdown from "@/app/components/UserDropdown"
 import RequireAuth from "@/app/components/RequireAuth"
 import { useToast } from "@/hooks/use-toast"
+import { logger } from "@/lib/logger"
+import { measureApiCall } from "@/lib/performance"
 
 interface Post {
   id: string
@@ -81,17 +83,13 @@ export default function FeedPage() {
     const trainingParam = searchParams.get('training')
     const classParam = searchParams.get('class')
     
-    console.log("🔍 URL parameters detected:", { trainingParam, classParam })
-    
     if (trainingParam) {
       // If training parameter is provided, filter by that training
-      console.log("📚 Setting filterTraining to:", trainingParam)
       setFilterTraining(trainingParam)
     }
     
     if (classParam) {
       // If class parameter is provided, filter by that class
-      console.log("🏫 Setting filterClass to:", classParam)
       setFilterClass(classParam)
     }
     
@@ -107,9 +105,20 @@ export default function FeedPage() {
   }, [currentPage, debouncedSearchQuery, filterType, filterTraining, filterModule, filterClass, urlParamsProcessed])
   
   useEffect(() => {
-    loadTrainings()
-    loadClasses()
-    loadAllTrainingModules()
+    const loadInitialData = async () => {
+      try {
+        // Load all data in parallel for better performance
+        await Promise.all([
+          loadTrainings(),
+          loadClasses(),
+          loadAllTrainingModules()
+        ])
+    } catch (error) {
+      logger.error("Failed to load initial data", {}, error as Error)
+    }
+    }
+    
+    loadInitialData()
   }, [])
 
   // Load training modules for the specific training from URL parameter
@@ -123,20 +132,6 @@ export default function FeedPage() {
   const loadPosts = async () => {
     try {
       setLoading(true)
-      console.log("🔍 Loading posts with filters:", {
-        filterTraining,
-        filterModule,
-        filterClass,
-        filterType,
-        searchQuery: debouncedSearchQuery
-      })
-      
-      console.log("🔍 Filter values check:", {
-        "filterTraining !== 'all'": filterTraining !== "all",
-        "filterModule !== 'all'": filterModule !== "all",
-        "filterClass !== 'all'": filterClass !== "all",
-        "filterType !== 'all'": filterType !== "all"
-      })
       
       const params = new URLSearchParams({
         page: currentPage.toString(),
@@ -151,20 +146,17 @@ export default function FeedPage() {
       }
       if (filterModule !== "all") {
         params.append("moduleId", filterModule)
-        console.log("📚 Adding module filter:", filterModule)
       }
       if (filterClass !== "all") {
         params.append("classId", filterClass)
-        console.log("🏫 Adding classId filter:", filterClass)
       }
 
       const finalUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/feed?${params}`
-      console.log("🌐 Final API URL:", finalUrl)
-      console.log("📋 Final parameters:", params.toString())
-      console.log("🔍 Request timestamp:", new Date().toISOString())
       
-      const res = await fetch(finalUrl, {
-        credentials: "include"
+      const res = await measureApiCall('loadPosts', async () => {
+        return fetch(finalUrl, {
+          credentials: "include"
+        })
       })
       
       if (res.ok) {
@@ -173,7 +165,10 @@ export default function FeedPage() {
         setTotalPages(data.totalPages || 0)
       }
     } catch (error) {
-      console.error("Error loading posts:", error)
+      logger.error("Failed to load posts", { 
+        page: currentPage, 
+        filters: { filterType, filterTraining, filterModule, filterClass } 
+      }, error as Error)
       toast({
         title: "Error",
         description: "Failed to load posts",
@@ -191,13 +186,12 @@ export default function FeedPage() {
         credentials: "include"
       })
       
-      if (trainingsRes.ok) {
-        const trainingsData = await trainingsRes.json()
-        console.log("📚 Loaded trainings:", trainingsData.length)
-        setTrainings(trainingsData)
-      }
+        if (trainingsRes.ok) {
+          const trainingsData = await trainingsRes.json()
+          setTrainings(trainingsData)
+        }
     } catch (error) {
-      console.error("Error loading trainings:", error)
+      logger.error("Failed to load trainings", {}, error as Error)
     }
   }
 
@@ -253,12 +247,11 @@ export default function FeedPage() {
       if (modulesRes.ok) {
         const trainingData = await modulesRes.json()
         if (trainingData.modules) {
-          console.log("📚 Loaded modules for specific training:", trainingData.modules.length)
           setTrainingModules(trainingData.modules)
         }
       }
     } catch (error) {
-      console.error("Error loading training modules for specific training:", error)
+      logger.error("Failed to load training modules for specific training", { trainingId }, error as Error)
     }
   }
 
@@ -274,7 +267,7 @@ export default function FeedPage() {
         setClasses(data)
       }
     } catch (error) {
-      console.error("Error loading classes:", error)
+      logger.error("Failed to load classes", {}, error as Error)
     }
   }
 

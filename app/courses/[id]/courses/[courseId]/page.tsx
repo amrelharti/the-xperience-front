@@ -1,12 +1,22 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { useUser } from "../../../../hooks/useUser"
 import { useToast } from "@/hooks/use-toast"
 import { 
@@ -37,10 +47,15 @@ interface Module {
 export default function CourseDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user, isLoading: userLoading } = useUser()
   const { toast } = useToast()
   const trainingId = params.id as string
   const courseId = params.courseId as string
+  const classIdParam = searchParams.get('class')
+  
+  // State to store the actual classId (may come from URL or user enrollments)
+  const [classId, setClassId] = useState<string | null>(classIdParam)
 
   const [courseProgress, setCourseProgress] = useState<{
     status: string
@@ -49,6 +64,11 @@ export default function CourseDetailPage() {
     isCompleted: boolean
     isStarted: boolean
   } | null>(null)
+  
+  // Video completion tracking
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [allCourses, setAllCourses] = useState<Course[]>([])
+  const [currentCourseIndex, setCurrentCourseIndex] = useState(-1)
 
   // Function to convert YouTube URL to embed URL
   const getYouTubeEmbedUrl = (url: string) => {
@@ -119,6 +139,11 @@ export default function CourseDetailPage() {
         title: moduleData.title,
         description: moduleData.description
       })
+      
+      // Set all courses for navigation
+      setAllCourses(moduleData.courses || [])
+      const courseIndex = moduleData.courses?.findIndex((c: Course) => c.id === courseId) || -1
+      setCurrentCourseIndex(courseIndex)
 
       // Enrollment check removed - not needed on individual course page
     } catch (err) {
@@ -129,73 +154,171 @@ export default function CourseDetailPage() {
     }
   }, [trainingId, courseId])
 
-  const loadCourseProgress = async () => {
+  const loadCourseProgress = useCallback(async () => {
+    if (!classId) {
+      console.log("❌ No classId available for progress loading")
+      return
+    }
+    
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}/progress`, {
+      console.log("📊 Loading progress for course:", courseId, "class:", classId)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}/progress?classId=${classId}`, {
         credentials: "include"
       })
       
-      if (response.ok) {
-        const data = await response.json()
-        setCourseProgress(data)
-      }
-    } catch (error) {
-      console.log("Course progress not available:", error)
-    }
-  }
-
-  const markCourseAsStarted = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}/start`, {
-        method: "POST",
-        credentials: "include"
-      })
+      console.log("📊 Progress response status:", response.status)
       
       if (response.ok) {
         const data = await response.json()
+        console.log("📊 Progress data received:", data)
         setCourseProgress(data)
+      } else {
+        console.error("❌ Failed to load progress:", response.status)
       }
     } catch (error) {
-      console.error("Error marking course as started:", error)
+      console.error("❌ Error loading progress:", error)
     }
-  }
+  }, [classId, courseId])
 
   const markCourseAsCompleted = async () => {
+    if (!classId) {
+      console.error("❌ No classId provided")
+      toast({
+        title: "Error",
+        description: "Class ID is missing. Please go back and select a class.",
+        variant: "destructive"
+      })
+      return
+    }
+    
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}/complete`, {
+      console.log("✅ Marking course as completed:", courseId, "class:", classId)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}/complete?classId=${classId}`, {
         method: "POST",
         credentials: "include"
       })
       
+      console.log("✅ Complete response status:", response.status)
+      
       if (response.ok) {
-        const data = await response.json()
-        setCourseProgress({
-          status: "COMPLETED",
-          watchTimeSeconds: courseProgress?.watchTimeSeconds || 0,
-          completionPercentage: 100,
-          isCompleted: true,
-          isStarted: true
-        })
+        const responseData = await response.json()
+        console.log("✅ Completion response data:", responseData)
+        
+        // Reload progress from the API to get the correct state
+        console.log("🔄 Reloading progress after completion...")
+        await loadCourseProgress()
+        
         toast({
           title: "Course Completed!",
           description: "Great job! You've completed this course."
         })
+      } else {
+        const errorData = await response.json()
+        console.error("❌ Completion failed:", errorData)
+        toast({
+          title: "Error",
+          description: errorData.message || "Failed to mark course as completed",
+          variant: "destructive"
+        })
       }
     } catch (error) {
-      console.error("Error marking course as completed:", error)
+      console.error("❌ Error marking course as completed:", error)
       toast({
         title: "Error",
-        description: "Failed to mark course as completed"
+        description: "Failed to mark course as completed",
+        variant: "destructive"
       })
     }
   }
 
+  // Navigation functions
+  const goToPreviousCourse = () => {
+    if (currentCourseIndex > 0) {
+      const prevCourse = allCourses[currentCourseIndex - 1]
+      router.push(`/courses/${trainingId}/courses/${prevCourse.id}${classId ? `?class=${classId}` : ''}`)
+    } else if (currentCourseIndex === -1 && allCourses.length > 0) {
+      // If we don't know our position, go to the first course
+      const firstCourse = allCourses[0]
+      router.push(`/courses/${trainingId}/courses/${firstCourse.id}${classId ? `?class=${classId}` : ''}`)
+    }
+  }
+
+  const goToNextCourse = () => {
+    if (currentCourseIndex >= 0 && currentCourseIndex < allCourses.length - 1) {
+      const nextCourse = allCourses[currentCourseIndex + 1]
+      router.push(`/courses/${trainingId}/courses/${nextCourse.id}${classId ? `?class=${classId}` : ''}`)
+    } else if (currentCourseIndex === -1 && allCourses.length > 1) {
+      // If we don't know our position, go to the second course
+      const secondCourse = allCourses[1]
+      router.push(`/courses/${trainingId}/courses/${secondCourse.id}${classId ? `?class=${classId}` : ''}`)
+    }
+  }
+
+  // Sync classId from URL params
+  useEffect(() => {
+    const urlClassId = searchParams.get('class')
+    console.log("🔍 URL classId:", urlClassId)
+    
+    if (urlClassId) {
+      setClassId(urlClassId)
+    } else if (user) {
+      // Try to get classId from user enrollments
+      console.log("🔍 No classId in URL, fetching from my-classes...")
+      fetch('/api/classes/my-classes')
+        .then(res => res.json())
+        .then(classesData => {
+          console.log("🔍 Full my-classes data:", JSON.stringify(classesData, null, 2))
+          
+          if (classesData && classesData.length > 0) {
+            console.log("📋 Found classes:", classesData)
+            
+            // Find class for this training
+            const matchingClasses = classesData.filter((c: any) => {
+              console.log("🔍 Checking class:", c)
+              // Check if the class belongs to this training (moduleId matches trainingId)
+              const matches = c.moduleId === trainingId
+              console.log(`  - moduleId: ${c.moduleId}, trainingId: ${trainingId}, matches: ${matches}`)
+              return matches
+            })
+            
+            console.log(`📊 Found ${matchingClasses.length} matching classes`)
+            
+            // Prefer active classes over archived ones
+            let trainingClass = matchingClasses.find((c: any) => c.isActive && !c.isArchived)
+            if (!trainingClass) {
+              // If no active class, get the first matching one
+              trainingClass = matchingClasses[0]
+            }
+            
+            if (trainingClass) {
+              const foundClassId = trainingClass.id
+              console.log("✅ Found classId from my-classes:", foundClassId)
+              if (foundClassId) {
+                setClassId(foundClassId)
+              }
+            } else {
+              console.log("⚠️ No class found for training:", trainingId)
+            }
+          } else {
+            console.log("⚠️ No classes found in my-classes data")
+          }
+        })
+        .catch(err => console.error("❌ Error fetching my-classes:", err))
+    }
+  }, [searchParams, user, trainingId])
+
   useEffect(() => {
     if (user && courseId) {
       loadData()
+    }
+  }, [user, courseId, loadData])
+
+  useEffect(() => {
+    console.log("🔍 Current classId state:", classId)
+    if (classId && courseId) {
       loadCourseProgress()
     }
-  }, [user, courseId])
+  }, [classId, courseId, loadCourseProgress])
 
   if (loading) {
     return (
@@ -349,6 +472,47 @@ export default function CourseDetailPage() {
                       </div>
                     )}
                     
+                    {/* Manual completion trigger */}
+                    <div className="mt-4 text-center">
+                      <Button 
+                        onClick={() => setShowConfirmDialog(true)}
+                        variant="default"
+                        size="lg"
+                        className="w-full"
+                      >
+                        ✅ I Finished Watching This Video
+                      </Button>
+                    </div>
+                    
+                    {/* Course Navigation */}
+                    {allCourses.length > 1 && (
+                      <div className="flex justify-between items-center py-4 border-t">
+                        <Button 
+                          variant="outline" 
+                          onClick={goToPreviousCourse}
+                          disabled={currentCourseIndex === -1 ? allCourses.length <= 1 : currentCourseIndex <= 0}
+                          className="flex items-center"
+                        >
+                          <ArrowLeft className="h-4 w-4 mr-2" />
+                          Previous Course
+                        </Button>
+                        
+                        <div className="text-sm text-muted-foreground">
+                          {currentCourseIndex >= 0 ? currentCourseIndex + 1 : 1} of {allCourses.length}
+                        </div>
+                        
+                        <Button 
+                          variant="outline" 
+                          onClick={goToNextCourse}
+                          disabled={currentCourseIndex === -1 ? allCourses.length <= 1 : currentCourseIndex >= allCourses.length - 1}
+                          className="flex items-center"
+                        >
+                          Next Course
+                          <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
+                        </Button>
+                      </div>
+                    )}
+                    
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold">Course Description</h3>
                       <p className="text-muted-foreground">
@@ -399,6 +563,7 @@ export default function CourseDetailPage() {
                         <span>Course Progress</span>
                         <span>{courseProgress?.completionPercentage || 0}%</span>
                       </div>
+                      {console.log("🎨 Rendering progress:", courseProgress?.completionPercentage)}
                       <Progress value={courseProgress?.completionPercentage || 0} className="w-full" />
                       <p className="text-xs text-muted-foreground">
                         {courseProgress?.isCompleted ? "Course completed!" : 
@@ -406,28 +571,6 @@ export default function CourseDetailPage() {
                          "Start watching to track your progress"}
                       </p>
                     </div>
-                    
-                    {courseProgress && !courseProgress.isCompleted && (
-                      <div className="space-y-2">
-                        <Button 
-                          onClick={markCourseAsStarted}
-                          variant="outline" 
-                          size="sm" 
-                          className="w-full"
-                        >
-                          Mark as Started
-                        </Button>
-                        <Button 
-                          onClick={markCourseAsCompleted}
-                          variant="default" 
-                          size="sm" 
-                          className="w-full"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Mark as Completed
-                        </Button>
-                      </div>
-                    )}
                     
                     {courseProgress?.isCompleted && (
                       <div className="flex items-center gap-2 text-green-600">
@@ -442,6 +585,31 @@ export default function CourseDetailPage() {
           </div>
         </div>
       </div>
+      
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Video Completion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Did you watch the entire video? Clicking "I Watched It" means you honorably confirm that you have fully watched the course video content.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={async () => {
+                setShowConfirmDialog(false)
+                // Mark course as completed immediately
+                await markCourseAsCompleted()
+              }}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              ✅ I Watched It
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

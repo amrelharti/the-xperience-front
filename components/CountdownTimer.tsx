@@ -108,18 +108,6 @@ export default function CountdownTimer({
                 Minutes
               </div>
             </div>
-
-            <div className="text-2xl md:text-4xl font-bold text-muted-foreground self-start mt-1">:</div>
-
-            {/* Seconds */}
-            <div className="flex flex-col items-center">
-              <div className="text-3xl md:text-5xl font-bold text-primary tabular-nums">
-                {formatNumber(timeLeft.seconds)}
-              </div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wide mt-1">
-                Seconds
-              </div>
-            </div>
           </div>
     </div>
   )

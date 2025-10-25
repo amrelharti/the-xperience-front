@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock, Users, Video, CheckCircle, ExternalLink } from "lucide-react"
 import CountdownTimer from "./CountdownTimer"
+import { useToast } from "@/hooks/use-toast"
 
 interface LiveSessionCardProps {
   liveSession: {
@@ -20,6 +21,7 @@ interface LiveSessionCardProps {
   isAttended: boolean
   onAttendanceToggle: (attended: boolean) => Promise<void>
   currentProgress: number // Current module progress (0-100)
+  classId?: string | null
 }
 
 export default function LiveSessionCard({
@@ -27,15 +29,12 @@ export default function LiveSessionCard({
   isAttended,
   onAttendanceToggle,
   currentProgress,
+  classId,
 }: LiveSessionCardProps) {
   const [isLive, setIsLive] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
 
-  // Debug and validate the date
-  console.log("🔍 LiveSessionCard received data:", liveSession)
-  console.log("📅 scheduledDate:", liveSession.scheduledDate)
-  console.log("📅 Date object:", new Date(liveSession.scheduledDate))
-  console.log("📅 Is valid date:", !isNaN(new Date(liveSession.scheduledDate).getTime()))
 
   // Ensure we have a valid date
   const sessionDate = new Date(liveSession.scheduledDate)
@@ -47,6 +46,30 @@ export default function LiveSessionCard({
   }
 
   const handleAttendanceChange = async (checked: boolean) => {
+    if (!classId) {
+      toast({
+        title: "Error",
+        description: "Class ID is missing",
+        variant: "destructive",
+      })
+      return
+    }
+    
+    // Check if trying to mark as attended before the session has started
+    if (checked && !isLive && isValidDate) {
+      const now = new Date().getTime()
+      const sessionTime = new Date(liveSession.scheduledDate).getTime()
+      
+      if (now < sessionTime) {
+        toast({
+          title: "Session Not Started Yet",
+          description: "You can only mark attendance after the live session has started. Please wait for the session to begin.",
+          variant: "destructive",
+        })
+        return
+      }
+    }
+    
     setIsLoading(true)
     try {
       await onAttendanceToggle(checked)

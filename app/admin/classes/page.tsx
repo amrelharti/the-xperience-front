@@ -62,15 +62,12 @@ export default function ClassManagementPage() {
 
   const loadClasses = async () => {
     try {
-      console.log("🔄 Loading classes...")
       setLoading(true)
       const res = await fetch("/api/classes", {
         credentials: "include"
       })
       if (res.ok) {
         const classesData = await res.json()
-        console.log("✅ Classes loaded:", classesData.length, "classes")
-        console.log("📋 Classes data:", classesData)
         setClasses(classesData)
       } else {
         console.error("❌ Failed to load classes:", res.status)
@@ -110,7 +107,6 @@ export default function ClassManagementPage() {
         moduleId: newClass.moduleId.trim()
       }
 
-      console.log("Creating class with data:", classData)
 
       const res = await fetch("/api/classes", {
         method: "POST",
@@ -119,7 +115,6 @@ export default function ClassManagementPage() {
         body: JSON.stringify(classData)
       })
       
-      console.log("Response status:", res.status)
       
       if (res.ok) {
         setNewClass({ name: "", description: "", moduleId: "", startDate: "", endDate: "", maxStudents: 30 })
@@ -169,7 +164,6 @@ export default function ClassManagementPage() {
         newState = "inactive";
       }
       
-      console.log(`🔄 Changing class ${classId} to ${newState} state`)
       
       const res = await fetch(`/api/classes/${classId}`, {
         method: "PUT",
@@ -178,11 +172,9 @@ export default function ClassManagementPage() {
         body: JSON.stringify({ isActive: newIsActive, isArchived: newIsArchived })
       })
       
-      console.log(`📡 Response status: ${res.status}`)
       
       if (res.ok) {
         const responseData = await res.json()
-        console.log("✅ Class status updated successfully:", responseData)
         loadClasses()
       } else {
         const errorData = await res.text()
@@ -455,7 +447,6 @@ export default function ClassManagementPage() {
           <CardContent>
             <div className="space-y-4">
               {filteredClasses.map((classItem) => {
-                console.log(`Class ${classItem.name}: isActive=${classItem.isActive}, isArchived=${classItem.isArchived}`)
                 return (
                 <div 
                   key={classItem.id} 
