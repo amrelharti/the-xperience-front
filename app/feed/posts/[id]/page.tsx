@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { useParams, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -88,6 +88,18 @@ export default function PostDetailPage() {
   const searchParams = useSearchParams()
   const { user } = useUser()
   const { toast } = useToast()
+
+  // Get training and class query parameters for preserving context
+  const training = searchParams.get('training')
+  const classParam = searchParams.get('class')
+
+  // Build feed URL with query parameters
+  const feedUrl = useMemo(() => {
+    if (training && classParam) {
+      return `/feed?training=${training}&class=${classParam}`
+    }
+    return '/feed'
+  }, [training, classParam])
 
   useEffect(() => {
     if (params.id) {
@@ -755,7 +767,7 @@ export default function PostDetailPage() {
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Back Button */}
           <Button variant="ghost" asChild className="mb-6">
-            <Link href={cameFromAdmin ? "/admin/feed" : "/feed"}>
+            <Link href={cameFromAdmin ? "/admin/feed" : feedUrl}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to {cameFromAdmin ? "Admin Feed" : "Feed"}
             </Link>
@@ -893,8 +905,23 @@ export default function PostDetailPage() {
               )}
               
               {post.attachments && (
-                <div className="mb-4 p-3 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground">{post.attachments}</p>
+                <div className="mb-4">
+                  {post.attachments.startsWith('data:image') || post.attachments.startsWith('http://') || post.attachments.startsWith('https://') ? (
+                    <div className="relative w-full max-h-96 overflow-hidden rounded-lg border border-gray-200">
+                      <img 
+                        src={post.attachments} 
+                        alt="Post attachment" 
+                        className="w-full h-auto object-contain max-h-96"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-muted rounded-lg">
+                      <p className="text-sm text-muted-foreground">{post.attachments}</p>
+                    </div>
+                  )}
                 </div>
               )}
 

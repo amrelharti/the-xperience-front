@@ -44,6 +44,7 @@ interface TrainingModule {
   status: "LOCKED" | "UNLOCKED"
   coursesCount: number
   progress?: number // Add progress percentage
+  thumbnailUrl?: string // Add thumbnail URL
 }
 
 interface ModuleDetailPageProps {
@@ -80,6 +81,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     try {
       // Get user's enrolled classes if classId not provided
       let selectedClassId = classId
+      console.log("📊 loadModuleProgress called with classId:", classId)
       if (!selectedClassId) {
         const enrollmentsResponse = await fetch("/api/classes/my-classes")
         if (enrollmentsResponse.ok) {
@@ -109,6 +111,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       }
 
       // Load progress for each module with class context
+      console.log("📊 Loading progress for classId:", selectedClassId)
       const progressPromises = trainingData.modules.map(async (module) => {
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${module.id}/training-progress?classId=${selectedClassId}`, {
@@ -116,6 +119,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           })
           if (response.ok) {
             const progressData = await response.json()
+            console.log(`📊 ${module.title} progress: ${progressData.progress || 0}% for class: ${selectedClassId}`)
             return { moduleId: module.id, progress: progressData.progress || 0 }
           }
         } catch (error) {
@@ -125,6 +129,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       })
 
       const progressResults = await Promise.all(progressPromises)
+      console.log("📊 Progress results for all modules:", progressResults)
       
       // Update training with progress data
       setTraining(prevTraining => {
@@ -132,11 +137,14 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         
         const updatedModules = prevTraining.modules.map(module => {
           const progressData = progressResults.find(p => p.moduleId === module.id)
+          console.log(`📊 Updating ${module.title} progress to: ${progressData?.progress || 0}%`)
           return {
             ...module,
             progress: progressData?.progress || 0
           }
         })
+        
+        console.log("📊 Updated modules with progress:", updatedModules.map(m => ({ title: m.title, progress: m.progress })))
         
         return {
           ...prevTraining,
@@ -146,7 +154,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     } catch (error) {
       console.log("Error loading module progress:", error)
     }
-  }, [user, params.id])
+  }, [user, params.id, selectedClassId])
 
   const loadAvailableClasses = useCallback(async () => {
     try {
@@ -176,18 +184,25 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     }
   }, [params.id])
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (overrideClassId?: string) => {
     try {
       setLoading(true)
       setError(null)
 
-      // Load training details with modules
-      const trainingResponse = await fetch(`/api/courses/${params.id}`)
+      // Use overrideClassId if provided, otherwise use selectedClassId
+      const classIdToUse = overrideClassId || selectedClassId
+      const classIdParam = classIdToUse ? `?classId=${classIdToUse}` : ''
+      console.log("🔄 Loading training with classId:", classIdToUse, "param:", classIdParam)
+      const trainingResponse = await fetch(`/api/courses/${params.id}${classIdParam}`)
       if (!trainingResponse.ok) {
         throw new Error("Failed to load training")
       }
       const trainingData = await trainingResponse.json()
       console.log("Training data from API:", trainingData)
+      console.log("📦 All module statuses for classId:", classIdToUse)
+      trainingData.modules?.forEach((module: any) => {
+        console.log(`  - ${module.title}: ${module.status}`)
+      })
       setTraining(trainingData)
 
       // Check if user is enrolled in ACTIVE classes only (only if authenticated)
@@ -217,13 +232,14 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             if (trainingEnrollments.length > 1) {
               // Check if student has a saved preference for this training
               const savedClassId = localStorage.getItem(`selectedClass_${params.id}`)
-              const savedClass = savedClassId ? trainingEnrollments.find(c => c.id === savedClassId) : null
+              const savedClass = savedClassId ? trainingEnrollments.find((c: any) => c.id === savedClassId) : null
               
-              if (savedClass) {
+              if (savedClass && savedClassId) {
                 // Student has a saved preference, use it
                 setSelectedClassId(savedClassId)
                 setIsEnrolled(true)
-                // Don't show modal, just use the saved class
+                // Load available classes in background for the switch button
+                await loadAvailableClasses()
               } else {
                 // No saved preference, show class selection modal
                 setShowClassSelection(true)
@@ -237,6 +253,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
               setIsEnrolled(true)
               // Save the selection
               localStorage.setItem(`selectedClass_${params.id}`, singleClass.id)
+              // Load available classes in background for the switch button
+              await loadAvailableClasses()
             }
           }
         } catch (enrollError) {
@@ -251,9 +269,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         await loadAvailableClasses()
       }
 
-      // Load progress if user is enrolled
+      // Load progress if user is enrolled - pass classId for class-specific progress
       if (enrolled && user && trainingData?.modules) {
-        await loadModuleProgress(trainingData)
+        await loadModuleProgress(trainingData, classIdToUse)
       }
     } catch (err) {
       console.error("Error loading training:", err)
@@ -274,6 +292,18 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       return
     }
 
+    // CRITICAL: Log the module ID being unlocked for debugging
+    console.log("🔓 Unlocking module:", unlockingModule)
+    console.log("🔑 Access code:", moduleAccessCode)
+    
+    // Validate we have a valid module ID
+    const moduleToUnlock = training?.modules?.find(m => m.id === unlockingModule)
+    if (!moduleToUnlock) {
+      alert("Error: Module not found")
+      return
+    }
+    console.log("📚 Target module:", moduleToUnlock.title)
+
     try {
       const response = await fetch(`/api/training-modules/${unlockingModule}/unlock`, {
         method: "POST",
@@ -281,7 +311,13 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ code: moduleAccessCode }),
+        body: JSON.stringify({ 
+          code: moduleAccessCode,
+          // Explicitly include the module ID in the request body as a safeguard
+          moduleId: unlockingModule,
+          // CRITICAL: Pass classId for class-specific access
+          classId: selectedClassId
+        }),
       })
 
       if (response.ok) {
@@ -289,8 +325,22 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         setShowUnlockDialog(false)
         setModuleAccessCode("")
         setUnlockingModule(null)
+        
         // Reload to update module access status
-        load()
+        await load()
+        
+        // Verify that ONLY the specific module was unlocked (backend bug check)
+        setTimeout(() => {
+          const updatedModules = training?.modules?.filter(m => m.status === "UNLOCKED")
+          if (updatedModules && updatedModules.length > 1) {
+            const expectedModule = updatedModules.find(m => m.id === unlockingModule)
+            if (expectedModule) {
+              console.warn("⚠️ WARNING: Multiple modules unlocked. Expected only:", moduleToUnlock.title)
+              console.warn("⚠️ This indicates a backend issue - access codes should unlock only ONE module")
+              console.warn("📊 Currently unlocked:", updatedModules.map(m => m.title))
+            }
+          }
+        }, 1000)
       } else {
         const errorData = await response.json()
         alert(`Unlock failed: ${errorData.error || "Invalid or used code"}`)
@@ -332,8 +382,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           setShowClassSelection(false)
           // Save the student's choice for this training
           localStorage.setItem(`selectedClass_${params.id}`, selectedClassId)
-          // Reload the page to update the UI
-          window.location.reload()
+          // Reload the training data with the new class context
+          setLoading(true)
+          await load(selectedClassId) // Pass the classId explicitly
         } else {
           const errorData = await response.json()
           alert(`Enrollment failed: ${errorData.error || "Unknown error"}`)
@@ -346,16 +397,37 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       // This is an already enrolled class, just continue
       setIsEnrolled(true)
       setShowClassSelection(false)
+      // Update selectedClassId state before loading
+      setSelectedClassId(selectedClassId)
       // Save the student's choice for this training
       localStorage.setItem(`selectedClass_${params.id}`, selectedClassId)
-      // Reload the page to update the UI
-      window.location.reload()
+      // Reload the training data with the new class context
+      setLoading(true)
+      await load(selectedClassId) // Pass the classId explicitly
     }
   }
 
   useEffect(() => {
     load()
   }, [load])
+
+  // Debug: Track selectedClassId changes
+  useEffect(() => {
+    console.log("🎯 selectedClassId changed to:", selectedClassId)
+  }, [selectedClassId])
+
+  // Debug: Track modal rendering
+  useEffect(() => {
+    if (showClassSelection) {
+      console.log("🎨 Modal opened - available classes:", availableClasses, "selectedClassId:", selectedClassId)
+    }
+  }, [showClassSelection, availableClasses, selectedClassId])
+
+  // Debug: Track switch button visibility
+  useEffect(() => {
+    console.log("🔍 Switch button check - availableClasses.length:", availableClasses.length, "isEnrolled:", isEnrolled, "should show:", availableClasses.length > 1 && isEnrolled)
+  }, [availableClasses, isEnrolled])
+
 
   // Show loading while checking authentication
   if (userLoading) {
@@ -400,7 +472,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-destructive mb-4">Error</h1>
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={load}>Try Again</Button>
+            <Button onClick={() => load()}>Try Again</Button>
           </div>
         </div>
       </div>
@@ -539,11 +611,21 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           {training.modules?.map((module, index) => (
             <Card key={module.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary font-bold">
-                      {index + 1}
-                    </div>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 flex-1">
+                    {/* Module Thumbnail */}
+                    {module.thumbnailUrl && (
+                      <div className="w-23 h-23 rounded-lg overflow-hidden flex-shrink-0">
+                        <NextImage
+                          src={module.thumbnailUrl}
+                          alt={module.title}
+                          width={160}
+                          height={160}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-xl font-semibold">{module.title}</h3>
@@ -678,7 +760,12 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                     ? "border-blue-500 bg-blue-50"
                                     : "border-blue-200 bg-blue-25 hover:border-blue-300"
                                 }`}
-                                onClick={() => setSelectedClassId(classItem.id)}
+                                onClick={() => {
+                                  console.log("🖱️ Clicked on ARCHIVED class:", classItem.name, "id:", classItem.id)
+                                  console.log("🔍 Current selectedClassId before:", selectedClassId)
+                                  setSelectedClassId(classItem.id)
+                                  console.log("✅ Set selectedClassId to:", classItem.id)
+                                }}
                               >
                                 <div className="flex items-center gap-3">
                                   <div className={`h-4 w-4 rounded-full border-2 ${
@@ -716,7 +803,12 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                     ? "border-green-500 bg-green-50"
                                     : "border-green-200 bg-green-25 hover:border-green-300"
                                 }`}
-                                onClick={() => setSelectedClassId(classItem.id)}
+                                onClick={() => {
+                                  console.log("🖱️ Clicked on ACTIVE class:", classItem.name, "id:", classItem.id)
+                                  console.log("🔍 Current selectedClassId before:", selectedClassId)
+                                  setSelectedClassId(classItem.id)
+                                  console.log("✅ Set selectedClassId to:", classItem.id)
+                                }}
                               >
                                 <div className="flex items-center gap-3">
                                   <div className={`h-4 w-4 rounded-full border-2 ${

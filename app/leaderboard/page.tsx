@@ -230,9 +230,9 @@ export default function LeaderboardPage() {
         <div className="container mx-auto px-4 py-8">
           {/* Back Button */}
           <Button variant="ghost" asChild className="mb-6">
-            <Link href="/">
+            <Link href={selectedTraining ? `/courses/${selectedTraining}` : "/"}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Trainings
+              {selectedTraining ? "Back to Training" : "Back to Trainings"}
             </Link>
           </Button>
 
@@ -323,12 +323,9 @@ export default function LeaderboardPage() {
                 <div className="text-center py-12">
                   <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-semibold mb-2">No rankings yet</h3>
-                  <p className="text-muted-foreground mb-4">
+                  <p className="text-muted-foreground">
                     No rated assignments in your class yet. Be the first!
                   </p>
-                  <Button asChild>
-                    <Link href="/feed/new">Submit First Assignment</Link>
-                  </Button>
                 </div>
               ) : (
                 <div className="space-y-4">

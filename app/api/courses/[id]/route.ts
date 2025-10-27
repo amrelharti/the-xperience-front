@@ -7,7 +7,14 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/courses/${params.id}`, {
+    // Get classId from query parameters
+    const { searchParams } = new URL(request.url)
+    const classId = searchParams.get('classId')
+    const classIdParam = classId ? `?classId=${classId}` : ''
+    
+    console.log("🔍 Fetching course with classId:", classId)
+    
+    const response = await fetch(`${BACKEND_URL}/api/courses/${params.id}${classIdParam}`, {
       method: 'GET',
       headers: {
         'Cookie': request.headers.get('cookie') || '',

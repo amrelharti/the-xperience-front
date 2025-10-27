@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import RequireAdmin from "@/app/components/RequireAdmin"
+import ImageUpload from "@/components/ui/image-upload"
+import NextImage from "next/image"
 
 interface Training {
   id: string
@@ -36,6 +38,7 @@ interface TrainingModule {
   orderIndex: number
   isActive: boolean
   coursesCount: number
+  thumbnailUrl?: string
   createdAt: string
   updatedAt: string
 }
@@ -61,7 +64,8 @@ export default function TrainingModulesPage() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    orderIndex: 0
+    orderIndex: 0,
+    thumbnailUrl: ""
   })
 
   useEffect(() => {
@@ -142,7 +146,7 @@ export default function TrainingModulesPage() {
         })
         
         setShowCreateDialog(false)
-        setFormData({ title: "", description: "", orderIndex: 0, accessCode: "" })
+        setFormData({ title: "", description: "", orderIndex: 0, thumbnailUrl: "" })
         loadModules()
       } else {
         const error = await res.text()
@@ -236,7 +240,8 @@ export default function TrainingModulesPage() {
         setFormData({
           title: "",
           description: "",
-          orderIndex: modules.length + 1
+          orderIndex: modules.length + 1,
+          thumbnailUrl: ""
         })
     setShowCreateDialog(true)
   }
@@ -246,7 +251,8 @@ export default function TrainingModulesPage() {
     setFormData({
       title: module.title,
       description: module.description,
-      orderIndex: module.orderIndex
+      orderIndex: module.orderIndex,
+      thumbnailUrl: module.thumbnailUrl || ""
     })
     setShowEditDialog(true)
   }
@@ -360,9 +366,9 @@ export default function TrainingModulesPage() {
           {/* Header */}
           <div className="mb-8">
             <Button variant="ghost" asChild className="mb-4">
-              <Link href="/admin/trainings">
+              <Link href={`/admin/trainings/${trainingId}`}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Trainings
+                Back to Training
               </Link>
             </Button>
 
@@ -415,13 +421,21 @@ export default function TrainingModulesPage() {
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="font-bold text-primary">
-                              {module.orderIndex}
-                            </span>
-                          </div>
+                          {/* Module Thumbnail */}
+                          {module.thumbnailUrl && (
+                            <div className="w-23 h-23 rounded-lg overflow-hidden flex-shrink-0">
+                              <NextImage
+                                src={module.thumbnailUrl}
+                                alt={module.title}
+                                width={128}
+                                height={128}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+                          
                           <div>
-                            <CardTitle>Module {module.orderIndex}: {module.title}</CardTitle>
+                            <CardTitle>{module.title}</CardTitle>
                             <p className="text-sm text-muted-foreground mt-1">
                               {module.description}
                             </p>
@@ -484,7 +498,7 @@ export default function TrainingModulesPage() {
 
           {/* Create Module Dialog */}
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-            <DialogContent>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <form onSubmit={handleCreateModule}>
                 <DialogHeader>
                   <DialogTitle>Create New Module</DialogTitle>
@@ -526,6 +540,14 @@ export default function TrainingModulesPage() {
                     />
                   </div>
 
+                  <ImageUpload
+                    value={formData.thumbnailUrl}
+                    onChange={(url) => setFormData({ ...formData, thumbnailUrl: url })}
+                    label="Module Thumbnail"
+                    placeholder="Enter image URL or upload a file"
+                    description="Upload a thumbnail image for your module (recommended: 800×450px)"
+                  />
+
                 </div>
 
                 <DialogFooter>
@@ -540,7 +562,7 @@ export default function TrainingModulesPage() {
 
           {/* Edit Module Dialog */}
           <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-            <DialogContent>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <form onSubmit={handleUpdateModule}>
                 <DialogHeader>
                   <DialogTitle>Edit Module</DialogTitle>
@@ -579,6 +601,14 @@ export default function TrainingModulesPage() {
                       required
                     />
                   </div>
+
+                  <ImageUpload
+                    value={formData.thumbnailUrl}
+                    onChange={(url) => setFormData({ ...formData, thumbnailUrl: url })}
+                    label="Module Thumbnail"
+                    placeholder="Enter image URL or upload a file"
+                    description="Upload a thumbnail image for your module (recommended: 800×450px)"
+                  />
 
                 </div>
 

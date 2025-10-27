@@ -75,7 +75,8 @@ export default function TrainingsPage() {
 
       if (coursesResponse.ok) {
         const responseData = await coursesResponse.json();
-        const coursesData = responseData.courses || [];
+        // Backend returns array directly, not wrapped in {courses: [...]}
+        const coursesData = Array.isArray(responseData) ? responseData : (responseData.courses || []);
 
         // If we got enrolled classes data, merge it
         if (enrolledClassesResponse && enrolledClassesResponse.ok) {

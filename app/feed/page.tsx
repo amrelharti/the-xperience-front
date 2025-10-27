@@ -19,7 +19,8 @@ import {
   BookOpen,
   HelpCircle,
   FileText,
-  Megaphone
+  Megaphone,
+  ArrowLeft
 } from "lucide-react"
 import { useUser } from "@/app/hooks/useUser"
 import { useDebounce } from "@/app/hooks/useDebounce"
@@ -77,6 +78,30 @@ export default function FeedPage() {
   
   // Debounce search query to avoid excessive API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 500)
+  
+  // Get the URL for "Create New Post" with query parameters
+  const training = searchParams.get('training')
+  const classParam = searchParams.get('class')
+  
+  const newPostUrl = useMemo(() => {
+    console.log('🔗 Creating New Post URL - training:', training, 'class:', classParam)
+    
+    if (training && classParam) {
+      const url = `/feed/new?training=${training}&class=${classParam}`
+      console.log('✅ Returning filtered new post URL:', url)
+      return url
+    }
+    console.log('❌ No params, returning default new post URL')
+    return '/feed/new'
+  }, [training, classParam])
+
+  // Build post detail URL with query parameters
+  const getPostDetailUrl = (postId: string) => {
+    if (training && classParam) {
+      return `/feed/posts/${postId}?training=${training}&class=${classParam}`
+    }
+    return `/feed/posts/${postId}`
+  }
   
   // Handle URL parameters for training and class filtering
   useEffect(() => {
@@ -346,10 +371,22 @@ export default function FeedPage() {
             
           </div>
 
+          {/* Back to Training Button - only show when viewing filtered feed */}
+          {training && (
+            <div className="mb-4">
+              <Button variant="outline" asChild>
+                <Link href={`/courses/${training}`}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Training
+                </Link>
+              </Button>
+            </div>
+          )}
+
           {/* Create Post Button */}
           <div className="mb-6">
             <Button asChild className="w-full">
-              <Link href="/feed/new">
+              <Link href={newPostUrl}>
                 <Plus className="h-4 w-4 mr-2" />
                 Create New Post
               </Link>
@@ -420,13 +457,13 @@ export default function FeedPage() {
                   <h3 className="text-lg font-semibold mb-2">No posts yet</h3>
                   <p className="text-muted-foreground mb-4">Be the first to share something with the community!</p>
                   <Button asChild>
-                    <Link href="/feed/new">Create First Post</Link>
+                    <Link href={newPostUrl}>Create First Post</Link>
                   </Button>
                 </CardContent>
               </Card>
             ) : (
               posts.map((post) => (
-                <Card key={post.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = `/feed/posts/${post.id}`}>
+                <Card key={post.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = getPostDetailUrl(post.id)}>
                   <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
@@ -481,9 +518,24 @@ export default function FeedPage() {
                     <p className="text-gray-700 mb-4 whitespace-pre-wrap">{post.content}</p>
                     
                     {post.attachments && (
-                      <div className="mb-4 p-3 bg-muted rounded-lg">
-                        <p className="text-sm text-muted-foreground">{post.attachments}</p>
-                        </div>
+                      <div className="mb-4">
+                        {post.attachments.startsWith('data:image') || post.attachments.startsWith('http://') || post.attachments.startsWith('https://') ? (
+                          <div className="relative w-full max-h-96 overflow-hidden rounded-lg border border-gray-200">
+                            <img 
+                              src={post.attachments} 
+                              alt="Post attachment" 
+                              className="w-full h-auto object-contain max-h-96"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div className="p-3 bg-muted rounded-lg">
+                            <p className="text-sm text-muted-foreground">{post.attachments}</p>
+                          </div>
+                        )}
+                      </div>
                     )}
 
 
@@ -507,7 +559,7 @@ export default function FeedPage() {
                         className="flex items-center gap-2"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <Link href={`/feed/posts/${post.id}`}>
+                        <Link href={getPostDetailUrl(post.id)}>
                           <MessageSquare className="h-4 w-4" />
                           {post.commentCount}
                         </Link>

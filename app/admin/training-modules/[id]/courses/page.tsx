@@ -33,6 +33,7 @@ interface Course {
 
 interface TrainingModule {
   id: string
+  trainingId: string
   title: string
   description: string
   orderIndex: number
@@ -260,9 +261,9 @@ export default function ModuleCoursesPage() {
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/admin/trainings">
+              <Link href={module?.trainingId ? `/admin/trainings/${module.trainingId}/modules` : "/admin/trainings"}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Trainings
+                {module?.trainingId ? "Back to Training Modules" : "Back to Trainings"}
               </Link>
             </Button>
           </div>

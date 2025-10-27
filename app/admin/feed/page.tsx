@@ -397,8 +397,28 @@ export default function AdminFeedPage() {
                       <p className="text-gray-700 mb-4 whitespace-pre-wrap text-lg">{post.content}</p>
                       
                       {post.attachments && (
-                        <div className="mb-4 p-3 bg-muted rounded-lg">
-                          <p className="text-sm text-muted-foreground">{post.attachments}</p>
+                        <div className="mb-4">
+                          {post.attachments.startsWith('data:image') ? (
+                            <div className="rounded-lg overflow-hidden border">
+                              <img
+                                src={post.attachments} 
+                                alt="Post attachment" 
+                                className="w-full h-auto max-h-96 object-contain"
+                              />
+                            </div>
+                          ) : post.attachments.match(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                            <div className="rounded-lg overflow-hidden border">
+                              <img 
+                                src={post.attachments} 
+                                alt="Post attachment" 
+                                className="w-full h-auto max-h-96 object-contain"
+                              />
+                            </div>
+                          ) : (
+                            <div className="p-3 bg-muted rounded-lg">
+                              <p className="text-sm text-muted-foreground">{post.attachments}</p>
+                            </div>
+                          )}
                         </div>
                       )}
 
