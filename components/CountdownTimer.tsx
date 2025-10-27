@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Clock } from "lucide-react"
 
 interface CountdownTimerProps {
-  targetDate: string // ISO date string
+  targetDate: string
   onCountdownEnd: () => void
 }
 
@@ -16,7 +16,6 @@ export default function CountdownTimer({
     days: 0,
     hours: 0,
     minutes: 0,
-    seconds: 0,
   })
   const [isEnded, setIsEnded] = useState(false)
 
@@ -26,27 +25,23 @@ export default function CountdownTimer({
       const currentTime = new Date().getTime()
       const difference = targetTime - currentTime
 
-            if (difference <= 0) {
-              setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
-              if (!isEnded) {
-                setIsEnded(true)
-                onCountdownEnd()
-              }
-              return
-            }
+      if (difference <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0 })
+        if (!isEnded) {
+          setIsEnded(true)
+          onCountdownEnd()
+        }
+        return
+      }
 
-            const days = Math.floor(difference / (1000 * 60 * 60 * 24))
-            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-            const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
 
-            setTimeLeft({ days, hours, minutes, seconds })
+      setTimeLeft({ days, hours, minutes })
     }
 
-    // Calculate immediately
     calculateTimeLeft()
-    
-    // Update every second
     const interval = setInterval(calculateTimeLeft, 1000)
 
     return () => clearInterval(interval)
@@ -56,60 +51,56 @@ export default function CountdownTimer({
 
   if (isEnded) {
     return (
-      <div className="text-center space-y-2">
-        <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-          🎉 Session is Live!
+      <div className="text-center py-10">
+        <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-[#0476D7] to-[#005eb8] rounded-xl mb-4 shadow-lg">
+          <Clock className="h-7 w-7 text-white" />
         </div>
-        <p className="text-sm text-muted-foreground">
-          Click "Join Live Session" below to participate
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">Session is Live</h3>
+        <p className="text-sm text-gray-600">
+          Join the session now
         </p>
       </div>
     )
   }
 
   return (
-    <div className="text-center space-y-4">
-      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-        <Clock className="h-4 w-4" />
-        <span>Session starts in:</span>
+    <div className="space-y-6">
+      <div className="flex items-center justify-center gap-2.5 text-gray-700">
+        <div className="p-1.5 bg-blue-50 rounded-lg">
+          <Clock className="h-4 w-4 text-[#0476D7]" />
+        </div>
+        <span className="text-base font-semibold">Session starts in</span>
       </div>
 
-          <div className="flex items-center justify-center gap-3 md:gap-4">
-            {/* Days */}
-            <div className="flex flex-col items-center">
-              <div className="text-3xl md:text-5xl font-bold text-primary tabular-nums">
-                {formatNumber(timeLeft.days)}
-              </div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wide mt-1">
-                Days
-              </div>
-            </div>
-
-            <div className="text-2xl md:text-4xl font-bold text-muted-foreground self-start mt-1">:</div>
-
-            {/* Hours */}
-            <div className="flex flex-col items-center">
-              <div className="text-3xl md:text-5xl font-bold text-primary tabular-nums">
-                {formatNumber(timeLeft.hours)}
-              </div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wide mt-1">
-                Hours
-              </div>
-            </div>
-
-            <div className="text-2xl md:text-4xl font-bold text-muted-foreground self-start mt-1">:</div>
-
-            {/* Minutes */}
-            <div className="flex flex-col items-center">
-              <div className="text-3xl md:text-5xl font-bold text-primary tabular-nums">
-                {formatNumber(timeLeft.minutes)}
-              </div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wide mt-1">
-                Minutes
+      <div className="flex items-center justify-center gap-2 md:gap-3">
+        {[
+          { value: timeLeft.days, label: 'Days' },
+          { value: timeLeft.hours, label: 'Hours' },
+          { value: timeLeft.minutes, label: 'Minutes' }
+        ].map((unit, index, array) => (
+          <>
+            <div key={unit.label} className="group">
+              <div className="relative bg-white border-2 border-[#0476D7]/10 rounded-xl px-6 py-5 md:px-8 md:py-6 shadow-sm hover:border-[#0476D7]/30 hover:shadow-lg transition-all duration-200">
+                <div className="text-center">
+                  <div className="relative">
+                    <div className="text-4xl md:text-5xl font-black text-[#0476D7] tabular-nums tracking-tight">
+                      {formatNumber(unit.value)}
+                    </div>
+                    {/* Accent line */}
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-[#FFBC00] rounded-full" />
+                  </div>
+                  <div className="mt-3 text-xs font-bold text-[#0476D7] uppercase tracking-widest">
+                    {unit.label}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+            {index < array.length - 1 && (
+              <div className="text-3xl text-[#0476D7]/30 font-light pb-2">:</div>
+            )}
+          </>
+        ))}
+      </div>
     </div>
   )
 }
-

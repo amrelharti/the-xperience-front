@@ -1,16 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, PlayCircle, Clock, CheckCircle, BookOpen } from "lucide-react"
+import { ArrowLeft, PlayCircle, Clock, CheckCircle, BookOpen, Sparkles, Trophy, Zap } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useUser } from "@/app/hooks/useUser"
 import NextImage from "next/image"
 import LiveSessionCard from "@/components/LiveSessionCard"
+import { motion, useInView } from "framer-motion"
 
 interface TrainingModule {
   id: string
@@ -51,6 +52,11 @@ export default function ModuleDetailPage() {
   const [isAttended, setIsAttended] = useState(false)
   const [loadingLiveSession, setLoadingLiveSession] = useState(true)
   const [moduleProgress, setModuleProgress] = useState(0)
+
+  const progressRef = useRef(null)
+  const coursesRef = useRef(null)
+  const progressInView = useInView(progressRef, { once: true, margin: "-100px" })
+  const coursesInView = useInView(coursesRef, { once: true, margin: "-50px" })
 
   useEffect(() => {
     if (!userLoading && !user) {
@@ -131,7 +137,7 @@ export default function ModuleDetailPage() {
     } catch (err) {
       console.error("❌ Error loading module:", err)
       setError("An error occurred")
-      } finally {
+    } finally {
       setLoading(false)
     }
   }
@@ -266,12 +272,15 @@ export default function ModuleDetailPage() {
 
   if (userLoading || loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
         <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-muted rounded w-1/4"></div>
-            <div className="h-32 bg-muted rounded"></div>
-            <div className="h-32 bg-muted rounded"></div>
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 bg-blue-100 rounded-xl w-1/4"></div>
+            <div className="h-48 bg-gradient-to-r from-blue-50 to-yellow-50 rounded-2xl"></div>
+            <div className="space-y-4">
+              <div className="h-24 bg-white rounded-xl shadow-sm"></div>
+              <div className="h-24 bg-white rounded-xl shadow-sm"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -284,14 +293,25 @@ export default function ModuleDetailPage() {
 
   if (error || !module) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
         <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Module Not Found</h1>
-            <p className="text-muted-foreground mb-4">{error || "This module doesn't exist."}</p>
-          <Button asChild>
-              <Link href={`/courses/${trainingId}`}>Back to Training</Link>
-          </Button>
+          <div className="text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-block p-4 rounded-full bg-red-100 mb-4"
+            >
+              <Sparkles className="h-12 w-12 text-red-500" />
+            </motion.div>
+            <h1 className="text-3xl font-bold mb-4 text-gray-900">Module Not Found</h1>
+            <p className="text-gray-600 mb-6">{error || "This module doesn't exist."}</p>
+            <Button asChild size="lg" className="bg-[#0476D7] hover:bg-[#005eb8] text-white rounded-xl px-8">
+              <Link href={`/courses/${trainingId}`}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Training
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -299,76 +319,196 @@ export default function ModuleDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-        <div className="mb-8">
-          <Button variant="ghost" asChild className="mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Back Button */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-6"
+        >
+          <Button 
+            variant="ghost" 
+            asChild 
+            className="text-gray-600 hover:text-[#0476D7] hover:bg-blue-50 rounded-xl transition-all"
+          >
             <Link href={`/courses/${trainingId}`}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Training
             </Link>
           </Button>
+        </motion.div>
 
-          <div>
-            <h1 className="text-4xl font-bold mb-2">
-              Module {module.orderIndex}: {module.title}
-            </h1>
-            <p className="text-xl text-muted-foreground mb-4">
-              {module.description}
-            </p>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <BookOpen className="h-4 w-4" />
-                <span>{module.courses?.length || 0} courses</span>
+        {/* Hero Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-12"
+        >
+          <div className="relative rounded-3xl overflow-hidden shadow-xl shadow-blue-500/10">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#60A5FA] via-[#3B82F6] to-[#2563EB]" />
+            <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px] opacity-50" />
+            <div className="relative p-10 md:p-14">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <div className="flex-1">
+                  <Badge className="bg-white/20 text-white border-yellow-400 mb-4 rounded-full px-4 py-1">
+                    <BookOpen className="h-3 w-3 mr-2" />
+                    Module {module.orderIndex}
+                  </Badge>
+                  <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">
+                    {module.title}
+                  </h1>
+                  <p className="text-lg text-blue-100 mb-6 max-w-2xl">
+                    {module.description}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-6 text-blue-100">
+                    <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                      <PlayCircle className="h-5 w-5 text-yellow-300" />
+                      <span className="font-medium">{module.courses?.length || 0} Lessons</span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                      <Zap className="h-5 w-5 text-yellow-300" />
+                      <span className="font-medium">Interactive Content</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+        </motion.div>
+
+        {/* Progress Card */}
+        {moduleProgress > 0 && (
+          <motion.div
+            ref={progressRef}
+            initial={{ opacity: 0, y: 20 }}
+            animate={progressInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mb-12"
+          >
+            <Card className="border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <Trophy className="h-5 w-5 text-[#FFBC00]" />
+                    Module Progress
+                  </h3>
+                  <span className="text-2xl font-bold text-[#0476D7]">{moduleProgress}%</span>
+                </div>
+                <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={progressInView ? { width: `${moduleProgress}%` } : {}}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    className="h-full bg-gradient-to-r from-[#0476D7] via-[#005eb8] to-[#0068A7] rounded-full"
+                  />
+                </div>
+                <p className="text-sm text-gray-600 mt-3">
+                  Keep up the great work! {module.courses?.length || 0} lessons available to complete this module.
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Courses List */}
         {module.courses && module.courses.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-6">Video Lessons</h2>
-            <div className="space-y-4">
+          <div ref={coursesRef} className="mb-12">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
+                    <PlayCircle className="h-5 w-5 text-white" />
+                  </div>
+                  Video Lessons
+                </h2>
+                <p className="text-sm text-gray-600">Explore and learn at your own pace</p>
+              </div>
+            </div>
+            <div className="grid gap-6">
               {module.courses
                 .sort((a, b) => a.orderIndex - b.orderIndex)
                 .map((course, index) => (
-                  <Card key={course.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
-                          <span className="font-medium">{index + 1}</span>
-              </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold mb-1">{course.title}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">{course.description}</p>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              <span>{Math.round(course.durationSeconds / 60)} min</span>
-              </div>
-            </div>
-                  </div>
-                        <Button asChild>
-                          <Link href={`/courses/${trainingId}/courses/${course.id}${classId ? `?class=${classId}` : ''}`}>
-                            <PlayCircle className="h-4 w-4 mr-2" />
-                            Watch
-                      </Link>
-                    </Button>
-                </div>
-              </CardContent>
-            </Card>
+                  <motion.div
+                    key={course.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    whileHover={{ scale: 1.02, y: -4 }}
+                  >
+                    <div className="group relative overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-lg border border-gray-200 hover:border-[#0476D7]/30">
+                      {/* Gradient accent line */}
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#0476D7] via-[#005eb8] to-[#FFBC00] group-hover:w-2 transition-all duration-300" />
+                      
+                      <div className="p-6 pl-8">
+                        <div className="flex flex-col md:flex-row md:items-center gap-6">
+                          {/* Number Badge */}
+                          <div className="flex-shrink-0">
+                            <div className="relative">
+                              <div className="absolute inset-0 bg-gradient-to-br from-[#0476D7] to-[#005eb8] rounded-2xl blur-md opacity-20 group-hover:opacity-30 transition-opacity" />
+                              <div className="relative h-16 w-16 rounded-xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center text-white font-bold text-xl shadow-md group-hover:scale-105 transition-transform">
+                                {index + 1}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0476D7] transition-colors line-clamp-1 mb-2">
+                              {course.title}
+                            </h3>
+                            <p className="text-gray-600 mb-4 line-clamp-2 leading-relaxed">
+                              {course.description}
+                            </p>
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 rounded-full border border-blue-100">
+                                <Clock className="h-4 w-4 text-[#0476D7]" />
+                                <span className="text-sm font-medium text-gray-700">{Math.round(course.durationSeconds / 60)} minutes</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Action Button */}
+                          <div className="flex-shrink-0">
+                            <Link href={`/courses/${trainingId}/courses/${course.id}${classId ? `?class=${classId}` : ''}`}>
+                              <Button 
+                                size="lg"
+                                className="bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white rounded-lg px-7 shadow-md hover:shadow-lg transition-all font-semibold border-0"
+                              >
+                                <PlayCircle className="h-5 w-5 mr-2" />
+                                Watch Now
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
                 ))}
+            </div>
           </div>
-        </div>
         )}
 
 
         {/* Live Session */}
         {liveSession && !loadingLiveSession && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-6">Live Session</h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mb-12"
+          >
+            <div className="flex items-center gap-3 mb-5">
+              <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center shadow-md">
+                <Sparkles className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Live Session</h2>
+                <p className="text-sm text-gray-500">Interactive learning with your instructor</p>
+              </div>
+            </div>
             <LiveSessionCard
               liveSession={{
                 id: liveSession.id,
@@ -384,7 +524,7 @@ export default function ModuleDetailPage() {
               currentProgress={moduleProgress}
               classId={classId}
             />
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

@@ -289,6 +289,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     }
   }, [params.id, user?.id, loadModuleProgress, loadAvailableClasses])
 
+
   const handleUnlockModule = async (moduleId: string) => {
     setUnlockingModule(moduleId)
     setShowUnlockDialog(true)
@@ -419,6 +420,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     load()
   }, [load])
 
+
   // Debug: Track selectedClassId changes
   useEffect(() => {
     console.log("🎯 selectedClassId changed to:", selectedClassId)
@@ -520,8 +522,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           <div className="space-y-6">
             
             {/* Training Info */}
-            <div className="w-full">
-              <div className="flex items-start gap-4 mb-4">
+            <div className="w-full rounded-2xl p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 shadow-lg">
+              <div className="flex items-start gap-4">
                 {training.thumbnailUrl && (
                   <div className="w-52 h-52 rounded-2xl overflow-hidden flex-shrink-0 shadow-xl">
                     <NextImage
@@ -555,16 +557,13 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                     </div>
     
                   </div>
-                  
-                  
                 </div>
-                
               </div>
             </div>
             {/* Class-Specific Social Features */}
             {isEnrolled && selectedClassId && (
                     <div className="flex justify-center mt-6">
-                      <div className="p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 rounded-2xl border-2 border-purple-100 w-full max-w-4xl">
+                      <div className="p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 rounded-2xl w-full max-w-2xl shadow-lg">
                         <p className="text-sm font-semibold text-purple-700 mb-4 flex items-center gap-2 justify-center">
                           <Users className="h-4 w-4" />
                           Class Community
