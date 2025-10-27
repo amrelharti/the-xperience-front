@@ -214,12 +214,12 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           if (enrollmentsResponse.ok) {
             const enrollments = await enrollmentsResponse.json()
             // Filter for this training and only active classes
-            const trainingEnrollments = enrollments.filter((enrollment: any) => 
+            const trainingEnrollments = enrollments.filter((enrollment) => 
               enrollment.moduleId === params.id // moduleId is actually trainingId in backend
             )
             
             // Check if user has any active enrollments for this training
-            const activeEnrollments = trainingEnrollments.filter((enrollment: any) => 
+            const activeEnrollments = trainingEnrollments.filter((enrollment) => 
               enrollment.isActive && !enrollment.isArchived
             )
             
@@ -232,18 +232,26 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             if (trainingEnrollments.length > 1) {
               // Check if student has a saved preference for this training
               const savedClassId = localStorage.getItem(`selectedClass_${params.id}`)
-              const savedClass = savedClassId ? trainingEnrollments.find((c: any) => c.id === savedClassId) : null
+              const savedClass = savedClassId ? trainingEnrollments.find((c) => c.id === savedClassId) : null
               
               if (savedClass && savedClassId) {
                 // Student has a saved preference, use it
-                setSelectedClassId(savedClassId)
+                setSelectedClassId(savedClassId!)
                 setIsEnrolled(true)
                 // Load available classes in background for the switch button
                 await loadAvailableClasses()
               } else {
-                // No saved preference, show class selection modal
-                setShowClassSelection(true)
-                // Load available classes to populate the modal
+                // No saved preference - auto-select the first active class and save it
+                const firstActiveClass = trainingEnrollments.find((c: any) => c.isActive && !c.isArchived)
+                const classToUse = firstActiveClass || trainingEnrollments[0]
+                
+                setSelectedClassId(classToUse.id)
+                setIsEnrolled(true)
+                // Auto-save the selection so we don't ask again
+                if (classToUse.id) {
+                  localStorage.setItem(`selectedClass_${params.id}`, classToUse.id)
+                }
+                // Load available classes in background for the switch button
                 await loadAvailableClasses()
               }
             } else if (trainingEnrollments.length === 1) {
@@ -499,59 +507,73 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-6 py-10 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <Button variant="ghost" asChild className="mb-4">
-            <Link href="/" className="flex items-center gap-2">
+          <Button variant="ghost" asChild className="mb-6">
+            <Link href="/" className="flex items-center gap-2 hover:text-[#0476D7] transition-colors">
               <ArrowLeft className="h-4 w-4" />
               Back to Trainings
             </Link>
           </Button>
 
-          <div className="flex flex-col lg:flex-row gap-6">
+          <div className="space-y-6">
+            
             {/* Training Info */}
-            <div className="flex-1">
+            <div className="w-full">
               <div className="flex items-start gap-4 mb-4">
                 {training.thumbnailUrl && (
-                  <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                  <div className="w-52 h-52 rounded-2xl overflow-hidden flex-shrink-0 shadow-xl">
                     <NextImage
                       src={training.thumbnailUrl}
                       alt={training.title}
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-cover"
+                      width={208}
+                      height={208}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />
                   </div>
                 )}
                 <div className="flex-1">
-                  <h1 className="text-3xl font-bold mb-2">{training.title}</h1>
-                  <p className="text-muted-foreground mb-4">{training.description}</p>
+                  <div className="mb-4">
+                    <Badge className="bg-gradient-to-r from-[#0476D7] to-[#0068A7] text-white mb-3">
+                      Training Program
+                    </Badge>
+                  </div>
+                  <h1 className="text-3xl font-semibold mb-3 text-[#0476D7]">{training.title}</h1>
+                  <p className="text-[#666] mb-6 leading-relaxed text-base">{training.description}</p>
                   
                   {/* Progress Overview */}
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <BookOpen className="h-4 w-4" />
-                      <span>{totalModules} modules</span>
+                  <div className="flex items-center gap-6 mb-6">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-[#0476D7]/10 to-[#0476D7]/5 rounded-xl border border-[#0476D7]/20">
+                      <div className="p-2 bg-[#0476D7] rounded-lg">
+                        <BookOpen className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-xs text-[#047690] font-medium">Total Modules</div>
+                        <div className="text-lg font-bold text-[#0476D7]">{totalModules}</div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Award className="h-4 w-4" />
-                      <span>Training Program</span>
-                    </div>
+    
                   </div>
                   
-                  {/* Class-Specific Social Features - only show if enrolled and has selected class */}
-                  {isEnrolled && selectedClassId && (
-                    <div className="mt-4">
-                      <div className="flex items-center gap-3">
+                  
+                </div>
+                
+              </div>
+            </div>
+            {/* Class-Specific Social Features */}
+            {isEnrolled && selectedClassId && (
+                    <div className="flex justify-center mt-6">
+                      <div className="p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 rounded-2xl border-2 border-purple-100 w-full max-w-4xl">
+                        <p className="text-sm font-semibold text-purple-700 mb-4 flex items-center gap-2 justify-center">
+                          <Users className="h-4 w-4" />
+                          Class Community
+                        </p>
+                        <div className="flex flex-wrap items-center justify-center gap-3">
                         <Button 
-                          variant="outline" 
-                          size="sm"
                           asChild
-                          className="flex items-center gap-2"
-                          onClick={() => {
-                            console.log("🔗 Navigating to feed with training:", params.id, "class:", selectedClassId)
-                          }}
+                          className="flex items-center gap-2 text-white rounded-full shadow-sm hover:shadow-md border-0 transition-all duration-200"
+                          style={{ background: 'linear-gradient(90deg, #0068A7, #0476D7)' }}
                         >
                           <Link href={`/feed?training=${params.id}&class=${selectedClassId}`}>
                             <MessageSquare className="h-4 w-4" />
@@ -559,57 +581,45 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                           </Link>
                         </Button>
                         <Button 
-                          variant="outline" 
-                          size="sm"
                           asChild
-                          className="flex items-center gap-2"
-                          onClick={() => {
-                            console.log("🔗 Navigating to leaderboard with training:", params.id, "class:", selectedClassId)
-                          }}
+                          className="flex items-center gap-2 text-white rounded-full shadow-sm hover:shadow-md border-0 transition-all duration-200"
+                          style={{ background: 'linear-gradient(90deg, #FFBC00, #FFD84D)' }}
                         >
                           <Link href={`/leaderboard?training=${params.id}&class=${selectedClassId}`}>
                             <Trophy className="h-4 w-4" />
-                            Class Leaderboard
+                            Leaderboard
                           </Link>
                         </Button>
+                        {availableClasses.length > 1 && (
+                          <Button 
+                            variant="outline" 
+                            onClick={async () => {
+                              localStorage.removeItem(`selectedClass_${params.id}`)
+                              setShowClassSelection(true)
+                              await loadAvailableClasses()
+                            }}
+                            className="flex items-center gap-2 rounded-full shadow-sm hover:shadow-md transition-all duration-200 border-0"
+                            style={{ background: 'linear-gradient(90deg, #F1F5F9, #E2E8F0)', color: '#334155' }}
+                          >
+                            <Users className="h-4 w-4" />
+                            Switch Class
+                          </Button>
+                        )}
+                        </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        View posts and rankings for your current class
-                      </p>
                     </div>
                   )}
-                  
-                  {/* Switch Class Button - only show if multiple classes available */}
-                  {availableClasses.length > 1 && isEnrolled && (
-                    <div className="mt-4">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={async () => {
-                          // Clear saved preference to show class selection modal
-                          localStorage.removeItem(`selectedClass_${params.id}`)
-                          setShowClassSelection(true)
-                          // Load available classes to populate the modal
-                          await loadAvailableClasses()
-                        }}
-                        className="flex items-center gap-2"
-                      >
-                        <Users className="h-4 w-4" />
-                        Switch Class
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
         {/* Modules List */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold mb-6">Training Modules</h2>
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="h-1 w-12 bg-gradient-to-r from-[#0476D7] to-[#FFBC00] rounded-full"></div>
+            <h2 className="text-2xl font-semibold text-[#0476D7]">Training Modules</h2>
+          </div>
           {training.modules?.map((module, index) => (
-            <Card key={module.id} className="hover:shadow-md transition-shadow">
+            <Card key={module.id} className="hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4 flex-1">
@@ -628,23 +638,29 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                     
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-xl font-semibold">{module.title}</h3>
+                        <h3 className="text-xl font-semibold text-[#0476D7]">{module.title}</h3>
                         {module.status === "LOCKED" ? (
-                          <Lock className="h-4 w-4 text-muted-foreground" />
+                          <Badge variant="outline" className="border-orange-500 text-orange-700">
+                            <Lock className="h-3 w-3 mr-1" />
+                            Locked
+                          </Badge>
                         ) : (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <div className="relative inline-flex items-center justify-center">
+                            <div className="absolute inset-0 bg-green-500 rounded-full animate-pulse opacity-20"></div>
+                            <CheckCircle className="h-6 w-6 text-green-600 relative" />
+                          </div>
                         )}
                       </div>
                       <p className="text-muted-foreground mb-3">{module.description}</p>
                       
                       {/* Progress Bar */}
-                      {module.progress !== undefined && (
+                      {module.progress !== undefined && module.progress > 0 && (
                         <div className="mb-3">
                           <div className="flex items-center justify-between text-sm mb-1">
-                            <span className="text-muted-foreground">Progress</span>
-                            <span className="font-medium">{module.progress}%</span>
+                            <span className="font-semibold text-foreground">Progress</span>
+                            <span className="font-bold text-[#0476D7]">{module.progress}%</span>
                           </div>
-                          <Progress value={module.progress} className="h-2" />
+                          <Progress value={module.progress} className="h-3 bg-muted" />
                         </div>
                       )}
                       
@@ -672,10 +688,10 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                         Unlock Module
                       </Button>
                     ) : (
-                      <Button asChild>
+                      <Button asChild className="bg-[#0476D7] hover:bg-[#0068A7] shadow-md hover:shadow-lg">
                         <Link href={`/courses/${params.id}/modules/${module.id}`}>
-                          <PlayCircle className="h-4 w-4 mr-2" />
-                          Start Module
+                          <PlayCircle className="h-5 w-5 mr-2" />
+                          {module.progress && module.progress > 0 ? "Continue" : "Start Module"}
                         </Link>
                       </Button>
                     )}

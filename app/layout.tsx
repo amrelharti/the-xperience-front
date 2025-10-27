@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Space_Grotesk, DM_Sans } from "next/font/google"
+import { Montserrat, Poppins } from "next/font/google"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
@@ -8,16 +8,16 @@ import ErrorBoundary from "@/components/ErrorBoundary"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
-const spaceGrotesk = Space_Grotesk({
+const montserrat = Montserrat({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-montserrat",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 })
 
-const dmSans = DM_Sans({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
-  weight: ["400", "500", "700"],
+  variable: "--font-poppins",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 })
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${dmSans.variable} ${spaceGrotesk.variable} ${GeistMono.variable} font-sans antialiased`}>
+      <body className={`${poppins.variable} ${montserrat.variable} ${GeistMono.variable} font-sans antialiased`}>
         <ErrorBoundary>
           <Suspense fallback={null}>{children}</Suspense>
         </ErrorBoundary>

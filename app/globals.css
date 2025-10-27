@@ -6,35 +6,35 @@
 /* Updated design tokens for "The Xperience" with orange and blue brand colors */
 :root {
   --background: #ffffff;
-  --foreground: #1f2937;
-  --card: #f9fafb;
-  --card-foreground: #1f2937;
+  --foreground: #333333;
+  --card: #f8fafc;
+  --card-foreground: #333333;
   --popover: #ffffff;
   --popover-foreground: #1f2937;
   --primary: #005eb8;
   --primary-foreground: #ffffff;
-  --secondary: #ff9500;
+  --secondary: #FFBC00;
   --secondary-foreground: #ffffff;
   --muted: #f3f4f6;
   --muted-foreground: #6b7280;
-  --accent: #ff9500;
+  --accent: #FFBC00;
   --accent-foreground: #ffffff;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --border: #e5e7eb;
   --input: #f9fafb;
   --ring: rgba(0, 94, 184, 0.5);
-  --chart-1: #005eb8;
-  --chart-2: #ff9500;
-  --chart-3: #10b981;
+  --chart-1: #0476D7;
+  --chart-2: #0068A7;
+  --chart-3: #FFBC00;
   --chart-4: #8b5cf6;
   --chart-5: #f59e0b;
-  --radius: 0.5rem;
+  --radius: 1rem;
   --sidebar: #f9fafb;
   --sidebar-foreground: #1f2937;
   --sidebar-primary: #ffffff;
-  --sidebar-primary-foreground: #1f2937;
-  --sidebar-accent: #ff9500;
+  --sidebar-primary-foreground: #0476D7;
+  --sidebar-accent: #FFBC00;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #e5e7eb;
   --sidebar-ring: rgba(0, 94, 184, 0.5);
@@ -47,13 +47,13 @@
   --card-foreground: #f9fafb;
   --popover: #111827;
   --popover-foreground: #f9fafb;
-  --primary: #0284c7;
+  --primary: #0476D7;
   --primary-foreground: #ffffff;
-  --secondary: #fb923c;
+  --secondary: #FFBC00;
   --secondary-foreground: #ffffff;
   --muted: #1f2937;
   --muted-foreground: #9ca3af;
-  --accent: #fb923c;
+  --accent: #FFBC00;
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
@@ -61,22 +61,23 @@
   --input: #1f2937;
   --ring: rgba(2, 132, 199, 0.5);
   --chart-1: #0284c7;
-  --chart-2: #fb923c;
-  --chart-3: #10b981;
+  --chart-2: #0068A7;
+  --chart-3: #FFBC00;
   --chart-4: #8b5cf6;
   --chart-5: #f59e0b;
   --sidebar: #1f2937;
   --sidebar-foreground: #f9fafb;
   --sidebar-primary: #0284c7;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #fb923c;
+  --sidebar-accent: #FFBC00;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #374151;
   --sidebar-ring: rgba(2, 132, 199, 0.5);
 }
 
 @theme inline {
-  --font-sans: var(--font-space-grotesk), var(--font-geist-sans);
+  --font-sans: var(--font-poppins), var(--font-geist-sans);
+  --font-heading: var(--font-montserrat);
   --font-mono: var(--font-geist-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -122,5 +123,63 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Smooth font rendering */
+    font-feature-settings: "kern" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Typography scale with brand fonts */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-montserrat), sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+  }
+  
+  /* Brand animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
   }
 }
