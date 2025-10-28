@@ -6,19 +6,26 @@ import { Button } from "@/components/ui/button";
 import { PlayCircle } from "lucide-react";
 import { useUser } from "../hooks/useUser";
 import UserDropdown from "./UserDropdown";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname, useParams, useSearchParams } from "next/navigation";
 
 function Navbar() {
   const { user, isLoading } = useUser();
   const pathname = usePathname();
   const params = useParams();
+  const searchParams = useSearchParams();
   const [feedUrl, setFeedUrl] = useState("/feed");
   const [leaderboardUrl, setLeaderboardUrl] = useState("/leaderboard");
 
   useEffect(() => {
+    // Get current URL parameters
+    const currentTraining = searchParams.get('training');
+    const currentClass = searchParams.get('class');
+    
     // Check if we're on a training detail page
     const isTrainingPage = pathname?.startsWith("/courses/");
+    
     if (isTrainingPage && params?.id) {
+      // We're on a training detail page
       const trainingId = params.id as string;
       
       // Try to get the selected class from localStorage
@@ -32,12 +39,21 @@ function Navbar() {
         setFeedUrl(`/feed?training=${trainingId}`);
         setLeaderboardUrl(`/leaderboard?training=${trainingId}`);
       }
+    } else if (currentTraining) {
+      // We're on feed or leaderboard page with training parameters
+      if (currentClass) {
+        setFeedUrl(`/feed?training=${currentTraining}&class=${currentClass}`);
+        setLeaderboardUrl(`/leaderboard?training=${currentTraining}&class=${currentClass}`);
+      } else {
+        setFeedUrl(`/feed?training=${currentTraining}`);
+        setLeaderboardUrl(`/leaderboard?training=${currentTraining}`);
+      }
     } else {
-      // Reset to default URLs when not on a training page
+      // Reset to default URLs when no training context
       setFeedUrl("/feed");
       setLeaderboardUrl("/leaderboard");
     }
-  }, [pathname, params]);
+  }, [pathname, params, searchParams]);
 
   // Check if we're on the homepage
   const isHomepage = pathname === "/";
