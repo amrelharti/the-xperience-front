@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -33,8 +33,25 @@ export default function NewPostPage() {
   const [loading, setLoading] = useState(false)
   const [modulesLoading, setModulesLoading] = useState(true)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user } = useUser()
   const { toast } = useToast()
+
+  // Build feed URL with query parameters
+  const training = searchParams.get('training')
+  const classParam = searchParams.get('class')
+  
+  const feedUrl = useMemo(() => {
+    console.log('🔍 Feed URL params - training:', training, 'class:', classParam)
+    
+    if (training && classParam) {
+      const url = `/feed?training=${training}&class=${classParam}`
+      console.log('✅ Returning filtered feed URL:', url)
+      return url
+    }
+    console.log('❌ No params, returning default feed URL')
+    return '/feed'
+  }, [training, classParam])
 
   useEffect(() => {
     loadModules()
@@ -76,6 +93,10 @@ export default function NewPostPage() {
 
     setLoading(true)
     
+    // Get classId from URL parameters if available
+    const classParam = searchParams.get('class')
+    console.log('🔍 Creating post with classId:', classParam, 'from URL params')
+    
     try {
       // Handle file upload if a file is selected
       if (selectedFile) {
@@ -84,20 +105,24 @@ export default function NewPostPage() {
           const dataUrl = reader.result as string
           
           try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/feed/posts`, {
+            const postData = {
+              moduleId: selectedModuleId && selectedModuleId !== "none" ? selectedModuleId : null,
+              classId: classParam || null,
+              postType: postType,
+              title: title.trim() || null,
+              content: content.trim(),
+              attachments: dataUrl, // Use data URL instead of text
+              isAssignment: postType === "ASSIGNMENT"
+            }
+            console.log('📤 Sending post data:', postData)
+            
+            const res = await fetch(`/api/feed/posts`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               credentials: "include",
-              body: JSON.stringify({
-                moduleId: selectedModuleId && selectedModuleId !== "none" ? selectedModuleId : null,
-                postType: postType,
-                title: title.trim() || null,
-                content: content.trim(),
-                attachments: dataUrl, // Use data URL instead of text
-                isAssignment: postType === "ASSIGNMENT"
-              })
+              body: JSON.stringify(postData)
             })
 
             if (res.ok) {
@@ -105,7 +130,7 @@ export default function NewPostPage() {
                 title: "Success",
                 description: "Post created successfully!",
               })
-              router.push("/feed")
+              router.push(feedUrl)
             } else {
               const error = await res.json()
               toast({
@@ -138,20 +163,24 @@ export default function NewPostPage() {
       }
       
       // If no file selected, proceed with original logic
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/feed/posts`, {
+      const postData = {
+        moduleId: selectedModuleId && selectedModuleId !== "none" ? selectedModuleId : null,
+        classId: classParam || null,
+        postType: postType,
+        title: title.trim() || null,
+        content: content.trim(),
+        attachments: attachments.trim() || null,
+        isAssignment: postType === "ASSIGNMENT" // Automatically true for assignment posts
+      }
+      console.log('📤 Sending post data (no file):', postData)
+      
+      const res = await fetch(`/api/feed/posts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({
-          moduleId: selectedModuleId && selectedModuleId !== "none" ? selectedModuleId : null,
-          postType: postType,
-          title: title.trim() || null,
-          content: content.trim(),
-          attachments: attachments.trim() || null,
-          isAssignment: postType === "ASSIGNMENT" // Automatically true for assignment posts
-        })
+        body: JSON.stringify(postData)
       })
 
       if (res.ok) {
@@ -159,7 +188,7 @@ export default function NewPostPage() {
           title: "Success",
           description: "Post created successfully!",
         })
-        router.push("/feed")
+        router.push(feedUrl)
       } else {
         const error = await res.json()
         toast({
@@ -223,7 +252,7 @@ export default function NewPostPage() {
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Back Button */}
           <Button variant="ghost" asChild className="mb-6">
-            <Link href="/feed">
+            <Link href={feedUrl}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Feed
             </Link>
@@ -387,7 +416,7 @@ export default function NewPostPage() {
                     )}
                   </Button>
                   <Button type="button" variant="outline" asChild>
-                    <Link href="/feed">Cancel</Link>
+                    <Link href={feedUrl}>Cancel</Link>
                   </Button>
                 </div>
               </form>

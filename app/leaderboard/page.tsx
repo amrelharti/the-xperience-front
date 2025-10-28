@@ -1,17 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
+import { motion, useInView } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { PlayCircle, Trophy, Star, TrendingUp, ArrowLeft, Medal, Award } from "lucide-react"
+import { PlayCircle, Trophy, Star, TrendingUp, ArrowLeft, Medal, Award, Crown, Zap, Target } from "lucide-react"
 import { useUser } from "../hooks/useUser"
 import UserDropdown from "../components/UserDropdown"
 import RequireAuth from "../components/RequireAuth"
+import Navbar from "../components/Navbar"
 import { useToast } from "@/hooks/use-toast"
 
 interface LeaderboardEntry {
@@ -42,6 +44,11 @@ export default function LeaderboardPage() {
   const { user } = useUser()
   const { toast } = useToast()
   const searchParams = useSearchParams()
+  
+  const headerRef = useRef(null)
+  const leaderboardRef = useRef(null)
+  const headerInView = useInView(headerRef, { once: true })
+  const leaderboardInView = useInView(leaderboardRef, { once: true })
 
   // Handle URL parameters for training and class filtering
   useEffect(() => {
@@ -199,10 +206,13 @@ export default function LeaderboardPage() {
   if (loading) {
     return (
       <RequireAuth>
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p>Loading leaderboard...</p>
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#0476D7] to-[#005eb8] rounded-2xl mb-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading leaderboard...</h3>
+            <p className="text-gray-500">Please wait while we fetch the rankings</p>
           </div>
         </div>
       </RequireAuth>
@@ -211,194 +221,325 @@ export default function LeaderboardPage() {
 
   return (
     <RequireAuth>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <PlayCircle className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-xl font-[family-name:var(--font-space-grotesk)]">The Xperience</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              {user && <UserDropdown user={user} />}
-            </div>
-          </div>
-        </header>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
+        <Navbar />
 
-        <div className="container mx-auto px-4 py-8">
-          {/* Back Button */}
-          <Button variant="ghost" asChild className="mb-6">
-            <Link href="/">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Trainings
-            </Link>
-          </Button>
-
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 font-[family-name:var(--font-space-grotesk)]">Leaderboard</h1>
-            <p className="text-muted-foreground text-lg">
-              {myClass ? `${myClass.name} - ` : ""}Top performers based on assignment ratings
-            </p>
-            
-          </div>
+          <motion.div 
+            ref={headerRef}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-12"
+          >
+            <div className="relative rounded-3xl overflow-hidden shadow-xl shadow-blue-500/10">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#60A5FA] via-[#3B82F6] to-[#2563EB]" />
+              <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px] opacity-50" />
+              <div className="relative p-10 md:p-14">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                  <div className="flex-1">
+                    <Badge className="bg-white/20 text-white border-yellow-400 mb-4 rounded-full px-4 py-1">
+                      <Trophy className="h-3 w-3 mr-2" />
+                      Class Rankings
+                    </Badge>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">
+                      Leaderboard
+                    </h1>
+                    <p className="text-lg text-blue-100 mb-6 max-w-2xl">
+                      {myClass ? `${myClass.name} - ` : ""}Top performers based on assignment ratings
+                    </p>
+                    <div className="flex flex-wrap items-center gap-6 text-blue-100">
+                      <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                        <Target className="h-5 w-5 text-yellow-300" />
+                        <span className="font-medium">Competitive</span>
+                      </div>
+                      <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                        <Zap className="h-5 w-5 text-yellow-300" />
+                        <span className="font-medium">Real-time</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Back Button */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mb-8"
+          >
+            <Button variant="outline" asChild className="border-gray-200 hover:border-[#0476D7]/30 hover:bg-blue-50/50">
+              <Link href={selectedTraining ? `/courses/${selectedTraining}` : "/"}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                {selectedTraining ? "Back to Training" : "Back to Trainings"}
+              </Link>
+            </Button>
+          </motion.div>
 
           {/* Class Selector - Only show if user has multiple classes */}
           {allClasses.length > 1 && (
-            <Card className="mb-8">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <Label htmlFor="class-select" className="text-sm font-medium">
-                    Select Class:
-                  </Label>
-                  <Select value={myClass?.id || ""} onValueChange={handleClassChange}>
-                    <SelectTrigger id="class-select" className="w-[300px]">
-                      <SelectValue placeholder="Choose a class" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {allClasses.map((classItem) => (
-                        <SelectItem key={classItem.id} value={classItem.id}>
-                          {classItem.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mb-8"
+            >
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="p-6">
+                  <div className="flex items-center gap-4">
+                    <Label htmlFor="class-select" className="text-sm font-semibold text-gray-700">
+                      Select Class:
+                    </Label>
+                    <Select value={myClass?.id || ""} onValueChange={handleClassChange}>
+                      <SelectTrigger id="class-select" className="w-[300px] border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl">
+                        <SelectValue placeholder="Choose a class" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {allClasses.map((classItem) => (
+                          <SelectItem key={classItem.id} value={classItem.id}>
+                            {classItem.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </motion.div>
           )}
 
           {/* Class Info Card */}
           {myClass && (
-            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
-                    <Trophy className="h-5 w-5 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">Your Class</h3>
-                    <p className="text-muted-foreground">{myClass.name}</p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="mb-8"
+            >
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border border-blue-200 shadow-sm overflow-hidden">
+                <div className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center shadow-md">
+                      <Trophy className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-gray-900">Your Class</h3>
+                      <p className="text-gray-600">{myClass.name}</p>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </motion.div>
           )}
 
           {/* My Rank Card */}
           {myRank && myRank > 0 && (
-            <Card className="mb-8 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center">
-                    <Trophy className="h-6 w-6 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold">Your Rank</h3>
-                    <p className="text-2xl font-bold text-primary">#{myRank}</p>
-                    <p className="text-sm text-muted-foreground">
-                      In {myClass?.name || "your class"}
-                    </p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="mb-8"
+            >
+              <div className="bg-gradient-to-r from-[#0476D7]/10 to-[#005eb8]/5 border-2 border-[#0476D7]/20 rounded-2xl shadow-lg overflow-hidden">
+                <div className="p-6">
+                  <div className="flex items-center gap-6">
+                    <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center shadow-lg">
+                      <Crown className="h-8 w-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">Your Rank</h3>
+                      <p className="text-4xl font-black text-[#0476D7] mb-1">#{myRank}</p>
+                      <p className="text-sm text-gray-600">
+                        In {myClass?.name || "your class"}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </motion.div>
           )}
 
           {/* Leaderboard */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                {myClass?.name} Leaderboard
-              </CardTitle>
-              <CardDescription>
-                Compete with your classmates! Rankings based on assignment ratings.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {leaderboard.length === 0 ? (
-                <div className="text-center py-12">
-                  <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No rankings yet</h3>
-                  <p className="text-muted-foreground mb-4">
-                    No rated assignments in your class yet. Be the first!
-                  </p>
-                  <Button asChild>
-                    <Link href="/feed/new">Submit First Assignment</Link>
-                  </Button>
+          <motion.div
+            ref={leaderboardRef}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="mb-8"
+          >
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{myClass?.name} Leaderboard</h3>
+                    <p className="text-sm text-gray-600">Compete with your classmates! Rankings based on assignment ratings.</p>
+                  </div>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {leaderboard.map((entry, index) => (
-                    <div
-                      key={entry.user.id}
-                      className={`flex items-center gap-4 p-4 rounded-lg border transition-colors ${
-                        index < 3 ? "bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20" : "hover:bg-muted/50"
-                      }`}
-                    >
-                      {/* Rank */}
-                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-muted">
-                        {getRankIcon(entry.rank)}
-                      </div>
+              </div>
+              <div className="p-6">
+                {leaderboard.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-6">
+                      <Trophy className="h-10 w-10 text-gray-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">No rankings yet</h3>
+                    <p className="text-gray-600 max-w-md mx-auto">
+                      No rated assignments in your class yet. Be the first to submit and get rated!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {leaderboard.map((entry, index) => (
+                      <motion.div
+                        key={entry.user.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        className={`group relative overflow-hidden rounded-2xl transition-all duration-300 ${
+                          index < 3 
+                            ? "bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 shadow-lg" 
+                            : "bg-white border border-gray-200 hover:border-[#0476D7]/30 hover:shadow-md"
+                        }`}
+                      >
+                        {/* Gradient accent line for top 3 */}
+                        {index < 3 && (
+                          <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-yellow-400 to-orange-400" />
+                        )}
+                        
+                        <div className="p-6 pl-8">
+                          <div className="flex items-center gap-6">
+                            {/* Rank */}
+                            <div className="flex-shrink-0">
+                              <div className={`relative ${
+                                index < 3 ? "h-16 w-16" : "h-12 w-12"
+                              } rounded-2xl flex items-center justify-center shadow-md ${
+                                index === 0 ? "bg-gradient-to-br from-yellow-400 to-yellow-600" :
+                                index === 1 ? "bg-gradient-to-br from-gray-300 to-gray-500" :
+                                index === 2 ? "bg-gradient-to-br from-amber-500 to-amber-700" :
+                                "bg-gradient-to-br from-gray-100 to-gray-200"
+                              }`}>
+                                {getRankIcon(entry.rank)}
+                              </div>
+                            </div>
 
-                      {/* User Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
-                            {entry.user.imageUrl ? (
-                              <img
-                                src={entry.user.imageUrl}
-                                alt={entry.user.name}
-                                className="h-10 w-10 rounded-full object-cover"
-                              />
-                            ) : (
-                              <span className="text-primary-foreground font-bold">
-                                {entry.user.name.charAt(0).toUpperCase()}
-                              </span>
-                            )}
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-lg">{entry.user.name}</h3>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <Star className="h-4 w-4" />
-                                {entry.totalPoints.toFixed(1)} points
-                              </span>
-                              <span>{entry.assignmentCount} rated assignments</span>
-                              <span>Avg: {entry.avgScore.toFixed(1)}/10</span>
+                            {/* User Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center shadow-md">
+                                  {entry.user.imageUrl ? (
+                                    <img
+                                      src={entry.user.imageUrl}
+                                      alt={entry.user.name}
+                                      className="h-12 w-12 rounded-xl object-cover"
+                                    />
+                                  ) : (
+                                    <span className="text-lg font-bold text-white">
+                                      {entry.user.name.charAt(0).toUpperCase()}
+                                    </span>
+                                  )}
+                                </div>
+                                <div>
+                                  <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#0476D7] transition-colors">
+                                    {entry.user.name}
+                                  </h3>
+                                  <div className="flex items-center gap-6 text-sm text-gray-600 mt-1">
+                                    <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100">
+                                      <Star className="h-4 w-4 text-[#0476D7]" />
+                                      <span className="font-semibold">{entry.totalPoints.toFixed(1)} points</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
+                                      <Target className="h-4 w-4 text-gray-600" />
+                                      <span className="font-medium">{entry.assignmentCount} assignments</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
+                                      <TrendingUp className="h-4 w-4 text-green-600" />
+                                      <span className="font-semibold text-green-700">Avg: {entry.avgScore.toFixed(1)}/10</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Rank Badge */}
+                            <div className="flex-shrink-0">
+                              {getRankBadge(entry.rank)}
                             </div>
                           </div>
                         </div>
-                      </div>
-
-                      {/* Rank Badge */}
-                      <div>
-                        {getRankBadge(entry.rank)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
 
           {/* How it Works */}
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>How Rankings Work</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm text-muted-foreground">
-              <p>• Points are calculated as the sum of average scores from all your rated assignments</p>
-              <p>• Each assignment's average score is the mean of all ratings given by other students in your class</p>
-              <p>• Rankings are class-specific - compete with your classmates!</p>
-              <p>• Once you rate an assignment, you cannot change your rating</p>
-              <p>• You cannot rate your own assignments</p>
-              <p>• Ratings range from 0-10 points per assignment</p>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className="mt-8"
+          >
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
+                    <Target className="h-5 w-5 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">How Rankings Work</h3>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="grid gap-4 text-sm text-gray-600">
+                  <div className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-[#0476D7] text-xs font-bold">1</span>
+                    </div>
+                    <p>Points are calculated as the sum of average scores from all your rated assignments</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-[#0476D7] text-xs font-bold">2</span>
+                    </div>
+                    <p>Each assignment's average score is the mean of all ratings given by other students in your class</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-[#0476D7] text-xs font-bold">3</span>
+                    </div>
+                    <p>Rankings are class-specific - compete with your classmates!</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-[#0476D7] text-xs font-bold">4</span>
+                    </div>
+                    <p>Once you rate an assignment, you cannot change your rating</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-[#0476D7] text-xs font-bold">5</span>
+                    </div>
+                    <p>You cannot rate your own assignments</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-[#0476D7] text-xs font-bold">6</span>
+                    </div>
+                    <p>Ratings range from 0-10 points per assignment</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </RequireAuth>

@@ -60,7 +60,8 @@ export async function POST(
       title: body.title,
       description: body.description || "",
       orderIndex: body.orderIndex || 0,
-      accessCode: body.accessCode || null
+      accessCode: body.accessCode || null,
+      thumbnailUrl: body.thumbnailUrl || null
     }
     
     console.log('📦 Sending training module data to backend:', moduleData)

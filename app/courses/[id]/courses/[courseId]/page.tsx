@@ -27,6 +27,7 @@ import {
   CheckCircle
 } from "lucide-react"
 import VimeoPlayer from "../../../../components/VimeoPlayer"
+import Navbar from "../../../../components/Navbar"
 
 interface Course {
   id: string
@@ -357,53 +358,67 @@ export default function CourseDetailPage() {
   const durationMinutes = Math.round(course.durationSeconds / 60)
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
+      <Navbar />
+      <div className="container mx-auto px-6 py-12 max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
-          <Button variant="ghost" asChild className="mb-4">
+        <div className="mb-12">
+          <Button 
+            variant="ghost" 
+            asChild 
+            className="mb-6 hover:text-[#0476D7] transition-colors"
+          >
             <Link href={`/courses/${trainingId}/modules/${module?.id}`} className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
               Back to Module
             </Link>
           </Button>
 
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h1 className="text-4xl font-bold mb-2 font-[family-name:var(--font-space-grotesk)]">
+          {/* Course Header Card */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
+            <div className="flex flex-col">
+              <div className="mb-4">
+                <Badge className="bg-gradient-to-r from-[#0476D7] to-[#0068A7] text-white">
+                  {module.title}
+                </Badge>
+              </div>
+              <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-[#0476D7] to-[#005eb8] bg-clip-text text-transparent leading-tight">
                 {course.title}
               </h1>
-              <p className="text-xl text-muted-foreground mb-4">
+              <p className="text-lg text-gray-600 mb-6 leading-relaxed max-w-4xl">
                 {course.description}
               </p>
 
-              <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  <span>{durationMinutes} minutes</span>
+              <div className="flex items-center gap-8 flex-wrap">
+                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-[#0476D7]/10 to-[#0068A7]/5 rounded-xl border border-[#0476D7]/20">
+                  <Clock className="h-5 w-5 text-[#0476D7]" />
+                  <span className="font-semibold text-[#0476D7]">{durationMinutes} minutes</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span>Module: {module.title}</span>
-                </div>
+                {courseProgress?.isCompleted && (
+                  <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="font-semibold text-green-700">Completed</span>
+                  </div>
+                )}
               </div>
             </div>
-
-            {/* Enrollment status removed - belongs on module page, not course page */}
           </div>
         </div>
 
         {/* Course Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  {isLocked ? <Lock className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="shadow-xl border-0 overflow-hidden">
+              <CardHeader className="bg-[#0476D7] text-white px-6 py-4">
+                <CardTitle className="flex items-center gap-3 text-white text-lg font-semibold">
+                  <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                    {isLocked ? <Lock className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                  </div>
                   Course Content
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 {isLocked ? (
                   <div className="text-center py-12">
                     <Lock className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
@@ -419,7 +434,7 @@ export default function CourseDetailPage() {
                 ) : (
                   <div className="space-y-6">
                     {course.videoUrl ? (
-                      <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                      <div className="aspect-video bg-black rounded-xl overflow-hidden shadow-2xl">
                         {isVimeoUrl(course.videoUrl) ? (
                           <VimeoPlayer
                             videoId={getVimeoVideoId(course.videoUrl) || ""}
@@ -473,12 +488,12 @@ export default function CourseDetailPage() {
                     )}
                     
                     {/* Manual completion trigger */}
-                    <div className="mt-4 text-center">
+                    <div className="mt-6">
                       <Button 
                         onClick={() => setShowConfirmDialog(true)}
                         variant="default"
                         size="lg"
-                        className="w-full"
+                        className="w-full bg-gradient-to-r from-[#0476D7] to-[#0068A7] hover:from-[#0068A7] hover:to-[#005eb8] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                       >
                         ✅ I Finished Watching This Video
                       </Button>
@@ -486,18 +501,18 @@ export default function CourseDetailPage() {
                     
                     {/* Course Navigation */}
                     {allCourses.length > 1 && (
-                      <div className="flex justify-between items-center py-4 border-t">
+                      <div className="flex justify-between items-center py-6 border-t border-gray-200">
                         <Button 
                           variant="outline" 
                           onClick={goToPreviousCourse}
                           disabled={currentCourseIndex === -1 ? allCourses.length <= 1 : currentCourseIndex <= 0}
-                          className="flex items-center"
+                          className="flex items-center px-6 hover:bg-[#0476D7] hover:text-white transition-all duration-300 border-[#0476D7]"
                         >
                           <ArrowLeft className="h-4 w-4 mr-2" />
                           Previous Course
                         </Button>
                         
-                        <div className="text-sm text-muted-foreground">
+                        <div className="px-4 py-2 bg-gradient-to-r from-[#0476D7]/10 to-[#0068A7]/5 rounded-xl border border-[#0476D7]/20 text-sm font-semibold text-[#0476D7]">
                           {currentCourseIndex >= 0 ? currentCourseIndex + 1 : 1} of {allCourses.length}
                         </div>
                         
@@ -505,7 +520,7 @@ export default function CourseDetailPage() {
                           variant="outline" 
                           onClick={goToNextCourse}
                           disabled={currentCourseIndex === -1 ? allCourses.length <= 1 : currentCourseIndex >= allCourses.length - 1}
-                          className="flex items-center"
+                          className="flex items-center px-6 hover:bg-[#0476D7] hover:text-white transition-all duration-300 border-[#0476D7]"
                         >
                           Next Course
                           <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
@@ -513,12 +528,7 @@ export default function CourseDetailPage() {
                       </div>
                     )}
                     
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">Course Description</h3>
-                      <p className="text-muted-foreground">
-                        {course.description}
-                      </p>
-                    </div>
+                    
                   </div>
                 )}
               </CardContent>
@@ -528,22 +538,22 @@ export default function CourseDetailPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Course Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Course Information</CardTitle>
+            <Card className="shadow-xl border-0">
+              <CardHeader className="bg-gradient-to-r from-[#FFBC00]/15 to-[#FFBC00]/8 px-6 py-4">
+                <CardTitle className="text-[#0476D7] text-lg font-semibold">Course Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Duration</p>
-                  <p className="font-medium">{durationMinutes} minutes</p>
+              <CardContent className="space-y-4 p-6">
+                <div className="p-3 bg-gradient-to-br from-[#0476D7]/5 to-[#0068A7]/5 rounded-xl">
+                  <p className="text-sm text-gray-600 mb-1">Duration</p>
+                  <p className="font-semibold text-[#0476D7]">{durationMinutes} minutes</p>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Module</p>
-                  <p className="font-medium">{module.title}</p>
+                <div className="p-3 bg-gradient-to-br from-[#0476D7]/5 to-[#0068A7]/5 rounded-xl">
+                  <p className="text-sm text-gray-600 mb-1">Module</p>
+                  <p className="font-semibold text-[#0476D7]">{module.title}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <Badge variant={isLocked ? "secondary" : "default"}>
+                <div className="p-3 bg-gradient-to-br from-[#0476D7]/5 to-[#0068A7]/5 rounded-xl">
+                  <p className="text-sm text-gray-600 mb-1">Status</p>
+                  <Badge className={isLocked ? "bg-orange-100 text-orange-700 border-orange-300" : "bg-green-100 text-green-700 border-green-300"}>
                     {isLocked ? "Locked" : "Available"}
                   </Badge>
                 </div>
@@ -552,20 +562,19 @@ export default function CourseDetailPage() {
 
             {/* Progress */}
             {!isLocked && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Progress</CardTitle>
+              <Card className="shadow-xl border-0">
+                <CardHeader className="bg-gradient-to-r from-[#FFBC00]/15 to-[#FFBC00]/8 px-6 py-4">
+                  <CardTitle className="text-[#0476D7] text-lg font-semibold">Progress</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                   <div className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div className="flex justify-between text-sm">
-                        <span>Course Progress</span>
-                        <span>{courseProgress?.completionPercentage || 0}%</span>
+                        <span className="font-semibold text-gray-700">Course Progress</span>
+                        <span className="font-bold text-[#0476D7]">{courseProgress?.completionPercentage || 0}%</span>
                       </div>
-                      {console.log("🎨 Rendering progress:", courseProgress?.completionPercentage)}
-                      <Progress value={courseProgress?.completionPercentage || 0} className="w-full" />
-                      <p className="text-xs text-muted-foreground">
+                      <Progress value={courseProgress?.completionPercentage || 0} className="w-full h-3" />
+                      <p className="text-xs text-gray-600">
                         {courseProgress?.isCompleted ? "Course completed!" : 
                          courseProgress?.isStarted ? "Continue watching..." : 
                          "Start watching to track your progress"}
@@ -573,9 +582,9 @@ export default function CourseDetailPage() {
                     </div>
                     
                     {courseProgress?.isCompleted && (
-                      <div className="flex items-center gap-2 text-green-600">
-                        <CheckCircle className="h-4 w-4" />
-                        <span className="text-sm font-medium">Course Completed!</span>
+                      <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                        <span className="text-sm font-semibold text-green-700">Course Completed!</span>
                       </div>
                     )}
                   </div>

@@ -4,21 +4,157 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { PlayCircle, Mail, Lock } from "lucide-react"
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false)
-  const [signInMethod, setSignInMethod] = useState<"google" | "email">("google")
   const [error, setError] = useState("")
-  const [emailForm, setEmailForm] = useState({
-    email: "",
-    password: ""
-  })
   const gsiDivRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    // Inject custom styles to prevent hydration issues
+    const style = document.createElement('style')
+    style.textContent = `
+      @keyframes gridMove {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
+      }
+      
+      @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+      }
+      
+      @keyframes float-delayed {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(-3deg); }
+      }
+      
+      @keyframes float-slow {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-25px) rotate(2deg); }
+      }
+      
+      @keyframes spin-slow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      @keyframes fade-in-up {
+        0% { 
+          opacity: 0; 
+          transform: translateY(30px); 
+        }
+        100% { 
+          opacity: 1; 
+          transform: translateY(0); 
+        }
+      }
+      
+      @keyframes fade-in-up-delayed {
+        0% { 
+          opacity: 0; 
+          transform: translateY(30px); 
+        }
+        50% { 
+          opacity: 0; 
+          transform: translateY(30px); 
+        }
+        100% { 
+          opacity: 1; 
+          transform: translateY(0); 
+        }
+      }
+      
+      @keyframes pulse-delayed {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.8; }
+      }
+      
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+        20%, 40%, 60%, 80% { transform: translateX(2px); }
+      }
+      
+      .animate-float { animation: float 6s ease-in-out infinite; }
+      .animate-float-delayed { animation: float-delayed 8s ease-in-out infinite; }
+      .animate-float-slow { animation: float-slow 10s ease-in-out infinite; }
+      .animate-spin-slow { animation: spin-slow 8s linear infinite; }
+      .animate-fade-in-up { animation: fade-in-up 1s ease-out; }
+      .animate-fade-in-up-delayed { animation: fade-in-up-delayed 1.5s ease-out; }
+      .animate-pulse-delayed { animation: pulse-delayed 3s ease-in-out infinite; }
+      .animate-shake { animation: shake 0.5s ease-in-out; }
+      
+      .gsi-material-button {
+        width: 100% !important;
+        height: 56px !important;
+        border-radius: 28px !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(20px) !important;
+        box-shadow: 
+          0 4px 20px rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        transition: all 0.3s ease !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        font-weight: 400 !important;
+        font-size: 15px !important;
+        color: rgba(255, 255, 255, 0.9) !important;
+        position: relative !important;
+        overflow: hidden !important;
+        cursor: pointer !important;
+      }
+      
+      .gsi-material-button:hover {
+        transform: translateY(-2px) !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 
+          0 8px 30px rgba(0, 0, 0, 0.15),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+      }
+      
+      .gsi-material-button:active {
+        transform: translateY(0) !important;
+        box-shadow: 
+          0 2px 10px rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+      }
+      
+      .gsi-material-button .gsi-material-button-contents {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        padding: 0 20px !important;
+        position: relative !important;
+        z-index: 1 !important;
+        height: 100% !important;
+      }
+      
+      .gsi-material-button .gsi-material-button-icon {
+        width: 18px !important;
+        height: 18px !important;
+        margin-right: 0 !important;
+      }
+      
+      .gsi-material-button .gsi-material-button-text {
+        font-weight: 400 !important;
+        letter-spacing: 0.3px !important;
+        font-size: 15px !important;
+      }
+      
+      .gsi-material-button:focus {
+        outline: none !important;
+        border-color: rgba(0, 94, 184, 0.6) !important;
+        box-shadow: 
+          0 4px 20px rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          0 0 0 2px rgba(0, 94, 184, 0.2) !important;
+      }
+    `
+    document.head.appendChild(style)
+
     // Hardcoded Google Client ID for testing
     const clientId = "128297296458-8nj8i8ej0mcrq5drskb2iargscjl3s59.apps.googleusercontent.com"
     console.log("Google Client ID:", clientId)
@@ -133,8 +269,8 @@ export default function SignInPage() {
     }
 
     const renderGoogleButton = () => {
-      console.log("Rendering Google button, signInMethod:", signInMethod)
-      if (gsiDivRef.current && signInMethod === "google") {
+      console.log("Rendering Google button")
+      if (gsiDivRef.current) {
         // Clear any existing content
         gsiDivRef.current.innerHTML = ""
         
@@ -144,10 +280,12 @@ export default function SignInPage() {
           try {
             // @ts-ignore
             window.google.accounts.id.renderButton(gsiDivRef.current, { 
-              theme: "filled_blue", 
+              theme: "outline", 
               size: "large", 
               type: "standard", 
-              shape: "pill" 
+              shape: "pill",
+              text: "signin_with",
+              width: "100%"
             })
           } catch (error) {
             console.error("Error rendering Google button:", error)
@@ -161,177 +299,157 @@ export default function SignInPage() {
     // Initialize Google Sign-In
     initGoogleSignIn()
 
-    // Re-render button when sign-in method changes
-    if (signInMethod === "google") {
-      // Small delay to ensure the method change has been processed
-      setTimeout(renderGoogleButton, 100)
-    }
-  }, [signInMethod])
+    // Render button after initialization
+    setTimeout(renderGoogleButton, 100)
 
-
-  const handleEmailSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("") // Clear any previous errors
-    
-    try {
-      const res = await fetch(`http://localhost:8080/api/auth/email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(emailForm),
-      })
-      
-      if (res.ok) {
-        const user = await res.json()
-        console.log("Email sign-in successful, user data:", user)
-        console.log("User role:", user.role)
-        // Redirect admins to admin page, others to home (modules page)
-        if (user.role === "ADMIN") {
-          console.log("Redirecting admin to /admin")
-          window.location.href = "/admin"
-        } else {
-          console.log("Redirecting user to /")
-          window.location.href = "/"
-        }
-      } else {
-        const errorData = await res.json()
-        console.error("Email sign-in failed:", errorData)
-        setError("Invalid credentials. Please check your email and password.")
+    // Cleanup function to remove the style element
+    return () => {
+      if (style && style.parentNode) {
+        style.parentNode.removeChild(style)
       }
-    } catch (error) {
-      console.error("Email sign-in error:", error)
-      setError("Network error. Please check your connection and try again.")
-    } finally {
-      setIsLoading(false)
     }
-  }
+  }, [])
+
+
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-              <PlayCircle className="h-6 w-6 text-primary-foreground" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 p-4 relative overflow-hidden">
+      {/* Futuristic Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Animated Grid Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="grid-pattern" style={{
+            backgroundImage: `
+              linear-gradient(rgba(0, 94, 184, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0, 94, 184, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+            animation: 'gridMove 20s linear infinite'
+          }}></div>
+        </div>
+        
+        {/* Floating Orbs */}
+        <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-xl animate-float"></div>
+        <div className="absolute top-40 right-32 w-24 h-24 bg-gradient-to-r from-secondary/30 to-primary/20 rounded-full blur-lg animate-float-delayed"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-gradient-to-r from-primary/15 to-secondary/25 rounded-full blur-2xl animate-float-slow"></div>
+        
+        {/* Geometric Shapes */}
+        <div className="absolute top-1/3 right-20 w-16 h-16 border border-primary/30 rotate-45 animate-spin-slow"></div>
+        <div className="absolute bottom-1/4 left-20 w-12 h-12 bg-secondary/20 rotate-12 animate-pulse"></div>
+        
+        {/* Light Rays */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-px h-full bg-gradient-to-b from-transparent via-primary/20 to-transparent animate-pulse"></div>
+        <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-secondary/20 to-transparent animate-pulse-delayed"></div>
+      </div>
+      
+      <div className="w-full max-w-lg relative z-10">
+        {/* Logo Section with Enhanced Animation */}
+        <div className="text-center mb-12">
+          <Link href="/" className="inline-flex items-center justify-center mb-8 group hover:scale-105 transition-all duration-500">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl blur-lg group-hover:blur-xl transition-all duration-500"></div>
+              <img 
+                src="/logos/yellow secondary logo.svg" 
+                alt="XPERIENCE Logo" 
+                className="relative h-20 w-auto filter drop-shadow-2xl"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
             </div>
-            <span className="font-bold text-2xl font-[family-name:var(--font-space-grotesk)]">The Xperience</span>
           </Link>
-          <h1 className="text-3xl font-bold mb-2 font-[family-name:var(--font-space-grotesk)]">Welcome Back</h1>
-          <p className="text-muted-foreground">Sign in to continue your learning journey</p>
+          
+          <div className="space-y-4">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent font-[family-name:var(--font-space-grotesk)] animate-fade-in-up">
+              Welcome Back
+            </h1>
+            <p className="text-blue-200/80 text-xl font-light tracking-wide animate-fade-in-up-delayed">
+              Continue your learning journey
+            </p>
+          </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>Choose your preferred sign-in method</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Sign-in Method Toggle */}
-            <div className="flex rounded-lg border p-1">
-              <button
-                type="button"
-                className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  signInMethod === "google"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                onClick={() => setSignInMethod("google")}
-              >
-                Google
-              </button>
-              <button
-                type="button"
-                className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  signInMethod === "email"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                onClick={() => setSignInMethod("email")}
-              >
-                Email
-              </button>
+        {/* Futuristic Sign-in Card */}
+        <div className="relative group">
+          {/* Card Glow Effect */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-secondary/20 to-primary/30 rounded-3xl blur-lg group-hover:blur-xl transition-all duration-500 opacity-75 group-hover:opacity-100"></div>
+          
+          {/* Main Card */}
+          <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+            {/* Card Header */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl mb-4">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h2 className="text-3xl font-bold text-white mb-2">Authentication</h2>
+              <p className="text-blue-200/70 text-lg font-light">Secure access to your learning platform</p>
             </div>
-
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-6 py-4 rounded-2xl backdrop-blur-sm animate-shake">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <svg className="h-4 w-4 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
+                    <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center">
+                      <svg className="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
                   </div>
-                  <div className="ml-3">
-                    <p className="font-medium">Sign-in Failed</p>
-                    <p className="mt-1">{error}</p>
+                  <div className="ml-4">
+                    <p className="font-semibold text-red-200">Authentication Error</p>
+                    <p className="mt-1 text-red-300/80">{error}</p>
                   </div>
                 </div>
               </div>
             )}
 
             {/* Google Sign-in */}
-            {signInMethod === "google" && (
-              <div ref={gsiDivRef} className="w-full flex justify-center" />
-            )}
-
-            {/* Email Sign-in */}
-            {signInMethod === "email" && (
-              <form onSubmit={handleEmailSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={emailForm.email}
-                      onChange={(e) => setEmailForm({ ...emailForm, email: e.target.value })}
-                      className="pl-10"
-                      required
-                    />
+            <div className="w-full space-y-6">
+              {isLoading ? (
+                <div className="w-full h-16 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl border border-white/20 flex items-center justify-center backdrop-blur-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <div className="absolute inset-0 w-8 h-8 border-2 border-transparent border-t-primary rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '0.8s'}}></div>
+                    </div>
+                    <span className="text-white font-semibold text-lg">Authenticating...</span>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="Enter your password"
-                      value={emailForm.password}
-                      onChange={(e) => setEmailForm({ ...emailForm, password: e.target.value })}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
+              ) : (
+                <div className="relative">
+                  <div ref={gsiDivRef} className="w-full flex justify-center" />
                 </div>
-                <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
-                  {isLoading ? "Signing in..." : "Sign In with Email"}
-                </Button>
-              </form>
-            )}
+              )}
+              
+            </div>
 
-            <div className="text-center text-sm text-muted-foreground">
-              <p>
+            {/* Footer Section */}
+            <div className="text-center pt-8 border-t border-white/10">
+              <p className="text-blue-200/60 text-sm leading-relaxed">
                 By signing in, you agree to our{" "}
-                <Link href="#" className="underline hover:text-foreground">
+                <Link href="#" className="text-white hover:text-primary transition-colors duration-300 font-medium underline decoration-primary/50 underline-offset-4 hover:decoration-primary">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="#" className="underline hover:text-foreground">
+                <Link href="#" className="text-white hover:text-primary transition-colors duration-300 font-medium underline decoration-primary/50 underline-offset-4 hover:decoration-primary">
                   Privacy Policy
                 </Link>
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <div className="text-center mt-6">
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            ← Back to Home
+        {/* Back to Home Link */}
+        <div className="text-center mt-12">
+          <Link href="/" className="inline-flex items-center gap-3 text-blue-200/70 hover:text-white transition-all duration-500 font-medium group">
+            <div className="w-10 h-10 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full flex items-center justify-center group-hover:bg-white/10 transition-all duration-300">
+              <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </div>
+            <span className="text-lg">Back to Home</span>
           </Link>
         </div>
       </div>

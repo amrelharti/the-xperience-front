@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,8 +10,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { FileUpload } from "@/components/ui/file-upload"
-import { Plus, Search, Edit, Trash2, ArrowLeft, Users, Mail, Calendar, Shield } from "lucide-react"
+import { Plus, Search, Edit, Trash2, ArrowLeft, Users, Mail, Calendar, Shield, Menu, X } from "lucide-react"
 import Navbar from "../../components/Navbar"
+import UserDropdown from "../../components/UserDropdown"
+import { useUser } from "../../hooks/useUser"
 
 interface User {
   id: string
@@ -23,10 +26,12 @@ interface User {
 }
 
 export default function UserManagementPage() {
+  const { user } = useUser()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [showCreateUser, setShowCreateUser] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
@@ -159,30 +164,144 @@ export default function UserManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
+      {/* Modern Header */}
+      <header className="border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-6">
+            <Link href="/admin" className="flex items-center gap-3 group hover:opacity-80 transition-opacity duration-200">
+              <img 
+                src="/logos/dark blue secondary logo.svg" 
+                alt="XPERIENCE Logo" 
+                className="h-10 w-25"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </Link>
+            <nav className="hidden md:flex items-center space-x-8">
+              <Link href="/admin" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Dashboard
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+              <Link href="/admin/trainings" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Trainings
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+              <Link href="/admin/classes" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Classes
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+              <Link href="/admin/users" className="text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Users
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+              <Link href="/admin/feed" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Feed
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+              <Link href="/admin/leaderboard" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Leaderboard
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+            </nav>
+          </div>
+          <div className="flex items-center space-x-4">
+            {user && <UserDropdown user={user} />}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden hover:bg-slate-100"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+        
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t bg-white/95 backdrop-blur-md">
+            <nav className="container mx-auto px-6 py-4 space-y-3">
+              <Link 
+                href="/admin" 
+                className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Link 
+                href="/admin/trainings" 
+                className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Trainings
+              </Link>
+              <Link 
+                href="/admin/classes" 
+                className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Classes
+              </Link>
+              <Link 
+                href="/admin/users" 
+                className="block py-3 text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Users
+              </Link>
+              <Link 
+                href="/admin/feed" 
+                className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Feed
+              </Link>
+              <Link 
+                href="/admin/leaderboard" 
+                className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Leaderboard
+              </Link>
+            </nav>
+          </div>
+        )}
+      </header>
+
+      <div className="container mx-auto px-6 py-8 space-y-8">
+        {/* Page Header */}
+        <div className="text-center space-y-4 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#005eb8] to-[#0476D7] text-white rounded-full text-sm font-medium">
+            <Users className="h-4 w-4" />
+            User Management
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+            User Management
+          </h1>
+          <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            Manage user accounts, permissions, and access controls
+          </p>
+        </div>
+
+        {/* Header Actions */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
               size="sm"
               onClick={() => window.history.back()}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:bg-slate-100"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-              <p className="text-gray-600">Manage user accounts and permissions</p>
-            </div>
           </div>
           <Dialog open={showCreateUser} onOpenChange={setShowCreateUser}>
             <DialogTrigger asChild>
-              <Button type="button">
-                <Plus className="h-4 w-4 mr-2" />
+              <Button type="button" className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+                <Plus className="h-5 w-5 mr-2" />
                 Add User
               </Button>
             </DialogTrigger>
@@ -257,78 +376,86 @@ export default function UserManagementPage() {
         </div>
 
         {/* Search and Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="lg:col-span-3">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-slide-up">
+          <Card className="lg:col-span-3 border-0 bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-6">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
                 <Input
                   placeholder="Search users by name, email, or role..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-12 h-12 text-lg border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-xl"
                 />
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-6">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{users.length}</div>
-                <div className="text-sm text-gray-600">Total Users</div>
+                <div className="text-3xl font-bold text-[#005eb8] mb-2">{users.length}</div>
+                <div className="text-sm text-slate-600">Total Users</div>
+                <div className="mt-4 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-[#005eb8] to-[#0476D7] rounded-full w-4/5"></div>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Users List */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
+        <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-scale-in">
+          <CardHeader className="pb-6">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="p-2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg">
+                <Users className="h-5 w-5 text-white" />
+              </div>
               Users ({filteredUsers.length})
             </CardTitle>
-            <CardDescription>Manage user accounts and permissions</CardDescription>
+            <CardDescription className="text-slate-600">Manage user accounts and permissions</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {filteredUsers.map((user) => (
-                <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                  <div className="flex items-center space-x-4">
-                    <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+              {filteredUsers.map((user, index) => (
+                <div key={user.id} className="group flex items-center justify-between p-6 border-2 border-slate-200 rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:bg-slate-50 hover:border-[#005eb8]/30 animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+                  <div className="flex items-center space-x-6">
+                    <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       {user.imageUrl ? (
                         <img
                           src={user.imageUrl}
                           alt={user.name}
-                          className="h-12 w-12 rounded-full object-cover"
+                          className="h-16 w-16 rounded-xl object-cover"
                         />
                       ) : (
-                        <Users className="h-6 w-6 text-gray-400" />
+                        <Users className="h-8 w-8 text-slate-400" />
                       )}
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{user.name}</p>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <div className="flex-1">
+                      <p className="text-lg font-bold text-slate-800 group-hover:text-[#005eb8] transition-colors duration-200 mb-2">{user.name}</p>
+                      <div className="flex items-center space-x-2 text-sm text-slate-600 mb-2">
                         <Mail className="h-4 w-4" />
                         <span>{user.email}</span>
                       </div>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Badge variant={user.role === "ADMIN" ? "default" : "outline"}>
+                      <div className="flex items-center space-x-3">
+                        <Badge variant={user.role === "ADMIN" ? "default" : "outline"} className={`px-3 py-1 text-xs font-semibold ${
+                          user.role === "ADMIN" ? "bg-gradient-to-r from-[#FFBC00] to-[#f59e0b] text-white hover:from-[#f59e0b] hover:to-[#FFBC00]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}>
                           <Shield className="h-3 w-3 mr-1" />
                           {user.role}
                         </Badge>
-                        <span className="text-xs text-gray-500">
-                          <Calendar className="h-3 w-3 inline mr-1" />
+                        <span className="text-xs text-slate-500 flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
                           {new Date(user.createdAt).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => handleDeleteUser(user.id)}
+                      className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all duration-200"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -336,9 +463,26 @@ export default function UserManagementPage() {
                 </div>
               ))}
               {filteredUsers.length === 0 && (
-                <div className="text-center py-8">
-                  <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No users found</p>
+                <div className="text-center py-16">
+                  <div className="space-y-6">
+                    <div className="mx-auto w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center">
+                      <Users className="h-12 w-12 text-slate-400" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-2xl font-bold text-slate-800">No users found</h3>
+                      <p className="text-slate-600 max-w-md mx-auto">
+                        {searchTerm ? "Try adjusting your search terms" : "Get started by creating your first user account"}
+                      </p>
+                    </div>
+                    {!searchTerm && (
+                      <Button asChild className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+                        <Link href="#" onClick={() => setShowCreateUser(true)}>
+                          <Plus className="h-5 w-5 mr-2" />
+                          Create User
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

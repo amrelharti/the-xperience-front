@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { useParams, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -24,6 +24,7 @@ import {
 import { useUser } from "@/app/hooks/useUser"
 import UserDropdown from "@/app/components/UserDropdown"
 import RequireAuth from "@/app/components/RequireAuth"
+import Navbar from "@/app/components/Navbar"
 import { useToast } from "@/hooks/use-toast"
 
 interface Post {
@@ -88,6 +89,18 @@ export default function PostDetailPage() {
   const searchParams = useSearchParams()
   const { user } = useUser()
   const { toast } = useToast()
+
+  // Get training and class query parameters for preserving context
+  const training = searchParams.get('training')
+  const classParam = searchParams.get('class')
+
+  // Build feed URL with query parameters
+  const feedUrl = useMemo(() => {
+    if (training && classParam) {
+      return `/feed?training=${training}&class=${classParam}`
+    }
+    return '/feed'
+  }, [training, classParam])
 
   useEffect(() => {
     if (params.id) {
@@ -709,7 +722,7 @@ export default function PostDetailPage() {
   if (loading) {
     return (
       <RequireAuth>
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
             <p>Loading post...</p>
@@ -722,7 +735,7 @@ export default function PostDetailPage() {
   if (!post) {
     return (
       <RequireAuth>
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30 flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Post not found</h1>
             <Button asChild>
@@ -736,26 +749,13 @@ export default function PostDetailPage() {
 
   return (
     <RequireAuth>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <MessageSquare className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-xl font-[family-name:var(--font-space-grotesk)]">The Xperience</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              {user && <UserDropdown user={user} />}
-            </div>
-          </div>
-        </header>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
+        <Navbar />
 
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Back Button */}
           <Button variant="ghost" asChild className="mb-6">
-            <Link href={cameFromAdmin ? "/admin/feed" : "/feed"}>
+            <Link href={cameFromAdmin ? "/admin/feed" : feedUrl}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to {cameFromAdmin ? "Admin Feed" : "Feed"}
             </Link>
@@ -893,8 +893,23 @@ export default function PostDetailPage() {
               )}
               
               {post.attachments && (
-                <div className="mb-4 p-3 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground">{post.attachments}</p>
+                <div className="mb-4">
+                  {post.attachments.startsWith('data:image') || post.attachments.startsWith('http://') || post.attachments.startsWith('https://') ? (
+                    <div className="relative w-full max-h-96 overflow-hidden rounded-lg border border-gray-200">
+                      <img 
+                        src={post.attachments} 
+                        alt="Post attachment" 
+                        className="w-full h-auto object-contain max-h-96"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-muted rounded-lg">
+                      <p className="text-sm text-muted-foreground">{post.attachments}</p>
+                    </div>
+                  )}
                 </div>
               )}
 

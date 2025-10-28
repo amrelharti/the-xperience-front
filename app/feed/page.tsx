@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
+import { motion, useInView } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -19,12 +20,17 @@ import {
   BookOpen,
   HelpCircle,
   FileText,
-  Megaphone
+  Megaphone,
+  ArrowLeft,
+  Users,
+  Sparkles,
+  TrendingUp
 } from "lucide-react"
 import { useUser } from "@/app/hooks/useUser"
 import { useDebounce } from "@/app/hooks/useDebounce"
 import UserDropdown from "@/app/components/UserDropdown"
 import RequireAuth from "@/app/components/RequireAuth"
+import Navbar from "@/app/components/Navbar"
 import { useToast } from "@/hooks/use-toast"
 import { logger } from "@/lib/logger"
 import { measureApiCall } from "@/lib/performance"
@@ -77,6 +83,30 @@ export default function FeedPage() {
   
   // Debounce search query to avoid excessive API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 500)
+  
+  // Get the URL for "Create New Post" with query parameters
+  const training = searchParams.get('training')
+  const classParam = searchParams.get('class')
+  
+  const newPostUrl = useMemo(() => {
+    console.log('🔗 Creating New Post URL - training:', training, 'class:', classParam)
+    
+    if (training && classParam) {
+      const url = `/feed/new?training=${training}&class=${classParam}`
+      console.log('✅ Returning filtered new post URL:', url)
+      return url
+    }
+    console.log('❌ No params, returning default new post URL')
+    return '/feed/new'
+  }, [training, classParam])
+
+  // Build post detail URL with query parameters
+  const getPostDetailUrl = (postId: string) => {
+    if (training && classParam) {
+      return `/feed/posts/${postId}?training=${training}&class=${classParam}`
+    }
+    return `/feed/posts/${postId}`
+  }
   
   // Handle URL parameters for training and class filtering
   useEffect(() => {
@@ -320,249 +350,360 @@ export default function FeedPage() {
     return `${Math.floor(diffInSeconds / 86400)}d ago`
   }, [])
 
+  const headerRef = useRef(null)
+  const postsRef = useRef(null)
+  const headerInView = useInView(headerRef, { once: true })
+  const postsInView = useInView(postsRef, { once: true })
+
   return (
     <RequireAuth>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <MessageSquare className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-xl font-[family-name:var(--font-space-grotesk)]">The Xperience</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              {user && <UserDropdown user={user} />}
-            </div>
-          </div>
-        </header>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
+        <Navbar />
 
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Page Header */}
-              <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 font-[family-name:var(--font-space-grotesk)]">Feed</h1>
-            <p className="text-muted-foreground text-lg">Share your thoughts, ask questions, and connect with the community</p>
-            
-          </div>
-
-          {/* Create Post Button */}
-          <div className="mb-6">
-            <Button asChild className="w-full">
-              <Link href="/feed/new">
-                <Plus className="h-4 w-4 mr-2" />
-                Create New Post
-              </Link>
-            </Button>
-              </div>
-
-          {/* Filters */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Filters
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                      placeholder="Search posts..."
-                  value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
+          <motion.div 
+            ref={headerRef}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-12"
+          >
+            <div className="relative rounded-3xl overflow-hidden shadow-xl shadow-blue-500/10">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#60A5FA] via-[#3B82F6] to-[#2563EB]" />
+              <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px] opacity-50" />
+              <div className="relative p-10 md:p-14">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                  <div className="flex-1">
+                    <Badge className="bg-white/20 text-white border-yellow-400 mb-4 rounded-full px-4 py-1">
+                      <MessageSquare className="h-3 w-3 mr-2" />
+                      Community Feed
+                    </Badge>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">
+                      Feed
+                    </h1>
+                    <p className="text-lg text-blue-100 mb-6 max-w-2xl">
+                      Share your thoughts, ask questions, and connect with the community
+                    </p>
+                    <div className="flex flex-wrap items-center gap-6 text-blue-100">
+                      <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                        <Users className="h-5 w-5 text-yellow-300" />
+                        <span className="font-medium">Community</span>
+                      </div>
+                      <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                        <Sparkles className="h-5 w-5 text-yellow-300" />
+                        <span className="font-medium">Interactive</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <Select value={filterType} onValueChange={setFilterType}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="POST">Posts</SelectItem>
-                    <SelectItem value="ASSIGNMENT">Assignments</SelectItem>
-                    <SelectItem value="QUESTION">Questions</SelectItem>
-                    <SelectItem value="ANNOUNCEMENT">Announcements</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={filterModule} onValueChange={setFilterModule}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Training Module" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Modules</SelectItem>
-                    {trainingModules.map((module) => (
-                      <SelectItem key={module.id} value={module.id}>
-                        {module.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </motion.div>
+
+          {/* Action Buttons */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mb-8"
+          >
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Back to Training Button - only show when viewing filtered feed */}
+              {training && (
+                <Button variant="outline" asChild className="border-gray-200 hover:border-[#0476D7]/30 hover:bg-blue-50/50">
+                  <Link href={`/courses/${training}`}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Training
+                  </Link>
+                </Button>
+              )}
+
+              {/* Create Post Button */}
+              <Button asChild className="flex-1 bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white rounded-xl px-8 shadow-lg hover:shadow-xl transition-all font-semibold border-0">
+                <Link href={newPostUrl}>
+                  <Plus className="h-5 w-5 mr-2" />
+                  Create New Post
+                </Link>
+              </Button>
+            </div>
+          </motion.div>
+
+          {/* Filters */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mb-8"
+          >
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
+                    <Filter className="h-5 w-5 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex flex-col lg:flex-row gap-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Search posts..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10 border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Select value={filterType} onValueChange={setFilterType}>
+                      <SelectTrigger className="w-full sm:w-40 border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl">
+                        <SelectValue placeholder="Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="POST">Posts</SelectItem>
+                        <SelectItem value="ASSIGNMENT">Assignments</SelectItem>
+                        <SelectItem value="QUESTION">Questions</SelectItem>
+                        <SelectItem value="ANNOUNCEMENT">Announcements</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={filterModule} onValueChange={setFilterModule}>
+                      <SelectTrigger className="w-full sm:w-48 border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl">
+                        <SelectValue placeholder="Training Module" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Modules</SelectItem>
+                        {trainingModules.map((module) => (
+                          <SelectItem key={module.id} value={module.id}>
+                            {module.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Posts Feed */}
-          <div className="space-y-4">
+          <motion.div 
+            ref={postsRef}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
             {loading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                <p>Loading posts...</p>
+              <div className="text-center py-12">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#0476D7] to-[#005eb8] rounded-2xl mb-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading posts...</h3>
+                <p className="text-gray-500">Please wait while we fetch the latest content</p>
               </div>
             ) : posts.length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No posts yet</h3>
-                  <p className="text-muted-foreground mb-4">Be the first to share something with the community!</p>
-                  <Button asChild>
-                    <Link href="/feed/new">Create First Post</Link>
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="text-center py-16">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-6">
+                    <MessageSquare className="h-10 w-10 text-gray-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">No posts yet</h3>
+                  <p className="text-gray-600 mb-6 max-w-md mx-auto">Be the first to share something with the community and start the conversation!</p>
+                  <Button asChild className="bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white rounded-xl px-8 shadow-lg hover:shadow-xl transition-all font-semibold border-0">
+                    <Link href={newPostUrl}>
+                      <Plus className="h-5 w-5 mr-2" />
+                      Create First Post
+                    </Link>
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ) : (
-              posts.map((post) => (
-                <Card key={post.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = `/feed/posts/${post.id}`}>
-                  <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                          {post.author.imageUrl ? (
+              posts.map((post, index) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  whileHover={{ scale: 1.02, y: -4 }}
+                  className="group relative overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-lg border border-gray-200 hover:border-[#0476D7]/30 cursor-pointer"
+                  onClick={() => window.location.href = getPostDetailUrl(post.id)}
+                >
+                  {/* Gradient accent line */}
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#0476D7] via-[#005eb8] to-[#FFBC00] group-hover:w-2 transition-all duration-300" />
+                  
+                  <div className="p-6 pl-8">
+                    {/* Post Header */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center shadow-md">
+                            {post.author.imageUrl ? (
                               <img
-                              src={post.author.imageUrl} 
-                              alt={post.author.name}
-                                className="h-10 w-10 rounded-full object-cover"
+                                src={post.author.imageUrl} 
+                                alt={post.author.name}
+                                className="h-12 w-12 rounded-xl object-cover"
                               />
                             ) : (
-                            <span className="text-sm font-medium">
-                              {post.author.name.charAt(0).toUpperCase()}
-                            </span>
+                              <span className="text-lg font-bold text-white">
+                                {post.author.name.charAt(0).toUpperCase()}
+                              </span>
                             )}
                           </div>
-                          <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold">{post.author.name}</h3>
-                            <Badge className={getPostTypeColor(post.type)}>
+                          {post.isPinned && (
+                            <div className="absolute -top-1 -right-1 h-5 w-5 bg-[#FFBC00] rounded-full flex items-center justify-center">
+                              <Pin className="h-3 w-3 text-white" />
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-3 mb-1">
+                            <h3 className="font-bold text-gray-900 group-hover:text-[#0476D7] transition-colors">{post.author.name}</h3>
+                            <Badge className={`${getPostTypeColor(post.type)} rounded-full px-3 py-1 text-xs font-semibold`}>
                               {getPostIcon(post.type)}
                               <span className="ml-1">{post.type}</span>
                             </Badge>
-                            {post.isPinned && (
-                              <Badge variant="outline" className="text-orange-600 border-orange-600">
-                                <Pin className="h-3 w-3 mr-1" />
-                                Pinned
-                              </Badge>
-                            )}
                           </div>
-                          <p className="text-sm text-muted-foreground">
-                            {formatTimeAgo(post.createdAt)}
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <span>{formatTimeAgo(post.createdAt)}</span>
                             {post.module && (
-                              <span className="ml-2">
-                                in <span className="font-medium">{post.module.title}</span>
-                              </span>
+                              <>
+                                <span>•</span>
+                                <span className="font-medium text-[#0476D7]">{post.module.title}</span>
+                              </>
                             )}
                             {post.class && (
-                              <span className="ml-2">
-                                • <span className="font-medium text-blue-600">{post.class.name}</span>
-                              </span>
+                              <>
+                                <span>•</span>
+                                <span className="font-medium text-gray-700">{post.class.name}</span>
+                              </>
                             )}
-                          </p>
+                          </div>
                         </div>
                       </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                    {post.title && (
-                      <h2 className="text-lg font-semibold mb-2">{post.title}</h2>
-                    )}
-                    <p className="text-gray-700 mb-4 whitespace-pre-wrap">{post.content}</p>
-                    
-                    {post.attachments && (
-                      <div className="mb-4 p-3 bg-muted rounded-lg">
-                        <p className="text-sm text-muted-foreground">{post.attachments}</p>
+                    </div>
+
+                    {/* Post Content */}
+                    <div className="mb-6">
+                      {post.title && (
+                        <h2 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#0476D7] transition-colors">{post.title}</h2>
+                      )}
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{post.content}</p>
+                      
+                      {post.attachments && (
+                        <div className="mt-4">
+                          {post.attachments.startsWith('data:image') || post.attachments.startsWith('http://') || post.attachments.startsWith('https://') ? (
+                            <div className="relative w-full max-h-96 overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+                              <img 
+                                src={post.attachments} 
+                                alt="Post attachment" 
+                                className="w-full h-auto object-contain max-h-96"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                              <p className="text-sm text-gray-600">{post.attachments}</p>
+                            </div>
+                          )}
                         </div>
-                    )}
+                      )}
+                    </div>
 
-
-                    <div className="flex items-center gap-6 pt-4 border-t">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleLike(post.id);
-                        }}
-                        className="flex items-center gap-2"
-                      >
-                        <Heart className="h-4 w-4" />
-                        {post.likeCount}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        asChild
-                        className="flex items-center gap-2"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Link href={`/feed/posts/${post.id}`}>
-                          <MessageSquare className="h-4 w-4" />
-                          {post.commentCount}
-                        </Link>
-                      </Button>
-                            <Button
-                        variant="ghost"
-                              size="sm"
-                        className="flex items-center gap-2"
-                        onClick={(e) => e.stopPropagation()}
-                            >
-                        <Share2 className="h-4 w-4" />
-                        Share
-                            </Button>
+                    {/* Post Actions */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                      <div className="flex items-center gap-6">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLike(post.id);
+                          }}
+                          className="flex items-center gap-2 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-xl px-4 py-2"
+                        >
+                          <Heart className="h-4 w-4" />
+                          <span className="font-medium">{post.likeCount}</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          asChild
+                          className="flex items-center gap-2 text-gray-600 hover:text-[#0476D7] hover:bg-blue-50 rounded-xl px-4 py-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Link href={getPostDetailUrl(post.id)}>
+                            <MessageSquare className="h-4 w-4" />
+                            <span className="font-medium">{post.commentCount}</span>
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-xl px-4 py-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Share2 className="h-4 w-4" />
+                          <span className="font-medium">Share</span>
+                        </Button>
+                      </div>
                       
                       {/* Show rating for assignment posts */}
                       {post.type === 'ASSIGNMENT' && post.avgScore !== undefined && (
                         <div 
-                          className="flex items-center gap-2 text-sm text-muted-foreground"
+                          className="flex items-center gap-2 text-sm bg-yellow-50 px-3 py-2 rounded-xl border border-yellow-200"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <span className="font-medium">Rating:</span>
-                          <span className="text-yellow-600 font-semibold">
+                          <TrendingUp className="h-4 w-4 text-yellow-600" />
+                          <span className="font-semibold text-yellow-800">
                             {post.avgScore.toFixed(1)}/10
                           </span>
-                          <span>({post.scoreCount} ratings)</span>
+                          <span className="text-yellow-600">({post.scoreCount})</span>
                         </div>
                       )}
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
+                </motion.div>
               ))
             )}
-          </div>
+          </motion.div>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="flex justify-center gap-3 mt-12"
+            >
               <Button
                 variant="outline"
                 onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
                 disabled={currentPage === 0}
+                className="border-gray-200 hover:border-[#0476D7]/30 hover:bg-blue-50/50 rounded-xl px-6"
               >
                 Previous
-                  </Button>
-              <span className="flex items-center px-4">
-                Page {currentPage + 1} of {totalPages}
-              </span>
+              </Button>
+              <div className="flex items-center px-6 py-2 bg-gray-50 rounded-xl border border-gray-200">
+                <span className="text-sm font-medium text-gray-700">
+                  Page {currentPage + 1} of {totalPages}
+                </span>
+              </div>
               <Button
                 variant="outline"
                 onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
                 disabled={currentPage >= totalPages - 1}
+                className="border-gray-200 hover:border-[#0476D7]/30 hover:bg-blue-50/50 rounded-xl px-6"
               >
                 Next
-                  </Button>
-            </div>
+              </Button>
+            </motion.div>
           )}
         </div>
       </div>

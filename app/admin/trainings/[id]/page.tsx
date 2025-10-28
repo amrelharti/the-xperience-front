@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Edit, Trash2, Save, Calendar, BookOpen, GraduationCap } from "lucide-react"
+import { ArrowLeft, Edit, Trash2, Save, Calendar, BookOpen, GraduationCap, Menu, X } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,8 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import RequireAdmin from "@/app/components/RequireAdmin"
 import ImageUpload from "@/components/ui/image-upload"
+import UserDropdown from "@/app/components/UserDropdown"
+import { useUser } from "@/app/hooks/useUser"
 
 interface Training {
   id: string
@@ -38,11 +40,13 @@ export default function TrainingDetailPage() {
   const router = useRouter()
   const trainingId = params.id as string
   const { toast } = useToast()
+  const { user } = useUser()
 
   const [training, setTraining] = useState<Training | null>(null)
   const [loading, setLoading] = useState(true)
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [modulesCount, setModulesCount] = useState(0)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const [editForm, setEditForm] = useState({
     title: "",
@@ -128,7 +132,13 @@ export default function TrainingDetailPage() {
   }
 
   const handleDeleteTraining = async () => {
-    if (!confirm("Are you sure you want to delete this training? This will also delete all associated modules and courses.")) return
+    // First check if there are modules
+    if (modulesCount > 0) {
+      const confirmMessage = `This training has ${modulesCount} module(s). Do you want to delete the training and all its modules?\n\nThis action cannot be undone.`
+      if (!confirm(confirmMessage)) return
+    } else {
+      if (!confirm("Are you sure you want to delete this training? This action cannot be undone.")) return
+    }
 
     try {
       console.log("🗑️ Deleting training:", trainingId)
@@ -154,9 +164,20 @@ export default function TrainingDetailPage() {
       } else {
         const error = await res.json()
         console.error("Delete failed:", error)
+        
+        // Provide more helpful error message
+        let errorMessage = error.error || "Failed to delete training"
+        
+        // Check for common backend issues
+        if (errorMessage.includes("foreign key") || errorMessage.includes("constraint")) {
+          errorMessage = "Cannot delete training because it has associated modules or data. Please delete all modules first."
+        } else if (errorMessage === "" || errorMessage.includes("Bad Request")) {
+          errorMessage = "Cannot delete training. It may have associated modules or courses. Please delete them first."
+        }
+        
         toast({
           title: "Error",
-          description: error.error || "Failed to delete training",
+          description: errorMessage,
           variant: "destructive"
         })
       }
@@ -164,7 +185,7 @@ export default function TrainingDetailPage() {
       console.error("Error deleting training:", error)
       toast({
         title: "Error",
-        description: "Failed to delete training",
+        description: "Failed to delete training. Please try again.",
         variant: "destructive"
       })
     }
@@ -203,48 +224,169 @@ export default function TrainingDetailPage() {
 
   return (
     <RequireAdmin>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <Button variant="ghost" asChild className="mb-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
+        {/* Modern Header */}
+        <header className="border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 shadow-sm">
+          <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <Link href="/admin" className="flex items-center gap-3 group hover:opacity-80 transition-opacity duration-200">
+                <img 
+                  src="/logos/dark blue secondary logo.svg" 
+                  alt="XPERIENCE Logo" 
+                  className="h-10 w-25"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </Link>
+              <nav className="hidden md:flex items-center space-x-8">
+                <Link href="/admin" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Dashboard
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+                <Link href="/admin/trainings" className="text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Trainings
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+                <Link href="/admin/classes" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Classes
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+                <Link href="/admin/users" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Users
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+                <Link href="/admin/feed" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Feed
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+                <Link href="/admin/leaderboard" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Leaderboard
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+              </nav>
+            </div>
+            <div className="flex items-center space-x-4">
+              {user && <UserDropdown user={user} />}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden hover:bg-slate-100"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+            </div>
+          </div>
+          
+          {/* Mobile Navigation Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden border-t bg-white/95 backdrop-blur-md">
+              <nav className="container mx-auto px-6 py-4 space-y-3">
+                <Link 
+                  href="/admin" 
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  href="/admin/trainings" 
+                  className="block py-3 text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Trainings
+                </Link>
+                <Link 
+                  href="/admin/classes" 
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Classes
+                </Link>
+                <Link 
+                  href="/admin/users" 
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Users
+                </Link>
+                <Link 
+                  href="/admin/feed" 
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Feed
+                </Link>
+                <Link 
+                  href="/admin/leaderboard" 
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Leaderboard
+                </Link>
+              </nav>
+            </div>
+          )}
+        </header>
+
+        <div className="container mx-auto px-6 py-8 space-y-8">
+          {/* Back Button */}
+          <Button variant="outline" asChild className="hover:bg-slate-100">
               <Link href="/admin/trainings">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Trainings
               </Link>
             </Button>
 
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold mb-2">{training.title}</h1>
-                <Badge variant={training.isPublished ? "default" : "secondary"}>
+          {/* Page Header */}
+          <div className="text-center space-y-4 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#005eb8] to-[#0476D7] text-white rounded-full text-sm font-medium">
+              <BookOpen className="h-4 w-4" />
+              Training Details
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+              {training.title}
+            </h1>
+            <div className="flex items-center justify-center gap-4">
+              <Badge variant={training.isPublished ? "default" : "secondary"} className={`px-4 py-2 text-sm font-semibold ${
+                training.isPublished 
+                  ? "bg-emerald-500 hover:bg-emerald-600 text-white" 
+                  : "bg-amber-500 hover:bg-amber-600 text-white"
+              }`}>
                   {training.isPublished ? "Published" : "Draft"}
                 </Badge>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setShowEditDialog(true)}>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center justify-center gap-4 animate-slide-up">
+            <Button variant="outline" onClick={() => setShowEditDialog(true)} className="hover:bg-slate-100">
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Training
                 </Button>
-                <Button variant="destructive" onClick={handleDeleteTraining}>
+            <Button variant="destructive" onClick={handleDeleteTraining} className="hover:bg-red-600">
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete
                 </Button>
-              </div>
-            </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="md:col-span-2 space-y-6">
               {/* Training Info */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Training Information</CardTitle>
+              <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-scale-in">
+                <CardHeader className="pb-6">
+                  <CardTitle className="flex items-center gap-3 text-xl">
+                    <div className="p-2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg">
+                      <BookOpen className="h-5 w-5 text-white" />
+                    </div>
+                    Training Information
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   {training.thumbnailUrl && (
-                    <div className="relative h-64 w-full rounded-lg overflow-hidden">
+                    <div className="relative h-80 w-full rounded-xl overflow-hidden border-2 border-slate-200">
                       <NextImage
                         src={training.thumbnailUrl}
                         alt={training.title}
@@ -255,17 +397,17 @@ export default function TrainingDetailPage() {
                     </div>
                   )}
                   <div>
-                    <Label className="text-muted-foreground">Description</Label>
-                    <p className="mt-2">{training.description}</p>
+                    <Label className="text-slate-600 font-semibold">Description</Label>
+                    <p className="mt-3 text-slate-700 text-lg leading-relaxed">{training.description}</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-2 gap-6 text-sm">
                     <div>
-                      <Label className="text-muted-foreground">Created</Label>
-                      <p className="mt-1">{new Date(training.createdAt).toLocaleDateString()}</p>
+                      <Label className="text-slate-600 font-semibold">Created</Label>
+                      <p className="mt-2 text-slate-700">{new Date(training.createdAt).toLocaleDateString()}</p>
                     </div>
                     <div>
-                      <Label className="text-muted-foreground">Updated</Label>
-                      <p className="mt-1">{new Date(training.updatedAt).toLocaleDateString()}</p>
+                      <Label className="text-slate-600 font-semibold">Updated</Label>
+                      <p className="mt-2 text-slate-700">{new Date(training.updatedAt).toLocaleDateString()}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -275,34 +417,47 @@ export default function TrainingDetailPage() {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Quick Stats */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quick Stats</CardTitle>
+              <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-slide-up">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg">
+                      <Calendar className="h-5 w-5 text-white" />
+                    </div>
+                    Quick Stats
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">Modules</span>
+                    <div className="flex items-center gap-3">
+                      <Calendar className="h-5 w-5 text-slate-500" />
+                      <span className="text-slate-600 font-medium">Modules</span>
                     </div>
-                    <span className="font-semibold">{modulesCount}</span>
+                    <span className="text-2xl font-bold text-[#005eb8]">{modulesCount}</span>
+                  </div>
+                  <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-[#005eb8] to-[#0476D7] rounded-full w-3/4"></div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Manage Modules */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Curriculum Management</CardTitle>
+              <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-scale-in">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-[#FFBC00] to-[#f59e0b] rounded-lg">
+                      <GraduationCap className="h-5 w-5 text-white" />
+                    </div>
+                    Curriculum Management
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button asChild className="w-full">
+                <CardContent className="space-y-4">
+                  <Button asChild className="w-full h-12 bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
                     <Link href={`/admin/trainings/${trainingId}/modules`}>
-                      <GraduationCap className="h-4 w-4 mr-2" />
+                      <GraduationCap className="h-5 w-5 mr-2" />
                       Manage Modules
                     </Link>
                   </Button>
-                  <p className="text-xs text-muted-foreground text-center">
+                  <p className="text-xs text-slate-500 text-center leading-relaxed">
                     Create and organize training modules (weeks)
                   </p>
                 </CardContent>

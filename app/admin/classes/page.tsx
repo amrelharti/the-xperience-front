@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,8 +9,10 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Edit, Trash2, ArrowLeft, GraduationCap, Users, Calendar, Clock, Key, Copy } from "lucide-react"
+import { Plus, Search, Edit, Trash2, ArrowLeft, GraduationCap, Users, Calendar, Clock, Key, Copy, Menu, X } from "lucide-react"
 import Navbar from "../../components/Navbar"
+import UserDropdown from "../../components/UserDropdown"
+import { useUser } from "../../hooks/useUser"
 
 interface Class {
   id: string
@@ -34,6 +37,7 @@ interface Module {
 }
 
 export default function ClassManagementPage() {
+  const { user } = useUser()
   const [classes, setClasses] = useState<Class[]>([])
   const [modules, setModules] = useState<Module[]>([])
   const [loading, setLoading] = useState(true)
@@ -41,6 +45,7 @@ export default function ClassManagementPage() {
   const [showCreateClass, setShowCreateClass] = useState(false)
   const [showInactive, setShowInactive] = useState(false)
   const [showArchived, setShowArchived] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [newClass, setNewClass] = useState({
     name: "",
     description: "",
@@ -275,64 +280,189 @@ export default function ClassManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
+      {/* Modern Header */}
+      <header className="border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-6">
+            <Link href="/admin" className="flex items-center gap-3 group hover:opacity-80 transition-opacity duration-200">
+              <img 
+                src="/logos/dark blue secondary logo.svg" 
+                alt="XPERIENCE Logo" 
+                className="h-10 w-25"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </Link>
+            <nav className="hidden md:flex items-center space-x-8">
+              <Link href="/admin" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Dashboard
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+              <Link href="/admin/trainings" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Trainings
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+              <Link href="/admin/classes" className="text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Classes
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+              <Link href="/admin/users" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Users
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+              <Link href="/admin/feed" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Feed
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+              <Link href="/admin/leaderboard" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                Leaderboard
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+              </Link>
+            </nav>
+          </div>
+          <div className="flex items-center space-x-4">
+            {user && <UserDropdown user={user} />}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden hover:bg-slate-100"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+        
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t bg-white/95 backdrop-blur-md">
+            <nav className="container mx-auto px-6 py-4 space-y-3">
+              <Link 
+                href="/admin" 
+                className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Link 
+                href="/admin/trainings" 
+                className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Trainings
+              </Link>
+              <Link 
+                href="/admin/classes" 
+                className="block py-3 text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Classes
+              </Link>
+              <Link 
+                href="/admin/users" 
+                className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Users
+              </Link>
+              <Link 
+                href="/admin/feed" 
+                className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Feed
+              </Link>
+              <Link 
+                href="/admin/leaderboard" 
+                className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Leaderboard
+              </Link>
+            </nav>
+          </div>
+        )}
+      </header>
+
+      <div className="container mx-auto px-6 py-8 space-y-8">
+        {/* Page Header */}
+        <div className="text-center space-y-4 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#005eb8] to-[#0476D7] text-white rounded-full text-sm font-medium">
+            <GraduationCap className="h-4 w-4" />
+            Class Management
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+            Class Management
+          </h1>
+          <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            Manage classes, enrollments, and student access codes
+          </p>
+        </div>
+
+        {/* Header Actions */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
               size="sm"
               onClick={() => window.history.back()}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:bg-slate-100"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Class Management</h1>
-              <p className="text-gray-600">Manage classes and enrollments</p>
-            </div>
           </div>
           <Dialog open={showCreateClass} onOpenChange={setShowCreateClass}>
             <DialogTrigger asChild>
-              <Button type="button">
-                <Plus className="h-4 w-4 mr-2" />
+              <Button type="button" className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+                <Plus className="h-5 w-5 mr-2" />
                 Add Class
               </Button>
             </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Class</DialogTitle>
-                <DialogDescription>Add a new class to the system</DialogDescription>
+            <DialogContent className="border-0 bg-white/95 backdrop-blur-md shadow-2xl">
+              <DialogHeader className="text-center space-y-3 pb-4">
+                <div className="mx-auto w-12 h-12 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-full flex items-center justify-center">
+                  <Plus className="h-6 w-6 text-white" />
+                </div>
+                <DialogTitle className="text-xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+                  Create New Class
+                </DialogTitle>
+                <DialogDescription className="text-slate-600 text-sm">
+                  Add a new class to the system
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleCreateClass} className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Class Name</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-semibold text-slate-700">Class Name</Label>
                   <Input
                     id="name"
                     value={newClass.name}
                     onChange={(e) => setNewClass({ ...newClass, name: e.target.value })}
                     required
+                    className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
+                    placeholder="e.g., Web Development Bootcamp 2024"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="description">Description</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-sm font-semibold text-slate-700">Description</Label>
                   <Textarea
                     id="description"
                     value={newClass.description}
                     onChange={(e) => setNewClass({ ...newClass, description: e.target.value })}
                     required
+                    className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
+                    placeholder="Describe the class objectives and content..."
                   />
                 </div>
-                <div>
-                  <Label htmlFor="moduleId">Module</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="moduleId" className="text-sm font-semibold text-slate-700">Module</Label>
                   <select
                     id="moduleId"
                     value={newClass.moduleId}
                     onChange={(e) => setNewClass({ ...newClass, moduleId: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005eb8]/20 focus:border-[#005eb8] transition-colors duration-200"
                     required
                   >
                     <option value="">Select a module</option>
@@ -344,29 +474,31 @@ export default function ClassManagementPage() {
                   </select>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="startDate">Start Date</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate" className="text-sm font-semibold text-slate-700">Start Date</Label>
                     <Input
                       id="startDate"
                       type="date"
                       value={newClass.startDate}
                       onChange={(e) => setNewClass({ ...newClass, startDate: e.target.value })}
                       required
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="endDate">End Date</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="endDate" className="text-sm font-semibold text-slate-700">End Date</Label>
                     <Input
                       id="endDate"
                       type="date"
                       value={newClass.endDate}
                       onChange={(e) => setNewClass({ ...newClass, endDate: e.target.value })}
                       required
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                     />
                   </div>
                 </div>
-                <div>
-                  <Label htmlFor="maxStudents">Max Students</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="maxStudents" className="text-sm font-semibold text-slate-700">Max Students</Label>
                   <Input
                     id="maxStudents"
                     type="number"
@@ -374,13 +506,25 @@ export default function ClassManagementPage() {
                     onChange={(e) => setNewClass({ ...newClass, maxStudents: parseInt(e.target.value) })}
                     min="1"
                     required
+                    className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
+                    placeholder="30"
                   />
                 </div>
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setShowCreateClass(false)}>
+                <DialogFooter className="gap-3 pt-4">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setShowCreateClass(false)}
+                    className="hover:bg-slate-100"
+                  >
                     Cancel
                   </Button>
-                  <Button type="submit">Create Class</Button>
+                  <Button 
+                    type="submit"
+                    className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-6"
+                  >
+                    Create Class
+                  </Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -388,25 +532,25 @@ export default function ClassManagementPage() {
         </div>
 
         {/* Search and Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="lg:col-span-3">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-slide-up">
+          <Card className="lg:col-span-3 border-0 bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-6">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
                 <Input
                   placeholder="Search classes by name, description, or module..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-12 h-12 text-lg border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-xl"
                 />
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-6">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{filteredClasses.length}</div>
-                <div className="text-sm text-gray-600">
+                <div className="text-3xl font-bold text-[#005eb8] mb-2">{filteredClasses.length}</div>
+                <div className="text-sm text-slate-600 mb-4">
                   {(() => {
                     if (showArchived && showInactive) return 'All Classes'
                     if (showArchived) return 'Active + Archived'
@@ -414,11 +558,12 @@ export default function ClassManagementPage() {
                     return 'Active Classes Only'
                   })()}
                 </div>
-                <div className="flex gap-2 mt-2">
+                <div className="flex flex-col gap-2">
                   <Button
                     variant={showArchived ? "default" : "outline"}
                     size="sm"
                     onClick={() => setShowArchived(!showArchived)}
+                    className={showArchived ? "bg-emerald-500 hover:bg-emerald-600 text-white" : "hover:bg-slate-100"}
                   >
                     {showArchived ? 'Hide Archived' : 'Show Archived'}
                   </Button>
@@ -426,6 +571,7 @@ export default function ClassManagementPage() {
                     variant={showInactive ? "default" : "outline"}
                     size="sm"
                     onClick={() => setShowInactive(!showInactive)}
+                    className={showInactive ? "bg-amber-500 hover:bg-amber-600 text-white" : "hover:bg-slate-100"}
                   >
                     {showInactive ? 'Hide Inactive' : 'Show Inactive'}
                   </Button>
@@ -436,97 +582,99 @@ export default function ClassManagementPage() {
         </div>
 
         {/* Classes List */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5" />
+        <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-scale-in">
+          <CardHeader className="pb-6">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="p-2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
               Classes ({filteredClasses.length})
             </CardTitle>
-            <CardDescription>Manage classes and their enrollments</CardDescription>
+            <CardDescription className="text-slate-600">Manage classes and their enrollments</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {filteredClasses.map((classItem) => {
+              {filteredClasses.map((classItem, index) => {
                 return (
                 <div 
                   key={classItem.id} 
-                  className={`flex items-center justify-between p-4 border rounded-lg ${
+                  className={`group flex items-center justify-between p-6 border-2 rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 animate-fade-in ${
                     classItem.isActive && !classItem.isArchived
-                      ? 'hover:bg-gray-50' 
+                      ? 'hover:bg-slate-50 border-slate-200 hover:border-[#005eb8]/30' 
                       : !classItem.isActive && classItem.isArchived
-                        ? 'bg-blue-50 border-blue-200'
-                        : 'bg-gray-100 opacity-75'
+                        ? 'bg-blue-50/50 border-blue-200 hover:border-blue-300'
+                        : 'bg-slate-100/50 border-slate-300 hover:border-slate-400'
                   }`}
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className={`h-16 w-16 rounded-lg flex items-center justify-center ${
+                  <div className="flex items-center space-x-6">
+                    <div className={`h-20 w-20 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${
                       classItem.isActive && !classItem.isArchived
-                        ? 'bg-purple-100' 
+                        ? 'bg-gradient-to-br from-[#005eb8] to-[#0476D7]' 
                         : !classItem.isActive && classItem.isArchived
-                          ? 'bg-blue-100'
-                          : 'bg-gray-200'
+                          ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+                          : 'bg-gradient-to-br from-slate-400 to-slate-500'
                     }`}>
-                      <GraduationCap className={`h-8 w-8 ${
-                        classItem.isActive && !classItem.isArchived
-                          ? 'text-purple-600' 
-                          : !classItem.isActive && classItem.isArchived
-                            ? 'text-blue-600'
-                            : 'text-gray-500'
-                      }`} />
+                      <GraduationCap className="h-10 w-10 text-white" />
                     </div>
                     <div className="flex-1">
-                      <p className={`font-medium ${
+                      <p className={`text-lg font-bold mb-2 ${
                         classItem.isActive && !classItem.isArchived
-                          ? 'text-gray-900' 
+                          ? 'text-slate-800 group-hover:text-[#005eb8]' 
                           : !classItem.isActive && classItem.isArchived
-                            ? 'text-blue-900'
-                            : 'text-gray-600'
-                      }`}>
+                            ? 'text-blue-800'
+                            : 'text-slate-600'
+                      } transition-colors duration-200`}>
                         {classItem.name}
                       </p>
-                      <p className={`text-sm mb-2 ${
+                      <p className={`text-sm mb-3 leading-relaxed ${
                         classItem.isActive 
-                          ? 'text-gray-600' 
-                          : 'text-gray-500'
+                          ? 'text-slate-600' 
+                          : 'text-slate-500'
                       }`}>
                         {classItem.description}
                       </p>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-4">
                         <Badge variant={
                           classItem.isActive && !classItem.isArchived ? "default" : 
                           !classItem.isActive && classItem.isArchived ? "secondary" : 
                           "destructive"
-                        }>
+                        } className={`px-3 py-1 text-xs font-semibold ${
+                          classItem.isActive && !classItem.isArchived ? "bg-emerald-500 hover:bg-emerald-600 text-white" :
+                          !classItem.isActive && classItem.isArchived ? "bg-blue-500 hover:bg-blue-600 text-white" :
+                          "bg-red-500 hover:bg-red-600 text-white"
+                        }`}>
                           {classItem.isActive && !classItem.isArchived ? "Active" : 
                            !classItem.isActive && classItem.isArchived ? "Archived" : 
                            "Inactive"}
                         </Badge>
-                        <span className={`text-xs ${
+                        <span className={`text-sm flex items-center gap-1 ${
                           classItem.isActive && !classItem.isArchived
-                            ? 'text-gray-500' 
-                            : 'text-gray-400'
+                            ? 'text-slate-500' 
+                            : 'text-slate-400'
                         }`}>
-                          <Calendar className="h-3 w-3 inline mr-1" />
+                          <Calendar className="h-4 w-4" />
                           {new Date(classItem.startDate).toLocaleDateString()} - {new Date(classItem.endDate).toLocaleDateString()}
                         </span>
-                        <span className={`text-xs ${
+                        <span className={`text-sm flex items-center gap-1 ${
                           classItem.isActive 
-                            ? 'text-gray-500' 
-                            : 'text-gray-400'
+                            ? 'text-slate-500' 
+                            : 'text-slate-400'
                         }`}>
-                          <Users className="h-3 w-3 inline mr-1" />
+                          <Users className="h-4 w-4" />
                           {classItem.currentStudents}/{classItem.maxStudents} students
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => openCodeGeneration(classItem)}
                       title="Generate enrollment codes"
                       disabled={!classItem.isActive}
+                      className="hover:bg-[#FFBC00]/10 hover:border-[#FFBC00] hover:text-[#FFBC00] transition-all duration-200"
                     >
                       <Key className="h-4 w-4" />
                     </Button>
@@ -534,24 +682,27 @@ export default function ClassManagementPage() {
                       <Button
                         size="sm"
                         variant={classItem.isActive ? "default" : "outline"}
-                        onClick={() => handleToggleClassStatus(classItem.id, true, false)} // Set to Active
+                        onClick={() => handleToggleClassStatus(classItem.id, true, false)}
                         disabled={classItem.isActive}
+                        className={classItem.isActive ? "bg-emerald-500 hover:bg-emerald-600 text-white" : "hover:bg-slate-100"}
                       >
                         Active
                       </Button>
                       <Button
                         size="sm"
                         variant={classItem.isArchived ? "secondary" : "outline"}
-                        onClick={() => handleToggleClassStatus(classItem.id, false, true)} // Set to Archived
+                        onClick={() => handleToggleClassStatus(classItem.id, false, true)}
                         disabled={classItem.isArchived}
+                        className={classItem.isArchived ? "bg-blue-500 hover:bg-blue-600 text-white" : "hover:bg-slate-100"}
                       >
                         Archived
                       </Button>
                       <Button
                         size="sm"
                         variant={!classItem.isActive && !classItem.isArchived ? "destructive" : "outline"}
-                        onClick={() => handleToggleClassStatus(classItem.id, false, false)} // Set to Inactive
+                        onClick={() => handleToggleClassStatus(classItem.id, false, false)}
                         disabled={!classItem.isActive && !classItem.isArchived}
+                        className={(!classItem.isActive && !classItem.isArchived) ? "bg-red-500 hover:bg-red-600 text-white" : "hover:bg-slate-100"}
                       >
                         Inactive
                       </Button>
@@ -561,6 +712,7 @@ export default function ClassManagementPage() {
                       variant="outline"
                       onClick={() => window.location.href = `/admin/classes/${classItem.id}`}
                       disabled={!classItem.isActive}
+                      className="hover:bg-[#005eb8]/10 hover:border-[#005eb8] hover:text-[#005eb8] transition-all duration-200"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -568,6 +720,7 @@ export default function ClassManagementPage() {
                       size="sm"
                       variant="outline"
                       onClick={() => handleDeleteClass(classItem.id)}
+                      className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all duration-200"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -576,9 +729,18 @@ export default function ClassManagementPage() {
                 )
               })}
               {filteredClasses.length === 0 && (
-                <div className="text-center py-8">
-                  <GraduationCap className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No classes found</p>
+                <div className="text-center py-16">
+                  <div className="space-y-6">
+                    <div className="mx-auto w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center">
+                      <GraduationCap className="h-12 w-12 text-slate-400" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-2xl font-bold text-slate-800">No classes found</h3>
+                      <p className="text-slate-600 max-w-md mx-auto">
+                        Create your first class to get started with managing student enrollments
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -587,18 +749,23 @@ export default function ClassManagementPage() {
 
         {/* Code Generation Dialog */}
         <Dialog open={showGenerateCodes} onOpenChange={setShowGenerateCodes}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Generate Enrollment Codes</DialogTitle>
-              <DialogDescription>
-                Generate enrollment codes for {selectedClassForCodes?.name}
+          <DialogContent className="max-w-2xl border-0 bg-white/95 backdrop-blur-md shadow-2xl">
+            <DialogHeader className="text-center space-y-3 pb-4">
+              <div className="mx-auto w-12 h-12 bg-gradient-to-br from-[#FFBC00] to-[#f59e0b] rounded-full flex items-center justify-center">
+                <Key className="h-6 w-6 text-white" />
+              </div>
+              <DialogTitle className="text-xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+                Generate Enrollment Codes
+              </DialogTitle>
+              <DialogDescription className="text-slate-600 text-sm">
+                Generate enrollment codes for <span className="font-semibold text-[#005eb8]">{selectedClassForCodes?.name}</span>
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-6">
               {/* Generate New Codes */}
-              <div>
-                <Label htmlFor="generateCount">Number of codes to generate</Label>
+              <div className="space-y-3">
+                <Label htmlFor="generateCount" className="text-sm font-semibold text-slate-700">Number of codes to generate</Label>
                 <Input
                   id="generateCount"
                   type="number"
@@ -606,9 +773,12 @@ export default function ClassManagementPage() {
                   max="50"
                   value={generateCount}
                   onChange={(e) => setGenerateCount(parseInt(e.target.value) || 1)}
-                  className="mt-2"
+                  className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                 />
-                <Button onClick={handleGenerateCodes} className="mt-4">
+                <Button 
+                  onClick={handleGenerateCodes} 
+                  className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-6"
+                >
                   <Key className="h-4 w-4 mr-2" />
                   Generate Codes
                 </Button>
@@ -616,16 +786,20 @@ export default function ClassManagementPage() {
 
               {/* Generated Codes */}
               {generatedCodes.length > 0 && (
-                <div>
-                  <h3 className="font-medium mb-2">Generated Codes:</h3>
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    Generated Codes:
+                  </h3>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
                     {generatedCodes.map((code, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded">
-                        <code className="font-mono text-sm">{code}</code>
+                      <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-lg">
+                        <code className="font-mono text-sm text-emerald-800 font-semibold">{code}</code>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => copyToClipboard(code)}
+                          className="hover:bg-emerald-100 hover:border-emerald-300 hover:text-emerald-700 transition-all duration-200"
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -637,18 +811,23 @@ export default function ClassManagementPage() {
 
               {/* Existing Codes */}
               {existingCodes.length > 0 && (
-                <div>
-                  <h3 className="font-medium mb-2">Existing Codes:</h3>
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
+                    Existing Codes:
+                  </h3>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
                     {existingCodes.map((code, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 border rounded">
-                        <div className="flex items-center space-x-2">
-                          <code className="font-mono text-sm">***{code.id.substring(0, 8)}</code>
-                          <Badge variant={code.used ? "destructive" : "secondary"}>
+                      <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <code className="font-mono text-sm text-slate-700">***{code.id.substring(0, 8)}</code>
+                          <Badge variant={code.used ? "destructive" : "secondary"} className={`px-2 py-1 text-xs font-semibold ${
+                            code.used ? "bg-red-500 hover:bg-red-600 text-white" : "bg-blue-500 hover:bg-blue-600 text-white"
+                          }`}>
                             {code.used ? "Used" : "Available"}
                           </Badge>
                         </div>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-slate-500">
                           {new Date(code.createdAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -658,8 +837,12 @@ export default function ClassManagementPage() {
               )}
             </div>
 
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowGenerateCodes(false)}>
+            <DialogFooter className="gap-3 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowGenerateCodes(false)}
+                className="hover:bg-slate-100"
+              >
                 Close
               </Button>
             </DialogFooter>

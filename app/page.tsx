@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PlayCircle, Clock, Users, BookOpen, CheckCircle } from "lucide-react";
+import { PlayCircle, Clock, Users, BookOpen, CheckCircle, Calendar } from "lucide-react";
 import Navbar from "./components/Navbar";
 import { useUser } from "./hooks/useUser";
 import NextImage from "next/image";
@@ -75,7 +75,8 @@ export default function TrainingsPage() {
 
       if (coursesResponse.ok) {
         const responseData = await coursesResponse.json();
-        const coursesData = responseData.courses || [];
+        // Backend returns array directly, not wrapped in {courses: [...]}
+        const coursesData = Array.isArray(responseData) ? responseData : (responseData.courses || []);
 
         // If we got enrolled classes data, merge it
         if (enrolledClassesResponse && enrolledClassesResponse.ok) {
@@ -158,22 +159,21 @@ export default function TrainingsPage() {
     <div className="min-h-screen">
       <Navbar />
       
-      <div className="container mx-auto p-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Available Trainings</h1>
-          <p className="text-muted-foreground">
+      <div className="container mx-auto p-15 py-10">
+        <div className="mb-8 animate-slide-up">
+          <h1 className="text-4xl mb-3 font-[family-name:var(--font-montserrat)] tracking-tight bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">
+            Available Trainings
+          </h1>
+          <p className="text-base text-[#6b7280] mb-4 max-w-2xl">
             Choose a training and select a class to start your learning journey.
           </p>
-          <div className="mt-2 text-sm text-gray-500">
-            Showing {modules.length} trainings ({modules.filter(m => m.isPublished).length} published, {modules.filter(m => !m.isPublished).length} coming soon)
-          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {modules.length === 0 ? (
             <div className="col-span-full text-center py-12">
               <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No trainings available</h3>
+              <h3 className="text-lg mb-2">No trainings available</h3>
               <p className="text-muted-foreground">
                 Check back later for new trainings.
             </p>
@@ -182,10 +182,10 @@ export default function TrainingsPage() {
             modules.map((module) => (
               <Card 
                 key={module.id} 
-                className={`transition-all duration-300 group relative ${
+                className={`transition-all duration-300 group relative overflow-hidden animate-fade-in ${
                   !module.isPublished 
-                    ? 'opacity-75 bg-gradient-to-br from-orange-50 to-yellow-50 cursor-not-allowed' 
-                    : 'hover:shadow-lg'
+                    ? 'opacity-90 bg-gradient-to-br from-[#FFBC00]/10 to-[#FFBC00]/5 cursor-not-allowed' 
+                    : 'hover:shadow-xl hover:-translate-y-1'
                 }`}
                 onClick={(e) => {
                   if (!module.isPublished) {
@@ -194,7 +194,7 @@ export default function TrainingsPage() {
                   }
                 }}
               >
-                <div className="aspect-video bg-muted rounded-t-lg overflow-hidden relative">
+                <div className="aspect-video bg-gradient-to-br from-[#0476D7]/10 to-[#0068A7]/5 rounded-t-2xl overflow-hidden relative border-b">
                   {module.thumbnailUrl && module.thumbnailUrl.trim() !== '' ? (
                     <NextImage
                       src={module.thumbnailUrl}
@@ -208,8 +208,8 @@ export default function TrainingsPage() {
                   ) : (
                     <div className={`w-full h-full flex items-center justify-center ${
                       module.isPublished 
-                        ? 'bg-gradient-to-br from-blue-50 to-indigo-100' 
-                        : 'bg-gradient-to-br from-orange-50 to-yellow-100'
+                        ? 'bg-gradient-to-br from-[#0476D7]/20 to-[#0068A7]/20' 
+                        : 'bg-gradient-to-br from-[#FFBC00]/20 to-[#FFBC00]/10'
                     }`}>
                       <BookOpen className={`h-12 w-12 ${module.isPublished ? 'text-blue-500' : 'text-orange-500'}`} />
                     </div>
@@ -238,73 +238,94 @@ export default function TrainingsPage() {
                     </>
                   )}
                 </div>
-              <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg mb-2">{module.title}</CardTitle>
-                      <CardDescription className="line-clamp-2">
+              <CardHeader className="pb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-xl mb-2 leading-tight">{module.title}</CardTitle>
+                      <CardDescription className="line-clamp-2 text-sm text-muted-foreground leading-relaxed">
                         {module.description}
-                </CardDescription>
-                </div>
-               <div className="flex flex-col gap-1">
-                 {module.isPublished && (
-                   <Badge variant="default">
-                     Published
-                   </Badge>
-                 )}
-                 {module.isEnrolled && (
-                   <Badge className="bg-green-600">
-                     <CheckCircle className="h-3 w-3 mr-1" />
-                     Enrolled
-                   </Badge>
-                 )}
-               </div>
-        </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {module.courses && module.courses.length > 0 && (
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <PlayCircle className="h-4 w-4" />
-                          <span>{module.courses?.length || 0} courses</span>
+                      </CardDescription>
+                    </div>
+                    {module.isEnrolled && (
+                      <div className="flex-shrink-0">
+                        <div className="relative inline-flex items-center justify-center">
+                          <div className="absolute inset-0 bg-green-500 rounded-full animate-pulse opacity-20"></div>
+                          <CheckCircle className="h-5 w-5 text-green-600 relative" />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          <span>{formatDuration(getTotalDuration(module.courses || []))}</span>
-          </div>
-        </div>
+                  <div className="flex items-center gap-2 mt-3">
+                    {module.isPublished ? (
+                      <Badge className="bg-[#0476D7] text-white hover:bg-[#0476D7]/90">
+                        Published
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-[#FFBC00] text-[#333] hover:bg-[#FFBC00]/90">
+                        Coming Soon
+                      </Badge>
+                    )}
+                    {module.isEnrolled && (
+                      <Badge variant="outline" className="border-green-500 text-green-700 bg-green-50">
+                        Enrolled
+                      </Badge>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-4">
+                    {module.courses && module.courses.length > 0 && (
+                      <div className="flex items-center gap-6 p-3 bg-muted/30 rounded-xl">
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="p-1.5 bg-[#0476D7]/10 rounded-lg">
+                            <PlayCircle className="h-4 w-4 text-[#0476D7]" />
+                          </div>
+                          <span className="font-medium text-foreground">{module.courses?.length || 0} lessons</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="p-1.5 bg-[#0476D7]/10 rounded-lg">
+                            <Clock className="h-4 w-4 text-[#0476D7]" />
+                          </div>
+                          <span className="font-medium text-foreground">{formatDuration(getTotalDuration(module.courses || []))}</span>
+                        </div>
+                      </div>
                     )}
                     
                     {module.isEnrolled && module.enrolledClass && (
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                        <div className="text-sm font-medium text-green-800 mb-1">
-                          Enrolled in: {module.enrolledClass.name}
-          </div>
-                        <div className="text-xs text-green-600">
-                          📅 {new Date(module.enrolledClass.startDate).toLocaleDateString()} - {new Date(module.enrolledClass.endDate).toLocaleDateString()}
-          </div>
-        </div>
+                      <div className="relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200/50 rounded-xl p-4">
+                        <div className="absolute top-0 right-0 w-20 h-20 bg-green-200/20 rounded-full -mr-10 -mt-10"></div>
+                        <div className="relative">
+                          <div className="flex items-center gap-2 text-sm text-green-900 mb-2">
+                            <CheckCircle className="h-4 w-4" />
+                            Enrolled Class
+                          </div>
+                          <div className="text-base text-green-950 mb-1">{module.enrolledClass.name}</div>
+                          <div className="flex items-center gap-2 text-xs text-green-700">
+                            <Calendar className="h-3.5 w-3.5" />
+                            <span>{new Date(module.enrolledClass.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(module.enrolledClass.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                          </div>
+                        </div>
+                      </div>
                     )}
                     
-                    <div className="pt-2">
+                    <div className="pt-1">
                       {module.isPublished ? (
-                        <Button asChild className="w-full">
-                          <Link href={`/courses/${module.id}`}>
-                            <BookOpen className="h-4 w-4 mr-2" />
-                            {module.isEnrolled ? "Continue Learning" : "View Module"}
+                        <Button asChild className="w-full h-12 text-base shadow-md hover:shadow-lg group">
+                          <Link href={`/courses/${module.id}`} className="flex items-center justify-center gap-2">
+                            <BookOpen className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                            {module.isEnrolled ? "Continue Learning" : "Start Learning"}
+                            <span className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                           </Link>
                         </Button>
                       ) : (
                         <Button 
                           disabled 
-                          className="w-full bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 border-orange-200 hover:from-orange-200 hover:to-yellow-200 cursor-not-allowed"
-                          title="This module is not yet available"
+                          className="w-full h-12 bg-gradient-to-r from-[#FFBC00]/10 to-[#FFBC00]/5 text-[#FFBC00] border-2 border-[#FFBC00]/20 cursor-not-allowed"
                         >
                           <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                            <div className="w-2 h-2 bg-[#FFBC00] rounded-full animate-pulse"></div>
                             <span>Coming Soon</span>
-                            <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                            <div className="w-2 h-2 bg-[#FFBC00] rounded-full animate-pulse"></div>
                           </div>
                         </Button>
                       )}
