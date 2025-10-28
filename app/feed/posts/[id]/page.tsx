@@ -24,6 +24,7 @@ import {
 import { useUser } from "@/app/hooks/useUser"
 import UserDropdown from "@/app/components/UserDropdown"
 import RequireAuth from "@/app/components/RequireAuth"
+import Navbar from "@/app/components/Navbar"
 import { useToast } from "@/hooks/use-toast"
 
 interface Post {
@@ -721,7 +722,7 @@ export default function PostDetailPage() {
   if (loading) {
     return (
       <RequireAuth>
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
             <p>Loading post...</p>
@@ -734,7 +735,7 @@ export default function PostDetailPage() {
   if (!post) {
     return (
       <RequireAuth>
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30 flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Post not found</h1>
             <Button asChild>
@@ -748,21 +749,8 @@ export default function PostDetailPage() {
 
   return (
     <RequireAuth>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <MessageSquare className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-xl font-[family-name:var(--font-space-grotesk)]">The Xperience</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              {user && <UserDropdown user={user} />}
-            </div>
-          </div>
-        </header>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
+        <Navbar />
 
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Back Button */}

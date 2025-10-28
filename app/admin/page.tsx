@@ -291,40 +291,54 @@ export default function AdminPage() {
 
   return (
     <RequireAdmin>
-      <div className="min-h-screen bg-background">
-        <div className="border-b">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="text-2xl font-bold">
-                TheXperience
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
+        {/* Modern Header */}
+        <header className="border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 shadow-sm">
+          <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <Link href="/" className="flex items-center gap-3 group hover:opacity-80 transition-opacity duration-200">
+                <img 
+                  src="/logos/dark blue secondary logo.svg" 
+                  alt="XPERIENCE Logo" 
+                  className="h-10 w-25"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
               </Link>
-              <nav className="hidden md:flex items-center space-x-6">
-                <Link href="/admin" className="text-sm font-medium hover:text-primary transition-colors">
+              <nav className="hidden md:flex items-center space-x-8">
+                <Link href="/admin" className="text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
                   Dashboard
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
                 </Link>
-                <Link href="/admin/trainings" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link href="/admin/trainings" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
                   Trainings
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
                 </Link>
-                <Link href="/admin/classes" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link href="/admin/classes" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
                   Classes
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
                 </Link>
-                <Link href="/admin/users" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link href="/admin/users" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
                   Users
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
                 </Link>
-                <Link href="/admin/feed" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link href="/admin/feed" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
                   Feed
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
                 </Link>
-                <Link href="/admin/leaderboard" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link href="/admin/leaderboard" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
                   Leaderboard
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
                 </Link>
               </nav>
             </div>
             <div className="flex items-center space-x-4">
-              <UserDropdown user={user} />
+              {user && <UserDropdown user={user} />}
               <Button
                 variant="ghost"
                 size="sm"
-                className="md:hidden"
+                className="md:hidden hover:bg-slate-100"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -334,46 +348,46 @@ export default function AdminPage() {
           
           {/* Mobile Navigation Menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden border-t bg-background">
-              <nav className="container mx-auto px-4 py-4 space-y-2">
+            <div className="md:hidden border-t bg-white/95 backdrop-blur-md">
+              <nav className="container mx-auto px-6 py-4 space-y-3">
                 <Link 
                   href="/admin" 
-                  className="block py-2 text-sm font-medium hover:text-primary transition-colors"
+                  className="block py-3 text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Dashboard
                 </Link>
                 <Link 
                   href="/admin/trainings" 
-                  className="block py-2 text-sm font-medium hover:text-primary transition-colors"
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Trainings
                 </Link>
                 <Link 
                   href="/admin/classes" 
-                  className="block py-2 text-sm font-medium hover:text-primary transition-colors"
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Classes
                 </Link>
                 <Link 
                   href="/admin/users" 
-                  className="block py-2 text-sm font-medium hover:text-primary transition-colors"
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Users
                 </Link>
                 <Link 
                   href="/admin/feed" 
-                  className="block py-2 text-sm font-medium hover:text-primary transition-colors"
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Feed
                 </Link>
                 <Link 
                   href="/admin/leaderboard" 
-                  className="block py-2 text-sm font-medium hover:text-primary transition-colors"
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Leaderboard
@@ -381,86 +395,119 @@ export default function AdminPage() {
               </nav>
             </div>
           )}
-        </div>
+        </header>
 
-        {/* Simple Admin Dashboard */}
-        <div className="container mx-auto py-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <div className="text-sm text-muted-foreground">
-              Welcome back, Admin
+        {/* Modern Admin Dashboard */}
+        <div className="container mx-auto px-6 py-8 space-y-8">
+          {/* Welcome Header */}
+          <div className="text-center space-y-4 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#005eb8] to-[#0476D7] text-white rounded-full text-sm font-medium">
+              <div className="w-2 h-2 bg-[#FFBC00] rounded-full animate-pulse"></div>
+              Admin Dashboard
             </div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+              Welcome Back, Admin
+            </h1>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Manage your training programs, monitor student progress, and oversee the learning experience
+            </p>
           </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Modules</CardTitle>
-                <PlayCircle className="h-4 w-4 text-muted-foreground" />
+          {/* Enhanced Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up">
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 bg-white/80 backdrop-blur-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-semibold text-slate-600">Total Trainings</CardTitle>
+                <div className="p-2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg group-hover:scale-110 transition-transform duration-200">
+                  <PlayCircle className="h-5 w-5 text-white" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{courses.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Training modules available
+                <div className="text-3xl font-bold text-[#005eb8] mb-1">{courses.length}</div>
+                <p className="text-sm text-slate-500">
+                  Training programs available
                 </p>
+                <div className="mt-3 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-[#005eb8] to-[#0476D7] rounded-full w-3/4"></div>
+                </div>
               </CardContent>
             </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                <User className="h-4 w-4 text-muted-foreground" />
+            
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 bg-white/80 backdrop-blur-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-semibold text-slate-600">Total Users</CardTitle>
+                <div className="p-2 bg-gradient-to-br from-[#FFBC00] to-[#f59e0b] rounded-lg group-hover:scale-110 transition-transform duration-200">
+                  <User className="h-5 w-5 text-white" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{users.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Registered users
+                <div className="text-3xl font-bold text-[#FFBC00] mb-1">{users.length}</div>
+                <p className="text-sm text-slate-500">
+                  Registered students
                 </p>
+                <div className="mt-3 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-[#FFBC00] to-[#f59e0b] rounded-full w-4/5"></div>
+                </div>
               </CardContent>
             </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Published</CardTitle>
-                <Eye className="h-4 w-4 text-muted-foreground" />
+            
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 bg-white/80 backdrop-blur-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-semibold text-slate-600">Published</CardTitle>
+                <div className="p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                  <Eye className="h-5 w-5 text-white" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{courses.filter(course => course.isPublished).length}</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-3xl font-bold text-emerald-600 mb-1">{courses.filter(course => course.isPublished).length}</div>
+                <p className="text-sm text-slate-500">
                   Published modules
                 </p>
+                <div className="mt-3 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full w-2/3"></div>
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+          {/* Enhanced Quick Actions */}
+          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-scale-in">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-2xl font-bold text-slate-800">Quick Actions</CardTitle>
+              <p className="text-slate-600">Access your most important admin functions</p>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Button asChild variant="outline" className="h-20 flex-col gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Button asChild variant="outline" className="h-24 flex-col gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#005eb8] group">
                   <Link href="/admin/trainings">
-                    <PlayCircle className="h-6 w-6" />
-                    <span>Manage Trainings</span>
+                    <div className="p-3 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <PlayCircle className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="font-semibold text-slate-700">Manage Trainings</span>
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="h-20 flex-col gap-2">
+                <Button asChild variant="outline" className="h-24 flex-col gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#FFBC00] group">
                   <Link href="/admin/classes">
-                    <User className="h-6 w-6" />
-                    <span>Manage Classes</span>
+                    <div className="p-3 bg-gradient-to-br from-[#FFBC00] to-[#f59e0b] rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <User className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="font-semibold text-slate-700">Manage Classes</span>
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="h-20 flex-col gap-2">
+                <Button asChild variant="outline" className="h-24 flex-col gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-emerald-500 group">
                   <Link href="/admin/users">
-                    <User className="h-6 w-6" />
-                    <span>Manage Users</span>
+                    <div className="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <User className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="font-semibold text-slate-700">Manage Users</span>
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="h-20 flex-col gap-2">
+                <Button asChild variant="outline" className="h-24 flex-col gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-purple-500 group">
                   <Link href="/admin/feed">
-                    <MessageSquare className="h-6 w-6" />
-                    <span>Monitor Feed</span>
+                    <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <MessageSquare className="h-6 w-6 text-white" />
+                    </div>
+                    <span className="font-semibold text-slate-700">Monitor Feed</span>
                   </Link>
                 </Button>
               </div>

@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, Plus, Edit, Trash2, PlayCircle } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { ArrowLeft, Plus, Edit, Trash2, PlayCircle, Menu, X, Calendar, Clock, BookOpen, Video, GraduationCap } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,8 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import RequireAdmin from "@/app/components/RequireAdmin"
 import NextImage from "next/image"
+import UserDropdown from "@/app/components/UserDropdown"
+import { useUser } from "@/app/hooks/useUser"
 
 interface Course {
   id: string
@@ -44,6 +47,7 @@ export default function ModuleCoursesPage() {
   const router = useRouter()
   const moduleId = params.id as string
   const { toast } = useToast()
+  const { user } = useUser()
 
   const [module, setModule] = useState<TrainingModule | null>(null)
   const [courses, setCourses] = useState<Course[]>([])
@@ -51,6 +55,7 @@ export default function ModuleCoursesPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   const [formData, setFormData] = useState({
     title: "",
@@ -238,16 +243,16 @@ export default function ModuleCoursesPage() {
   if (isLoading) {
     return (
       <RequireAdmin>
-        <div className="min-h-screen bg-background">
-          <div className="container mx-auto px-4 py-8">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
-              <div className="grid gap-4">
-                <div className="h-32 bg-gray-200 rounded"></div>
-                <div className="h-32 bg-gray-200 rounded"></div>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
+          <div className="container mx-auto px-6 py-8">
+            <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
+              <CardContent className="text-center py-16">
+                <div className="space-y-4">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005eb8] mx-auto"></div>
+                  <p className="text-slate-600 text-lg">Loading courses...</p>
               </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </RequireAdmin>
@@ -256,87 +261,246 @@ export default function ModuleCoursesPage() {
 
   return (
     <RequireAdmin>
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-6">
-            <Button variant="ghost" size="sm" asChild>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
+        {/* Modern Header */}
+        <header className="border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 shadow-sm">
+          <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <Link href="/admin" className="flex items-center gap-3 group hover:opacity-80 transition-opacity duration-200">
+                <img 
+                  src="/logos/dark blue secondary logo.svg" 
+                  alt="XPERIENCE Logo" 
+                  className="h-10 w-25"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </Link>
+              <nav className="hidden md:flex items-center space-x-8">
+                <Link href="/admin" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Dashboard
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+                <Link href="/admin/trainings" className="text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Trainings
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+                <Link href="/admin/classes" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Classes
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+                <Link href="/admin/users" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Users
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+                <Link href="/admin/feed" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Feed
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+                <Link href="/admin/leaderboard" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Leaderboard
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
+              </nav>
+            </div>
+            <div className="flex items-center space-x-4">
+              {user && <UserDropdown user={user} />}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden hover:bg-slate-100"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+            </div>
+          </div>
+          
+          {/* Mobile Navigation Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden border-t bg-white/95 backdrop-blur-md">
+              <nav className="container mx-auto px-6 py-4 space-y-3">
+                <Link 
+                  href="/admin" 
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  href="/admin/trainings" 
+                  className="block py-3 text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Trainings
+                </Link>
+                <Link 
+                  href="/admin/classes" 
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Classes
+                </Link>
+                <Link 
+                  href="/admin/users" 
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Users
+                </Link>
+                <Link 
+                  href="/admin/feed" 
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Feed
+                </Link>
+                <Link 
+                  href="/admin/leaderboard" 
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Leaderboard
+                </Link>
+              </nav>
+            </div>
+          )}
+        </header>
+
+        <div className="container mx-auto px-6 py-8 space-y-8">
+          {/* Back Button */}
+          <Button variant="outline" asChild className="hover:bg-slate-100">
               <Link href={module?.trainingId ? `/admin/trainings/${module.trainingId}/modules` : "/admin/trainings"}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 {module?.trainingId ? "Back to Training Modules" : "Back to Trainings"}
               </Link>
             </Button>
-          </div>
 
-          <div className="max-w-4xl mx-auto">
             {/* Module Info */}
             {module && (
-              <div className="mb-8">
-                <h1 className="text-3xl font-bold mb-2">{module.title}</h1>
-                <p className="text-muted-foreground mb-4">{module.description}</p>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>Module {module.orderIndex}</span>
-                  <span>•</span>
-                  <span>{courses.length} course{courses.length !== 1 ? 's' : ''}</span>
+            <Card className="border-0 bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm shadow-lg animate-fade-in">
+              <CardContent className="pt-6">
+                <div className="text-center space-y-4">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#005eb8] to-[#0476D7] text-white rounded-full text-sm font-medium">
+                    <BookOpen className="h-4 w-4" />
+                    Module {module.orderIndex}
+                  </div>
+                  <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+                    {module.title}
+                  </h1>
+                  <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                    {module.description}
+                  </p>
+                  <div className="flex items-center justify-center gap-6 text-sm">
+                    <div className="flex items-center gap-2 text-slate-500">
+                      <Calendar className="h-4 w-4" />
+                      <span className="font-medium">Module {module.orderIndex}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-500">
+                      <Video className="h-4 w-4" />
+                      <span className="font-medium">{courses.length} course{courses.length !== 1 ? 's' : ''}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
+              </CardContent>
+            </Card>
+          )}
 
-            {/* Actions */}
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Courses</h2>
-              <Button onClick={() => setShowCreateDialog(true)}>
-                <Plus className="h-4 w-4 mr-2" />
+          {/* Action Button */}
+          <div className="flex items-center justify-center animate-slide-up">
+            <Button 
+              onClick={() => setShowCreateDialog(true)}
+              className="h-12 px-8 bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
+            >
+              <Plus className="h-5 w-5 mr-2" />
                 Add Course
               </Button>
             </div>
 
             {/* Courses List */}
             {courses.length === 0 ? (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <PlayCircle className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No courses yet</h3>
-                  <p className="text-muted-foreground text-center mb-4">
+            <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
+              <CardContent className="text-center py-16">
+                <div className="space-y-6">
+                  <div className="mx-auto w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center">
+                    <PlayCircle className="h-12 w-12 text-slate-400" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-bold text-slate-800">No courses yet</h3>
+                    <p className="text-slate-600 max-w-md mx-auto">
                     Add your first course to this module to get started.
                   </p>
-                  <Button onClick={() => setShowCreateDialog(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
+                  </div>
+                  <Button 
+                    onClick={() => setShowCreateDialog(true)}
+                    className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
                     Add First Course
                   </Button>
+                </div>
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-4">
-                {courses.map((course) => (
-                  <Card key={course.id}>
+            <div className="grid gap-6">
+              {courses
+                .sort((a, b) => a.orderIndex - b.orderIndex)
+                .map((course, index) => (
+                  <Card 
+                    key={course.id} 
+                    className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm animate-fade-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
                     <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <div className="w-20 h-15 bg-muted rounded-lg flex items-center justify-center">
-                          <PlayCircle className="h-8 w-8 text-muted-foreground" />
+                      <div className="flex items-start gap-6">
+                        {/* Course Thumbnail */}
+                        <div className="relative h-20 w-20 rounded-xl overflow-hidden border-2 border-slate-200 group-hover:border-[#005eb8]/30 transition-colors duration-200">
+                          {course.thumbnailUrl ? (
+                            <NextImage
+                              src={course.thumbnailUrl}
+                              alt={course.title}
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform duration-500"
+                              sizes="80px"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#005eb8]/20 to-[#0476D7]/10 group-hover:from-[#005eb8]/30 group-hover:to-[#0476D7]/20 transition-all duration-300">
+                              <PlayCircle className="h-8 w-8 text-[#005eb8]/50 group-hover:text-[#005eb8]/70 transition-colors duration-300" />
+                            </div>
+                          )}
                         </div>
                         
                         <div className="flex-1">
-                          <h3 className="font-semibold mb-1">{course.title}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">{course.description}</p>
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span>Order: {course.orderIndex}</span>
-                            <span>•</span>
-                            <span>{formatDuration(course.durationSeconds)}</span>
+                          <h3 className="text-xl font-bold text-slate-800 group-hover:text-[#005eb8] transition-colors duration-200 mb-2">
+                            {course.title}
+                          </h3>
+                          <p className="text-slate-600 leading-relaxed mb-4">
+                            {course.description}
+                          </p>
+                          <div className="flex items-center gap-6 text-sm">
+                            <div className="flex items-center gap-2 text-slate-500">
+                              <Calendar className="h-4 w-4" />
+                              <span className="font-medium">Order: {course.orderIndex}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-slate-500">
+                              <Clock className="h-4 w-4" />
+                              <span className="font-medium">{formatDuration(course.durationSeconds)}</span>
+                            </div>
                             {course.videoUrl && (
-                              <>
-                                <span>•</span>
-                                <span>Video available</span>
-                              </>
+                              <Badge className="px-3 py-1 text-xs font-semibold bg-emerald-500 hover:bg-emerald-600 text-white">
+                                <Video className="h-3 w-3 mr-1" />
+                                Video available
+                              </Badge>
                             )}
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <Button 
                             variant="outline" 
                             size="sm"
                             onClick={() => handleEditCourse(course)}
+                            className="hover:bg-[#FFBC00]/10 hover:border-[#FFBC00] hover:text-[#FFBC00] transition-all duration-200"
                           >
                             <Edit className="h-4 w-4 mr-1" />
                             Edit
@@ -345,6 +509,7 @@ export default function ModuleCoursesPage() {
                             variant="outline" 
                             size="sm"
                             onClick={() => handleDeleteCourse(course.id)}
+                            className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all duration-200"
                           >
                             <Trash2 className="h-4 w-4 mr-1" />
                             Delete
@@ -359,76 +524,93 @@ export default function ModuleCoursesPage() {
 
             {/* Create Course Dialog */}
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-              <DialogContent>
+            <DialogContent className="border-0 bg-white/95 backdrop-blur-md shadow-2xl">
                 <form onSubmit={handleCreateCourse}>
-                  <DialogHeader>
-                    <DialogTitle>Create New Course</DialogTitle>
-                    <DialogDescription>
+                <DialogHeader className="text-center space-y-3 pb-4">
+                  <div className="mx-auto w-12 h-12 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-full flex items-center justify-center">
+                    <Plus className="h-6 w-6 text-white" />
+                  </div>
+                  <DialogTitle className="text-xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+                    Create New Course
+                  </DialogTitle>
+                  <DialogDescription className="text-slate-600 text-sm">
                       Add a new video course to this module
                     </DialogDescription>
                   </DialogHeader>
 
                   <div className="space-y-4 py-4">
-                    <div>
-                      <Label htmlFor="title">Course Title *</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="title" className="text-sm font-semibold text-slate-700">Course Title *</Label>
                       <Input
                         id="title"
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="e.g., Introduction to React"
                         required
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                       />
                     </div>
 
-                    <div>
-                      <Label htmlFor="description">Description</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="description" className="text-sm font-semibold text-slate-700">Description</Label>
                       <Textarea
                         id="description"
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         placeholder="Course description..."
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                       />
                     </div>
 
-                    <div>
-                      <Label htmlFor="videoUrl">Video URL</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="videoUrl" className="text-sm font-semibold text-slate-700">Video URL</Label>
                       <Input
                         id="videoUrl"
                         value={formData.videoUrl}
                         onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
                         placeholder="https://example.com/video.mp4"
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                       />
                     </div>
 
-                    <div>
-                      <Label htmlFor="durationSeconds">Duration (seconds)</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="durationSeconds" className="text-sm font-semibold text-slate-700">Duration (seconds)</Label>
                       <Input
                         id="durationSeconds"
                         type="number"
                         value={formData.durationSeconds}
                         onChange={(e) => setFormData({ ...formData, durationSeconds: parseInt(e.target.value) || 0 })}
                         placeholder="1800"
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                       />
                     </div>
 
-                    <div>
-                      <Label htmlFor="orderIndex">Order *</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="orderIndex" className="text-sm font-semibold text-slate-700">Order *</Label>
                       <Input
                         id="orderIndex"
                         type="number"
                         value={formData.orderIndex}
                         onChange={(e) => setFormData({ ...formData, orderIndex: parseInt(e.target.value) })}
                         required
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                       />
-                    </div>
-
+                  </div>
                   </div>
 
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
+                <DialogFooter className="gap-3 pt-4">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setShowCreateDialog(false)}
+                    className="hover:bg-slate-100"
+                  >
                       Cancel
                     </Button>
-                    <Button type="submit">
+                  <Button 
+                    type="submit"
+                    className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-6"
+                  >
                       Create Course
                     </Button>
                   </DialogFooter>
@@ -438,82 +620,99 @@ export default function ModuleCoursesPage() {
 
             {/* Edit Course Dialog */}
             <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-              <DialogContent>
+            <DialogContent className="border-0 bg-white/95 backdrop-blur-md shadow-2xl">
                 <form onSubmit={handleUpdateCourse}>
-                  <DialogHeader>
-                    <DialogTitle>Edit Course</DialogTitle>
-                    <DialogDescription>
+                <DialogHeader className="text-center space-y-3 pb-4">
+                  <div className="mx-auto w-12 h-12 bg-gradient-to-br from-[#FFBC00] to-[#f59e0b] rounded-full flex items-center justify-center">
+                    <Edit className="h-6 w-6 text-white" />
+                  </div>
+                  <DialogTitle className="text-xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+                    Edit Course
+                  </DialogTitle>
+                  <DialogDescription className="text-slate-600 text-sm">
                       Update the course details
                     </DialogDescription>
                   </DialogHeader>
 
                   <div className="space-y-4 py-4">
-                    <div>
-                      <Label htmlFor="edit-title">Course Title *</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-title" className="text-sm font-semibold text-slate-700">Course Title *</Label>
                       <Input
                         id="edit-title"
                         value={editFormData.title}
                         onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
                         placeholder="e.g., Introduction to React"
                         required
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                       />
                     </div>
 
-                    <div>
-                      <Label htmlFor="edit-description">Description</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-description" className="text-sm font-semibold text-slate-700">Description</Label>
                       <Textarea
                         id="edit-description"
                         value={editFormData.description}
                         onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                         placeholder="Course description..."
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                       />
                     </div>
 
-                    <div>
-                      <Label htmlFor="edit-videoUrl">Video URL</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-videoUrl" className="text-sm font-semibold text-slate-700">Video URL</Label>
                       <Input
                         id="edit-videoUrl"
                         value={editFormData.videoUrl}
                         onChange={(e) => setEditFormData({ ...editFormData, videoUrl: e.target.value })}
                         placeholder="https://example.com/video.mp4"
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                       />
                     </div>
 
-                    <div>
-                      <Label htmlFor="edit-durationSeconds">Duration (seconds)</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-durationSeconds" className="text-sm font-semibold text-slate-700">Duration (seconds)</Label>
                       <Input
                         id="edit-durationSeconds"
                         type="number"
                         value={editFormData.durationSeconds}
                         onChange={(e) => setEditFormData({ ...editFormData, durationSeconds: parseInt(e.target.value) || 0 })}
                         placeholder="1800"
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                       />
                     </div>
 
-                    <div>
-                      <Label htmlFor="edit-orderIndex">Order *</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-orderIndex" className="text-sm font-semibold text-slate-700">Order *</Label>
                       <Input
                         id="edit-orderIndex"
                         type="number"
                         value={editFormData.orderIndex}
                         onChange={(e) => setEditFormData({ ...editFormData, orderIndex: parseInt(e.target.value) })}
                         required
+                      className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
                       />
                     </div>
                   </div>
 
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>
+                <DialogFooter className="gap-3 pt-4">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setShowEditDialog(false)}
+                    className="hover:bg-slate-100"
+                  >
                       Cancel
                     </Button>
-                    <Button type="submit">
+                  <Button 
+                    type="submit"
+                    className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-6"
+                  >
                       Update Course
                     </Button>
                   </DialogFooter>
                 </form>
               </DialogContent>
             </Dialog>
-          </div>
         </div>
       </div>
     </RequireAdmin>
