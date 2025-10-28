@@ -25,6 +25,7 @@ import {
 } from "lucide-react"
 import NextImage from "next/image"
 import LiveSessionCard from "@/components/LiveSessionCard"
+import Navbar from "../../components/Navbar"
 
 interface Training {
   id: string
@@ -214,12 +215,12 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           if (enrollmentsResponse.ok) {
             const enrollments = await enrollmentsResponse.json()
             // Filter for this training and only active classes
-            const trainingEnrollments = enrollments.filter((enrollment) => 
+            const trainingEnrollments = enrollments.filter((enrollment: any) => 
               enrollment.moduleId === params.id // moduleId is actually trainingId in backend
             )
             
             // Check if user has any active enrollments for this training
-            const activeEnrollments = trainingEnrollments.filter((enrollment) => 
+            const activeEnrollments = trainingEnrollments.filter((enrollment: any) => 
               enrollment.isActive && !enrollment.isArchived
             )
             
@@ -232,7 +233,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             if (trainingEnrollments.length > 1) {
               // Check if student has a saved preference for this training
               const savedClassId = localStorage.getItem(`selectedClass_${params.id}`)
-              const savedClass = savedClassId ? trainingEnrollments.find((c) => c.id === savedClassId) : null
+              const savedClass = savedClassId ? trainingEnrollments.find((c: any) => c.id === savedClassId) : null
               
               if (savedClass && savedClassId) {
                 // Student has a saved preference, use it
@@ -443,6 +444,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
   if (userLoading) {
     return (
       <div className="min-h-screen bg-background">
+        <Navbar />
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center h-64">
             <div className="text-lg">Loading...</div>
@@ -460,6 +462,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
+        <Navbar />
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse">
             <div className="h-8 bg-muted rounded w-1/4 mb-4"></div>
@@ -478,6 +481,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
   if (error) {
     return (
       <div className="min-h-screen bg-background">
+        <Navbar />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-destructive mb-4">Error</h1>
@@ -492,6 +496,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
   if (!training) {
     return (
       <div className="min-h-screen bg-background">
+        <Navbar />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Training Not Found</h1>
@@ -509,6 +514,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navbar />
       <div className="container mx-auto px-6 py-10 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
@@ -564,7 +570,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             {isEnrolled && selectedClassId && (
                     <div className="flex justify-center mt-6">
                       <div className="p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 rounded-2xl w-full max-w-2xl shadow-lg">
-                        <p className="text-sm font-semibold text-purple-700 mb-4 flex items-center gap-2 justify-center">
+                        <p className="text-sm font-semibold text-[#0476D7] mb-4 flex items-center gap-2 justify-center">
                           <Users className="h-4 w-4" />
                           Class Community
                         </p>

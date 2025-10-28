@@ -27,6 +27,7 @@ import {
   CheckCircle
 } from "lucide-react"
 import VimeoPlayer from "../../../../components/VimeoPlayer"
+import Navbar from "../../../../components/Navbar"
 
 interface Course {
   id: string
@@ -358,6 +359,7 @@ export default function CourseDetailPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Navbar />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -563,7 +565,6 @@ export default function CourseDetailPage() {
                         <span>Course Progress</span>
                         <span>{courseProgress?.completionPercentage || 0}%</span>
                       </div>
-                      {console.log("🎨 Rendering progress:", courseProgress?.completionPercentage)}
                       <Progress value={courseProgress?.completionPercentage || 0} className="w-full" />
                       <p className="text-xs text-muted-foreground">
                         {courseProgress?.isCompleted ? "Course completed!" : 

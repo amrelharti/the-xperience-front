@@ -47,9 +47,24 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     })
     
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Backend DELETE error:', errorText)
-      return NextResponse.json({ error: errorText }, { status: response.status })
+      let errorMessage = 'Failed to delete training'
+      
+      // Try to get error message from response
+      try {
+        const contentType = response.headers.get('content-type')
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorData.error || errorMessage
+        } else {
+          const errorText = await response.text()
+          errorMessage = errorText || errorMessage
+        }
+      } catch (parseError) {
+        console.error('Error parsing response:', parseError)
+      }
+      
+      console.error('Backend DELETE error:', errorMessage, 'Status:', response.status)
+      return NextResponse.json({ error: errorMessage }, { status: response.status })
     }
     
     // Return success response

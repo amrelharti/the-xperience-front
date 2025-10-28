@@ -64,15 +64,15 @@ export default function CountdownTimer({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-center gap-2.5 text-gray-700">
         <div className="p-1.5 bg-blue-50 rounded-lg">
           <Clock className="h-4 w-4 text-[#0476D7]" />
         </div>
-        <span className="text-base font-semibold">Session starts in</span>
+        <span className="text-sm font-semibold">Session starts in</span>
       </div>
 
-      <div className="flex items-center justify-center gap-2 md:gap-3">
+      <div className="flex items-center justify-center gap-2">
         {[
           { value: timeLeft.days, label: 'Days' },
           { value: timeLeft.hours, label: 'Hours' },
@@ -80,23 +80,23 @@ export default function CountdownTimer({
         ].map((unit, index, array) => (
           <>
             <div key={unit.label} className="group">
-              <div className="relative bg-white border-2 border-[#0476D7]/10 rounded-xl px-6 py-5 md:px-8 md:py-6 shadow-sm hover:border-[#0476D7]/30 hover:shadow-lg transition-all duration-200">
+              <div className="relative bg-white border-2 border-[#0476D7]/10 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 shadow-sm hover:border-[#0476D7]/30 hover:shadow-md transition-all duration-200">
                 <div className="text-center">
                   <div className="relative">
-                    <div className="text-4xl md:text-5xl font-black text-[#0476D7] tabular-nums tracking-tight">
+                    <div className="text-2xl sm:text-3xl font-black text-[#0476D7] tabular-nums tracking-tight">
                       {formatNumber(unit.value)}
                     </div>
                     {/* Accent line */}
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-[#FFBC00] rounded-full" />
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-10 sm:w-12 h-0.5 bg-[#FFBC00] rounded-full" />
                   </div>
-                  <div className="mt-3 text-xs font-bold text-[#0476D7] uppercase tracking-widest">
+                  <div className="mt-2 text-xs font-bold text-[#0476D7] uppercase tracking-widest">
                     {unit.label}
                   </div>
                 </div>
               </div>
             </div>
             {index < array.length - 1 && (
-              <div className="text-3xl text-[#0476D7]/30 font-light pb-2">:</div>
+              <div className="text-2xl text-[#0476D7]/30 font-light pb-2">:</div>
             )}
           </>
         ))}

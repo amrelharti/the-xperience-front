@@ -159,29 +159,21 @@ export default function TrainingsPage() {
     <div className="min-h-screen">
       <Navbar />
       
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-15 py-10">
         <div className="mb-8 animate-slide-up">
-          <h1 className="text-4xl font-bold mb-3 font-[family-name:var(--font-montserrat)] tracking-tight bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">
+          <h1 className="text-4xl mb-3 font-[family-name:var(--font-montserrat)] tracking-tight bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">
             Available Trainings
           </h1>
           <p className="text-base text-[#6b7280] mb-4 max-w-2xl">
             Choose a training and select a class to start your learning journey.
           </p>
-          <div className="flex items-center gap-3">
-            <span className="px-4 py-1.5 bg-[#0476D7]/10 text-[#0476D7] rounded-full text-sm font-medium">
-              {modules.filter(m => m.isPublished).length} Active
-            </span>
-            <span className="px-4 py-1.5 bg-[#FFBC00]/10 text-[#FFBC00] rounded-full text-sm font-medium">
-              {modules.filter(m => !m.isPublished).length} Coming Soon
-            </span>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {modules.length === 0 ? (
             <div className="col-span-full text-center py-12">
               <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No trainings available</h3>
+              <h3 className="text-lg mb-2">No trainings available</h3>
               <p className="text-muted-foreground">
                 Check back later for new trainings.
             </p>
@@ -249,7 +241,7 @@ export default function TrainingsPage() {
               <CardHeader className="pb-4">
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
-                      <CardTitle className="text-xl font-bold mb-2 leading-tight">{module.title}</CardTitle>
+                      <CardTitle className="text-xl mb-2 leading-tight">{module.title}</CardTitle>
                       <CardDescription className="line-clamp-2 text-sm text-muted-foreground leading-relaxed">
                         {module.description}
                       </CardDescription>
@@ -303,11 +295,11 @@ export default function TrainingsPage() {
                       <div className="relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200/50 rounded-xl p-4">
                         <div className="absolute top-0 right-0 w-20 h-20 bg-green-200/20 rounded-full -mr-10 -mt-10"></div>
                         <div className="relative">
-                          <div className="flex items-center gap-2 text-sm font-semibold text-green-900 mb-2">
+                          <div className="flex items-center gap-2 text-sm text-green-900 mb-2">
                             <CheckCircle className="h-4 w-4" />
                             Enrolled Class
                           </div>
-                          <div className="text-base font-bold text-green-950 mb-1">{module.enrolledClass.name}</div>
+                          <div className="text-base text-green-950 mb-1">{module.enrolledClass.name}</div>
                           <div className="flex items-center gap-2 text-xs text-green-700">
                             <Calendar className="h-3.5 w-3.5" />
                             <span>{new Date(module.enrolledClass.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(module.enrolledClass.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
@@ -318,7 +310,7 @@ export default function TrainingsPage() {
                     
                     <div className="pt-1">
                       {module.isPublished ? (
-                        <Button asChild className="w-full h-12 text-base font-semibold shadow-md hover:shadow-lg group">
+                        <Button asChild className="w-full h-12 text-base shadow-md hover:shadow-lg group">
                           <Link href={`/courses/${module.id}`} className="flex items-center justify-center gap-2">
                             <BookOpen className="h-5 w-5 group-hover:scale-110 transition-transform" />
                             {module.isEnrolled ? "Continue Learning" : "Start Learning"}
@@ -332,7 +324,7 @@ export default function TrainingsPage() {
                         >
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-[#FFBC00] rounded-full animate-pulse"></div>
-                            <span className="font-semibold">Coming Soon</span>
+                            <span>Coming Soon</span>
                             <div className="w-2 h-2 bg-[#FFBC00] rounded-full animate-pulse"></div>
                           </div>
                         </Button>

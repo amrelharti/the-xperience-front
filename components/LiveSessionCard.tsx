@@ -81,7 +81,7 @@ export default function LiveSessionCard({
     <div className="space-y-6">
       {/* Session Info */}
       <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-6 border border-gray-200">
-        <h3 className="text-2xl font-bold text-gray-900 mb-5">{liveSession.title}</h3>
+        <h3 className="text-2xl font-medium text-gray-900 mb-5">{liveSession.title}</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div className="flex items-center gap-3">
@@ -170,7 +170,7 @@ export default function LiveSessionCard({
       <Button
         onClick={handleJoinLive}
         disabled={!isLive}
-        className={`w-full ${isLive ? 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+        className={`w-full ${isLive ? 'bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white shadow-lg hover:shadow-xl' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
         size="lg"
       >
         {isLive ? (
@@ -202,26 +202,6 @@ export default function LiveSessionCard({
             I attended the live session
           </label>
           {isAttended && <CheckCircle className="h-5 w-5 text-green-500" />}
-        </div>
-
-        {/* Progress */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-600 font-medium">Module Progress</span>
-            <span className="font-bold text-gray-900">{progressWithLive}%</span>
-          </div>
-          <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-[#0476D7] to-[#005eb8] transition-all duration-700"
-              style={{ width: `${progressWithLive}%` }}
-            />
-          </div>
-          {isAttended && (
-            <p className="text-xs text-green-600 flex items-center gap-1.5 font-medium">
-              <CheckCircle className="h-3.5 w-3.5" />
-              Live session attendance recorded! Progress updated to 100%
-            </p>
-          )}
         </div>
       </div>
 

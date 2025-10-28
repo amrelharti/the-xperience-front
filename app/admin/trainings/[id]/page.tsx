@@ -128,7 +128,13 @@ export default function TrainingDetailPage() {
   }
 
   const handleDeleteTraining = async () => {
-    if (!confirm("Are you sure you want to delete this training? This will also delete all associated modules and courses.")) return
+    // First check if there are modules
+    if (modulesCount > 0) {
+      const confirmMessage = `This training has ${modulesCount} module(s). Do you want to delete the training and all its modules?\n\nThis action cannot be undone.`
+      if (!confirm(confirmMessage)) return
+    } else {
+      if (!confirm("Are you sure you want to delete this training? This action cannot be undone.")) return
+    }
 
     try {
       console.log("🗑️ Deleting training:", trainingId)
@@ -154,9 +160,20 @@ export default function TrainingDetailPage() {
       } else {
         const error = await res.json()
         console.error("Delete failed:", error)
+        
+        // Provide more helpful error message
+        let errorMessage = error.error || "Failed to delete training"
+        
+        // Check for common backend issues
+        if (errorMessage.includes("foreign key") || errorMessage.includes("constraint")) {
+          errorMessage = "Cannot delete training because it has associated modules or data. Please delete all modules first."
+        } else if (errorMessage === "" || errorMessage.includes("Bad Request")) {
+          errorMessage = "Cannot delete training. It may have associated modules or courses. Please delete them first."
+        }
+        
         toast({
           title: "Error",
-          description: error.error || "Failed to delete training",
+          description: errorMessage,
           variant: "destructive"
         })
       }
@@ -164,7 +181,7 @@ export default function TrainingDetailPage() {
       console.error("Error deleting training:", error)
       toast({
         title: "Error",
-        description: "Failed to delete training",
+        description: "Failed to delete training. Please try again.",
         variant: "destructive"
       })
     }
