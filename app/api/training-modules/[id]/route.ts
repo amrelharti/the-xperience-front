@@ -5,7 +5,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"
+    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"
     const moduleId = params.id
 
     const response = await fetch(`${backendUrl}/api/training-modules/${moduleId}`, {

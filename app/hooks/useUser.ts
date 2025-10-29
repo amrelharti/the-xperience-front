@@ -58,7 +58,7 @@ export function useUser() {
         }
         
         if (jwtToken) {
-          const backendRes = await fetch(`http://localhost:8080/api/me`, {
+          const backendRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'}/api/me`, {
             headers: {
               'Authorization': `Bearer ${jwtToken}`
             }

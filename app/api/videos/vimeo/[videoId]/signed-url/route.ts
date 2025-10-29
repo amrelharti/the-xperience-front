@@ -11,7 +11,7 @@ export async function GET(
     const cookies = request.headers.get("cookie")
     
     // Forward the request to the backend
-    const backendUrl = `http://localhost:8080/api/videos/vimeo/${videoId}/signed-url`
+    const backendUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'}/api/videos/vimeo/${videoId}/signed-url`
     
     const response = await fetch(backendUrl, {
       method: "GET",

@@ -222,7 +222,7 @@ export default function SignInPage() {
             setIsLoading(true)
             setError("") // Clear any previous errors
             try {
-              const res = await fetch(`http://localhost:8080/api/auth/google`, {
+              const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'}/api/auth/google`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
