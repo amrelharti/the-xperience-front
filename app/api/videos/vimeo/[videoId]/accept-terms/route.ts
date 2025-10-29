@@ -11,7 +11,7 @@ export async function POST(
     const cookies = request.headers.get("cookie")
     
     // Forward the request to the backend
-    const backendUrl = `http://localhost:8080/api/videos/vimeo/${videoId}/accept-terms`
+    const backendUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'}/api/videos/vimeo/${videoId}/accept-terms`
     
     const response = await fetch(backendUrl, {
       method: "POST",
