@@ -206,3 +206,5 @@ Training
 ✅ Frontend is correctly calling `/api/training-modules/{moduleId}/unlock` with the specific module ID
 ❌ Backend is not properly scoping the access to that specific module
 
+
+

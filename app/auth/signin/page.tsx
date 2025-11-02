@@ -239,8 +239,17 @@ export default function SignInPage() {
                   window.location.href = "/"
                 }
               } else {
-                const errorData = await res.json()
-                console.error("Google sign-in failed:", errorData)
+                // Try to parse JSON, but handle empty responses
+                let errorData: any = {}
+                const text = await res.text()
+                try {
+                  if (text) {
+                    errorData = JSON.parse(text)
+                  }
+                } catch (e) {
+                  console.error("Failed to parse error response:", text)
+                }
+                console.error("Google sign-in failed:", errorData, "Status:", res.status)
                 
                 // Handle specific error types
                 if (errorData.error === "user_not_found") {

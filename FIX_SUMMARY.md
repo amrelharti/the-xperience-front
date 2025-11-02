@@ -94,3 +94,5 @@ The issue is in the **Spring Boot backend**. I've created detailed documentation
 
 The fix is straightforward - it's about ensuring the database query matches both the code AND the module ID, then granting access only for that specific module.
 
+
+
