@@ -54,11 +54,19 @@ export default function ClassManagementPage() {
     endDate: "",
     maxStudents: 30
   })
-  const [showGenerateCodes, setShowGenerateCodes] = useState(false)
-  const [selectedClassForCodes, setSelectedClassForCodes] = useState<Class | null>(null)
-  const [generateCount, setGenerateCount] = useState(5)
-  const [generatedCodes, setGeneratedCodes] = useState<string[]>([])
-  const [existingCodes, setExistingCodes] = useState<any[]>([])
+  const [showCodeDialog, setShowCodeDialog] = useState(false)
+  const [selectedClassForCode, setSelectedClassForCode] = useState<Class | null>(null)
+  const [activeCode, setActiveCode] = useState<{
+    hasCode: boolean
+    code?: string
+    codeId?: string
+    createdAt?: string
+    generatedBy?: string
+    usageCount?: number
+    recentUsage?: Array<{userName: string, userEmail: string, usedAt: string}>
+  } | null>(null)
+  const [showGeneratedCode, setShowGeneratedCode] = useState(false)
+  const [newlyGeneratedCode, setNewlyGeneratedCode] = useState("")
 
   useEffect(() => {
     loadClasses()
@@ -192,42 +200,41 @@ export default function ClassManagementPage() {
     }
   }
 
-  const loadExistingCodes = async (classId: string) => {
+  const loadActiveCode = async (classId: string) => {
     try {
       const res = await fetch(`/api/admin/classes/${classId}/codes`, {
         credentials: "include"
       })
       if (res.ok) {
         const data = await res.json()
-        setExistingCodes(data)
+        setActiveCode(data)
       }
     } catch (error) {
-      console.error("Error loading existing codes:", error)
+      console.error("Error loading active code:", error)
     }
   }
 
-  const handleGenerateCodes = async () => {
-    if (!selectedClassForCodes) return
+  const handleGenerateCode = async () => {
+    if (!selectedClassForCode) return
     
     try {
-      const res = await fetch(`/api/admin/classes/${selectedClassForCodes.id}/codes`, {
+      const res = await fetch(`/api/admin/classes/${selectedClassForCode.id}/codes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ count: generateCount })
+        credentials: "include"
       })
       
       if (res.ok) {
         const data = await res.json()
-        setGeneratedCodes(data.codes)
-        loadExistingCodes(selectedClassForCodes.id)
-        alert(`Generated ${data.codes.length} enrollment codes!`)
+        setNewlyGeneratedCode(data.code)
+        setShowGeneratedCode(true)
+        loadActiveCode(selectedClassForCode.id)
       } else {
-        alert("Failed to generate codes")
+        alert("Failed to generate code")
       }
     } catch (error) {
-      console.error("Error generating codes:", error)
-      alert("Error generating codes")
+      console.error("Error generating code:", error)
+      alert("Error generating code")
     }
   }
 
@@ -236,11 +243,12 @@ export default function ClassManagementPage() {
     alert("Code copied to clipboard!")
   }
 
-  const openCodeGeneration = (classItem: Class) => {
-    setSelectedClassForCodes(classItem)
-    setGeneratedCodes([])
-    setShowGenerateCodes(true)
-    loadExistingCodes(classItem.id)
+  const openCodeDialog = (classItem: Class) => {
+    setSelectedClassForCode(classItem)
+    setShowGeneratedCode(false)
+    setNewlyGeneratedCode("")
+    setShowCodeDialog(true)
+    loadActiveCode(classItem.id)
   }
 
   const filteredClasses = useMemo(() => {
@@ -283,19 +291,19 @@ export default function ClassManagementPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
       {/* Modern Header */}
       <header className="border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <Link href="/admin" className="flex items-center gap-3 group hover:opacity-80 transition-opacity duration-200">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-3 sm:space-x-6">
+            <Link href="/admin" className="flex items-center gap-2 sm:gap-3 group hover:opacity-80 transition-opacity duration-200">
               <img 
                 src="/logos/dark blue secondary logo.svg" 
                 alt="XPERIENCE Logo" 
-                className="h-10 w-25"
+                className="h-8 sm:h-10 w-auto"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}
               />
             </Link>
-            <nav className="hidden md:flex items-center space-x-8">
+            <nav className="hidden lg:flex items-center space-x-4 xl:space-x-8">
               <Link href="/admin" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
                 Dashboard
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
@@ -322,12 +330,12 @@ export default function ClassManagementPage() {
               </Link>
             </nav>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {user && <UserDropdown user={user} />}
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden hover:bg-slate-100"
+              className="lg:hidden hover:bg-slate-100 p-2"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -337,8 +345,8 @@ export default function ClassManagementPage() {
         
         {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t bg-white/95 backdrop-blur-md">
-            <nav className="container mx-auto px-6 py-4 space-y-3">
+          <div className="lg:hidden border-t bg-white/95 backdrop-blur-md">
+            <nav className="container mx-auto px-4 sm:px-6 py-4 space-y-2 sm:space-y-3">
               <Link 
                 href="/admin" 
                 className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
@@ -386,38 +394,38 @@ export default function ClassManagementPage() {
         )}
       </header>
 
-      <div className="container mx-auto px-6 py-8 space-y-8">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Page Header */}
-        <div className="text-center space-y-4 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#005eb8] to-[#0476D7] text-white rounded-full text-sm font-medium">
-            <GraduationCap className="h-4 w-4" />
+        <div className="text-center space-y-3 sm:space-y-4 animate-fade-in px-4">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#005eb8] to-[#0476D7] text-white rounded-full text-xs sm:text-sm font-medium">
+            <GraduationCap className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Class Management
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
             Class Management
           </h1>
-          <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-slate-600 max-w-3xl mx-auto">
             Manage classes, enrollments, and student access codes
           </p>
         </div>
 
         {/* Header Actions */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Button
               variant="outline"
               size="sm"
               onClick={() => window.history.back()}
-              className="flex items-center gap-2 hover:bg-slate-100"
+              className="flex items-center gap-2 hover:bg-slate-100 text-sm -ml-2 sm:ml-0"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Back
             </Button>
           </div>
           <Dialog open={showCreateClass} onOpenChange={setShowCreateClass}>
             <DialogTrigger asChild>
-              <Button type="button" className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-                <Plus className="h-5 w-5 mr-2" />
+              <Button type="button" size="sm" className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 text-sm sm:text-base w-full sm:w-auto">
+                <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                 Add Class
               </Button>
             </DialogTrigger>
@@ -532,25 +540,25 @@ export default function ClassManagementPage() {
         </div>
 
         {/* Search and Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-slide-up">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 animate-slide-up">
           <Card className="lg:col-span-3 border-0 bg-white/80 backdrop-blur-sm shadow-lg">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
+                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4 sm:h-5 sm:w-5" />
                 <Input
-                  placeholder="Search classes by name, description, or module..."
+                  placeholder="Search classes by name, description..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-12 text-lg border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-xl"
+                  className="pl-10 sm:pl-12 h-10 sm:h-12 text-sm sm:text-base md:text-lg border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-lg sm:rounded-xl"
                 />
               </div>
             </CardContent>
           </Card>
           <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-[#005eb8] mb-2">{filteredClasses.length}</div>
-                <div className="text-sm text-slate-600 mb-4">
+                <div className="text-2xl sm:text-3xl font-bold text-[#005eb8] mb-1.5 sm:mb-2">{filteredClasses.length}</div>
+                <div className="text-xs sm:text-sm text-slate-600 mb-3 sm:mb-4">
                   {(() => {
                     if (showArchived && showInactive) return 'All Classes'
                     if (showArchived) return 'Active + Archived'
@@ -583,22 +591,22 @@ export default function ClassManagementPage() {
 
         {/* Classes List */}
         <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-scale-in">
-          <CardHeader className="pb-6">
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <div className="p-2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg">
-                <GraduationCap className="h-5 w-5 text-white" />
+          <CardHeader className="pb-4 sm:pb-6 px-4 sm:px-6">
+            <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">
+              <div className="p-1.5 sm:p-2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg">
+                <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               Classes ({filteredClasses.length})
             </CardTitle>
-            <CardDescription className="text-slate-600">Manage classes and their enrollments</CardDescription>
+            <CardDescription className="text-slate-600 text-xs sm:text-sm">Manage classes and their enrollments</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="px-4 sm:px-6">
+            <div className="space-y-3 sm:space-y-4">
               {filteredClasses.map((classItem, index) => {
                 return (
                 <div 
                   key={classItem.id} 
-                  className={`group flex items-center justify-between p-6 border-2 rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 animate-fade-in ${
+                  className={`group flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 border-2 rounded-lg sm:rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 animate-fade-in ${
                     classItem.isActive && !classItem.isArchived
                       ? 'hover:bg-slate-50 border-slate-200 hover:border-[#005eb8]/30' 
                       : !classItem.isActive && classItem.isArchived
@@ -607,18 +615,18 @@ export default function ClassManagementPage() {
                   }`}
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="flex items-center space-x-6">
-                    <div className={`h-20 w-20 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${
+                  <div className="flex items-start sm:items-center space-x-4 sm:space-x-6 w-full sm:flex-1">
+                    <div className={`h-16 w-16 sm:h-20 sm:w-20 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 flex-shrink-0 ${
                       classItem.isActive && !classItem.isArchived
                         ? 'bg-gradient-to-br from-[#005eb8] to-[#0476D7]' 
                         : !classItem.isActive && classItem.isArchived
                           ? 'bg-gradient-to-br from-blue-500 to-blue-600'
                           : 'bg-gradient-to-br from-slate-400 to-slate-500'
                     }`}>
-                      <GraduationCap className="h-10 w-10 text-white" />
+                      <GraduationCap className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
                     </div>
-                    <div className="flex-1">
-                      <p className={`text-lg font-bold mb-2 ${
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-base sm:text-lg font-bold mb-1.5 sm:mb-2 ${
                         classItem.isActive && !classItem.isArchived
                           ? 'text-slate-800 group-hover:text-[#005eb8]' 
                           : !classItem.isActive && classItem.isArchived
@@ -627,19 +635,19 @@ export default function ClassManagementPage() {
                       } transition-colors duration-200`}>
                         {classItem.name}
                       </p>
-                      <p className={`text-sm mb-3 leading-relaxed ${
+                      <p className={`text-xs sm:text-sm mb-2 sm:mb-3 leading-relaxed line-clamp-2 ${
                         classItem.isActive 
                           ? 'text-slate-600' 
                           : 'text-slate-500'
                       }`}>
                         {classItem.description}
                       </p>
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center gap-2 sm:gap-3 md:space-x-4 flex-wrap">
                         <Badge variant={
                           classItem.isActive && !classItem.isArchived ? "default" : 
                           !classItem.isActive && classItem.isArchived ? "secondary" : 
                           "destructive"
-                        } className={`px-3 py-1 text-xs font-semibold ${
+                        } className={`px-2 sm:px-3 py-0.5 sm:py-1 text-xs font-semibold ${
                           classItem.isActive && !classItem.isArchived ? "bg-emerald-500 hover:bg-emerald-600 text-white" :
                           !classItem.isActive && classItem.isArchived ? "bg-blue-500 hover:bg-blue-600 text-white" :
                           "bg-red-500 hover:bg-red-600 text-white"
@@ -648,35 +656,36 @@ export default function ClassManagementPage() {
                            !classItem.isActive && classItem.isArchived ? "Archived" : 
                            "Inactive"}
                         </Badge>
-                        <span className={`text-sm flex items-center gap-1 ${
+                        <span className={`text-xs sm:text-sm flex items-center gap-1 ${
                           classItem.isActive && !classItem.isArchived
                             ? 'text-slate-500' 
                             : 'text-slate-400'
                         }`}>
-                          <Calendar className="h-4 w-4" />
-                          {new Date(classItem.startDate).toLocaleDateString()} - {new Date(classItem.endDate).toLocaleDateString()}
+                          <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          <span className="hidden md:inline">{new Date(classItem.startDate).toLocaleDateString()} - {new Date(classItem.endDate).toLocaleDateString()}</span>
+                          <span className="md:hidden">{new Date(classItem.startDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</span>
                         </span>
-                        <span className={`text-sm flex items-center gap-1 ${
+                        <span className={`text-xs sm:text-sm flex items-center gap-1 ${
                           classItem.isActive 
                             ? 'text-slate-500' 
                             : 'text-slate-400'
                         }`}>
-                          <Users className="h-4 w-4" />
+                          <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           {classItem.currentStudents}/{classItem.maxStudents} students
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end flex-wrap mt-3 sm:mt-0">
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => openCodeGeneration(classItem)}
-                      title="Generate enrollment codes"
+                      onClick={() => openCodeDialog(classItem)}
+                      title="Manage enrollment code"
                       disabled={!classItem.isActive}
                       className="hover:bg-[#FFBC00]/10 hover:border-[#FFBC00] hover:text-[#FFBC00] transition-all duration-200"
                     >
-                      <Key className="h-4 w-4" />
+                      <Key className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </Button>
                     <div className="flex gap-1">
                       <Button
@@ -684,7 +693,7 @@ export default function ClassManagementPage() {
                         variant={classItem.isActive ? "default" : "outline"}
                         onClick={() => handleToggleClassStatus(classItem.id, true, false)}
                         disabled={classItem.isActive}
-                        className={classItem.isActive ? "bg-emerald-500 hover:bg-emerald-600 text-white" : "hover:bg-slate-100"}
+                        className={`text-xs ${classItem.isActive ? "bg-emerald-500 hover:bg-emerald-600 text-white" : "hover:bg-slate-100"}`}
                       >
                         Active
                       </Button>
@@ -693,7 +702,7 @@ export default function ClassManagementPage() {
                         variant={classItem.isArchived ? "secondary" : "outline"}
                         onClick={() => handleToggleClassStatus(classItem.id, false, true)}
                         disabled={classItem.isArchived}
-                        className={classItem.isArchived ? "bg-blue-500 hover:bg-blue-600 text-white" : "hover:bg-slate-100"}
+                        className={`text-xs ${classItem.isArchived ? "bg-blue-500 hover:bg-blue-600 text-white" : "hover:bg-slate-100"}`}
                       >
                         Archived
                       </Button>
@@ -702,7 +711,7 @@ export default function ClassManagementPage() {
                         variant={!classItem.isActive && !classItem.isArchived ? "destructive" : "outline"}
                         onClick={() => handleToggleClassStatus(classItem.id, false, false)}
                         disabled={!classItem.isActive && !classItem.isArchived}
-                        className={(!classItem.isActive && !classItem.isArchived) ? "bg-red-500 hover:bg-red-600 text-white" : "hover:bg-slate-100"}
+                        className={`text-xs ${(!classItem.isActive && !classItem.isArchived) ? "bg-red-500 hover:bg-red-600 text-white" : "hover:bg-slate-100"}`}
                       >
                         Inactive
                       </Button>
@@ -714,7 +723,7 @@ export default function ClassManagementPage() {
                       disabled={!classItem.isActive}
                       className="hover:bg-[#005eb8]/10 hover:border-[#005eb8] hover:text-[#005eb8] transition-all duration-200"
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </Button>
                     <Button
                       size="sm"
@@ -722,7 +731,7 @@ export default function ClassManagementPage() {
                       onClick={() => handleDeleteClass(classItem.id)}
                       className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all duration-200"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 </div>
@@ -747,100 +756,122 @@ export default function ClassManagementPage() {
           </CardContent>
         </Card>
 
-        {/* Code Generation Dialog */}
-        <Dialog open={showGenerateCodes} onOpenChange={setShowGenerateCodes}>
-          <DialogContent className="max-w-2xl border-0 bg-white/95 backdrop-blur-md shadow-2xl">
+        {/* Enrollment Code Dialog */}
+        <Dialog open={showCodeDialog} onOpenChange={setShowCodeDialog}>
+          <DialogContent className="max-w-lg border-0 bg-white/95 backdrop-blur-md shadow-2xl">
             <DialogHeader className="text-center space-y-3 pb-4">
               <div className="mx-auto w-12 h-12 bg-gradient-to-br from-[#FFBC00] to-[#f59e0b] rounded-full flex items-center justify-center">
                 <Key className="h-6 w-6 text-white" />
               </div>
               <DialogTitle className="text-xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
-                Generate Enrollment Codes
+                Enrollment Code
               </DialogTitle>
               <DialogDescription className="text-slate-600 text-sm">
-                Generate enrollment codes for <span className="font-semibold text-[#005eb8]">{selectedClassForCodes?.name}</span>
+                Manage enrollment code for <span className="font-semibold text-[#005eb8]">{selectedClassForCode?.name}</span>
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-6">
-              {/* Generate New Codes */}
-              <div className="space-y-3">
-                <Label htmlFor="generateCount" className="text-sm font-semibold text-slate-700">Number of codes to generate</Label>
-                <Input
-                  id="generateCount"
-                  type="number"
-                  min="1"
-                  max="50"
-                  value={generateCount}
-                  onChange={(e) => setGenerateCount(parseInt(e.target.value) || 1)}
-                  className="border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20"
-                />
-                <Button 
-                  onClick={handleGenerateCodes} 
-                  className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-6"
-                >
-                  <Key className="h-4 w-4 mr-2" />
-                  Generate Codes
-                </Button>
-              </div>
-
-              {/* Generated Codes */}
-              {generatedCodes.length > 0 && (
+              {/* Current Active Code */}
+              {activeCode?.hasCode && !showGeneratedCode && (
                 <div className="space-y-3">
                   <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                    Generated Codes:
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    Active Code
                   </h3>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {generatedCodes.map((code, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-lg">
-                        <code className="font-mono text-sm text-emerald-800 font-semibold">{code}</code>
+                  <div className="p-4 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-300 rounded-lg space-y-3">
+                    {/* Display the actual code */}
+                    {activeCode.code && (
+                      <div className="flex items-center justify-between p-3 bg-white/80 rounded-lg">
+                        <code className="font-mono text-xl text-emerald-800 font-bold tracking-wider">{activeCode.code}</code>
                         <Button
                           size="sm"
-                          variant="outline"
-                          onClick={() => copyToClipboard(code)}
-                          className="hover:bg-emerald-100 hover:border-emerald-300 hover:text-emerald-700 transition-all duration-200"
+                          onClick={() => copyToClipboard(activeCode.code!)}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
                         >
-                          <Copy className="h-4 w-4" />
+                          <Copy className="h-4 w-4 mr-1" />
+                          Copy
                         </Button>
                       </div>
-                    ))}
+                    )}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-slate-600 mb-1">Created by {activeCode.generatedBy}</p>
+                        <p className="text-xs text-slate-500">{new Date(activeCode.createdAt!).toLocaleString()}</p>
+                      </div>
+                      <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white">
+                        Active
+                      </Badge>
+                    </div>
+                    <div className="pt-2 border-t border-emerald-200">
+                      <p className="text-xs text-slate-600 mb-2">Usage: <span className="font-semibold text-emerald-700">{activeCode.usageCount} students</span></p>
+                      {activeCode.recentUsage && activeCode.recentUsage.length > 0 && (
+                        <div className="text-xs text-slate-600">
+                          <p className="font-semibold mb-1">Recent Usage:</p>
+                          <div className="space-y-1 max-h-24 overflow-y-auto">
+                            {activeCode.recentUsage.slice(0, 5).map((usage, idx) => (
+                              <div key={idx} className="text-xs">• {usage.userName} - {new Date(usage.usedAt).toLocaleString()}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Existing Codes */}
-              {existingCodes.length > 0 && (
+              {/* Newly Generated Code */}
+              {showGeneratedCode && newlyGeneratedCode && (
                 <div className="space-y-3">
-                  <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                    <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
-                    Existing Codes:
+                  <h3 className="font-semibold text-emerald-800 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    New Code Generated!
                   </h3>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {existingCodes.map((code, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <code className="font-mono text-sm text-slate-700">***{code.id.substring(0, 8)}</code>
-                          <Badge variant={code.used ? "destructive" : "secondary"} className={`px-2 py-1 text-xs font-semibold ${
-                            code.used ? "bg-red-500 hover:bg-red-600 text-white" : "bg-blue-500 hover:bg-blue-600 text-white"
-                          }`}>
-                            {code.used ? "Used" : "Available"}
-                          </Badge>
-                        </div>
-                        <span className="text-xs text-slate-500">
-                          {new Date(code.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                    ))}
+                  <div className="p-4 bg-gradient-to-r from-emerald-100 to-green-100 border-2 border-emerald-400 rounded-lg">
+                    <p className="text-xs text-slate-700 mb-2">Share this code with students:</p>
+                    <div className="flex items-center justify-between p-3 bg-white/80 rounded-lg">
+                      <code className="font-mono text-lg text-emerald-800 font-bold tracking-wider">{newlyGeneratedCode}</code>
+                      <Button
+                        size="sm"
+                        onClick={() => copyToClipboard(newlyGeneratedCode)}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                      >
+                        <Copy className="h-4 w-4 mr-1" />
+                        Copy
+                      </Button>
+                    </div>
+                    <p className="text-xs text-amber-700 mt-2 font-semibold">⚠️ Save this code now! It cannot be retrieved later.</p>
                   </div>
                 </div>
+              )}
+
+              {/* No Code Yet */}
+              {!activeCode?.hasCode && !showGeneratedCode && (
+                <div className="text-center py-6 text-slate-500">
+                  <Key className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                  <p>No enrollment code generated yet</p>
+                </div>
+              )}
+
+              {/* Generate/Regenerate Button */}
+              <Button 
+                onClick={handleGenerateCode} 
+                className="w-full bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold"
+              >
+                <Key className="h-4 w-4 mr-2" />
+                {activeCode?.hasCode ? "Regenerate Code" : "Generate Code"}
+              </Button>
+              {activeCode?.hasCode && (
+                <p className="text-xs text-amber-600 text-center">
+                  ⚠️ Regenerating will deactivate the current code
+                </p>
               )}
             </div>
 
             <DialogFooter className="gap-3 pt-4">
               <Button 
                 variant="outline" 
-                onClick={() => setShowGenerateCodes(false)}
+                onClick={() => setShowCodeDialog(false)}
                 className="hover:bg-slate-100"
               >
                 Close

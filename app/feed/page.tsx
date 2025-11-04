@@ -24,7 +24,9 @@ import {
   ArrowLeft,
   Users,
   Sparkles,
-  TrendingUp
+  TrendingUp,
+  Instagram,
+  Linkedin
 } from "lucide-react"
 import { useUser } from "@/app/hooks/useUser"
 import { useDebounce } from "@/app/hooks/useDebounce"
@@ -52,6 +54,9 @@ interface Post {
     id: string
     name: string
     imageUrl?: string
+    title?: string
+    instagram?: string
+    linkedin?: string
   }
   module?: {
     id: string
@@ -360,29 +365,29 @@ export default function FeedPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
         <Navbar />
 
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-4xl">
           {/* Page Header */}
           <motion.div 
             ref={headerRef}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mb-12"
+            className="mb-8 sm:mb-12"
           >
-            <div className="relative rounded-3xl overflow-hidden shadow-xl shadow-blue-500/10">
+            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl shadow-blue-500/10">
               <div className="absolute inset-0 bg-gradient-to-br from-[#60A5FA] via-[#3B82F6] to-[#2563EB]" />
               <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px] opacity-50" />
-              <div className="relative p-10 md:p-14">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div className="relative p-6 sm:p-8 md:p-10 lg:p-14">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 sm:gap-6">
                   <div className="flex-1">
-                    <Badge className="bg-white/20 text-white border-yellow-400 mb-4 rounded-full px-4 py-1">
-                      <MessageSquare className="h-3 w-3 mr-2" />
+                    <Badge className="bg-white/20 text-white border-yellow-400 mb-3 sm:mb-4 rounded-full px-3 sm:px-4 py-1 text-xs sm:text-sm">
+                      <MessageSquare className="h-3 w-3 mr-1.5 sm:mr-2" />
                       Community Feed
                     </Badge>
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">
                       Feed
                     </h1>
-                    <p className="text-lg text-blue-100 mb-6 max-w-2xl">
+                    <p className="text-sm sm:text-base md:text-lg text-blue-100 mb-4 sm:mb-6 max-w-2xl">
                       Share your thoughts, ask questions, and connect with the community
                     </p>
                     <div className="flex flex-wrap items-center gap-6 text-blue-100">
@@ -406,23 +411,23 @@ export default function FeedPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mb-8"
+            className="mb-6 sm:mb-8"
           >
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               {/* Back to Training Button - only show when viewing filtered feed */}
               {training && (
-                <Button variant="outline" asChild className="border-gray-200 hover:border-[#0476D7]/30 hover:bg-blue-50/50">
+                <Button variant="outline" asChild size="sm" className="border-gray-200 hover:border-[#0476D7]/30 hover:bg-blue-50/50 text-sm sm:text-base">
                   <Link href={`/courses/${training}`}>
-                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                     Back to Training
                   </Link>
                 </Button>
               )}
 
               {/* Create Post Button */}
-              <Button asChild className="flex-1 bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white rounded-xl px-8 shadow-lg hover:shadow-xl transition-all font-semibold border-0">
+              <Button asChild size="sm" className="flex-1 bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white rounded-lg sm:rounded-xl px-6 sm:px-8 shadow-lg hover:shadow-xl transition-all font-semibold border-0 text-sm sm:text-base">
                 <Link href={newPostUrl}>
-                  <Plus className="h-5 w-5 mr-2" />
+                  <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                   Create New Post
                 </Link>
               </Button>
@@ -434,19 +439,19 @@ export default function FeedPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="mb-8"
+            className="mb-6 sm:mb-8"
           >
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
-                    <Filter className="h-5 w-5 text-white" />
+            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="p-4 sm:p-6 border-b border-gray-100">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
+                    <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Filters</h3>
                 </div>
               </div>
-              <div className="p-6">
-                <div className="flex flex-col lg:flex-row gap-4">
+              <div className="p-4 sm:p-6">
+                <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
                   <div className="flex-1">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -562,7 +567,12 @@ export default function FeedPage() {
                         </div>
                         <div>
                           <div className="flex items-center gap-3 mb-1">
-                            <h3 className="font-bold text-gray-900 group-hover:text-[#0476D7] transition-colors">{post.author.name}</h3>
+                            <div>
+                              <h3 className="font-bold text-gray-900 group-hover:text-[#0476D7] transition-colors">{post.author.name}</h3>
+                              {post.author.title && (
+                                <p className="text-xs text-gray-500 mt-0.5">{post.author.title}</p>
+                              )}
+                            </div>
                             <Badge className={`${getPostTypeColor(post.type)} rounded-full px-3 py-1 text-xs font-semibold`}>
                               {getPostIcon(post.type)}
                               <span className="ml-1">{post.type}</span>
@@ -583,6 +593,35 @@ export default function FeedPage() {
                               </>
                             )}
                           </div>
+                          {/* Social Media Links */}
+                          {(post.author.instagram || post.author.linkedin) && (
+                            <div className="flex items-center gap-2 mt-2">
+                              {post.author.instagram && (
+                                <a
+                                  href={`https://instagram.com/${post.author.instagram.replace('@', '')}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-pink-50 to-purple-50 hover:from-pink-100 hover:to-purple-100 border border-pink-200 rounded-lg transition-all text-xs font-medium text-pink-600 hover:text-pink-700"
+                                >
+                                  <Instagram className="h-3.5 w-3.5" />
+                                  <span>{post.author.instagram}</span>
+                                </a>
+                              )}
+                              {post.author.linkedin && (
+                                <a
+                                  href={post.author.linkedin.startsWith('http') ? post.author.linkedin : `https://${post.author.linkedin}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 rounded-lg transition-all text-xs font-medium text-blue-600 hover:text-blue-700"
+                                >
+                                  <Linkedin className="h-3.5 w-3.5" />
+                                  <span>LinkedIn</span>
+                                </a>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

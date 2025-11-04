@@ -51,30 +51,28 @@ export async function POST(
   try {
     const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"
     const moduleId = params.id
-    const body = await request.json()
     const cookie = request.headers.get("cookie") || ""
     
-    console.log("🔍 POST Generate Codes - Training Module ID:", moduleId)
+    console.log("🔍 POST Generate Code - Training Module ID:", moduleId)
     console.log("🔍 Cookie present:", !!cookie)
-    console.log("🔍 Request body:", body)
 
+    // No body needed for the new single-code generation endpoint
     const response = await fetch(`${backendUrl}/api/admin/training-modules/${moduleId}/codes`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Cookie": cookie
       },
-      credentials: "include",
-      body: JSON.stringify(body)
+      credentials: "include"
     })
     
     console.log("🔍 Response status:", response.status)
 
     if (!response.ok) {
       const error = await response.text()
-      console.error("❌ Failed to generate access codes:", error)
+      console.error("❌ Failed to generate access code:", error)
       return NextResponse.json(
-        { error: "Failed to generate access codes" },
+        { error: "Failed to generate access code" },
         { status: response.status }
       )
     }
@@ -82,9 +80,9 @@ export async function POST(
     const data = await response.json()
     return NextResponse.json(data)
   } catch (error) {
-    console.error("Error generating module access codes:", error)
+    console.error("Error generating module access code:", error)
     return NextResponse.json(
-      { error: "Failed to generate access codes" },
+      { error: "Failed to generate access code" },
       { status: 500 }
     )
   }

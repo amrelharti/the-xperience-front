@@ -3,7 +3,7 @@
 import { memo, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PlayCircle } from "lucide-react";
+import { PlayCircle, Menu, X } from "lucide-react";
 import { useUser } from "../hooks/useUser";
 import UserDropdown from "./UserDropdown";
 import { usePathname, useParams, useSearchParams } from "next/navigation";
@@ -15,6 +15,7 @@ function Navbar() {
   const searchParams = useSearchParams();
   const [feedUrl, setFeedUrl] = useState("/feed");
   const [leaderboardUrl, setLeaderboardUrl] = useState("/leaderboard");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     // Get current URL parameters
@@ -58,21 +59,27 @@ function Navbar() {
   // Check if we're on the homepage
   const isHomepage = pathname === "/";
 
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group hover:opacity-80 transition-opacity duration-200">
+      <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 sm:gap-3 group hover:opacity-80 transition-opacity duration-200">
           <img 
             src="/logos/dark blue secondary logo.svg" 
             alt="XPERIENCE Logo" 
-            className="h-10 w-25"
+            className="h-8 sm:h-10 w-auto"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
           />
         </Link>
         
-        <nav className="hidden md:flex items-center gap-6">
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-4 lg:gap-6">
           {user?.role === "ADMIN" ? (
             // Admin navigation - Using NEW routes with multi-course support
             <>
@@ -118,18 +125,118 @@ function Navbar() {
           )}
         </nav>
 
-        <div className="flex items-center gap-4">
-          {isLoading ? (
-            <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
-          ) : user ? (
-            <UserDropdown user={user} />
-          ) : (
-            <Button asChild>
-              <Link href="/auth/signin">Sign In</Link>
-            </Button>
-          )}
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Desktop User Section */}
+          <div className="hidden md:flex items-center gap-4">
+            {isLoading ? (
+              <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+            ) : user ? (
+              <UserDropdown user={user} />
+            ) : (
+              <Button asChild size="sm">
+                <Link href="/auth/signin">Sign In</Link>
+              </Button>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 hover:bg-muted rounded-lg transition-colors"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t bg-background/98 backdrop-blur-lg animate-in slide-in-from-top-5 duration-200">
+          <nav className="container mx-auto px-4 py-4 space-y-1">
+            {user?.role === "ADMIN" ? (
+              <>
+                <Link 
+                  href="/admin" 
+                  className="block px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  href="/admin/trainings" 
+                  className="block px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+                >
+                  Trainings
+                </Link>
+                <Link 
+                  href="/admin/classes" 
+                  className="block px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+                >
+                  Classes
+                </Link>
+                <Link 
+                  href="/admin/users" 
+                  className="block px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+                >
+                  Users
+                </Link>
+                <Link 
+                  href="/admin/analytics" 
+                  className="block px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+                >
+                  Analytics
+                </Link>
+              </>
+            ) : (
+              !isHomepage && (
+                <>
+                  <Link 
+                    href="/" 
+                    className="block px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+                  >
+                    Trainings
+                  </Link>
+                  <Link 
+                    href={feedUrl} 
+                    className="block px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+                  >
+                    Feed
+                  </Link>
+                  <Link 
+                    href={leaderboardUrl} 
+                    className="block px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+                  >
+                    Leaderboard
+                  </Link>
+                </>
+              )
+            )}
+            
+            {/* Mobile User Section */}
+            <div className="pt-4 border-t mt-4">
+              {isLoading ? (
+                <div className="px-4 py-3">
+                  <div className="w-full h-10 rounded-lg bg-muted animate-pulse" />
+                </div>
+              ) : user ? (
+                <div className="px-4 py-2">
+                  <UserDropdown user={user} />
+                </div>
+              ) : (
+                <div className="px-4">
+                  <Button asChild className="w-full">
+                    <Link href="/auth/signin">Sign In</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
       let sameSite = 'lax'
       let path = '/'
       let maxAge = 86400 // 1 day in seconds
+      let domain = undefined // Don't set domain for localhost
       
       for (const part of cookieParts) {
         const trimmed = part.trim()
@@ -54,17 +55,36 @@ export async function POST(request: NextRequest) {
           path = trimmed.split('=')[1]
         } else if (trimmed.toLowerCase().startsWith('max-age=')) {
           maxAge = parseInt(trimmed.split('=')[1])
+        } else if (trimmed.toLowerCase().startsWith('domain=')) {
+          // Only use domain in production, ignore for localhost
+          if (process.env.NODE_ENV === 'production') {
+            domain = trimmed.split('=')[1]
+          }
         }
       }
       
+      // In development (localhost), we need to adjust cookie settings:
+      // - Don't use 'secure' (we're on HTTP, not HTTPS)
+      // - Use 'lax' instead of 'none' for SameSite (none requires secure)
+      const isProduction = process.env.NODE_ENV === 'production'
+      const finalSecure = isProduction ? secure : false
+      const finalSameSite = isProduction ? sameSite : 'lax'
+      
       // Set the cookie in the Next.js response
-      nextResponse.cookies.set(cookieName, cookieValue, {
+      const cookieOptions: any = {
         httpOnly,
-        secure: process.env.NODE_ENV === 'production' ? secure : false,
-        sameSite: sameSite as 'lax' | 'strict' | 'none',
+        secure: finalSecure,
+        sameSite: finalSameSite as 'lax' | 'strict' | 'none',
         path,
         maxAge
-      })
+      }
+      
+      // Only set domain in production
+      if (domain) {
+        cookieOptions.domain = domain
+      }
+      
+      nextResponse.cookies.set(cookieName, cookieValue, cookieOptions)
     }
     
     return nextResponse

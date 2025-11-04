@@ -19,7 +19,9 @@ import {
   HelpCircle,
   FileText,
   Megaphone,
-  Send
+  Send,
+  Instagram,
+  Linkedin
 } from "lucide-react"
 import { useUser } from "@/app/hooks/useUser"
 import UserDropdown from "@/app/components/UserDropdown"
@@ -44,6 +46,9 @@ interface Post {
     id: string
     name: string
     imageUrl?: string
+    title?: string
+    instagram?: string
+    linkedin?: string
   }
   module?: {
     id: string
@@ -61,6 +66,9 @@ interface Comment {
     id: string
     name: string
     imageUrl?: string
+    title?: string
+    instagram?: string
+    linkedin?: string
   }
   replies: Comment[]
   parentCommentId?: string
@@ -752,48 +760,53 @@ export default function PostDetailPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
         <Navbar />
 
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-4xl">
           {/* Back Button */}
-          <Button variant="ghost" asChild className="mb-6">
+          <Button variant="ghost" asChild size="sm" className="mb-4 sm:mb-6 -ml-2 sm:ml-0 text-sm sm:text-base">
             <Link href={cameFromAdmin ? "/admin/feed" : feedUrl}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
               Back to {cameFromAdmin ? "Admin Feed" : "Feed"}
             </Link>
           </Button>
 
           {/* Post */}
-          <Card className="mb-6">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+          <Card className="mb-4 sm:mb-6">
+            <CardHeader className="pb-3 px-4 sm:px-6">
+              <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-0">
+                <div className="flex items-start sm:items-center gap-2 sm:gap-3 w-full sm:flex-1">
+                  <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
                     {post.author.imageUrl ? (
                       <img 
                         src={post.author.imageUrl} 
                         alt={post.author.name}
-                        className="h-10 w-10 rounded-full object-cover"
+                        className="h-9 w-9 sm:h-10 sm:w-10 rounded-full object-cover"
                       />
                     ) : (
-                      <span className="text-sm font-medium">
+                      <span className="text-xs sm:text-sm font-medium">
                         {post.author.name.charAt(0).toUpperCase()}
                       </span>
                     )}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{post.author.name}</h3>
-                      <Badge className={getPostTypeColor(post.type)}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                      <div>
+                        <h3 className="font-semibold text-sm sm:text-base">{post.author.name}</h3>
+                        {post.author.title && (
+                          <p className="text-xs text-gray-500 mt-0.5">{post.author.title}</p>
+                        )}
+                      </div>
+                      <Badge className={`${getPostTypeColor(post.type)} text-xs`}>
                         {getPostIcon(post.type)}
                         <span className="ml-1">{post.type}</span>
                       </Badge>
                       {post.isPinned && (
-                        <Badge variant="outline" className="text-orange-600 border-orange-600">
+                        <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs">
                           <Pin className="h-3 w-3 mr-1" />
                           Pinned
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       {formatTimeAgo(post.createdAt)}
                       {post.module && (
                         <span className="ml-2">
@@ -801,17 +814,44 @@ export default function PostDetailPage() {
                         </span>
                       )}
                     </p>
+                    {/* Social Media Links */}
+                    {(post.author.instagram || post.author.linkedin) && (
+                      <div className="flex items-center gap-2 mt-2">
+                        {post.author.instagram && (
+                          <a
+                            href={`https://instagram.com/${post.author.instagram.replace('@', '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-pink-50 to-purple-50 hover:from-pink-100 hover:to-purple-100 border border-pink-200 rounded-lg transition-all text-xs font-medium text-pink-600 hover:text-pink-700"
+                          >
+                            <Instagram className="h-3.5 w-3.5" />
+                            <span>{post.author.instagram}</span>
+                          </a>
+                        )}
+                        {post.author.linkedin && (
+                          <a
+                            href={post.author.linkedin.startsWith('http') ? post.author.linkedin : `https://${post.author.linkedin}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 rounded-lg transition-all text-xs font-medium text-blue-600 hover:text-blue-700"
+                          >
+                            <Linkedin className="h-3.5 w-3.5" />
+                            <span>LinkedIn</span>
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
                 {/* Post Edit/Delete buttons - only show for post owner (edit) or admin (delete) */}
                 {!editingPost && (
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center gap-1 sm:gap-1 w-full sm:w-auto justify-end">
                     {/* Edit button - only for post owner */}
                     {user?.id === post.author.id && (
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 px-2 text-xs hover:bg-yellow-50 hover:text-yellow-700"
+                        className="h-7 sm:h-8 px-2 text-xs hover:bg-yellow-50 hover:text-yellow-700"
                         onClick={() => {
                           setEditingPost(true);
                         }}
@@ -824,7 +864,7 @@ export default function PostDetailPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 px-2 text-xs hover:bg-red-50 hover:text-red-700"
+                        className="h-7 sm:h-8 px-2 text-xs hover:bg-red-50 hover:text-red-700"
                         onClick={handleDeletePost}
                       >
                         Delete
@@ -834,7 +874,7 @@ export default function PostDetailPage() {
                 )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 sm:px-6">
               {editingPost ? (
                 <div className="space-y-4">
                   <div>
@@ -940,19 +980,19 @@ export default function PostDetailPage() {
 
               {/* Rating section for assignment posts */}
               {post.type === 'ASSIGNMENT' && (
-                <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">Rate this Assignment</h3>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-muted/50 rounded-lg">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-2 sm:gap-0">
+                    <h3 className="text-base sm:text-lg font-semibold">Rate this Assignment</h3>
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                       <span>Average: {post.avgScore || 0}/10</span>
                       <span>({post.scoreCount || 0} ratings)</span>
                     </div>
                   </div>
                   
                   {!hasRated && user && user.id !== post.author.id ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">Your rating:</span>
-                      <div className="flex gap-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2">
+                      <span className="text-xs sm:text-sm font-medium">Your rating:</span>
+                      <div className="flex gap-1 flex-wrap">
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
                           <Button
                             key={score}
@@ -960,7 +1000,7 @@ export default function PostDetailPage() {
                             size="sm"
                             onClick={() => handleRate(score)}
                             disabled={submittingRating}
-                            className="w-8 h-8 p-0"
+                            className="w-7 h-7 sm:w-8 sm:h-8 p-0 text-xs sm:text-sm"
                           >
                             {score}
                           </Button>
@@ -983,29 +1023,29 @@ export default function PostDetailPage() {
 
           {/* Comments Section */}
           <Card>
-            <CardHeader>
-              <CardTitle>Comments ({post.commentCount})</CardTitle>
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="text-base sm:text-lg">Comments ({post.commentCount})</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
               {/* Comment Form */}
-              <form onSubmit={handleCommentSubmit} className="space-y-4">
+              <form onSubmit={handleCommentSubmit} className="space-y-3 sm:space-y-4">
                 <Textarea
                   placeholder="Write a comment..."
                   value={commentContent}
                   onChange={(e) => setCommentContent(e.target.value)}
                   rows={3}
-                  className="resize-none"
+                  className="resize-none text-sm sm:text-base"
                 />
                 <div className="flex justify-end">
-                  <Button type="submit" disabled={submittingComment || !commentContent.trim()}>
+                  <Button type="submit" size="sm" disabled={submittingComment || !commentContent.trim()} className="text-sm sm:text-base w-full sm:w-auto">
                     {submittingComment ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        <div className="animate-spin rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 border-b-2 border-white mr-1.5 sm:mr-2"></div>
                         Posting...
                       </>
                     ) : (
                       <>
-                        <Send className="h-4 w-4 mr-2" />
+                        <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                         Post Comment
                       </>
                     )}

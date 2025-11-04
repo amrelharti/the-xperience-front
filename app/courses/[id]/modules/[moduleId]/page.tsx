@@ -324,22 +324,23 @@ export default function ModuleDetailPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
       <Navbar />
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-7xl">
         {/* Compact Header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <div className="flex items-center justify-between gap-4 flex-wrap mb-4">
+          <div className="flex items-center justify-between gap-3 sm:gap-4 flex-wrap mb-3 sm:mb-4">
             <Button 
               variant="ghost" 
               asChild 
-              className="text-gray↵-600 hover:text-[#0476D7] hover:bg-blue-50 rounded-lg transition-all"
+              size="sm"
+              className="text-gray-600 hover:text-[#0476D7] hover:bg-blue-50 rounded-lg transition-all text-sm sm:text-base -ml-2 sm:ml-0"
             >
               <Link href={`/courses/${trainingId}`}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                 Back to Training
               </Link>
             </Button>
@@ -348,30 +349,30 @@ export default function ModuleDetailPage() {
 
           </div>
           
-          <div className="bg-gradient-to-br from-[#60A5FA] via-[#3B82F6] to-[#2563EB] rounded-3xl p-8 shadow-xl">
-            <div className="flex items-center gap-3 mb-4">
-              <Badge className="bg-white/20 text-white border-yellow-400 rounded-full px-3 py-1">
+          <div className="bg-gradient-to-br from-[#60A5FA] via-[#3B82F6] to-[#2563EB] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <Badge className="bg-white/20 text-white border-yellow-400 rounded-full px-2.5 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm w-fit">
                 <BookOpen className="h-3 w-3 mr-1" />
                 Module {module.orderIndex}
               </Badge>
-              <h1 className="text-3xl md:text-4xl font-medium text-white">{module.title}</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-white">{module.title}</h1>
             </div>
-            <p className="text-blue-100 text-lg mb-6">{module.description}</p>
+            <p className="text-blue-100 text-sm sm:text-base md:text-lg mb-4 sm:mb-6">{module.description}</p>
             
             {/* Module Info */}
-            <div className="flex items-center gap-6 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center">
-                  <PlayCircle className="h-4 w-4 text-white" />
+            <div className="flex items-center gap-4 sm:gap-6 flex-wrap">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-white/20 flex items-center justify-center">
+                  <PlayCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
                 </div>
-                <span className="text-white font-medium">{module.courses?.length || 0} Lessons</span>
+                <span className="text-white font-medium text-sm sm:text-base">{module.courses?.length || 0} Lessons</span>
               </div>
               {moduleProgress > 0 && (
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center">
-                    <Trophy className="h-4 w-4 text-yellow-300" />
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-white/20 flex items-center justify-center">
+                    <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-yellow-300" />
                   </div>
-                  <span className="text-white font-medium">{moduleProgress}% Complete</span>
+                  <span className="text-white font-medium text-sm sm:text-base">{moduleProgress}% Complete</span>
                 </div>
               )}
             </div>
@@ -379,26 +380,26 @@ export default function ModuleDetailPage() {
         </motion.div>
 
         {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           
           {/* Left Column */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             
             {/* Courses List */}
             {module.courses && module.courses.length > 0 && (
               <div ref={coursesRef}>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
                     <div>
-                      <h2 className="text-3xl font-medium text-gray-900 mb-2 flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
-                          <PlayCircle className="h-5 w-5 text-white" />
+                      <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-gray-900 mb-1 sm:mb-2 flex items-center gap-2 sm:gap-3">
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
+                          <PlayCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
                         Video Lessons
                       </h2>
-                      <p className="text-sm text-gray-600">Explore and learn at your own pace</p>
+                      <p className="text-xs sm:text-sm text-gray-600">Explore and learn at your own pace</p>
                     </div>
                   </div>
-                  <div className="grid gap-4">
+                  <div className="grid gap-3 sm:gap-4">
               {module.courses
                 .sort((a, b) => a.orderIndex - b.orderIndex)
                 .map((course, index) => (

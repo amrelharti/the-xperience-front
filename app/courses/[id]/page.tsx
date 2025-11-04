@@ -511,23 +511,23 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container mx-auto px-6 py-10 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-10 max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
-          <Button variant="ghost" asChild className="mb-6">
-            <Link href="/" className="flex items-center gap-2 hover:text-[#0476D7] transition-colors">
-              <ArrowLeft className="h-4 w-4" />
+        <div className="mb-6 sm:mb-8">
+          <Button variant="ghost" asChild className="mb-4 sm:mb-6 -ml-2 sm:ml-0">
+            <Link href="/" className="flex items-center gap-2 hover:text-[#0476D7] transition-colors text-sm sm:text-base">
+              <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Back to Trainings
             </Link>
           </Button>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             
             {/* Training Info */}
-            <div className="w-full rounded-2xl p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 shadow-lg">
-              <div className="flex items-start gap-4">
+            <div className="w-full rounded-xl sm:rounded-2xl p-4 sm:p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 shadow-lg">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
                 {training.thumbnailUrl && (
-                  <div className="w-52 h-52 rounded-2xl overflow-hidden flex-shrink-0 shadow-xl">
+                  <div className="w-full sm:w-40 md:w-52 h-40 sm:h-40 md:h-52 rounded-lg sm:rounded-2xl overflow-hidden flex-shrink-0 shadow-xl">
                     <NextImage
                       src={training.thumbnailUrl}
                       alt={training.title}
@@ -537,24 +537,24 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                     />
                   </div>
                 )}
-                <div className="flex-1">
-                  <div className="mb-4">
-                    <Badge className="bg-gradient-to-r from-[#0476D7] to-[#0068A7] text-white mb-3">
+                <div className="flex-1 w-full">
+                  <div className="mb-3 sm:mb-4">
+                    <Badge className="bg-gradient-to-r from-[#0476D7] to-[#0068A7] text-white mb-2 sm:mb-3 text-xs">
                       Training Program
                     </Badge>
                   </div>
-                  <h1 className="text-3xl font-semibold mb-3 text-[#0476D7]">{training.title}</h1>
-                  <p className="text-[#666] mb-6 leading-relaxed text-base">{training.description}</p>
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 sm:mb-3 text-[#0476D7]">{training.title}</h1>
+                  <p className="text-[#666] mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">{training.description}</p>
                   
                   {/* Progress Overview */}
-                  <div className="flex items-center gap-6 mb-6">
-                    <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-[#0476D7]/10 to-[#0476D7]/5 rounded-xl border border-[#0476D7]/20">
-                      <div className="p-2 bg-[#0476D7] rounded-lg">
-                        <BookOpen className="h-4 w-4 text-white" />
+                  <div className="flex items-center gap-3 sm:gap-6 mb-4 sm:mb-6 flex-wrap">
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-br from-[#0476D7]/10 to-[#0476D7]/5 rounded-lg sm:rounded-xl border border-[#0476D7]/20">
+                      <div className="p-1.5 sm:p-2 bg-[#0476D7] rounded-md sm:rounded-lg">
+                        <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
                       </div>
                       <div>
                         <div className="text-xs text-[#047690] font-medium">Total Modules</div>
-                        <div className="text-lg font-bold text-[#0476D7]">{totalModules}</div>
+                        <div className="text-base sm:text-lg font-bold text-[#0476D7]">{totalModules}</div>
                       </div>
                     </div>
     
@@ -564,45 +564,48 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             </div>
             {/* Class-Specific Social Features */}
             {isEnrolled && selectedClassId && (
-                    <div className="flex justify-center mt-6">
-                      <div className="p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 rounded-2xl w-full max-w-2xl shadow-lg">
-                        <p className="text-sm font-semibold text-purple-700 mb-4 flex items-center gap-2 justify-center">
-                          <Users className="h-4 w-4" />
+                    <div className="flex justify-center mt-4 sm:mt-6">
+                      <div className="p-4 sm:p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 rounded-xl sm:rounded-2xl w-full max-w-2xl shadow-lg">
+                        <p className="text-xs sm:text-sm font-semibold text-purple-700 mb-3 sm:mb-4 flex items-center gap-2 justify-center">
+                          <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           Class Community
                         </p>
-                        <div className="flex flex-wrap items-center justify-center gap-3">
+                        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-center gap-2 sm:gap-3">
                         <Button 
                           asChild
-                          className="flex items-center gap-2 text-white rounded-full shadow-sm hover:shadow-md border-0 transition-all duration-200"
+                          size="sm"
+                          className="flex items-center justify-center gap-2 text-white rounded-full shadow-sm hover:shadow-md border-0 transition-all duration-200 text-xs sm:text-sm w-full sm:w-auto"
                           style={{ background: 'linear-gradient(90deg, #0068A7, #0476D7)' }}
                         >
                           <Link href={`/feed?training=${params.id}&class=${selectedClassId}`}>
-                            <MessageSquare className="h-4 w-4" />
+                            <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             Class Feed
                           </Link>
                         </Button>
                         <Button 
                           asChild
-                          className="flex items-center gap-2 text-white rounded-full shadow-sm hover:shadow-md border-0 transition-all duration-200"
+                          size="sm"
+                          className="flex items-center justify-center gap-2 text-white rounded-full shadow-sm hover:shadow-md border-0 transition-all duration-200 text-xs sm:text-sm w-full sm:w-auto"
                           style={{ background: 'linear-gradient(90deg, #FFBC00, #FFD84D)' }}
                         >
                           <Link href={`/leaderboard?training=${params.id}&class=${selectedClassId}`}>
-                            <Trophy className="h-4 w-4" />
+                            <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             Leaderboard
                           </Link>
                         </Button>
                         {availableClasses.length > 1 && (
                           <Button 
                             variant="outline" 
+                            size="sm"
                             onClick={async () => {
                               localStorage.removeItem(`selectedClass_${params.id}`)
                               setShowClassSelection(true)
                               await loadAvailableClasses()
                             }}
-                            className="flex items-center gap-2 rounded-full shadow-sm hover:shadow-md transition-all duration-200 border-0"
+                            className="flex items-center justify-center gap-2 rounded-full shadow-sm hover:shadow-md transition-all duration-200 border-0 text-xs sm:text-sm w-full sm:w-auto"
                             style={{ background: 'linear-gradient(90deg, #F1F5F9, #E2E8F0)', color: '#334155' }}
                           >
-                            <Users className="h-4 w-4" />
+                            <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             Switch Class
                           </Button>
                         )}
@@ -614,19 +617,19 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         </div>
 
         {/* Modules List */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="h-1 w-12 bg-gradient-to-r from-[#0476D7] to-[#FFBC00] rounded-full"></div>
-            <h2 className="text-2xl font-semibold text-[#0476D7]">Training Modules</h2>
+        <div className="space-y-4 sm:space-y-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="h-1 w-8 sm:w-12 bg-gradient-to-r from-[#0476D7] to-[#FFBC00] rounded-full"></div>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-[#0476D7]">Training Modules</h2>
           </div>
           {training.modules?.map((module, index) => (
             <Card key={module.id} className="hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 flex-1">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 flex-1 w-full">
                     {/* Module Thumbnail */}
                     {module.thumbnailUrl && (
-                      <div className="w-23 h-23 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-full sm:w-20 md:w-23 h-32 sm:h-20 md:h-23 rounded-lg overflow-hidden flex-shrink-0">
                         <NextImage
                           src={module.thumbnailUrl}
                           alt={module.title}
@@ -637,62 +640,65 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       </div>
                     )}
                     
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-xl font-semibold text-[#0476D7]">{module.title}</h3>
+                    <div className="flex-1 w-full">
+                      <div className="flex items-start sm:items-center gap-2 mb-2 flex-wrap">
+                        <h3 className="text-base sm:text-lg md:text-xl font-semibold text-[#0476D7]">{module.title}</h3>
                         {module.status === "LOCKED" ? (
-                          <Badge variant="outline" className="border-orange-500 text-orange-700">
+                          <Badge variant="outline" className="border-orange-500 text-orange-700 text-xs">
                             <Lock className="h-3 w-3 mr-1" />
                             Locked
                           </Badge>
                         ) : (
                           <div className="relative inline-flex items-center justify-center">
                             <div className="absolute inset-0 bg-green-500 rounded-full animate-pulse opacity-20"></div>
-                            <CheckCircle className="h-6 w-6 text-green-600 relative" />
+                            <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 relative" />
                           </div>
                         )}
                       </div>
-                      <p className="text-muted-foreground mb-3">{module.description}</p>
+                      <p className="text-muted-foreground mb-3 text-sm sm:text-base">{module.description}</p>
                       
                       {/* Progress Bar */}
                       {module.progress !== undefined && module.progress > 0 && (
                         <div className="mb-3">
-                          <div className="flex items-center justify-between text-sm mb-1">
+                          <div className="flex items-center justify-between text-xs sm:text-sm mb-1">
                             <span className="font-semibold text-foreground">Progress</span>
                             <span className="font-bold text-[#0476D7]">{module.progress}%</span>
                           </div>
-                          <Progress value={module.progress} className="h-3 bg-muted" />
+                          <Progress value={module.progress} className="h-2 sm:h-3 bg-muted" />
                         </div>
                       )}
                       
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground flex-wrap">
                         <div className="flex items-center gap-1">
-                          <BookOpen className="h-4 w-4" />
+                          <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           <span>{module.coursesCount} courses</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
+                          <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           <span>Live sessions</span>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
                     {module.status === "LOCKED" ? (
                       <Button
+                        size="sm"
                         variant="outline"
                         onClick={() => handleUnlockModule(module.id)}
                         disabled={!isEnrolled}
+                        className="w-full sm:w-auto text-xs sm:text-sm"
                       >
-                        <Lock className="h-4 w-4 mr-2" />
-                        Unlock Module
+                        <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+                        <span className="hidden sm:inline">Unlock Module</span>
+                        <span className="sm:hidden">Unlock</span>
                       </Button>
                     ) : (
-                      <Button asChild className="bg-[#0476D7] hover:bg-[#0068A7] shadow-md hover:shadow-lg">
-                        <Link href={`/courses/${params.id}/modules/${module.id}`}>
-                          <PlayCircle className="h-5 w-5 mr-2" />
-                          {module.progress && module.progress > 0 ? "Continue" : "Start Module"}
+                      <Button asChild size="sm" className="bg-[#0476D7] hover:bg-[#0068A7] shadow-md hover:shadow-lg w-full sm:w-auto text-xs sm:text-sm">
+                        <Link href={`/courses/${params.id}/modules/${module.id}`} className="flex items-center justify-center">
+                          <PlayCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
+                          {module.progress && module.progress > 0 ? "Continue" : "Start"}
                         </Link>
                       </Button>
                     )}
@@ -705,14 +711,14 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
 
         {/* Unlock Dialog */}
         {showUnlockDialog && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <Card className="w-full max-w-md mx-4">
-              <CardHeader>
-                <CardTitle>Unlock Module</CardTitle>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md">
+              <CardHeader className="px-4 sm:px-6">
+                <CardTitle className="text-lg sm:text-xl">Unlock Module</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 px-4 sm:px-6">
                 <div>
-                  <label htmlFor="accessCode" className="text-sm font-medium">
+                  <label htmlFor="accessCode" className="text-xs sm:text-sm font-medium">
                     Access Code
                   </label>
                   <Input
@@ -721,11 +727,11 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                     value={moduleAccessCode}
                     onChange={(e) => setModuleAccessCode(e.target.value)}
                     placeholder="Enter access code"
-                    className="mt-1"
+                    className="mt-1 text-sm sm:text-base"
                   />
                 </div>
-                <div className="flex gap-3">
-                  <Button onClick={submitUnlockCode} className="flex-1">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <Button onClick={submitUnlockCode} className="flex-1 text-sm sm:text-base">
                     Unlock
                   </Button>
                   <Button
@@ -735,6 +741,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       setModuleAccessCode("")
                       setUnlockingModule(null)
                     }}
+                    className="flex-1 sm:flex-initial text-sm sm:text-base"
                   >
                     Cancel
                   </Button>
@@ -746,12 +753,12 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
 
         {/* Class Selection Modal */}
         {showClassSelection && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <Card className="w-full max-w-2xl mx-4">
-              <CardHeader>
-                <CardTitle>Select a Class</CardTitle>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <Card className="w-full max-w-2xl my-8">
+              <CardHeader className="px-4 sm:px-6">
+                <CardTitle className="text-lg sm:text-xl">Select a Class</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 px-4 sm:px-6">
                 {availableClasses.length > 0 ? (
                   <>
                     <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">

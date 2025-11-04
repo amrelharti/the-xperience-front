@@ -31,7 +31,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))                                                                                         
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/health", "/api/auth/google", "/api/auth/logout").permitAll()                                                                                 
+                        .requestMatchers("/api/health", "/api/auth/google", "/api/auth/logout").permitAll()
+                        .requestMatchers("/actuator/**", "/api/public/**").permitAll()                                                                                 
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -52,7 +53,7 @@ public class SecurityConfig {
             config.setAllowedOrigins(Arrays.asList(allowedOriginsEnv.split(",")));
         } else {
             // Default to localhost if env var not set
-            config.setAllowedOrigins(List.of("http://localhost:3000"));
+            config.setAllowedOrigins(List.of("http://localhost:3000","https://api.the-xperience.com","https://the-xperience.com","https://api.the-xperience.com/app"));
         }
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
