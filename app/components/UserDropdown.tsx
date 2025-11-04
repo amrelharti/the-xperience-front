@@ -179,33 +179,35 @@ function UserDropdown({ user }: UserDropdownProps) {
                 Edit Profile
               </Link>
 
-              <Link
-                href={user?.role === "ADMIN" ? "/admin/feed" : "/feed"}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <MessageSquare className="h-4 w-4" />
-                {user?.role === "ADMIN" ? "Admin Feed" : "Feed"}
-              </Link>
-
-              <Link
-                href={user?.role === "ADMIN" ? "/admin/leaderboard" : "/leaderboard"}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <Trophy className="h-4 w-4" />
-                {user?.role === "ADMIN" ? "Admin Leaderboard" : "Leaderboard"}
-              </Link>
-
               {user?.role === "ADMIN" && (
-                <Link
-                  href="/admin"
-                  className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Settings className="h-4 w-4" />
-                  Admin Dashboard
-                </Link>
+                <>
+                  <Link
+                    href="/admin/feed"
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Admin Feed
+                  </Link>
+
+                  <Link
+                    href="/admin/leaderboard"
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Trophy className="h-4 w-4" />
+                    Admin Leaderboard
+                  </Link>
+
+                  <Link
+                    href="/admin"
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Settings className="h-4 w-4" />
+                    Admin Dashboard
+                  </Link>
+                </>
               )}
             </div>
 
