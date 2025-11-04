@@ -496,7 +496,7 @@ export default function CourseDetailPage() {
                         size="default"
                         className="w-full bg-gradient-to-r from-[#0476D7] to-[#0068A7] hover:from-[#0068A7] hover:to-[#005eb8] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base py-5 sm:py-6"
                       >
-                        ✅ <span className="hidden xs:inline">I Finished Watching This Video</span><span className="xs:hidden">Finished Watching</span>
+                        <span className="hidden xs:inline">I Finished Watching This Video</span><span className="xs:hidden">Finished Watching</span>
                       </Button>
                     </div>
                     
@@ -569,20 +569,20 @@ export default function CourseDetailPage() {
             {!isLocked && (
               <Card className="shadow-xl border-0">
                 <CardHeader className="bg-gradient-to-r from-[#FFBC00]/15 to-[#FFBC00]/8 px-4 sm:px-6 py-3 sm:py-4">
-                  <CardTitle className="text-[#0476D7] text-base sm:text-lg font-semibold">Progress</CardTitle>
+                  <CardTitle className="text-[#0476D7] text-base sm:text-lg font-semibold">Course Progress</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6">
                   <div className="space-y-3 sm:space-y-4">
                     <div className="space-y-2 sm:space-y-3">
                       <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="font-semibold text-gray-700">Course Progress</span>
+                        
                         <span className="font-bold text-[#0476D7]">{courseProgress?.completionPercentage || 0}%</span>
                       </div>
                       <Progress value={courseProgress?.completionPercentage || 0} className="w-full h-2 sm:h-3" />
                       <p className="text-xs text-gray-600">
                         {courseProgress?.isCompleted ? "Course completed!" : 
                          courseProgress?.isStarted ? "Continue watching..." : 
-                         "Start watching to track your progress"}
+                         "This is your progress! "}
                       </p>
                     </div>
                     
@@ -617,7 +617,7 @@ export default function CourseDetailPage() {
                 // Mark course as completed immediately
                 await markCourseAsCompleted()
               }}
-              className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
+              className="bg-green-600 hover:bg-green-700"
             >
               ✅ I Watched It
             </AlertDialogAction>
