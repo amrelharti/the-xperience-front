@@ -182,7 +182,7 @@ export default function TrainingsPage() {
             modules.map((module) => (
               <Card 
                 key={module.id} 
-                className={`transition-all duration-300 group relative overflow-hidden animate-fade-in ${
+                className={`h-full flex flex-col transition-all duration-300 group relative overflow-hidden animate-fade-in ${
                   !module.isPublished 
                     ? 'opacity-90 bg-gradient-to-br from-[#FFBC00]/10 to-[#FFBC00]/5 cursor-not-allowed' 
                     : 'hover:shadow-xl hover:-translate-y-1'
@@ -272,8 +272,8 @@ export default function TrainingsPage() {
                     )}
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0 px-4 sm:px-6">
-                  <div className="space-y-3 sm:space-y-4">
+                <CardContent className="pt-0 px-4 sm:px-6 flex-1 flex flex-col">
+                  <div className="space-y-3 sm:space-y-4 flex-1 flex flex-col">
                     {module.courses && module.courses.length > 0 && (
                       <div className="flex items-center gap-3 sm:gap-6 p-2.5 sm:p-3 bg-muted/30 rounded-lg sm:rounded-xl flex-wrap sm:flex-nowrap">
                         <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
@@ -308,7 +308,7 @@ export default function TrainingsPage() {
                       </div>
                     )}
                     
-                    <div className="pt-0.5 sm:pt-1">
+                    <div className="pt-0.5 sm:pt-1 mt-auto">
                       {module.isPublished ? (
                         <Button asChild className="w-full h-10 sm:h-12 text-sm sm:text-base shadow-md hover:shadow-lg group">
                           <Link href={`/courses/${module.id}`} className="flex items-center justify-center gap-2">

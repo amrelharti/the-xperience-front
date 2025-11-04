@@ -565,8 +565,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             {/* Class-Specific Social Features */}
             {isEnrolled && selectedClassId && (
                     <div className="flex justify-center mt-4 sm:mt-6">
-                      <div className="p-4 sm:p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 rounded-xl sm:rounded-2xl w-full max-w-2xl shadow-lg">
-                        <p className="text-xs sm:text-sm font-semibold text-purple-700 mb-3 sm:mb-4 flex items-center gap-2 justify-center">
+                      <div className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 rounded-xl sm:rounded-2xl w-full max-w-2xl shadow-lg">
+                        <p className="text-xs sm:text-sm font-semibold text-[#0476D7] mb-3 sm:mb-4 flex items-center gap-2 justify-center">
                           <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           Class Community
                         </p>
