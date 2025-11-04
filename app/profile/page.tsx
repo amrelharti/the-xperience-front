@@ -1,16 +1,18 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { PlayCircle, User, Mail, Calendar, Edit, Save, X } from "lucide-react"
+import { PlayCircle, User, Mail, Calendar, Edit, Save, X, Upload, Instagram, Linkedin, Briefcase, Camera, Users } from "lucide-react"
 import { useUser } from "../hooks/useUser"
 import UserDropdown from "../components/UserDropdown"
 import RequireAuth from "../components/RequireAuth"
+import Navbar from "../components/Navbar"
 import { useToast } from "@/hooks/use-toast"
 
 export default function ProfilePage() {
@@ -19,8 +21,13 @@ export default function ProfilePage() {
   const [editForm, setEditForm] = useState({
     name: "",
     email: "",
-    imageUrl: ""
+    imageUrl: "",
+    title: "",
+    instagram: "",
+    linkedin: ""
   })
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -28,7 +35,10 @@ export default function ProfilePage() {
       setEditForm({
         name: user.name,
         email: user.email,
-        imageUrl: user.imageUrl || ""
+        imageUrl: user.imageUrl || "",
+        title: (user as any).title || "",
+        instagram: (user as any).instagram || "",
+        linkedin: (user as any).linkedin || ""
       })
     }
   }, [user])
@@ -43,35 +53,84 @@ export default function ProfilePage() {
       setEditForm({
         name: user.name,
         email: user.email,
-        imageUrl: user.imageUrl || ""
+        imageUrl: user.imageUrl || "",
+        title: (user as any).title || "",
+        instagram: (user as any).instagram || "",
+        linkedin: (user as any).linkedin || ""
+      })
+    }
+  }
+
+  const handleProfilePictureClick = () => {
+    if (isEditing && fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Error",
+        description: "Please select an image file",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "Image size should be less than 5MB",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setUploadingImage(true)
+
+    try {
+      // Convert image to base64
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64String = reader.result as string
+        setEditForm({ ...editForm, imageUrl: base64String })
+        setUploadingImage(false)
+        toast({
+          title: "Success",
+          description: "Profile picture uploaded. Click 'Save Changes' to update.",
+        })
+      }
+      reader.onerror = () => {
+        setUploadingImage(false)
+        toast({
+          title: "Error",
+          description: "Failed to upload image",
+          variant: "destructive",
+        })
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      setUploadingImage(false)
+      toast({
+        title: "Error",
+        description: "Failed to upload image",
+        variant: "destructive",
       })
     }
   }
 
   const handleSave = async () => {
     try {
-      // Extract JWT token from cookies
-      let jwtToken = null;
-      const cookies = document.cookie.split(';');
-      for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=');
-        if (name === 'SESSION' && value) {
-          jwtToken = value;
-          break;
-        }
-      }
-
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      
-      if (jwtToken) {
-        headers['Authorization'] = `Bearer ${jwtToken}`;
-      }
-
-      const res = await fetch('http://localhost:8080/api/profile', {
+      const res = await fetch('/api/me', {
         method: "PUT",
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
         body: JSON.stringify(editForm)
       })
@@ -85,9 +144,10 @@ export default function ProfilePage() {
         // Refresh user data
         window.location.reload()
       } else {
+        const errorData = await res.json()
         toast({
           title: "Error",
-          description: "Failed to update profile",
+          description: errorData.error || "Failed to update profile",
           variant: "destructive",
         })
       }
@@ -115,10 +175,13 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <RequireAuth>
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p>Loading profile...</p>
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#0476D7] to-[#005eb8] rounded-2xl mb-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading profile...</h3>
+            <p className="text-gray-500">Please wait</p>
           </div>
         </div>
       </RequireAuth>
@@ -128,10 +191,10 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <RequireAuth>
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30 flex items-center justify-center">
           <div className="text-center">
-            <p>Unable to load profile</p>
-            <Button asChild className="mt-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Unable to load profile</h3>
+            <Button asChild className="bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white rounded-xl px-8">
               <Link href="/">Go Home</Link>
             </Button>
           </div>
@@ -142,185 +205,288 @@ export default function ProfilePage() {
 
   return (
     <RequireAuth>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <PlayCircle className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-xl font-[family-name:var(--font-space-grotesk)]">The Xperience</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              {user && <UserDropdown user={user} />}
-            </div>
-          </div>
-        </header>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
+        <Navbar />
 
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
           {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 font-[family-name:var(--font-space-grotesk)]">Profile</h1>
-            <p className="text-muted-foreground text-lg">Manage your account settings and preferences</p>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-12"
+          >
+            <div className="relative rounded-3xl overflow-hidden shadow-xl shadow-blue-500/10">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#60A5FA] via-[#3B82F6] to-[#2563EB]" />
+              <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px] opacity-50" />
+              <div className="relative p-10 md:p-14">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                  <div className="flex-1">
+                    <Badge className="bg-white/20 text-white border-yellow-400 mb-4 rounded-full px-4 py-1">
+                      <User className="h-3 w-3 mr-2" />
+                      Your Account
+                    </Badge>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">
+                      Profile
+                    </h1>
+                    <p className="text-lg text-blue-100 mb-6 max-w-2xl">
+                      Manage your account settings and preferences
+                    </p>
+                    <div className="flex flex-wrap items-center gap-6 text-blue-100">
+                      <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                        <Users className="h-5 w-5 text-yellow-300" />
+                        <span className="font-medium">Personal Info</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Information */}
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="lg:col-span-2"
+            >
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-gray-100">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <User className="h-5 w-5" />
-                        Personal Information
-                      </CardTitle>
-                      <CardDescription>
-                        Update your personal details and contact information
-                      </CardDescription>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
+                        <User className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
+                        <p className="text-sm text-gray-600">Update your personal details and contact information</p>
+                      </div>
                     </div>
                     {!isEditing && (
-                      <Button variant="outline" size="sm" onClick={handleEdit}>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={handleEdit}
+                        className="border-gray-200 hover:border-[#0476D7]/30 hover:bg-blue-50/50"
+                      >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Profile
                       </Button>
                     )}
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
+                </div>
+                <div className="p-8">
                   {/* Profile Picture */}
-                  <div className="flex items-center gap-4">
-                    <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center">
-                      {user.imageUrl ? (
-                        <img
-                          src={user.imageUrl}
-                          alt={user.name}
-                          className="h-20 w-20 rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-2xl font-medium text-primary-foreground">
-                          {getInitials(user.name)}
-                        </span>
-                      )}
+                  <div className="flex flex-col items-center mb-8">
+                    <div className="relative group">
+                      <div className={`h-32 w-32 rounded-2xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center shadow-lg ${isEditing ? 'cursor-pointer' : ''}`}
+                        onClick={handleProfilePictureClick}
+                      >
+                        {editForm.imageUrl || user.imageUrl ? (
+                          <img
+                            src={editForm.imageUrl || user.imageUrl}
+                            alt={user.name}
+                            className="h-32 w-32 rounded-2xl object-cover"
+                          />
+                        ) : (
+                          <span className="text-4xl font-bold text-white">
+                            {getInitials(user.name)}
+                          </span>
+                        )}
+                        {isEditing && (
+                          <div className="absolute inset-0 bg-black/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div className="text-white text-center">
+                              <Camera className="h-8 w-8 mx-auto mb-2" />
+                              <p className="text-sm font-medium">
+                                {uploadingImage ? "Uploading..." : "Change Photo"}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold">{user.name}</h3>
-                      <p className="text-muted-foreground">{user.email}</p>
-                      <Badge variant="secondary" className="mt-1">
+                    <div className="mt-4 text-center">
+                      <h3 className="text-2xl font-bold text-gray-900">{user.name}</h3>
+                      {(user as any).title && (
+                        <p className="text-sm text-gray-600 mt-1">{(user as any).title}</p>
+                      )}
+                      <p className="text-gray-500 mt-1">{user.email}</p>
+                      <Badge className="mt-3 bg-gradient-to-r from-[#FFBC00]/20 to-[#FFBC00]/10 text-yellow-700 border-yellow-300">
                         {user.role}
                       </Badge>
                     </div>
                   </div>
 
                   {/* Form Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full Name</Label>
-                      {isEditing ? (
-                        <Input
-                          id="name"
-                          value={editForm.name}
-                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                          placeholder="Enter your full name"
-                        />
-                      ) : (
-                        <div className="p-3 border rounded-md bg-muted/50">
-                          {user.name}
-                        </div>
-                      )}
-                    </div>
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="text-sm font-semibold text-gray-700">Full Name</Label>
+                        {isEditing ? (
+                          <Input
+                            id="name"
+                            value={editForm.name}
+                            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                            placeholder="Enter your full name"
+                            className="border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl"
+                          />
+                        ) : (
+                          <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-800">
+                            {user.name}
+                          </div>
+                        )}
+                      </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
-                      {isEditing ? (
-                        <Input
-                          id="email"
-                          type="email"
-                          value={editForm.email}
-                          onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                          placeholder="Enter your email"
-                        />
-                      ) : (
-                        <div className="p-3 border rounded-md bg-muted/50">
-                          {user.email}
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-sm font-semibold text-gray-700">Email Address</Label>
+                        {isEditing ? (
+                          <Input
+                            id="email"
+                            type="email"
+                            value={editForm.email}
+                            onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                            placeholder="Enter your email"
+                            className="border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl"
+                          />
+                        ) : (
+                          <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-800">
+                            {user.email}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="title" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                          <Briefcase className="h-4 w-4 text-[#0476D7]" />
+                          Title / Role
+                        </Label>
+                        {isEditing ? (
+                          <Input
+                            id="title"
+                            value={editForm.title}
+                            onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                            placeholder="e.g. Full Stack Developer"
+                            className="border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl"
+                          />
+                        ) : (
+                          <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-800">
+                            {(user as any).title || "Not set"}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="instagram" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                          <Instagram className="h-4 w-4 text-pink-500" />
+                          Instagram
+                        </Label>
+                        {isEditing ? (
+                          <Input
+                            id="instagram"
+                            value={editForm.instagram}
+                            onChange={(e) => setEditForm({ ...editForm, instagram: e.target.value })}
+                            placeholder="@username"
+                            className="border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl"
+                          />
+                        ) : (
+                          <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-800">
+                            {(user as any).instagram || "Not set"}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor="linkedin" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                          <Linkedin className="h-4 w-4 text-blue-600" />
+                          LinkedIn
+                        </Label>
+                        {isEditing ? (
+                          <Input
+                            id="linkedin"
+                            value={editForm.linkedin}
+                            onChange={(e) => setEditForm({ ...editForm, linkedin: e.target.value })}
+                            placeholder="linkedin.com/in/username"
+                            className="border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl"
+                          />
+                        ) : (
+                          <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-800">
+                            {(user as any).linkedin || "Not set"}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-
                   {/* Action Buttons */}
                   {isEditing && (
-                    <div className="flex gap-2 pt-4">
-                      <Button onClick={handleSave}>
+                    <div className="flex gap-3 pt-6 mt-6 border-t border-gray-100">
+                      <Button 
+                        onClick={handleSave}
+                        className="bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white rounded-xl px-8 shadow-lg hover:shadow-xl transition-all font-semibold border-0"
+                      >
                         <Save className="h-4 w-4 mr-2" />
                         Save Changes
                       </Button>
-                      <Button variant="outline" onClick={handleCancel}>
+                      <Button 
+                        variant="outline" 
+                        onClick={handleCancel}
+                        className="border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-xl"
+                      >
                         <X className="h-4 w-4 mr-2" />
                         Cancel
                       </Button>
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </div>
+            </motion.div>
 
             {/* Account Summary */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Mail className="h-5 w-5" />
-                    Account Summary
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Account Type</span>
-                    <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>
-                      {user.role}
-                    </Badge>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
+                      <Mail className="h-5 w-5 text-white" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900">Account Summary</h3>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Member Since</span>
-                    <span className="text-sm font-medium">Recently</span>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 font-medium">Account Type</span>
+                      <Badge className={user.role === "ADMIN" ? "bg-gradient-to-r from-[#0476D7] to-[#005eb8] text-white" : "bg-gradient-to-r from-[#FFBC00]/20 to-[#FFBC00]/10 text-yellow-700 border-yellow-300"}>
+                        {user.role}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 font-medium">Member Since</span>
+                      <span className="text-sm font-semibold text-gray-800">Recently</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 font-medium">Status</span>
+                      <Badge className="bg-green-50 text-green-700 border-green-300">
+                        Active
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Status</span>
-                    <Badge variant="outline" className="text-green-600 border-green-600">
-                      Active
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
-                    Quick Actions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <Button variant="outline" className="w-full justify-start" asChild>
-                    <Link href="/classes">
-                      <PlayCircle className="h-4 w-4 mr-2" />
-                      My Courses
-                    </Link>
-                  </Button>
-                  {user.role === "ADMIN" && (
-                    <Button variant="outline" className="w-full justify-start" asChild>
-                      <Link href="/admin">
-                        <User className="h-4 w-4 mr-2" />
-                        Admin Dashboard
-                      </Link>
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>

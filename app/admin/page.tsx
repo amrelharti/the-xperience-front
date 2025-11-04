@@ -294,19 +294,19 @@ export default function AdminPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
         {/* Modern Header */}
         <header className="border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 shadow-sm">
-          <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-6">
-              <Link href="/" className="flex items-center gap-3 group hover:opacity-80 transition-opacity duration-200">
+          <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-3 sm:space-x-6">
+              <Link href="/" className="flex items-center gap-2 sm:gap-3 group hover:opacity-80 transition-opacity duration-200">
                 <img 
                   src="/logos/dark blue secondary logo.svg" 
                   alt="XPERIENCE Logo" 
-                  className="h-10 w-25"
+                  className="h-8 sm:h-10 w-auto"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
                 />
               </Link>
-              <nav className="hidden md:flex items-center space-x-8">
+              <nav className="hidden lg:flex items-center space-x-4 xl:space-x-8">
                 <Link href="/admin" className="text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
                   Dashboard
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
@@ -333,12 +333,12 @@ export default function AdminPage() {
                 </Link>
               </nav>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {user && <UserDropdown user={user} />}
               <Button
                 variant="ghost"
                 size="sm"
-                className="md:hidden hover:bg-slate-100"
+                className="lg:hidden hover:bg-slate-100 p-2"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -348,8 +348,8 @@ export default function AdminPage() {
           
           {/* Mobile Navigation Menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden border-t bg-white/95 backdrop-blur-md">
-              <nav className="container mx-auto px-6 py-4 space-y-3">
+            <div className="lg:hidden border-t bg-white/95 backdrop-blur-md">
+              <nav className="container mx-auto px-4 sm:px-6 py-4 space-y-2 sm:space-y-3">
                 <Link 
                   href="/admin" 
                   className="block py-3 text-sm font-semibold text-[#005eb8] hover:text-[#0476D7] transition-colors"
@@ -398,23 +398,23 @@ export default function AdminPage() {
         </header>
 
         {/* Modern Admin Dashboard */}
-        <div className="container mx-auto px-6 py-8 space-y-8">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
           {/* Welcome Header */}
-          <div className="text-center space-y-4 animate-fade-in">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#005eb8] to-[#0476D7] text-white rounded-full text-sm font-medium">
-              <div className="w-2 h-2 bg-[#FFBC00] rounded-full animate-pulse"></div>
+          <div className="text-center space-y-3 sm:space-y-4 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#005eb8] to-[#0476D7] text-white rounded-full text-xs sm:text-sm font-medium">
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#FFBC00] rounded-full animate-pulse"></div>
               Admin Dashboard
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent px-4">
               Welcome Back, Admin
             </h1>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-slate-600 max-w-2xl mx-auto px-4">
               Manage your training programs, monitor student progress, and oversee the learning experience
             </p>
           </div>
 
           {/* Enhanced Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-slide-up">
             <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 bg-white/80 backdrop-blur-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                 <CardTitle className="text-sm font-semibold text-slate-600">Total Trainings</CardTitle>
@@ -472,42 +472,42 @@ export default function AdminPage() {
 
           {/* Enhanced Quick Actions */}
           <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-scale-in">
-            <CardHeader className="text-center pb-6">
-              <CardTitle className="text-2xl font-bold text-slate-800">Quick Actions</CardTitle>
-              <p className="text-slate-600">Access your most important admin functions</p>
+            <CardHeader className="text-center pb-4 sm:pb-6 px-4 sm:px-6">
+              <CardTitle className="text-xl sm:text-2xl font-bold text-slate-800">Quick Actions</CardTitle>
+              <p className="text-sm sm:text-base text-slate-600">Access your most important admin functions</p>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Button asChild variant="outline" className="h-24 flex-col gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#005eb8] group">
+            <CardContent className="px-4 sm:px-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#005eb8] group">
                   <Link href="/admin/trainings">
-                    <div className="p-3 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg group-hover:scale-110 transition-transform duration-200">
-                      <PlayCircle className="h-6 w-6 text-white" />
+                    <div className="p-2 sm:p-3 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <PlayCircle className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
-                    <span className="font-semibold text-slate-700">Manage Trainings</span>
+                    <span className="font-semibold text-slate-700 text-xs sm:text-sm">Manage Trainings</span>
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="h-24 flex-col gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#FFBC00] group">
+                <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#FFBC00] group">
                   <Link href="/admin/classes">
-                    <div className="p-3 bg-gradient-to-br from-[#FFBC00] to-[#f59e0b] rounded-lg group-hover:scale-110 transition-transform duration-200">
-                      <User className="h-6 w-6 text-white" />
+                    <div className="p-2 sm:p-3 bg-gradient-to-br from-[#FFBC00] to-[#f59e0b] rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <User className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
-                    <span className="font-semibold text-slate-700">Manage Classes</span>
+                    <span className="font-semibold text-slate-700 text-xs sm:text-sm">Manage Classes</span>
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="h-24 flex-col gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-emerald-500 group">
+                <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-emerald-500 group">
                   <Link href="/admin/users">
-                    <div className="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
-                      <User className="h-6 w-6 text-white" />
+                    <div className="p-2 sm:p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <User className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
-                    <span className="font-semibold text-slate-700">Manage Users</span>
+                    <span className="font-semibold text-slate-700 text-xs sm:text-sm">Manage Users</span>
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="h-24 flex-col gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-purple-500 group">
+                <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-purple-500 group">
                   <Link href="/admin/feed">
-                    <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
-                      <MessageSquare className="h-6 w-6 text-white" />
+                    <div className="p-2 sm:p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
-                    <span className="font-semibold text-slate-700">Monitor Feed</span>
+                    <span className="font-semibold text-slate-700 text-xs sm:text-sm">Monitor Feed</span>
                   </Link>
                 </Button>
               </div>

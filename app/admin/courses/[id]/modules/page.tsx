@@ -332,23 +332,24 @@ export default function CourseModulesPage() {
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="border-b bg-gradient-to-r from-blue-50 to-purple-50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="container mx-auto px-4 sm:px-6 py-3 sm:h-20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
               <Button 
                 variant="ghost" 
                 onClick={() => router.push("/admin")}
-                className="flex items-center gap-2"
+                size="sm"
+                className="flex items-center gap-2 -ml-2 sm:ml-0 text-sm"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 Back to Admin
               </Button>
-              <div>
-                <h1 className="text-2xl font-bold">{course.title}</h1>
-                <p className="text-muted-foreground">Manage course modules</p>
+              <div className="w-full sm:w-auto">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold">{course.title}</h1>
+                <p className="text-muted-foreground text-xs sm:text-sm">Manage course modules</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button onClick={handleSignOut} variant="outline">
+            <div className="hidden sm:flex items-center space-x-4">
+              <Button onClick={handleSignOut} variant="outline" size="sm">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
               </Button>
@@ -356,16 +357,16 @@ export default function CourseModulesPage() {
           </div>
         </header>
 
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {/* Course Info */}
-          <Card className="mb-8">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-2xl">{course.title}</CardTitle>
-                  <CardDescription className="mt-2">{course.description}</CardDescription>
+          <Card className="mb-6 sm:mb-8">
+            <CardHeader className="px-4 sm:px-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex-1">
+                  <CardTitle className="text-lg sm:text-xl md:text-2xl">{course.title}</CardTitle>
+                  <CardDescription className="mt-1.5 sm:mt-2 text-xs sm:text-sm">{course.description}</CardDescription>
                 </div>
-                <Badge variant={course.isPublished ? "default" : "secondary"}>
+                <Badge variant={course.isPublished ? "default" : "secondary"} className="text-xs sm:text-sm w-fit">
                   {course.isPublished ? "Published" : "Draft"}
                 </Badge>
               </div>
@@ -373,13 +374,13 @@ export default function CourseModulesPage() {
           </Card>
 
           {/* Modules Section */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-semibold">Modules</h2>
-                <p className="text-muted-foreground">Manage your course modules</p>
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
+              <div className="flex-1">
+                <h2 className="text-lg sm:text-xl font-semibold">Modules</h2>
+                <p className="text-muted-foreground text-xs sm:text-sm">Manage your course modules</p>
               </div>
-              <Button onClick={() => setShowCreateModule(true)}>
+              <Button onClick={() => setShowCreateModule(true)} size="sm" className="w-full sm:w-auto text-sm sm:text-base">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Module
               </Button>
@@ -399,56 +400,60 @@ export default function CourseModulesPage() {
             </div>
 
             {/* Modules List */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {filteredModules.map((module) => (
                 <Card key={module.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <PlayCircle className="h-6 w-6 text-primary" />
+                  <CardHeader className="px-4 sm:px-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 w-full">
+                        <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <PlayCircle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                         </div>
-                        <div>
-                          <CardTitle className="text-lg">{module.title}</CardTitle>
-                          <CardDescription className="mt-1">
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-base sm:text-lg">{module.title}</CardTitle>
+                          <CardDescription className="mt-1 text-xs sm:text-sm line-clamp-2">
                             {module.description}
                           </CardDescription>
-                          <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
+                          <div className="flex items-center space-x-3 sm:space-x-4 mt-2 text-xs sm:text-sm text-muted-foreground flex-wrap gap-y-1">
                             <span className="flex items-center">
-                              <Clock className="h-4 w-4 mr-1" />
+                              <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
                               {formatDuration(module.durationSeconds)}
                             </span>
                             <span className="flex items-center">
-                              <BookOpen className="h-4 w-4 mr-1" />
+                              <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
                               Module {module.orderIndex + 1}
                             </span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap sm:flex-nowrap">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleAccessCodes(module)}
+                          className="text-xs sm:text-sm flex-1 sm:flex-initial"
                         >
-                          <Key className="h-4 w-4 mr-1" />
-                          Access Codes
+                          <Key className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
+                          <span className="hidden xs:inline">Access Codes</span>
+                          <span className="xs:hidden">Codes</span>
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleEditModule(module)}
+                          className="text-xs sm:text-sm"
                         >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
+                          <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-1" />
+                          <span className="hidden sm:inline">Edit</span>
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleDeleteModule(module.id)}
+                          className="text-xs sm:text-sm"
                         >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          Delete
+                          <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-1" />
+                          <span className="hidden sm:inline">Delete</span>
                         </Button>
                       </div>
                     </div>

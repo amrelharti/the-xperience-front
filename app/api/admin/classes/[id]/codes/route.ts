@@ -26,20 +26,20 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const body = await request.json()
+    // No body needed for the new single-code generation endpoint
     const response = await fetch(`${BACKEND_URL}/api/admin/classes/${params.id}/codes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Cookie': request.headers.get('cookie') || '',
       },
-      body: JSON.stringify(body),
     })
     
     const data = await response.json()
     return NextResponse.json(data, { status: response.status })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to generate class codes' }, { status: 500 })
+    console.error('Error generating class code:', error)
+    return NextResponse.json({ error: 'Failed to generate class code' }, { status: 500 })
   }
 }
 

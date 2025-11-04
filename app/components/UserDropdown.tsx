@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, memo } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { User, Settings, BookOpen, LogOut, ChevronDown, MessageSquare, Trophy } from "lucide-react"
+import { User, Settings, LogOut, ChevronDown, MessageSquare, Trophy } from "lucide-react"
 import { useUser } from "../hooks/useUser"
 
 interface UserDropdownProps {
@@ -44,6 +44,7 @@ function UserDropdown({ user }: UserDropdownProps) {
     try {
       console.log("Starting logout process...")
       
+      // Call the logout endpoint
       const res = await fetch(`/api/auth/logout`, {
         method: "POST",
         credentials: "include",
@@ -51,21 +52,54 @@ function UserDropdown({ user }: UserDropdownProps) {
 
       console.log("Logout response:", res.status)
       
-      if (res.ok || res.status === 204) {
-        console.log("Logout successful, clearing user state")
-        // Refresh user state to clear it
-        refreshUser()
-        // Force a hard refresh to clear all state
-        window.location.reload()
-      } else {
-        console.error("Sign out failed:", res.status, res.statusText)
-        // Still redirect
-        window.location.reload()
+      // Clear all client-side storage
+      console.log("Clearing client-side storage...")
+      
+      // Clear localStorage
+      localStorage.clear()
+      
+      // Clear sessionStorage
+      sessionStorage.clear()
+      
+      // Clear all cookies from client side
+      const cookies = document.cookie.split(";")
+      for (let cookie of cookies) {
+        const eqPos = cookie.indexOf("=")
+        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim()
+        
+        // Clear cookie with different path and domain combinations
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${window.location.hostname};`
+        
+        // Also try with SameSite=None for cross-site cookies
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=None; Secure;`
       }
+      
+      console.log("Cleared all client-side data")
+      
+      // Refresh user state to clear it
+      refreshUser()
+      
+      // Force a hard navigation to signin page (bypasses cache)
+      window.location.href = "/auth/signin"
+      
     } catch (error) {
       console.error("Sign out error:", error)
-      // Still redirect
-      window.location.reload()
+      
+      // Even on error, clear everything and redirect
+      localStorage.clear()
+      sessionStorage.clear()
+      
+      // Clear cookies
+      const cookies = document.cookie.split(";")
+      for (let cookie of cookies) {
+        const eqPos = cookie.indexOf("=")
+        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim()
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+      }
+      
+      window.location.href = "/auth/signin"
     }
   }
 
@@ -163,7 +197,7 @@ function UserDropdown({ user }: UserDropdownProps) {
                 {user?.role === "ADMIN" ? "Admin Leaderboard" : "Leaderboard"}
               </Link>
 
-              {user?.role === "ADMIN" ? (
+              {user?.role === "ADMIN" && (
                 <Link
                   href="/admin"
                   className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
@@ -171,15 +205,6 @@ function UserDropdown({ user }: UserDropdownProps) {
                 >
                   <Settings className="h-4 w-4" />
                   Admin Dashboard
-                </Link>
-              ) : (
-                <Link
-                  href="/my-courses"
-                  className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <BookOpen className="h-4 w-4" />
-                  My Courses
                 </Link>
               )}
             </div>

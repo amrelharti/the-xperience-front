@@ -139,19 +139,19 @@ export default function AdminLeaderboardPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
         {/* Modern Header */}
         <header className="border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 shadow-sm">
-          <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-6">
-              <Link href="/admin" className="flex items-center gap-3 group hover:opacity-80 transition-opacity duration-200">
+          <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-3 sm:space-x-6">
+              <Link href="/admin" className="flex items-center gap-2 sm:gap-3 group hover:opacity-80 transition-opacity duration-200">
                 <img 
                   src="/logos/dark blue secondary logo.svg" 
                   alt="XPERIENCE Logo" 
-                  className="h-10 w-25"
+                  className="h-8 sm:h-10 w-auto"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
                 />
               </Link>
-              <nav className="hidden md:flex items-center space-x-8">
+              <nav className="hidden lg:flex items-center space-x-4 xl:space-x-8">
                 <Link href="/admin" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
                   Dashboard
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
@@ -178,23 +178,23 @@ export default function AdminLeaderboardPage() {
                 </Link>
               </nav>
               </div>
-            <div className="flex items-center space-x-4">
-              {user && <UserDropdown user={user} />}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="md:hidden hover:bg-slate-100"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-            </div>
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {user && <UserDropdown user={user} />}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="lg:hidden hover:bg-slate-100 p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
           </div>
-          
-          {/* Mobile Navigation Menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden border-t bg-white/95 backdrop-blur-md">
-              <nav className="container mx-auto px-6 py-4 space-y-3">
+        </div>
+        
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden border-t bg-white/95 backdrop-blur-md">
+            <nav className="container mx-auto px-4 sm:px-6 py-4 space-y-2 sm:space-y-3">
                 <Link 
                   href="/admin" 
                   className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
@@ -242,58 +242,58 @@ export default function AdminLeaderboardPage() {
           )}
         </header>
 
-        <div className="container mx-auto px-8 py-12 space-y-10 max-w-7xl">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-12 space-y-6 sm:space-y-8 md:space-y-10 max-w-7xl">
           {/* Back Button */}
-          <Button variant="outline" asChild className="hover:bg-slate-100">
+          <Button variant="outline" asChild size="sm" className="hover:bg-slate-100 text-sm sm:text-base -ml-2 sm:ml-0">
             <Link href="/admin">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
               Back to Admin Dashboard
             </Link>
           </Button>
 
           {/* Page Header */}
-          <div className="text-center space-y-6 animate-fade-in py-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#005eb8] to-[#0476D7] text-white rounded-full text-sm font-medium">
-              <Trophy className="h-4 w-4" />
+          <div className="text-center space-y-4 sm:space-y-6 animate-fade-in py-4 sm:py-8 px-4">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#005eb8] to-[#0476D7] text-white rounded-full text-xs sm:text-sm font-medium">
+              <Trophy className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Leaderboard Management
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
               Class Leaderboards
             </h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-slate-600 max-w-3xl mx-auto">
               Monitor student performance and rankings across all classes
             </p>
           </div>
 
           {/* Class Selection */}
-          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-slide-up p-6">
-            <CardHeader className="pb-8">
-              <CardTitle className="flex items-center gap-3 text-xl">
-                <div className="p-2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg">
-                  <Users className="h-5 w-5 text-white" />
+          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-slide-up p-4 sm:p-6">
+            <CardHeader className="pb-4 sm:pb-8 px-0">
+              <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
+                <div className="p-1.5 sm:p-2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                 </div>
                 Select Class to Monitor
               </CardTitle>
-              <CardDescription className="text-slate-600">
+              <CardDescription className="text-slate-600 text-xs sm:text-sm md:text-base">
                 Choose a class to view its leaderboard and student rankings
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-4">
-              <div className="flex items-center gap-6">
+            <CardContent className="pt-3 sm:pt-4 px-0">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-6">
                 <Select onValueChange={handleClassChange}>
-                  <SelectTrigger className="w-80 h-12 text-lg border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-xl">
+                  <SelectTrigger className="w-full sm:w-80 h-10 sm:h-12 text-sm sm:text-base md:text-lg border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-lg sm:rounded-xl">
                     <SelectValue placeholder="Select a class..." />
                   </SelectTrigger>
                   <SelectContent>
                     {classes.map((classItem) => (
-                      <SelectItem key={classItem.id} value={classItem.id}>
+                      <SelectItem key={classItem.id} value={classItem.id} className="text-sm sm:text-base">
                         {classItem.name} ({classItem.studentCount} students)
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 {selectedClass && (
-                  <div className="text-sm text-slate-600 bg-slate-50 px-6 py-3 rounded-lg">
+                  <div className="text-xs sm:text-sm text-slate-600 bg-slate-50 px-4 sm:px-6 py-2 sm:py-3 rounded-lg">
                     Selected: <span className="font-semibold text-[#005eb8]">{selectedClass.name}</span>
                   </div>
                 )}
@@ -303,15 +303,15 @@ export default function AdminLeaderboardPage() {
 
           {/* Selected Class Info */}
           {selectedClass && (
-            <Card className="border-0 bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm shadow-lg animate-fade-in p-6">
-              <CardContent className="pt-8">
-                <div className="flex items-center gap-6">
-                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#005eb8] to-[#0476D7] flex items-center justify-center">
-                    <Trophy className="h-6 w-6 text-white" />
+            <Card className="border-0 bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm shadow-lg animate-fade-in p-4 sm:p-6">
+              <CardContent className="pt-4 sm:pt-8 px-0">
+                <div className="flex items-center gap-4 sm:gap-6">
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#005eb8] to-[#0476D7] flex items-center justify-center flex-shrink-0">
+                    <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-xl text-slate-800">{selectedClass.name} Leaderboard</h3>
-                    <p className="text-slate-600">
+                    <h3 className="font-semibold text-base sm:text-lg md:text-xl text-slate-800">{selectedClass.name} Leaderboard</h3>
+                    <p className="text-slate-600 text-xs sm:text-sm md:text-base">
                       {selectedClass.studentCount} students enrolled
                     </p>
                   </div>
@@ -323,18 +323,18 @@ export default function AdminLeaderboardPage() {
           {/* Leaderboard */}
           {selectedClass && (
             <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-scale-in">
-              <CardHeader className="pb-8">
-                <CardTitle className="flex items-center gap-3 text-xl">
-                  <div className="p-2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-white" />
+              <CardHeader className="pb-4 sm:pb-8 px-4 sm:px-6">
+                <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
+                  <div className="p-1.5 sm:p-2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg">
+                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                   </div>
                   {selectedClass.name} Leaderboard
                 </CardTitle>
-                <CardDescription className="text-slate-600">
+                <CardDescription className="text-slate-600 text-xs sm:text-sm md:text-base">
                   Student rankings based on assignment ratings
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-4">
+              <CardContent className="pt-3 sm:pt-4 px-4 sm:px-6">
                 {loadingLeaderboard ? (
                   <div className="text-center py-16">
                     <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#005eb8] border-t-transparent mx-auto mb-6"></div>
@@ -351,18 +351,18 @@ export default function AdminLeaderboardPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {leaderboard.map((entry, index) => (
                       <div
                         key={entry.user.id}
-                        className={`flex items-center gap-6 p-6 rounded-xl border transition-all duration-300 hover:shadow-lg ${
+                        className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 md:gap-6 p-4 sm:p-6 rounded-lg sm:rounded-xl border transition-all duration-300 hover:shadow-lg ${
                           index < 3 
                             ? "bg-gradient-to-r from-[#005eb8]/5 to-[#0476D7]/5 border-[#005eb8]/20 shadow-md" 
                             : "bg-white/60 hover:bg-white/80 border-slate-200"
                         }`}
                       >
                         {/* Rank */}
-                        <div className={`flex items-center justify-center w-14 h-14 rounded-xl ${
+                        <div className={`flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl flex-shrink-0 ${
                           index === 0 ? "bg-gradient-to-br from-[#005eb8] to-[#0476D7]" :
                           index === 1 ? "bg-gradient-to-br from-gray-300 to-gray-400" :
                           index === 2 ? "bg-gradient-to-br from-amber-500 to-amber-600" :
@@ -372,26 +372,26 @@ export default function AdminLeaderboardPage() {
                         </div>
 
                         {/* User Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#005eb8] to-[#0476D7] flex items-center justify-center">
+                        <div className="flex-1 min-w-0 w-full">
+                          <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+                            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#005eb8] to-[#0476D7] flex items-center justify-center flex-shrink-0">
                               {entry.user.imageUrl ? (
                                 <img
                                   src={entry.user.imageUrl}
                                   alt={entry.user.name}
-                                  className="h-12 w-12 rounded-xl object-cover"
+                                  className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg sm:rounded-xl object-cover"
                                 />
                               ) : (
-                                <span className="text-white font-bold text-lg">
+                                <span className="text-white font-bold text-sm sm:text-lg">
                                   {entry.user.name.charAt(0).toUpperCase()}
                                 </span>
                               )}
                             </div>
-                            <div>
-                              <h3 className="font-semibold text-lg text-slate-800">{entry.user.name}</h3>
-                              <div className="flex items-center gap-6 text-sm text-slate-600">
-                                <span className="flex items-center gap-2">
-                                  <Star className="h-4 w-4 text-[#005eb8]" />
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-base sm:text-lg text-slate-800">{entry.user.name}</h3>
+                              <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm text-slate-600">
+                                <span className="flex items-center gap-1.5 sm:gap-2">
+                                  <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#005eb8] flex-shrink-0" />
                                   {entry.totalPoints.toFixed(1)} points
                                 </span>
                                 <span>{entry.assignmentCount} rated assignments</span>
@@ -402,7 +402,7 @@ export default function AdminLeaderboardPage() {
                         </div>
 
                         {/* Rank Badge */}
-                        <div>
+                        <div className="w-full sm:w-auto flex justify-center sm:block">
                           {getRankBadge(entry.rank)}
                         </div>
                       </div>
@@ -415,39 +415,39 @@ export default function AdminLeaderboardPage() {
 
           {/* How it Works */}
           <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-fade-in">
-            <CardHeader className="pb-8">
-              <CardTitle className="flex items-center gap-3 text-xl">
+            <CardHeader className="pb-4 sm:pb-8 px-4 sm:px-6">
+              <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl">
                 <div className="p-2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg">
                   <Star className="h-5 w-5 text-white" />
                 </div>
                 How Rankings Work
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 text-slate-600">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-[#005eb8] mt-2"></div>
-                  <p>Points are calculated as the sum of average scores from all rated assignments</p>
+            <CardContent className="space-y-3 sm:space-y-4 text-slate-600 px-4 sm:px-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#005eb8] mt-1.5 sm:mt-2 flex-shrink-0"></div>
+                  <p className="text-xs sm:text-sm md:text-base">Points are calculated as the sum of average scores from all rated assignments</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-[#0476D7] mt-2"></div>
-                  <p>Each assignment's average score is the mean of all ratings given by other students in the class</p>
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#0476D7] mt-1.5 sm:mt-2 flex-shrink-0"></div>
+                  <p className="text-xs sm:text-sm md:text-base">Each assignment's average score is the mean of all ratings given by other students in the class</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-[#005eb8] mt-2"></div>
-                  <p>Rankings are class-specific - students compete with their classmates</p>
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#005eb8] mt-1.5 sm:mt-2 flex-shrink-0"></div>
+                  <p className="text-xs sm:text-sm md:text-base">Rankings are class-specific - students compete with their classmates</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-[#005eb8] mt-2"></div>
-                  <p>Once a student rates an assignment, they cannot change their rating</p>
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#005eb8] mt-1.5 sm:mt-2 flex-shrink-0"></div>
+                  <p className="text-xs sm:text-sm md:text-base">Once a student rates an assignment, they cannot change their rating</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-[#0476D7] mt-2"></div>
-                  <p>Students cannot rate their own assignments</p>
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#0476D7] mt-1.5 sm:mt-2 flex-shrink-0"></div>
+                  <p className="text-xs sm:text-sm md:text-base">Students cannot rate their own assignments</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-[#0476D7] mt-2"></div>
-                  <p>Ratings range from 0-10 points per assignment</p>
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#0476D7] mt-1.5 sm:mt-2 flex-shrink-0"></div>
+                  <p className="text-xs sm:text-sm md:text-base">Ratings range from 0-10 points per assignment</p>
                 </div>
               </div>
             </CardContent>

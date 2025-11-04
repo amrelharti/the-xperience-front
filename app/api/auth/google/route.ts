@@ -5,6 +5,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:80
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log('Google auth API route: Received request')
     
     const response = await fetch(`${BACKEND_URL}/api/auth/google`, {
       method: 'POST',
@@ -14,9 +15,14 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(body),
     })
     
+    console.log('Google auth API route: Backend response status:', response.status)
+    console.log('Google auth API route: All backend headers:', Array.from(response.headers.entries()))
+    
     const data = await response.json()
+    console.log('Google auth API route: Backend response data:', data)
     
     if (!response.ok) {
+      console.error('Google auth API route: Backend returned error')
       return NextResponse.json(data, { status: response.status })
     }
     
@@ -25,7 +31,7 @@ export async function POST(request: NextRequest) {
     
     // Extract the Set-Cookie header from the backend response
     const setCookieHeader = response.headers.get('Set-Cookie')
-    console.log('Google auth: Set-Cookie header from backend:', setCookieHeader)
+    console.log('Google auth API route: Set-Cookie header from backend:', setCookieHeader)
     
     if (setCookieHeader) {
       // Parse the cookie and set it in the Next.js response
@@ -34,7 +40,7 @@ export async function POST(request: NextRequest) {
       const cookieName = cookieNameValue[0]
       const cookieValue = cookieNameValue[1]
       
-      console.log('Google auth: Parsed cookie name:', cookieName, 'value:', cookieValue.substring(0, 50) + '...')
+      console.log('Google auth API route: Parsed cookie name:', cookieName, 'value:', cookieValue.substring(0, 50) + '...')
       
       // Extract other cookie attributes
       let httpOnly = false
@@ -42,6 +48,7 @@ export async function POST(request: NextRequest) {
       let sameSite = 'lax'
       let path = '/'
       let maxAge = 86400 // 1 day in seconds
+      let domain = undefined // Don't set domain for localhost
       
       for (const part of cookieParts) {
         const trimmed = part.trim()
@@ -55,21 +62,52 @@ export async function POST(request: NextRequest) {
           path = trimmed.split('=')[1]
         } else if (trimmed.toLowerCase().startsWith('max-age=')) {
           maxAge = parseInt(trimmed.split('=')[1])
+        } else if (trimmed.toLowerCase().startsWith('domain=')) {
+          // Only use domain in production, ignore for localhost
+          if (process.env.NODE_ENV === 'production') {
+            domain = trimmed.split('=')[1]
+          }
         }
       }
       
-      console.log('Google auth: Setting cookie with attributes:', { httpOnly, secure, sameSite, path, maxAge })
+      // In development (localhost), we need to adjust cookie settings:
+      // - Don't use 'secure' (we're on HTTP, not HTTPS)
+      // - Use 'lax' instead of 'none' for SameSite (none requires secure)
+      const isProduction = process.env.NODE_ENV === 'production'
+      const finalSecure = isProduction ? secure : false
+      const finalSameSite = isProduction ? sameSite : 'lax'
+      
+      console.log('Google auth API route: Setting cookie with attributes:', { 
+        httpOnly, 
+        secure: finalSecure,
+        sameSite: finalSameSite, 
+        path, 
+        maxAge,
+        domain: domain || '(not set - localhost)' 
+      })
       
       // Set the cookie in the Next.js response
-      nextResponse.cookies.set(cookieName, cookieValue, {
+      const cookieOptions: any = {
         httpOnly,
-        secure: process.env.NODE_ENV === 'production' ? secure : false,
-        sameSite: sameSite as 'lax' | 'strict' | 'none',
+        secure: finalSecure,
+        sameSite: finalSameSite as 'lax' | 'strict' | 'none',
         path,
         maxAge
-      })
+      }
+      
+      // Only set domain in production
+      if (domain) {
+        cookieOptions.domain = domain
+      }
+      
+      nextResponse.cookies.set(cookieName, cookieValue, cookieOptions)
+      
+      console.log('Google auth API route: Cookie set successfully in Next.js response')
+    } else {
+      console.warn('Google auth API route: No Set-Cookie header from backend!')
     }
     
+    console.log('Google auth API route: Returning response to frontend')
     return nextResponse
   } catch (error) {
     console.error('Google auth error:', error)

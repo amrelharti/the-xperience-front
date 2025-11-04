@@ -55,3 +55,52 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const cookieHeader = request.headers.get('cookie') || '';
+    
+    // Extract JWT token from SESSION cookie
+    let jwtToken = null;
+    if (cookieHeader) {
+      const cookies = cookieHeader.split(';');
+      for (const cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'SESSION' && value) {
+          jwtToken = value;
+          break;
+        }
+      }
+    }
+
+    if (!jwtToken) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+    }
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${jwtToken}`,
+    };
+    
+    const response = await fetch(`${BACKEND_URL}/api/me`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(body),
+    })
+    
+    if (!response.ok) {
+      const errorText = await response.text()
+      return NextResponse.json(
+        { error: errorText || 'Failed to update profile' },
+        { status: response.status }
+      )
+    }
+    
+    const data = await response.json()
+    return NextResponse.json(data, { status: response.status })
+  } catch (error) {
+    console.error('Error updating profile:', error)
+    return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
+  }
+}
