@@ -786,25 +786,33 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                             {availableClasses.filter((classItem) => !classItem.isActive && classItem.isArchived).map((classItem) => (
                               <label
                                 key={classItem.id}
-                                htmlFor={`class-${classItem.id}`}
+                                htmlFor={`class-archived-${classItem.id}`}
                                 className={`p-3 border rounded-lg cursor-pointer transition-colors block ${
                                   selectedClassId === classItem.id
                                     ? "border-blue-500 bg-blue-50"
                                     : "border-blue-200 bg-blue-25 hover:border-blue-300"
                                 }`}
+                                onClick={(e) => {
+                                  console.log("📍 Label clicked for ARCHIVED class:", classItem.name)
+                                  setSelectedClassId(classItem.id)
+                                }}
                               >
                                 <div className="flex items-center gap-3">
                                   <input
                                     type="radio"
-                                    id={`class-${classItem.id}`}
+                                    id={`class-archived-${classItem.id}`}
                                     name="selectedClass"
                                     value={classItem.id}
                                     checked={selectedClassId === classItem.id}
                                     onChange={(e) => {
-                                      console.log("🖱️ Selected ARCHIVED class:", classItem.name, "id:", classItem.id)
+                                      console.log("🖱️ Radio onChange ARCHIVED class:", classItem.name, "id:", classItem.id)
                                       setSelectedClassId(e.target.value)
                                     }}
-                                    className="sr-only"
+                                    onClick={(e) => {
+                                      console.log("🎯 Radio onClick ARCHIVED class:", classItem.name)
+                                      e.stopPropagation()
+                                    }}
+                                    className="w-0 h-0 opacity-0 absolute"
                                   />
                                   <div className={`h-4 w-4 rounded-full border-2 flex-shrink-0 ${
                                     selectedClassId === classItem.id
@@ -836,25 +844,33 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                             {availableClasses.filter((classItem) => classItem.isActive && !classItem.isArchived).map((classItem) => (
                               <label
                                 key={classItem.id}
-                                htmlFor={`class-${classItem.id}`}
+                                htmlFor={`class-active-${classItem.id}`}
                                 className={`p-3 border rounded-lg cursor-pointer transition-colors block ${
                                   selectedClassId === classItem.id
                                     ? "border-green-500 bg-green-50"
                                     : "border-green-200 bg-green-25 hover:border-green-300"
                                 }`}
+                                onClick={(e) => {
+                                  console.log("📍 Label clicked for ACTIVE class:", classItem.name)
+                                  setSelectedClassId(classItem.id)
+                                }}
                               >
                                 <div className="flex items-center gap-3">
                                   <input
                                     type="radio"
-                                    id={`class-${classItem.id}`}
+                                    id={`class-active-${classItem.id}`}
                                     name="selectedClass"
                                     value={classItem.id}
                                     checked={selectedClassId === classItem.id}
                                     onChange={(e) => {
-                                      console.log("🖱️ Selected ACTIVE class:", classItem.name, "id:", classItem.id)
+                                      console.log("🖱️ Radio onChange ACTIVE class:", classItem.name, "id:", classItem.id)
                                       setSelectedClassId(e.target.value)
                                     }}
-                                    className="sr-only"
+                                    onClick={(e) => {
+                                      console.log("🎯 Radio onClick ACTIVE class:", classItem.name)
+                                      e.stopPropagation()
+                                    }}
+                                    className="w-0 h-0 opacity-0 absolute"
                                   />
                                   <div className={`h-4 w-4 rounded-full border-2 flex-shrink-0 ${
                                     selectedClassId === classItem.id
