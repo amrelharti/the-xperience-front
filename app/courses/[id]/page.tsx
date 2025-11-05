@@ -296,7 +296,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     } finally {
       setLoading(false)
     }
-  }, [params.id, user?.id, loadModuleProgress, loadAvailableClasses])
+  }, [params.id, user?.id, loadModuleProgress, loadAvailableClasses, selectedClassId, isManuallySelectingClass])
 
 
   const handleUnlockModule = async (moduleId: string) => {
@@ -432,11 +432,14 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     }
   }
 
+  // Only run load on initial mount and when params.id or user changes
+  // Do NOT run when selectedClassId changes (that would reset the selection)
   useEffect(() => {
-    if (!userLoading) {
+    if (!userLoading && user) {
       load()
     }
-  }, [load, userLoading])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id, user?.id, userLoading])
 
 
   // Debug: Track selectedClassId changes
