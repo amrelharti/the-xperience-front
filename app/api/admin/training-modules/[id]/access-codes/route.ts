@@ -84,13 +84,19 @@ export async function POST(
 
     const data = await response.json()
     console.log("🔍 Raw backend response from POST:", JSON.stringify(data, null, 2))
-    console.log("🔍 Response type:", Array.isArray(data) ? 'array' : typeof data)
     
-    // If backend returns an array, extract the first code
-    const responseData = Array.isArray(data) && data.length > 0 
-      ? { code: data[0].code || data[0] }
-      : data
+    // Backend returns { codes: ["CODE1", "CODE2"] }
+    // Extract the first code from the array
+    let code = null
+    if (data.codes && Array.isArray(data.codes) && data.codes.length > 0) {
+      code = data.codes[0]
+    } else if (data.code) {
+      code = data.code
+    } else if (typeof data === 'string') {
+      code = data
+    }
     
+    const responseData = { code }
     console.log("🔍 Transformed response:", JSON.stringify(responseData, null, 2))
     return NextResponse.json(responseData)
   } catch (error) {
