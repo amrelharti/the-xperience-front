@@ -784,23 +784,28 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                           </p>
                           <div className="space-y-2">
                             {availableClasses.filter((classItem) => !classItem.isActive && classItem.isArchived).map((classItem) => (
-                              <div
+                              <label
                                 key={classItem.id}
-                                className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                                htmlFor={`class-${classItem.id}`}
+                                className={`p-3 border rounded-lg cursor-pointer transition-colors block ${
                                   selectedClassId === classItem.id
                                     ? "border-blue-500 bg-blue-50"
                                     : "border-blue-200 bg-blue-25 hover:border-blue-300"
                                 }`}
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  e.stopPropagation()
-                                  console.log("🖱️ Clicked on ARCHIVED class:", classItem.name, "id:", classItem.id)
-                                  console.log("🔍 Current selectedClassId before:", selectedClassId)
-                                  setSelectedClassId(classItem.id)
-                                  console.log("✅ Set selectedClassId to:", classItem.id)
-                                }}
                               >
-                                <div className="flex items-center gap-3 pointer-events-none">
+                                <div className="flex items-center gap-3">
+                                  <input
+                                    type="radio"
+                                    id={`class-${classItem.id}`}
+                                    name="selectedClass"
+                                    value={classItem.id}
+                                    checked={selectedClassId === classItem.id}
+                                    onChange={(e) => {
+                                      console.log("🖱️ Selected ARCHIVED class:", classItem.name, "id:", classItem.id)
+                                      setSelectedClassId(e.target.value)
+                                    }}
+                                    className="sr-only"
+                                  />
                                   <div className={`h-4 w-4 rounded-full border-2 flex-shrink-0 ${
                                     selectedClassId === classItem.id
                                       ? "border-blue-500 bg-blue-500"
@@ -814,7 +819,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                     </span>
                                   </div>
                                 </div>
-                              </div>
+                              </label>
                             ))}
                           </div>
                         </div>
@@ -829,23 +834,28 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                           </p>
                           <div className="space-y-2">
                             {availableClasses.filter((classItem) => classItem.isActive && !classItem.isArchived).map((classItem) => (
-                              <div
+                              <label
                                 key={classItem.id}
-                                className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                                htmlFor={`class-${classItem.id}`}
+                                className={`p-3 border rounded-lg cursor-pointer transition-colors block ${
                                   selectedClassId === classItem.id
                                     ? "border-green-500 bg-green-50"
                                     : "border-green-200 bg-green-25 hover:border-green-300"
                                 }`}
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  e.stopPropagation()
-                                  console.log("🖱️ Clicked on ACTIVE class:", classItem.name, "id:", classItem.id)
-                                  console.log("🔍 Current selectedClassId before:", selectedClassId)
-                                  setSelectedClassId(classItem.id)
-                                  console.log("✅ Set selectedClassId to:", classItem.id)
-                                }}
                               >
-                                <div className="flex items-center gap-3 pointer-events-none">
+                                <div className="flex items-center gap-3">
+                                  <input
+                                    type="radio"
+                                    id={`class-${classItem.id}`}
+                                    name="selectedClass"
+                                    value={classItem.id}
+                                    checked={selectedClassId === classItem.id}
+                                    onChange={(e) => {
+                                      console.log("🖱️ Selected ACTIVE class:", classItem.name, "id:", classItem.id)
+                                      setSelectedClassId(e.target.value)
+                                    }}
+                                    className="sr-only"
+                                  />
                                   <div className={`h-4 w-4 rounded-full border-2 flex-shrink-0 ${
                                     selectedClassId === classItem.id
                                       ? "border-green-500 bg-green-500"
@@ -859,7 +869,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                     </span>
                                   </div>
                                 </div>
-                              </div>
+                              </label>
                             ))}
                           </div>
                         </div>
