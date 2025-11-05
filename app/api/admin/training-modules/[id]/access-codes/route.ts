@@ -34,6 +34,22 @@ export async function GET(
     }
 
     const data = await response.json()
+    console.log("🔍 GET response data:", JSON.stringify(data, null, 2))
+    
+    // Transform response to ensure consistent format
+    // Backend may return { codes: [...], hasCode: true, ... } or similar
+    if (data && typeof data === 'object') {
+      // If there's a codes array, extract the active code
+      if (data.codes && Array.isArray(data.codes) && data.codes.length > 0) {
+        const activeCodeStr = data.codes[0]
+        return NextResponse.json({
+          hasCode: true,
+          code: activeCodeStr,
+          ...data
+        })
+      }
+    }
+    
     return NextResponse.json(data)
   } catch (error) {
     console.error("Error fetching module access codes:", error)

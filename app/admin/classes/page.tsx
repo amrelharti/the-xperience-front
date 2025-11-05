@@ -207,7 +207,13 @@ export default function ClassManagementPage() {
       })
       if (res.ok) {
         const data = await res.json()
+        console.log("🔍 Loaded class active code data:", data)
         setActiveCode(data)
+        // After successfully loading the active code, hide the "newly generated" section
+        // so the persistent "Active Code" section is shown instead
+        if (data?.hasCode) {
+          setShowGeneratedCode(false)
+        }
       }
     } catch (error) {
       console.error("Error loading active code:", error)
@@ -851,7 +857,7 @@ export default function ClassManagementPage() {
                         Copy
                       </Button>
                     </div>
-                    <p className="text-xs text-amber-700 mt-2 font-semibold">⚠️ Save this code now! It cannot be retrieved later.</p>
+                    <p className="text-xs text-emerald-700 mt-2 font-semibold">✓ This code will remain active and visible until you generate a new one.</p>
                   </div>
                 </div>
               )}

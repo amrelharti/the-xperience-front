@@ -15,8 +15,24 @@ export async function GET(
     })
     
     const data = await response.json()
+    console.log("🔍 GET class codes response:", JSON.stringify(data, null, 2))
+    
+    // Transform response to ensure consistent format
+    if (data && typeof data === 'object') {
+      // If there's a codes array, extract the active code
+      if (data.codes && Array.isArray(data.codes) && data.codes.length > 0) {
+        const activeCodeStr = data.codes[0]
+        return NextResponse.json({
+          hasCode: true,
+          code: activeCodeStr,
+          ...data
+        }, { status: response.status })
+      }
+    }
+    
     return NextResponse.json(data, { status: response.status })
   } catch (error) {
+    console.error('Error fetching class codes:', error)
     return NextResponse.json({ error: 'Failed to fetch class codes' }, { status: 500 })
   }
 }
