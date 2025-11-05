@@ -303,7 +303,8 @@ export default function TrainingModulesPage() {
       const res = await fetch(`/api/admin/training-modules/${selectedModule.id}/access-codes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include"
+        credentials: "include",
+        body: JSON.stringify({ count: 1 })
       })
 
       if (res.ok) {

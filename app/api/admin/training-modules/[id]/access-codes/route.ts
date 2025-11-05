@@ -56,14 +56,19 @@ export async function POST(
     console.log("🔍 POST Generate Code - Training Module ID:", moduleId)
     console.log("🔍 Cookie present:", !!cookie)
 
-    // No body needed for the new single-code generation endpoint
+    // Read the request body from the frontend
+    const body = await request.json()
+    console.log("🔍 Request body:", body)
+
+    // Forward the body to the backend
     const response = await fetch(`${backendUrl}/api/admin/training-modules/${moduleId}/codes`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Cookie": cookie
       },
-      credentials: "include"
+      credentials: "include",
+      body: JSON.stringify(body)
     })
     
     console.log("🔍 Response status:", response.status)
