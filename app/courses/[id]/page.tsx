@@ -375,7 +375,10 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         }),
       })
 
+      console.log("🔓 Unlock response status:", response.status)
+      
       if (response.ok) {
+        console.log("✅ Module unlocked successfully!")
         alert("Module unlocked successfully!")
         setShowUnlockDialog(false)
         setModuleAccessCode("")
@@ -397,8 +400,24 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           }
         }, 1000)
       } else {
-        const errorData = await response.json()
-        alert(`Unlock failed: ${errorData.error || "Invalid or used code"}`)
+        const errorText = await response.text()
+        let errorData
+        try {
+          errorData = JSON.parse(errorText)
+        } catch (e) {
+          errorData = { error: errorText }
+        }
+        
+        console.error("❌ Unlock failed!")
+        console.error("  - Status:", response.status)
+        console.error("  - Raw response:", errorText)
+        console.error("  - Parsed error:", JSON.stringify(errorData, null, 2))
+        console.error("  - Error message:", errorData.error || errorData.message || "Unknown error")
+        
+        const errorMsg = errorData.error || errorData.message || errorText || "Invalid or used code"
+        
+        // Show detailed error to user
+        alert(`⚠️ Unlock Failed!\n\nError: ${errorMsg}\n\nThis code may:\n- Have been used already (backend treating as single-use)\n- Belong to a different module\n- Be invalid or expired\n\nPlease check with admin or generate a new code.`)
       }
     } catch (error) {
       console.error("Error unlocking module:", error)
