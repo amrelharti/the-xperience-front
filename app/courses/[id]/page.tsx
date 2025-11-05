@@ -378,6 +378,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       }
 
       try {
+        console.log("🔍 Attempting enrollment with code:", enrollmentCode, "for class:", selectedClassId)
+        
         const response = await fetch(`/api/classes/${selectedClassId}/enroll-with-code`, {
           method: "POST",
           headers: {
@@ -386,7 +388,10 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           body: JSON.stringify({ code: enrollmentCode }),
         })
 
+        console.log("🔍 Enrollment response status:", response.status)
+
         if (response.ok) {
+          console.log("✅ Enrollment successful!")
           alert("Successfully enrolled in class!")
           setIsEnrolled(true)
           setShowClassSelection(false)
@@ -397,7 +402,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           await load(selectedClassId) // Pass the classId explicitly
         } else {
           const errorData = await response.json()
-          alert(`Enrollment failed: ${errorData.error || "Unknown error"}`)
+          console.error("❌ Enrollment failed:", errorData)
+          console.error("❌ Error details:", JSON.stringify(errorData, null, 2))
+          alert(`Enrollment failed: ${errorData.error || errorData.message || "Unknown error"}`)
         }
       } catch (error) {
         console.error("Error enrolling:", error)
