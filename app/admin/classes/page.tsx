@@ -221,15 +221,26 @@ export default function ClassManagementPage() {
       const res = await fetch(`/api/admin/classes/${selectedClassForCode.id}/codes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include"
+        credentials: "include",
+        body: JSON.stringify({ count: 1 })
       })
       
       if (res.ok) {
         const data = await res.json()
-        setNewlyGeneratedCode(data.code)
-        setShowGeneratedCode(true)
-        loadActiveCode(selectedClassForCode.id)
+        console.log("🔍 Response data:", data)
+        console.log("🔍 Code value:", data.code)
+        
+        if (data.code) {
+          setNewlyGeneratedCode(data.code)
+          setShowGeneratedCode(true)
+          loadActiveCode(selectedClassForCode.id)
+        } else {
+          console.error("❌ No code in response:", data)
+          alert("Generated code was not returned properly")
+        }
       } else {
+        const error = await res.text()
+        console.error("❌ Failed to generate code:", error)
         alert("Failed to generate code")
       }
     } catch (error) {
