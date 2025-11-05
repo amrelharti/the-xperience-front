@@ -230,40 +230,43 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             setAvailableClasses(availableClasses)
             
             // Smart class selection logic
-            if (trainingEnrollments.length > 1) {
-              // Check if student has a saved preference for this training
-              const savedClassId = localStorage.getItem(`selectedClass_${params.id}`)
-              const savedClass = savedClassId ? trainingEnrollments.find((c) => c.id === savedClassId) : null
-              
-              if (savedClass && savedClassId) {
-                // Student has a saved preference, use it
-                setSelectedClassId(savedClassId!)
-                setIsEnrolled(true)
-                // Load available classes in background for the switch button
-                await loadAvailableClasses()
-              } else {
-                // No saved preference - auto-select the first active class and save it
-                const firstActiveClass = trainingEnrollments.find((c: any) => c.isActive && !c.isArchived)
-                const classToUse = firstActiveClass || trainingEnrollments[0]
+            // ONLY auto-select if overrideClassId is NOT provided (meaning this is initial load, not user selection)
+            if (!overrideClassId) {
+              if (trainingEnrollments.length > 1) {
+                // Check if student has a saved preference for this training
+                const savedClassId = localStorage.getItem(`selectedClass_${params.id}`)
+                const savedClass = savedClassId ? trainingEnrollments.find((c) => c.id === savedClassId) : null
                 
-                setSelectedClassId(classToUse.id)
-                setIsEnrolled(true)
-                // Auto-save the selection so we don't ask again
-                if (classToUse.id) {
-                  localStorage.setItem(`selectedClass_${params.id}`, classToUse.id)
+                if (savedClass && savedClassId) {
+                  // Student has a saved preference, use it
+                  setSelectedClassId(savedClassId!)
+                  setIsEnrolled(true)
+                  // Load available classes in background for the switch button
+                  await loadAvailableClasses()
+                } else {
+                  // No saved preference - auto-select the first active class and save it
+                  const firstActiveClass = trainingEnrollments.find((c: any) => c.isActive && !c.isArchived)
+                  const classToUse = firstActiveClass || trainingEnrollments[0]
+                  
+                  setSelectedClassId(classToUse.id)
+                  setIsEnrolled(true)
+                  // Auto-save the selection so we don't ask again
+                  if (classToUse.id) {
+                    localStorage.setItem(`selectedClass_${params.id}`, classToUse.id)
+                  }
+                  // Load available classes in background for the switch button
+                  await loadAvailableClasses()
                 }
+              } else if (trainingEnrollments.length === 1) {
+                // Only one class available, auto-select it
+                const singleClass = trainingEnrollments[0]
+                setSelectedClassId(singleClass.id)
+                setIsEnrolled(true)
+                // Save the selection
+                localStorage.setItem(`selectedClass_${params.id}`, singleClass.id)
                 // Load available classes in background for the switch button
                 await loadAvailableClasses()
               }
-            } else if (trainingEnrollments.length === 1) {
-              // Only one class available, auto-select it
-              const singleClass = trainingEnrollments[0]
-              setSelectedClassId(singleClass.id)
-              setIsEnrolled(true)
-              // Save the selection
-              localStorage.setItem(`selectedClass_${params.id}`, singleClass.id)
-              // Load available classes in background for the switch button
-              await loadAvailableClasses()
             }
           }
         } catch (enrollError) {
@@ -426,7 +429,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
 
   useEffect(() => {
     load()
-  }, [load])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
 
   // Debug: Track selectedClassId changes
