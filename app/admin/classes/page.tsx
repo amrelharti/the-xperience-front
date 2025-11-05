@@ -59,12 +59,34 @@ export default function ClassManagementPage() {
   const [activeCode, setActiveCode] = useState<{
     hasCode: boolean
     code?: string
-    codeId?: string
-    createdAt?: string
-    generatedBy?: string
-    usageCount?: number
-    recentUsage?: Array<{userName: string, userEmail: string, usedAt: string}>
+    codesCount?: number
+    unusedCount?: number
   } | null>(null)
+  
+  // Store generated codes in localStorage so they remain visible
+  const getStoredCode = (classId: string) => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`class-code-${classId}`)
+      return stored ? JSON.parse(stored) : null
+    }
+    return null
+  }
+  
+  const storeCode = (classId: string, code: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`class-code-${classId}`, JSON.stringify({
+        code,
+        timestamp: new Date().toISOString()
+      }))
+    }
+  }
+  
+  const clearStoredCode = (classId: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(`class-code-${classId}`)
+    }
+  }
+  
   const [showGeneratedCode, setShowGeneratedCode] = useState(false)
   const [newlyGeneratedCode, setNewlyGeneratedCode] = useState("")
 
@@ -208,10 +230,17 @@ export default function ClassManagementPage() {
       if (res.ok) {
         const data = await res.json()
         console.log("🔍 Loaded class active code data:", data)
-        setActiveCode(data)
-        // After successfully loading the active code, hide the "newly generated" section
-        // so the persistent "Active Code" section is shown instead
-        if (data?.hasCode) {
+        
+        // Get the stored code from localStorage (backend masks codes for security)
+        const storedCodeData = getStoredCode(classId)
+        
+        setActiveCode({
+          ...data,
+          code: storedCodeData?.code || null // Use stored code if available
+        })
+        
+        // After successfully loading, hide the "newly generated" section
+        if (data?.hasCode && storedCodeData?.code) {
           setShowGeneratedCode(false)
         }
       }
@@ -237,6 +266,9 @@ export default function ClassManagementPage() {
         console.log("🔍 Code value:", data.code)
         
         if (data.code) {
+          // Store the code in localStorage so it remains visible
+          storeCode(selectedClassForCode.id, data.code)
+          
           setNewlyGeneratedCode(data.code)
           setShowGeneratedCode(true)
           loadActiveCode(selectedClassForCode.id)
@@ -796,9 +828,9 @@ export default function ClassManagementPage() {
                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                     Active Code
                   </h3>
-                  <div className="p-4 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-300 rounded-lg space-y-3">
-                    {/* Display the actual code */}
-                    {activeCode.code && (
+                  {/* Display the actual code if we have it stored */}
+                  {activeCode.code ? (
+                    <div className="p-4 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-300 rounded-lg space-y-3">
                       <div className="flex items-center justify-between p-3 bg-white/80 rounded-lg">
                         <code className="font-mono text-xl text-emerald-800 font-bold tracking-wider">{activeCode.code}</code>
                         <Button
@@ -810,30 +842,25 @@ export default function ClassManagementPage() {
                           Copy
                         </Button>
                       </div>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-slate-600 mb-1">Created by {activeCode.generatedBy}</p>
-                        <p className="text-xs text-slate-500">{new Date(activeCode.createdAt!).toLocaleString()}</p>
+                      <p className="text-xs text-emerald-700 mt-2 font-semibold">✓ This code will remain active and visible until you generate a new one.</p>
+                      <div className="pt-2 border-t border-emerald-200 mt-2">
+                        <p className="text-xs text-slate-600">
+                          Total codes: <span className="font-semibold text-emerald-700">{activeCode.codesCount || 0}</span>
+                          {' • '}
+                          Unused: <span className="font-semibold text-emerald-700">{activeCode.unusedCount || 0}</span>
+                        </p>
                       </div>
-                      <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white">
-                        Active
-                      </Badge>
                     </div>
-                    <div className="pt-2 border-t border-emerald-200">
-                      <p className="text-xs text-slate-600 mb-2">Usage: <span className="font-semibold text-emerald-700">{activeCode.usageCount} students</span></p>
-                      {activeCode.recentUsage && activeCode.recentUsage.length > 0 && (
-                        <div className="text-xs text-slate-600">
-                          <p className="font-semibold mb-1">Recent Usage:</p>
-                          <div className="space-y-1 max-h-24 overflow-y-auto">
-                            {activeCode.recentUsage.slice(0, 5).map((usage, idx) => (
-                              <div key={idx} className="text-xs">• {usage.userName} - {new Date(usage.usedAt).toLocaleString()}</div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                  ) : (
+                    <div className="p-4 bg-amber-50 rounded-lg border-2 border-amber-200">
+                      <p className="text-sm text-amber-800 mb-2">
+                        <strong>{activeCode.unusedCount || 0} unused code(s)</strong> exist for this class.
+                      </p>
+                      <p className="text-xs text-amber-700">
+                        The code was generated earlier and is not visible for security reasons. Generate a new code to see it.
+                      </p>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
 

@@ -67,8 +67,34 @@ export default function TrainingModulesPage() {
     createdAt?: string
     generatedBy?: string
     usageCount?: number
+    unusedCount?: number
+    codesCount?: number
     recentUsage?: Array<{userName: string, userEmail: string, usedAt: string}>
   } | null>(null)
+  
+  // Store generated codes in localStorage so they remain visible
+  const getStoredCode = (moduleId: string) => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(`module-code-${moduleId}`)
+      return stored ? JSON.parse(stored) : null
+    }
+    return null
+  }
+  
+  const storeCode = (moduleId: string, code: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`module-code-${moduleId}`, JSON.stringify({
+        code,
+        timestamp: new Date().toISOString()
+      }))
+    }
+  }
+  
+  const clearStoredCode = (moduleId: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(`module-code-${moduleId}`)
+    }
+  }
   const [showGeneratedCode, setShowGeneratedCode] = useState(false)
   const [newlyGeneratedCode, setNewlyGeneratedCode] = useState("")
   const [loadingCodes, setLoadingCodes] = useState(false)
@@ -288,10 +314,17 @@ export default function TrainingModulesPage() {
       if (res.ok) {
         const data = await res.json()
         console.log("🔍 Loaded active code data:", data)
-        setActiveCode(data)
-        // After successfully loading the active code, hide the "newly generated" section
-        // so the persistent "Active Code" section is shown instead
-        if (data?.hasCode) {
+        
+        // Get the stored code from localStorage (backend masks codes for security)
+        const storedCodeData = getStoredCode(moduleId)
+        
+        setActiveCode({
+          ...data,
+          code: storedCodeData?.code || null // Use stored code if available
+        })
+        
+        // After successfully loading, hide the "newly generated" section
+        if (data?.hasCode && storedCodeData?.code) {
           setShowGeneratedCode(false)
         }
       }
@@ -319,8 +352,18 @@ export default function TrainingModulesPage() {
         console.log("🔍 Code value:", data.code)
         
         if (data.code) {
+          // Store the code in localStorage so it remains visible
+          storeCode(selectedModule.id, data.code)
+          
           setNewlyGeneratedCode(data.code)
           setShowGeneratedCode(true)
+          
+          toast({
+            title: "Access Code Generated",
+            description: "New access code created successfully"
+          })
+          
+          await loadActiveCode(selectedModule.id)
         } else {
           console.error("❌ No code in response:", data)
           toast({
@@ -330,11 +373,6 @@ export default function TrainingModulesPage() {
           })
           return
         }
-        toast({
-          title: "Access Code Generated",
-          description: "New access code created successfully"
-        })
-        await loadActiveCode(selectedModule.id)
       } else {
         toast({
           title: "Error",
@@ -888,41 +926,38 @@ export default function TrainingModulesPage() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {/* Display the actual code */}
-                      {activeCode.code && (
-                        <div className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm">
-                          <code className="font-mono text-xl text-emerald-800 font-bold tracking-wider">{activeCode.code}</code>
-                          <Button
-                            size="sm"
-                            onClick={() => copyToClipboard(activeCode.code!)}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                          >
-                            <Copy className="h-4 w-4 mr-1" />
-                            Copy
-                          </Button>
+                      {/* Display the actual code if we have it stored */}
+                      {activeCode.code ? (
+                        <div>
+                          <div className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm mb-2">
+                            <code className="font-mono text-xl text-emerald-800 font-bold tracking-wider">{activeCode.code}</code>
+                            <Button
+                              size="sm"
+                              onClick={() => copyToClipboard(activeCode.code!)}
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                            >
+                              <Copy className="h-4 w-4 mr-1" />
+                              Copy
+                            </Button>
+                          </div>
+                          <p className="text-xs text-emerald-700 font-semibold">✓ This code will remain active and visible until you generate a new one.</p>
+                        </div>
+                      ) : (
+                        <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                          <p className="text-sm text-amber-800 mb-2">
+                            <strong>{activeCode.unusedCount || 0} unused code(s)</strong> exist for this module.
+                          </p>
+                          <p className="text-xs text-amber-700">
+                            The code was generated earlier and is not visible for security reasons. Generate a new code to see it.
+                          </p>
                         </div>
                       )}
-                      <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
-                        <div>
-                          <p className="text-xs text-slate-600 mb-1">Created by {activeCode.generatedBy}</p>
-                          <p className="text-xs text-slate-500">{new Date(activeCode.createdAt!).toLocaleString()}</p>
-                        </div>
-                        <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white">
-                          Active
-                        </Badge>
-                      </div>
                       <div className="pt-2 border-t border-emerald-200">
-                        <p className="text-sm text-slate-600 mb-2">Usage: <span className="font-semibold text-emerald-700">{activeCode.usageCount} students</span></p>
-                        {activeCode.recentUsage && activeCode.recentUsage.length > 0 && (
-                          <div className="text-xs text-slate-600">
-                            <p className="font-semibold mb-2">Recent Usage:</p>
-                            <div className="space-y-1 max-h-32 overflow-y-auto bg-white/40 p-2 rounded">
-                              {activeCode.recentUsage.slice(0, 5).map((usage, idx) => (
-                                <div key={idx} className="text-xs">• {usage.userName} - {new Date(usage.usedAt).toLocaleString()}</div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                        <p className="text-sm text-slate-600">
+                          Total codes: <span className="font-semibold text-emerald-700">{activeCode.codesCount || 0}</span>
+                          {' • '}
+                          Unused: <span className="font-semibold text-emerald-700">{activeCode.unusedCount || 0}</span>
+                        </p>
                       </div>
                     </CardContent>
                   </Card>

@@ -36,21 +36,28 @@ export async function GET(
     const data = await response.json()
     console.log("🔍 GET response data:", JSON.stringify(data, null, 2))
     
-    // Transform response to ensure consistent format
-    // Backend may return { codes: [...], hasCode: true, ... } or similar
-    if (data && typeof data === 'object') {
-      // If there's a codes array, extract the active code
-      if (data.codes && Array.isArray(data.codes) && data.codes.length > 0) {
-        const activeCodeStr = data.codes[0]
-        return NextResponse.json({
-          hasCode: true,
-          code: activeCodeStr,
-          ...data
-        })
-      }
+    // Backend returns array of code objects: [{ id, code: "••••••••", isUsed, ... }]
+    // Codes are masked for security, so we can't show the actual code from GET
+    if (Array.isArray(data) && data.length > 0) {
+      // Find the most recent unused code
+      const unusedCodes = data.filter((c: any) => !c.isUsed)
+      const hasActiveCode = unusedCodes.length > 0
+      
+      return NextResponse.json({
+        hasCode: hasActiveCode,
+        code: null, // Code is masked by backend for security
+        codesCount: data.length,
+        unusedCount: unusedCodes.length,
+        codes: data
+      })
     }
     
-    return NextResponse.json(data)
+    return NextResponse.json({
+      hasCode: false,
+      code: null,
+      codesCount: 0,
+      unusedCount: 0
+    })
   } catch (error) {
     console.error("Error fetching module access codes:", error)
     return NextResponse.json(
