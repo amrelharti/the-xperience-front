@@ -76,6 +76,23 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       window.location.href = "/auth/signin"
     }
   }, [user, userLoading])
+  
+  // Clear stale class selection when user changes
+  useEffect(() => {
+    if (user?.id) {
+      const storageKey = `selectedClass_${params.id}`
+      const savedClassId = localStorage.getItem(storageKey)
+      const userKey = `classUser_${params.id}`
+      const savedUserId = localStorage.getItem(userKey)
+      
+      // If the saved class was selected by a different user, clear it
+      if (savedClassId && savedUserId && savedUserId !== user.id) {
+        console.log("🧹 Clearing class selection from different user")
+        localStorage.removeItem(storageKey)
+        localStorage.removeItem(userKey)
+      }
+    }
+  }, [user?.id, params.id])
 
   const loadModuleProgress = useCallback(async (trainingData: Training, classId?: string) => {
     if (!user || !trainingData?.modules) return
@@ -238,13 +255,15 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                 const savedClassId = localStorage.getItem(`selectedClass_${params.id}`)
                 const savedClass = savedClassId ? trainingEnrollments.find((c) => c.id === savedClassId) : null
                 
-                if (savedClass && savedClassId) {
-                  // Student has a saved preference, use it
-                  setSelectedClassId(savedClassId!)
-                  setIsEnrolled(true)
-                  // Load available classes in background for the switch button
-                  await loadAvailableClasses()
-                } else {
+              if (savedClass && savedClassId) {
+                // Student has a saved preference, use it
+                setSelectedClassId(savedClassId!)
+                setIsEnrolled(true)
+                // Save the user ID who made this selection
+                localStorage.setItem(`classUser_${params.id}`, user.id)
+                // Load available classes in background for the switch button
+                await loadAvailableClasses()
+              } else {
                   // No saved preference - auto-select the first active class and save it
                   const firstActiveClass = trainingEnrollments.find((c: any) => c.isActive && !c.isArchived)
                   const classToUse = firstActiveClass || trainingEnrollments[0]
@@ -254,6 +273,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                   // Auto-save the selection so we don't ask again
                   if (classToUse.id) {
                     localStorage.setItem(`selectedClass_${params.id}`, classToUse.id)
+                    localStorage.setItem(`classUser_${params.id}`, user.id)
                   }
                   // Load available classes in background for the switch button
                   await loadAvailableClasses()
@@ -265,6 +285,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                 setIsEnrolled(true)
                 // Save the selection
                 localStorage.setItem(`selectedClass_${params.id}`, singleClass.id)
+                localStorage.setItem(`classUser_${params.id}`, user.id)
                 // Load available classes in background for the switch button
                 await loadAvailableClasses()
               }
@@ -405,6 +426,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           setShowClassSelection(false)
           // Save the student's choice for this training
           localStorage.setItem(`selectedClass_${params.id}`, selectedClassId)
+          if (user?.id) {
+            localStorage.setItem(`classUser_${params.id}`, user.id)
+          }
           // Reload the training data with the new class context
           setLoading(true)
           await load(selectedClassId) // Pass the classId explicitly
@@ -426,6 +450,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       setSelectedClassId(selectedClassId)
       // Save the student's choice for this training
       localStorage.setItem(`selectedClass_${params.id}`, selectedClassId)
+      if (user?.id) {
+        localStorage.setItem(`classUser_${params.id}`, user.id)
+      }
       // Reload the training data with the new class context
       setLoading(true)
       await load(selectedClassId) // Pass the classId explicitly
@@ -619,6 +646,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                             size="sm"
                             onClick={async () => {
                               localStorage.removeItem(`selectedClass_${params.id}`)
+                              localStorage.removeItem(`classUser_${params.id}`)
                               setShowClassSelection(true)
                               await loadAvailableClasses()
                             }}
