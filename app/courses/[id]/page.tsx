@@ -791,15 +791,17 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                     ? "border-blue-500 bg-blue-50"
                                     : "border-blue-200 bg-blue-25 hover:border-blue-300"
                                 }`}
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
                                   console.log("🖱️ Clicked on ARCHIVED class:", classItem.name, "id:", classItem.id)
                                   console.log("🔍 Current selectedClassId before:", selectedClassId)
                                   setSelectedClassId(classItem.id)
                                   console.log("✅ Set selectedClassId to:", classItem.id)
                                 }}
                               >
-                                <div className="flex items-center gap-3">
-                                  <div className={`h-4 w-4 rounded-full border-2 ${
+                                <div className="flex items-center gap-3 pointer-events-none">
+                                  <div className={`h-4 w-4 rounded-full border-2 flex-shrink-0 ${
                                     selectedClassId === classItem.id
                                       ? "border-blue-500 bg-blue-500"
                                       : "border-blue-300"
@@ -834,15 +836,17 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                     ? "border-green-500 bg-green-50"
                                     : "border-green-200 bg-green-25 hover:border-green-300"
                                 }`}
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
                                   console.log("🖱️ Clicked on ACTIVE class:", classItem.name, "id:", classItem.id)
                                   console.log("🔍 Current selectedClassId before:", selectedClassId)
                                   setSelectedClassId(classItem.id)
                                   console.log("✅ Set selectedClassId to:", classItem.id)
                                 }}
                               >
-                                <div className="flex items-center gap-3">
-                                  <div className={`h-4 w-4 rounded-full border-2 ${
+                                <div className="flex items-center gap-3 pointer-events-none">
+                                  <div className={`h-4 w-4 rounded-full border-2 flex-shrink-0 ${
                                     selectedClassId === classItem.id
                                       ? "border-green-500 bg-green-500"
                                       : "border-green-300"
