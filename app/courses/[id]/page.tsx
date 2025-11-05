@@ -77,7 +77,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     }
   }, [user, userLoading])
   
-  // Load saved class selection from localStorage on mount (before loading training data)
+  // Clear stale class selection from different users
   useEffect(() => {
     if (user?.id) {
       const storageKey = `selectedClass_${params.id}`
@@ -90,10 +90,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         console.log("🧹 Clearing class selection from different user")
         localStorage.removeItem(storageKey)
         localStorage.removeItem(userKey)
-      } else if (savedClassId && savedUserId === user.id) {
-        // Restore this user's saved class selection
-        console.log("📌 Restoring saved class selection:", savedClassId)
-        setSelectedClassId(savedClassId)
       }
     }
   }, [user?.id, params.id])
@@ -212,8 +208,20 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       setLoading(true)
       setError(null)
 
-      // Use overrideClassId if provided, otherwise use selectedClassId
-      const classIdToUse = overrideClassId || selectedClassId
+      // Priority: overrideClassId > selectedClassId > localStorage
+      let classIdToUse = overrideClassId || selectedClassId
+      
+      // If still no classId, check localStorage directly
+      if (!classIdToUse && user?.id) {
+        const savedClassId = localStorage.getItem(`selectedClass_${params.id}`)
+        const savedUserId = localStorage.getItem(`classUser_${params.id}`)
+        if (savedClassId && savedUserId === user.id) {
+          classIdToUse = savedClassId
+          setSelectedClassId(savedClassId) // Update state immediately
+          console.log("📌 Using class from localStorage in load():", savedClassId)
+        }
+      }
+      
       const classIdParam = classIdToUse ? `?classId=${classIdToUse}` : ''
       console.log("🔄 Loading training with classId:", classIdToUse, "param:", classIdParam)
       const trainingResponse = await fetch(`/api/courses/${params.id}${classIdParam}`)
