@@ -68,6 +68,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
   const [unlockingModule, setUnlockingModule] = useState<string | null>(null)
   const [moduleAccessCode, setModuleAccessCode] = useState("")
   const [showUnlockDialog, setShowUnlockDialog] = useState(false)
+  const [isManuallySelectingClass, setIsManuallySelectingClass] = useState(false)
 
   // Check authentication when component mounts
   useEffect(() => {
@@ -230,8 +231,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             setAvailableClasses(availableClasses)
             
             // Smart class selection logic
-            // ONLY auto-select if overrideClassId is NOT provided (meaning this is initial load, not user selection)
-            if (!overrideClassId) {
+            // ONLY auto-select if we're not in manual selection mode AND overrideClassId is not provided
+            if (!isManuallySelectingClass && !overrideClassId) {
               if (trainingEnrollments.length > 1) {
                 // Check if student has a saved preference for this training
                 const savedClassId = localStorage.getItem(`selectedClass_${params.id}`)
@@ -267,6 +268,10 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                 // Load available classes in background for the switch button
                 await loadAvailableClasses()
               }
+            }
+            // Always load available classes for switch button if enrolled
+            if (enrolled && trainingEnrollments.length > 1 && !overrideClassId) {
+              await loadAvailableClasses()
             }
           }
         } catch (enrollError) {
@@ -428,9 +433,10 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
   }
 
   useEffect(() => {
-    load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    if (!userLoading) {
+      load()
+    }
+  }, [load, userLoading])
 
 
   // Debug: Track selectedClassId changes
@@ -798,7 +804,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                 }`}
                                 onClick={(e) => {
                                   console.log("📍 Label clicked for ARCHIVED class:", classItem.name)
+                                  setIsManuallySelectingClass(true)
                                   setSelectedClassId(classItem.id)
+                                  setTimeout(() => setIsManuallySelectingClass(false), 1000)
                                 }}
                               >
                                 <div className="flex items-center gap-3">
@@ -856,7 +864,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                 }`}
                                 onClick={(e) => {
                                   console.log("📍 Label clicked for ACTIVE class:", classItem.name)
+                                  setIsManuallySelectingClass(true)
                                   setSelectedClassId(classItem.id)
+                                  setTimeout(() => setIsManuallySelectingClass(false), 1000)
                                 }}
                               >
                                 <div className="flex items-center gap-3">
