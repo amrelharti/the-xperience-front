@@ -309,7 +309,10 @@ export default function TrainingModulesPage() {
 
       if (res.ok) {
         const data = await res.json()
-        setNewlyGeneratedCode(data.code)
+        console.log("🔍 Backend response data:", data)
+        console.log("🔍 Code value:", data.code)
+        console.log("🔍 Full data structure:", JSON.stringify(data, null, 2))
+        setNewlyGeneratedCode(data.code || data.accessCode || data)
         setShowGeneratedCode(true)
         toast({
           title: "Access Code Generated",

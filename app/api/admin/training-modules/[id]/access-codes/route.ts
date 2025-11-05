@@ -83,7 +83,16 @@ export async function POST(
     }
 
     const data = await response.json()
-    return NextResponse.json(data)
+    console.log("🔍 Raw backend response from POST:", JSON.stringify(data, null, 2))
+    console.log("🔍 Response type:", Array.isArray(data) ? 'array' : typeof data)
+    
+    // If backend returns an array, extract the first code
+    const responseData = Array.isArray(data) && data.length > 0 
+      ? { code: data[0].code || data[0] }
+      : data
+    
+    console.log("🔍 Transformed response:", JSON.stringify(responseData, null, 2))
+    return NextResponse.json(responseData)
   } catch (error) {
     console.error("Error generating module access code:", error)
     return NextResponse.json(
