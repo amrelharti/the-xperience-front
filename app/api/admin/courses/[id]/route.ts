@@ -4,10 +4,10 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:80
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     
     const response = await fetch(`${BACKEND_URL}/api/admin/courses/${id}`, {
       method: 'DELETE',
@@ -36,10 +36,10 @@ export async function DELETE(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     
     const response = await fetch(`${BACKEND_URL}/api/admin/courses/${id}`, {
@@ -72,10 +72,10 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     
     const response = await fetch(`${BACKEND_URL}/api/admin/courses/${id}`, {
       method: 'GET',
