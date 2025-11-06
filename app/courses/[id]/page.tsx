@@ -360,7 +360,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     console.log("📚 Target module:", moduleToUnlock.title)
 
     try {
-      const response = await fetch(`/api/training-modules/${unlockingModule}/unlock`, {
+      // Use new class-specific verification endpoint
+      const response = await fetch(`/api/training-modules/${unlockingModule}/verify-code`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -368,9 +369,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         credentials: "include",
         body: JSON.stringify({ 
           code: moduleAccessCode,
-          // Explicitly include the module ID in the request body as a safeguard
-          moduleId: unlockingModule,
-          // CRITICAL: Pass classId for class-specific access
           classId: selectedClassId
         }),
       })
