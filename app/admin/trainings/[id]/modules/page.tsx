@@ -61,7 +61,7 @@ export default function TrainingModulesPage() {
   const [showCodesDialog, setShowCodesDialog] = useState(false)
   const [selectedModule, setSelectedModule] = useState<TrainingModule | null>(null)
   const [selectedClass, setSelectedClass] = useState<string>("")
-  const [availableClasses, setAvailableClasses] = useState<Array<{id: string, className: string}>>([])
+  const [availableClasses, setAvailableClasses] = useState<Array<{id: string, name: string}>>([])
   const [activeCode, setActiveCode] = useState<{
     hasCode: boolean
     code?: string
@@ -929,7 +929,7 @@ export default function TrainingModulesPage() {
                         <option value="">-- Select a class --</option>
                         {availableClasses.map((cls) => (
                           <option key={cls.id} value={cls.id}>
-                            {cls.className}
+                            {cls.name}
                           </option>
                         ))}
                       </select>

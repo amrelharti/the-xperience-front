@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 
+/**
+ * Get access codes for a training module (optionally filtered by class)
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -9,11 +12,15 @@ export async function GET(
     const moduleId = params.id
     const cookie = request.headers.get("cookie") || ""
     
+    // Get optional classId query param
+    const { searchParams } = new URL(request.url)
+    const classId = searchParams.get('classId')
+    const queryParam = classId ? `?classId=${classId}` : ''
+    
     console.log("🔍 GET Access Codes - Training Module ID:", moduleId)
-    console.log("🔍 Cookie present:", !!cookie)
-    console.log("🔍 Backend URL:", `${backendUrl}/api/admin/training-modules/${moduleId}/codes`)
+    console.log("🔍 Class ID:", classId || "all classes")
 
-    const response = await fetch(`${backendUrl}/api/admin/training-modules/${moduleId}/codes`, {
+    const response = await fetch(`${backendUrl}/api/admin/training-modules/${moduleId}/codes${queryParam}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -36,28 +43,7 @@ export async function GET(
     const data = await response.json()
     console.log("🔍 GET response data:", JSON.stringify(data, null, 2))
     
-    // Backend returns array of code objects: [{ id, code: "••••••••", isUsed, ... }]
-    // Codes are masked for security, so we can't show the actual code from GET
-    if (Array.isArray(data) && data.length > 0) {
-      // Find the most recent unused code
-      const unusedCodes = data.filter((c: any) => !c.isUsed)
-      const hasActiveCode = unusedCodes.length > 0
-      
-      return NextResponse.json({
-        hasCode: hasActiveCode,
-        code: null, // Code is masked by backend for security
-        codesCount: data.length,
-        unusedCount: unusedCodes.length,
-        codes: data
-      })
-    }
-    
-    return NextResponse.json({
-      hasCode: false,
-      code: null,
-      codesCount: 0,
-      unusedCount: 0
-    })
+    return NextResponse.json(data)
   } catch (error) {
     console.error("Error fetching module access codes:", error)
     return NextResponse.json(
@@ -67,6 +53,9 @@ export async function GET(
   }
 }
 
+/**
+ * Generate a new access code for a training module and class
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -79,7 +68,7 @@ export async function POST(
     console.log("🔍 POST Generate Code - Training Module ID:", moduleId)
     console.log("🔍 Cookie present:", !!cookie)
 
-    // Read the request body from the frontend
+    // Read the request body from the frontend (includes classId)
     const body = await request.json()
     console.log("🔍 Request body:", body)
 
@@ -108,20 +97,7 @@ export async function POST(
     const data = await response.json()
     console.log("🔍 Raw backend response from POST:", JSON.stringify(data, null, 2))
     
-    // Backend returns { codes: ["CODE1", "CODE2"] }
-    // Extract the first code from the array
-    let code = null
-    if (data.codes && Array.isArray(data.codes) && data.codes.length > 0) {
-      code = data.codes[0]
-    } else if (data.code) {
-      code = data.code
-    } else if (typeof data === 'string') {
-      code = data
-    }
-    
-    const responseData = { code }
-    console.log("🔍 Transformed response:", JSON.stringify(responseData, null, 2))
-    return NextResponse.json(responseData)
+    return NextResponse.json(data)
   } catch (error) {
     console.error("Error generating module access code:", error)
     return NextResponse.json(
@@ -130,4 +106,3 @@ export async function POST(
     )
   }
 }
-

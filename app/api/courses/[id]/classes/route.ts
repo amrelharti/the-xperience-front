@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 
 /**
- * Get all classes for a specific training (course)
+ * Get all classes for a specific training (module)
+ * Note: In the backend, 'module' refers to what the frontend calls 'training/course'
  */
 export async function GET(
   request: NextRequest,
@@ -9,10 +10,13 @@ export async function GET(
 ) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"
-    const trainingId = params.id
+    const moduleId = params.id // This is the training/course ID
     const cookie = request.headers.get("cookie") || ""
 
-    const response = await fetch(`${backendUrl}/api/courses/${trainingId}/classes`, {
+    console.log("🔍 Fetching classes for module:", moduleId)
+
+    // The backend endpoint is /api/classes/module/{moduleId}
+    const response = await fetch(`${backendUrl}/api/classes/module/${moduleId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -20,6 +24,8 @@ export async function GET(
       },
       credentials: "include"
     })
+
+    console.log("🔍 Response status:", response.status)
 
     if (!response.ok) {
       const error = await response.text()
@@ -31,6 +37,7 @@ export async function GET(
     }
 
     const data = await response.json()
+    console.log("✅ Classes loaded:", data.length, "classes")
     return NextResponse.json(data)
   } catch (error) {
     console.error("Error fetching classes:", error)
