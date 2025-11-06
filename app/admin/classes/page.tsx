@@ -62,31 +62,6 @@ export default function ClassManagementPage() {
     codesCount?: number
     unusedCount?: number
   } | null>(null)
-  
-  // Store generated codes in localStorage so they remain visible
-  const getStoredCode = (classId: string) => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(`class-code-${classId}`)
-      return stored ? JSON.parse(stored) : null
-    }
-    return null
-  }
-  
-  const storeCode = (classId: string, code: string) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`class-code-${classId}`, JSON.stringify({
-        code,
-        timestamp: new Date().toISOString()
-      }))
-    }
-  }
-  
-  const clearStoredCode = (classId: string) => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(`class-code-${classId}`)
-    }
-  }
-  
   const [showGeneratedCode, setShowGeneratedCode] = useState(false)
   const [newlyGeneratedCode, setNewlyGeneratedCode] = useState("")
 
@@ -231,16 +206,11 @@ export default function ClassManagementPage() {
         const data = await res.json()
         console.log("🔍 Loaded class active code data:", data)
         
-        // Get the stored code from localStorage (backend masks codes for security)
-        const storedCodeData = getStoredCode(classId)
+        // Backend now returns the plain code directly for admins
+        setActiveCode(data)
         
-        setActiveCode({
-          ...data,
-          code: storedCodeData?.code || null // Use stored code if available
-        })
-        
-        // After successfully loading, hide the "newly generated" section
-        if (data?.hasCode && storedCodeData?.code) {
+        // Hide the "newly generated" banner after loading
+        if (data?.hasCode) {
           setShowGeneratedCode(false)
         }
       }
@@ -266,12 +236,11 @@ export default function ClassManagementPage() {
         console.log("🔍 Code value:", data.code)
         
         if (data.code) {
-          // Store the code in localStorage so it remains visible
-          storeCode(selectedClassForCode.id, data.code)
-          
           setNewlyGeneratedCode(data.code)
           setShowGeneratedCode(true)
-          loadActiveCode(selectedClassForCode.id)
+          
+          // Reload to show in the active codes list
+          await loadActiveCode(selectedClassForCode.id)
         } else {
           console.error("❌ No code in response:", data)
           alert("Generated code was not returned properly")
@@ -853,11 +822,11 @@ export default function ClassManagementPage() {
                     </div>
                   ) : (
                     <div className="p-4 bg-amber-50 rounded-lg border-2 border-amber-200">
-                      <p className="text-sm text-amber-800 mb-2">
-                        <strong>{activeCode.unusedCount || 0} unused code(s)</strong> exist for this class.
+                      <p className="text-sm text-amber-800 mb-2 font-semibold">
+                        An enrollment code exists but wasn't stored properly.
                       </p>
                       <p className="text-xs text-amber-700">
-                        The code was generated earlier and is not visible for security reasons. Generate a new code to see it.
+                        Please generate a new code to see and share it with students.
                       </p>
                     </div>
                   )}

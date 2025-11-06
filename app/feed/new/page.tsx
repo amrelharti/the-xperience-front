@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Send, MessageSquare, FileText, HelpCircle, Megaphone } from "lucide-react"
+import { ArrowLeft, Send, MessageSquare, FileText, HelpCircle, Megaphone, BookOpen } from "lucide-react"
 import { FileUpload } from "@/components/ui/file-upload"
 import { useUser } from "@/app/hooks/useUser"
 import UserDropdown from "@/app/components/UserDropdown"
@@ -212,7 +212,8 @@ export default function NewPostPage() {
   const getPostTypeIcon = (type: string) => {
     switch (type) {
       case 'ASSIGNMENT': return <FileText className="h-4 w-4" />
-      case 'QUESTION': return <HelpCircle className="h-4 w-4" />
+      case 'WEEKLY_SUMMARY': return <BookOpen className="h-4 w-4" />
+      case 'FEEDBACK': return <MessageSquare className="h-4 w-4" />
       case 'ANNOUNCEMENT': return <Megaphone className="h-4 w-4" />
       default: return <MessageSquare className="h-4 w-4" />
     }
@@ -297,18 +298,26 @@ export default function NewPostPage() {
                           Assignment Submission
                         </div>
                       </SelectItem>
-                      <SelectItem value="QUESTION">
+                      <SelectItem value="WEEKLY_SUMMARY">
                         <div className="flex items-center gap-2">
-                          <HelpCircle className="h-4 w-4" />
-                          Question
+                          <BookOpen className="h-4 w-4" />
+                          Weekly Summary
                         </div>
                       </SelectItem>
-                      <SelectItem value="ANNOUNCEMENT">
+                      <SelectItem value="FEEDBACK">
                         <div className="flex items-center gap-2">
-                          <Megaphone className="h-4 w-4" />
-                          Announcement
+                          <MessageSquare className="h-4 w-4" />
+                          Feedback
                         </div>
                       </SelectItem>
+                      {user?.role === 'ADMIN' && (
+                        <SelectItem value="ANNOUNCEMENT">
+                          <div className="flex items-center gap-2">
+                            <Megaphone className="h-4 w-4" />
+                            Announcement
+                          </div>
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>

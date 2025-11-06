@@ -29,7 +29,7 @@ import { useToast } from "@/hooks/use-toast"
 
 interface Post {
   id: string
-  type: 'POST' | 'ASSIGNMENT' | 'QUESTION' | 'ANNOUNCEMENT'
+  type: 'POST' | 'ASSIGNMENT' | 'WEEKLY_SUMMARY' | 'FEEDBACK' | 'ANNOUNCEMENT'
   title?: string
   content: string
   attachments?: string
@@ -179,7 +179,8 @@ export default function AdminFeedPage() {
   const getPostIcon = (type: string) => {
     switch (type) {
       case 'ASSIGNMENT': return <FileText className="h-4 w-4" />
-      case 'QUESTION': return <HelpCircle className="h-4 w-4" />
+      case 'WEEKLY_SUMMARY': return <BookOpen className="h-4 w-4" />
+      case 'FEEDBACK': return <MessageSquare className="h-4 w-4" />
       case 'ANNOUNCEMENT': return <Megaphone className="h-4 w-4" />
       default: return <MessageSquare className="h-4 w-4" />
     }
@@ -188,7 +189,8 @@ export default function AdminFeedPage() {
   const getPostTypeColor = (type: string) => {
     switch (type) {
       case 'ASSIGNMENT': return "bg-blue-100 text-blue-800"
-      case 'QUESTION': return "bg-yellow-100 text-yellow-800"
+      case 'WEEKLY_SUMMARY': return "bg-purple-100 text-purple-800"
+      case 'FEEDBACK': return "bg-green-100 text-green-800"
       case 'ANNOUNCEMENT': return "bg-red-100 text-red-800"
       default: return "bg-gray-100 text-gray-800"
     }
@@ -401,7 +403,8 @@ export default function AdminFeedPage() {
                       <SelectItem value="all">All Posts</SelectItem>
                       <SelectItem value="POST">Posts</SelectItem>
                       <SelectItem value="ASSIGNMENT">Assignments</SelectItem>
-                      <SelectItem value="QUESTION">Questions</SelectItem>
+                      <SelectItem value="WEEKLY_SUMMARY">Weekly Summary</SelectItem>
+                      <SelectItem value="FEEDBACK">Feedback</SelectItem>
                       <SelectItem value="ANNOUNCEMENT">Announcements</SelectItem>
                     </SelectContent>
                   </Select>
