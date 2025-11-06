@@ -73,7 +73,7 @@ export default function AdminPage() {
   // Load courses
   const loadCourses = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/courses`, {
+      const res = await fetch(`/api/admin/courses`, {
         credentials: "include"
       })
       if (res.ok) {
@@ -96,7 +96,7 @@ export default function AdminPage() {
   // Load users
   const loadUsers = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/users`, {
+      const res = await fetch(`/api/admin/users`, {
         credentials: "include"
       })
       if (res.ok) {
@@ -148,7 +148,7 @@ export default function AdminPage() {
   const confirmDelete = async () => {
     if (courseToDelete) {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/courses/${courseToDelete}`, {
+        const res = await fetch(`/api/admin/courses/${courseToDelete}`, {
           method: "DELETE",
           credentials: "include",
         })
@@ -180,7 +180,7 @@ export default function AdminPage() {
 
     if (userToDelete) {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/users/${userToDelete}`, {
+        const res = await fetch(`/api/admin/users/${userToDelete}`, {
           method: "DELETE",
           credentials: "include",
         })
@@ -215,7 +215,7 @@ export default function AdminPage() {
 
   const handleCreateCourse = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/courses`, {
+      const res = await fetch(`/api/admin/courses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -254,7 +254,7 @@ export default function AdminPage() {
     if (!selectedUser) return
     
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/users/${selectedUser.id}`, {
+      const res = await fetch(`/api/admin/users/${selectedUser.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
