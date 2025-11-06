@@ -349,6 +349,18 @@ export default function AdminFeedPage() {
             <p className="text-lg text-slate-600 max-w-3xl mx-auto">
               Monitor and manage posts across all classes
             </p>
+            <div className="pt-4">
+              <Button 
+                asChild 
+                size="lg"
+                className="bg-gradient-to-r from-[#FFBC00] to-[#FFA500] hover:from-[#FFA500] hover:to-[#FFBC00] text-slate-900 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold border-0"
+              >
+                <Link href="/feed/new">
+                  <MessageSquare className="h-5 w-5 mr-2" />
+                  Create New Post
+                </Link>
+              </Button>
+            </div>
           </div>
 
           {/* Class Selection */}
@@ -387,16 +399,16 @@ export default function AdminFeedPage() {
             </CardContent>
           </Card>
 
-          {/* Filters */}
+          {/* Filters & Actions */}
           {selectedClass && (
             <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-scale-in p-6">
               <CardHeader className="pb-6">
-                <CardTitle className="text-lg">Filter Posts</CardTitle>
+                <CardTitle className="text-lg">Filter Posts & Actions</CardTitle>
               </CardHeader>
               <CardContent className="pt-2">
-                <div className="flex items-center gap-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
                   <Select value={filterType} onValueChange={handleTypeChange}>
-                    <SelectTrigger className="w-48 h-12 border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-xl">
+                    <SelectTrigger className="w-full sm:w-48 h-12 border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-xl">
                       <SelectValue placeholder="Post Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -408,6 +420,15 @@ export default function AdminFeedPage() {
                       <SelectItem value="ANNOUNCEMENT">Announcements</SelectItem>
                     </SelectContent>
                   </Select>
+                  <Button 
+                    asChild 
+                    className="w-full sm:w-auto bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white h-12 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold border-0"
+                  >
+                    <Link href={`/feed/new?class=${selectedClass.id}`}>
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Create New Post
+                    </Link>
+                  </Button>
                 </div>
               </CardContent>
             </Card>
