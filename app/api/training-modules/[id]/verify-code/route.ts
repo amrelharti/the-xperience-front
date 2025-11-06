@@ -17,8 +17,8 @@ export async function POST(
     console.log("🔍 Verify Code - Training Module ID:", moduleId)
     console.log("🔍 Request body:", body)
 
-    // Call the new verification endpoint
-    const response = await fetch(`${backendUrl}/api/admin/training-modules/${moduleId}/codes/verify`, {
+    // Call the verification endpoint (accessible to students)
+    const response = await fetch(`${backendUrl}/api/training-modules/${moduleId}/codes/verify`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -31,8 +31,18 @@ export async function POST(
     console.log("🔍 Verify response status:", response.status)
 
     if (!response.ok) {
-      const error = await response.json()
-      console.error("❌ Verification failed:", error)
+      const errorText = await response.text()
+      console.error("❌ Backend verification failed:")
+      console.error("  - Status:", response.status)
+      console.error("  - Response:", errorText)
+      
+      let error
+      try {
+        error = JSON.parse(errorText)
+      } catch (e) {
+        error = { error: errorText }
+      }
+      
       return NextResponse.json(
         error,
         { status: response.status }
@@ -43,9 +53,10 @@ export async function POST(
     console.log("✅ Module unlocked:", data)
     return NextResponse.json(data)
   } catch (error) {
-    console.error("Error verifying code:", error)
+    console.error("❌ Error in verify-code route:", error)
+    console.error("  - Error details:", error instanceof Error ? error.message : String(error))
     return NextResponse.json(
-      { error: "Failed to verify access code" },
+      { error: "Failed to verify access code", details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     )
   }

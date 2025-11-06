@@ -192,12 +192,12 @@ export default function UnlockModulePage() {
                 <div className="flex items-center gap-2 mt-2">
                   <Users className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">{className}</span>
-                </div>
-              )}
+                  </div>
+                )}
               {module.description && (
                 <CardDescription className="mt-2">
                   {module.description}
-                </CardDescription>
+              </CardDescription>
               )}
             </CardHeader>
             <CardContent>
