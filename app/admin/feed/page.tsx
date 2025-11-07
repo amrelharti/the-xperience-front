@@ -573,11 +573,7 @@ export default function AdminFeedPage() {
                                   in <span className="font-semibold text-[#005eb8]">{post.module.title}</span>
                                 </span>
                               )}
-                              {post.class && (
-                                <span className="ml-2">
-                                  • <span className="font-semibold text-blue-600">{post.class.name}</span>
-                                </span>
-                              )}
+                              
                             </p>
                             {/* Social Media Links */}
                             {(post.author.instagram || post.author.linkedin) && (
@@ -587,7 +583,7 @@ export default function AdminFeedPage() {
                                     href={`https://instagram.com/${post.author.instagram.replace('@', '')}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-pink-50 to-rose-50 hover:from-pink-100 hover:to-rose-100 border border-pink-300 rounded-full transition-all text-xs font-medium text-pink-700"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-grey hover:from-pink-100 hover:to-rose-100 border border-pink-300 rounded-full transition-all text-xs font-medium text-pink-700"
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     <Instagram className="h-3.5 w-3.5" />
@@ -599,7 +595,7 @@ export default function AdminFeedPage() {
                                     href={post.author.linkedin.startsWith('http') ? post.author.linkedin : `https://${post.author.linkedin}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-150 border border-blue-300 rounded-full transition-all text-xs font-medium text-blue-700"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-grey hover:to-blue-150 border border-blue-300 rounded-full transition-all text-xs font-medium text-blue-700"
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     <Linkedin className="h-3.5 w-3.5" />
