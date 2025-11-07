@@ -326,6 +326,43 @@ export default function FeedPage() {
     }
   }
 
+  const handleTogglePin = async (postId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/feed/posts/${postId}/pin`, {
+        method: "POST",
+        credentials: "include"
+      })
+      
+      if (res.ok) {
+        const data = await res.json()
+        setPosts(posts.map(post => 
+          post.id === postId 
+            ? { ...post, isPinned: data.isPinned }
+            : post
+        ))
+        toast({
+          title: "Success",
+          description: data.message,
+        })
+      } else {
+        const error = await res.json()
+        toast({
+          title: "Error",
+          description: error.error || "Failed to toggle pin",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error toggling pin:", error)
+      toast({
+        title: "Error",
+        description: "Failed to toggle pin status",
+        variant: "destructive",
+      })
+    }
+  }
+
   const getPostIcon = useMemo(() => (type: string) => {
     switch (type) {
       case 'ASSIGNMENT': return <FileText className="h-4 w-4" />
@@ -476,9 +513,7 @@ export default function FeedPage() {
                         <SelectItem value="ASSIGNMENT">Assignments</SelectItem>
                         <SelectItem value="WEEKLY_SUMMARY">Weekly Summary</SelectItem>
                         <SelectItem value="FEEDBACK">Feedback</SelectItem>
-                        {user?.role === 'ADMIN' && (
-                          <SelectItem value="ANNOUNCEMENT">Announcements</SelectItem>
-                        )}
+                        <SelectItem value="ANNOUNCEMENT">Announcements</SelectItem>
                       </SelectContent>
                     </Select>
                     <Select value={filterModule} onValueChange={setFilterModule}>
@@ -549,7 +584,7 @@ export default function FeedPage() {
                   <div className="p-6 pl-8">
                     {/* Post Header */}
                     <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 flex-1">
                         <div className="relative">
                           <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center shadow-md">
                             {post.author.imageUrl ? (
@@ -607,7 +642,7 @@ export default function FeedPage() {
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-pink-50 to-purple-50 hover:from-pink-100 hover:to-purple-100 border border-pink-200 rounded-lg transition-all text-xs font-medium text-pink-600 hover:text-pink-700"
+                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-pink-50 to-rose-50 hover:from-pink-100 hover:to-rose-100 border border-pink-300 rounded-full transition-all text-xs font-medium text-pink-700"
                                 >
                                   <Instagram className="h-3.5 w-3.5" />
                                   <span>{post.author.instagram}</span>
@@ -619,7 +654,7 @@ export default function FeedPage() {
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 rounded-lg transition-all text-xs font-medium text-blue-600 hover:text-blue-700"
+                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-150 border border-blue-300 rounded-full transition-all text-xs font-medium text-blue-700"
                                 >
                                   <Linkedin className="h-3.5 w-3.5" />
                                   <span>LinkedIn</span>
@@ -629,6 +664,18 @@ export default function FeedPage() {
                           )}
                         </div>
                       </div>
+                      {/* Pin Button - Admin Only */}
+                      {user?.role === 'ADMIN' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => handleTogglePin(post.id, e)}
+                          className={`ml-2 ${post.isPinned ? 'text-[#FFBC00] hover:text-[#FFA500]' : 'text-gray-400 hover:text-[#FFBC00]'}`}
+                          title={post.isPinned ? 'Unpin post' : 'Pin post'}
+                        >
+                          <Pin className="h-5 w-5" />
+                        </Button>
+                      )}
                     </div>
 
                     {/* Post Content */}

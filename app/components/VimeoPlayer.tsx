@@ -282,12 +282,12 @@ export default function VimeoPlayer({
 
   if (showTerms && !termsAccepted) {
     return (
-      <div className={`min-h-[300px] sm:aspect-video bg-black rounded-lg flex items-center justify-center ${className} overflow-y-auto`}>
-        <div className="text-center text-white max-w-md mx-auto p-4 sm:p-6 my-4">
+      <div className={`bg-black rounded-lg ${className} overflow-y-auto`} style={{ minHeight: '400px' }}>
+        <div className="text-center text-white max-w-md mx-auto px-4 sm:px-6 py-6 sm:py-8 h-full flex flex-col justify-center">
           <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Usage Rules</h3>
-          <div className="text-xs sm:text-sm text-gray-300 mb-4 sm:mb-6 text-left space-y-2">
+          <div className="text-xs sm:text-sm text-gray-300 mb-5 sm:mb-6 text-left space-y-2">
             <p className="font-medium">By accessing this video content, you agree to:</p>
-            <ul className="list-disc list-inside space-y-1.5 pl-2">
+            <ul className="list-disc list-inside space-y-2 pl-2">
               <li>Not share, download, or redistribute this content</li>
               <li>Use this content only for educational purposes</li>
               <li>Respect intellectual property rights</li>
@@ -299,7 +299,7 @@ export default function VimeoPlayer({
           </div>
           <button
             onClick={acceptTerms}
-            className="w-full sm:w-auto px-6 py-2.5 sm:py-2 bg-green-600 text-white text-sm sm:text-base rounded-lg hover:bg-green-700 font-medium transition-colors"
+            className="w-full sm:w-auto px-6 py-3 sm:py-2 bg-green-600 text-white text-sm sm:text-base rounded-lg hover:bg-green-700 font-medium transition-colors shadow-lg"
           >
             ✓ I Accept Terms
           </button>

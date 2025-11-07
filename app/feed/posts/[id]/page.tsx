@@ -624,6 +624,40 @@ export default function PostDetailPage() {
     }
   }
 
+  const handleTogglePin = async () => {
+    if (!post) return
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/feed/posts/${post.id}/pin`, {
+        method: "POST",
+        credentials: "include"
+      })
+      
+      if (res.ok) {
+        const data = await res.json()
+        setPost({ ...post, isPinned: data.isPinned })
+        toast({
+          title: "Success",
+          description: data.message,
+        })
+      } else {
+        const error = await res.json()
+        toast({
+          title: "Error",
+          description: error.error || "Failed to toggle pin",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error toggling pin:", error)
+      toast({
+        title: "Error",
+        description: "Failed to toggle pin status",
+        variant: "destructive",
+      })
+    }
+  }
+
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -824,7 +858,7 @@ export default function PostDetailPage() {
                             href={`https://instagram.com/${post.author.instagram.replace('@', '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-pink-50 to-purple-50 hover:from-pink-100 hover:to-purple-100 border border-pink-200 rounded-lg transition-all text-xs font-medium text-pink-600 hover:text-pink-700"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-pink-50 to-rose-50 hover:from-pink-100 hover:to-rose-100 border border-pink-300 rounded-full transition-all text-xs font-medium text-pink-700"
                           >
                             <Instagram className="h-3.5 w-3.5" />
                             <span>{post.author.instagram}</span>
@@ -835,7 +869,7 @@ export default function PostDetailPage() {
                             href={post.author.linkedin.startsWith('http') ? post.author.linkedin : `https://${post.author.linkedin}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 rounded-lg transition-all text-xs font-medium text-blue-600 hover:text-blue-700"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-150 border border-blue-300 rounded-full transition-all text-xs font-medium text-blue-700"
                           >
                             <Linkedin className="h-3.5 w-3.5" />
                             <span>LinkedIn</span>
@@ -848,6 +882,18 @@ export default function PostDetailPage() {
                 {/* Post Edit/Delete buttons - only show for post owner (edit) or admin (delete) */}
                 {!editingPost && (
                   <div className="flex items-center gap-1 sm:gap-1 w-full sm:w-auto justify-end">
+                    {/* Pin button - only for admin */}
+                    {user?.role === 'ADMIN' && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={`h-7 sm:h-8 px-2 text-xs ${post.isPinned ? 'text-[#FFBC00] hover:bg-yellow-50' : 'text-gray-400 hover:text-[#FFBC00] hover:bg-yellow-50'}`}
+                        onClick={handleTogglePin}
+                        title={post.isPinned ? 'Unpin post' : 'Pin post'}
+                      >
+                        <Pin className="h-4 w-4" />
+                      </Button>
+                    )}
                     {/* Edit button - only for post owner */}
                     {user?.id === post.author.id && (
                       <Button

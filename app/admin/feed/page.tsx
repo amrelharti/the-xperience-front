@@ -176,6 +176,43 @@ export default function AdminFeedPage() {
     }
   }
 
+  const handleTogglePin = async (postId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/feed/posts/${postId}/pin`, {
+        method: "POST",
+        credentials: "include"
+      })
+      
+      if (res.ok) {
+        const data = await res.json()
+        setPosts(posts.map(post => 
+          post.id === postId 
+            ? { ...post, isPinned: data.isPinned }
+            : post
+        ))
+        toast({
+          title: "Success",
+          description: data.message,
+        })
+      } else {
+        const error = await res.json()
+        toast({
+          title: "Error",
+          description: error.error || "Failed to toggle pin",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error toggling pin:", error)
+      toast({
+        title: "Error",
+        description: "Failed to toggle pin status",
+        variant: "destructive",
+      })
+    }
+  }
+
   const getPostIcon = (type: string) => {
     switch (type) {
       case 'ASSIGNMENT': return <FileText className="h-4 w-4" />
@@ -540,6 +577,16 @@ export default function AdminFeedPage() {
                             </p>
                           </div>
                         </div>
+                        {/* Pin Button */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => handleTogglePin(post.id, e)}
+                          className={`ml-2 ${post.isPinned ? 'text-[#FFBC00] hover:text-[#FFA500]' : 'text-gray-400 hover:text-[#FFBC00]'}`}
+                          title={post.isPinned ? 'Unpin post' : 'Pin post'}
+                        >
+                          <Pin className="h-5 w-5" />
+                        </Button>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-2">
