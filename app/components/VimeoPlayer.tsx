@@ -36,6 +36,7 @@ export default function VimeoPlayer({
   const [showTerms, setShowTerms] = useState(false)
   const [emailWatermarkOpacity, setEmailWatermarkOpacity] = useState(0) // Start at 0% opacity (hidden)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const [vimeoPlayerReady, setVimeoPlayerReady] = useState(false)
 
   const loadSignedUrl = useCallback(async () => {
     try {
@@ -69,6 +70,29 @@ export default function VimeoPlayer({
       loadSignedUrl()
     }
   }, [user?.id, videoId, loadSignedUrl])
+
+  // Listen for Vimeo player ready event
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== 'https://player.vimeo.com') return
+      
+      const data = event.data
+      if (typeof data === 'string') {
+        try {
+          const parsed = JSON.parse(data)
+          if (parsed.event === 'ready') {
+            console.log('✅ Vimeo player is ready')
+            setVimeoPlayerReady(true)
+          }
+        } catch (e) {
+          // Ignore non-JSON messages
+        }
+      }
+    }
+
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [])
 
   // Listen for Vimeo player events and track play time
   const [totalPlayTime, setTotalPlayTime] = useState(0)
@@ -151,7 +175,7 @@ export default function VimeoPlayer({
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [onEnded])
+  }, [onEnded, onPlayTimeUpdate])
 
   // Flash email watermark to 100% opacity for 7 seconds every 2 minutes
   useEffect(() => {
@@ -330,7 +354,6 @@ export default function VimeoPlayer({
         className="w-full h-full rounded-lg"
         frameBorder="0"
         allow="autoplay; fullscreen; picture-in-picture"
-        allowFullScreen
         title={title}
         onLoad={() => onLoad?.()}
         style={{
@@ -371,44 +394,75 @@ export default function VimeoPlayer({
       {/* Fullscreen Button - Bottom-Right, responsive positioning */}
       <button
         onClick={() => {
-          // Try iframe first (works better on mobile)
           const iframe = iframeRef.current
-          if (iframe) {
-            // Try standard fullscreen on iframe
-            if (iframe.requestFullscreen) {
-              iframe.requestFullscreen().catch(() => {
-                // Fallback to container
-                tryContainerFullscreen()
-              })
-            } else if ((iframe as any).webkitRequestFullscreen) {
-              (iframe as any).webkitRequestFullscreen()
-            } else if ((iframe as any).webkitEnterFullscreen) {
-              // iOS Safari specific
-              (iframe as any).webkitEnterFullscreen()
-            } else if ((iframe as any).mozRequestFullScreen) {
-              (iframe as any).mozRequestFullScreen()
-            } else if ((iframe as any).msRequestFullscreen) {
-              (iframe as any).msRequestFullscreen()
-            } else {
-              // Fallback to container
-              tryContainerFullscreen()
+          if (!iframe) return
+
+          console.log('🔍 Attempting fullscreen...')
+          
+          // Detect if we're on a mobile device
+          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+          const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+          
+          console.log('📱 Device info:', { isMobile, isIOS, userAgent: navigator.userAgent })
+
+          // Strategy 1: Try Vimeo's postMessage API first (works on most platforms)
+          if (iframe.contentWindow) {
+            try {
+              iframe.contentWindow.postMessage(JSON.stringify({
+                method: 'requestFullscreen'
+              }), '*')
+              console.log('✅ Sent fullscreen request via Vimeo postMessage')
+              
+              // Give Vimeo API a moment to respond, then try native methods as fallback
+              setTimeout(() => {
+                if (!document.fullscreenElement && !(document as any).webkitFullscreenElement) {
+                  tryNativeFullscreen()
+                }
+              }, 500)
+              return
+            } catch (error) {
+              console.error('❌ Vimeo postMessage failed:', error)
             }
           }
 
-          function tryContainerFullscreen() {
+          // Strategy 2: Try native fullscreen APIs
+          function tryNativeFullscreen() {
+            console.log('🔄 Trying native fullscreen APIs...')
+            
+            // Try container fullscreen first (works on most desktop browsers)
             const container = document.getElementById('vimeo-container')
+            
             if (container) {
-              if (container.requestFullscreen) {
-                container.requestFullscreen()
-              } else if ((container as any).webkitRequestFullscreen) {
-                (container as any).webkitRequestFullscreen()
-              } else if ((container as any).mozRequestFullScreen) {
-                (container as any).mozRequestFullScreen()
-              } else if ((container as any).msRequestFullscreen) {
-                (container as any).msRequestFullscreen()
+              const attemptFullscreen = async () => {
+                try {
+                  if (container.requestFullscreen) {
+                    await container.requestFullscreen()
+                    console.log('✅ Fullscreen activated (standard)')
+                  } else if ((container as any).webkitRequestFullscreen) {
+                    await (container as any).webkitRequestFullscreen()
+                    console.log('✅ Fullscreen activated (webkit)')
+                  } else if ((container as any).webkitEnterFullscreen) {
+                    await (container as any).webkitEnterFullscreen()
+                    console.log('✅ Fullscreen activated (webkit enter)')
+                  } else if ((container as any).mozRequestFullScreen) {
+                    await (container as any).mozRequestFullScreen()
+                    console.log('✅ Fullscreen activated (moz)')
+                  } else if ((container as any).msRequestFullscreen) {
+                    await (container as any).msRequestFullscreen()
+                    console.log('✅ Fullscreen activated (ms)')
+                  } else {
+                    console.log('❌ No fullscreen API available')
+                  }
+                } catch (error) {
+                  console.error('❌ Native fullscreen failed:', error)
+                }
               }
+              
+              attemptFullscreen()
             }
           }
+
+          tryNativeFullscreen()
         }}
         className="absolute bg-black bg-opacity-70 text-white p-1.5 sm:p-2 rounded-md sm:rounded-lg hover:bg-gray-800 active:bg-gray-700 transition-all z-10 bottom-16 sm:bottom-20 right-2 sm:right-3 touch-manipulation"
         title="Fullscreen"

@@ -139,8 +139,8 @@ export default function PostDetailPage() {
         const data = await res.json()
         setPost(data)
         
-        // Load user's rating if it's an assignment
-        if (data.type === 'ASSIGNMENT') {
+        // Load user's rating if it's an assignment or weekly summary
+        if (data.type === 'ASSIGNMENT' || data.type === 'WEEKLY_SUMMARY') {
           loadMyRating()
         }
       } else {
@@ -179,10 +179,11 @@ export default function PostDetailPage() {
   }
 
   const handleRate = async (score: number) => {
-    if (!post || post.type !== 'ASSIGNMENT') return
+    if (!post || (post.type !== 'ASSIGNMENT' && post.type !== 'WEEKLY_SUMMARY')) return
 
     // Show confirmation dialog before rating
-    const confirmed = confirm(`Are you sure you want to rate this assignment ${score}/10? This rating cannot be changed once submitted.`)
+    const postType = post.type === 'WEEKLY_SUMMARY' ? 'weekly summary' : 'assignment'
+    const confirmed = confirm(`Are you sure you want to rate this ${postType} ${score}/10? This rating cannot be changed once submitted.`)
     if (!confirmed) return
 
     setSubmittingRating(true)
@@ -207,7 +208,7 @@ export default function PostDetailPage() {
 
           toast({
             title: "Success",
-            description: "Assignment rated successfully",
+            description: `${post.type === 'WEEKLY_SUMMARY' ? 'Weekly summary' : 'Assignment'} rated successfully`,
           })
         } catch (jsonError) {
           console.error("Error parsing rating response:", jsonError)
@@ -1026,11 +1027,13 @@ export default function PostDetailPage() {
                 </Button>
               </div>
 
-              {/* Rating section for assignment posts */}
-              {post.type === 'ASSIGNMENT' && (
+              {/* Rating section for assignment and weekly summary posts */}
+              {(post.type === 'ASSIGNMENT' || post.type === 'WEEKLY_SUMMARY') && (
                 <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-muted/50 rounded-lg">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-2 sm:gap-0">
-                    <h3 className="text-base sm:text-lg font-semibold">Rate this Assignment</h3>
+                    <h3 className="text-base sm:text-lg font-semibold">
+                      Rate this {post.type === 'WEEKLY_SUMMARY' ? 'Weekly Summary' : 'Assignment'}
+                    </h3>
                     <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                       <span>Average: {post.avgScore || 0}/10</span>
                       <span>({post.scoreCount || 0} ratings)</span>
@@ -1060,9 +1063,13 @@ export default function PostDetailPage() {
                       <span className="font-medium">Your rating: {rating}/10</span>
                     </div>
                   ) : user && user.id === post.author.id ? (
-                    <p className="text-sm text-muted-foreground">You cannot rate your own assignment</p>
+                    <p className="text-sm text-muted-foreground">
+                      You cannot rate your own {post.type === 'WEEKLY_SUMMARY' ? 'weekly summary' : 'assignment'}
+                    </p>
                   ) : (
-                    <p className="text-sm text-muted-foreground">Please sign in to rate this assignment</p>
+                    <p className="text-sm text-muted-foreground">
+                      Please sign in to rate this {post.type === 'WEEKLY_SUMMARY' ? 'weekly summary' : 'assignment'}
+                    </p>
                   )}
                 </div>
               )}

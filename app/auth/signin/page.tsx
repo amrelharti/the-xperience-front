@@ -180,7 +180,7 @@ export default function SignInPage() {
         script.id = "google-identity-services"
         
         script.onload = () => {
-          console.log("Google script loaded successfully")
+          
           resolve()
         }
         
@@ -206,13 +206,13 @@ export default function SignInPage() {
           return
         }
 
-        console.log("Initializing Google Sign-In with client ID:", clientId)
+        
         
         // @ts-ignore
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: async (response: any) => {
-            console.log("Google sign-in callback triggered")
+            
             const idToken = response?.credential
             if (!idToken) {
               console.error("No ID token received")
@@ -222,7 +222,7 @@ export default function SignInPage() {
             setIsLoading(true)
             setError("") // Clear any previous errors
             try {
-              console.log("Sending authentication request to /api/auth/google")
+              
               const res = await fetch(`/api/auth/google`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -230,13 +230,11 @@ export default function SignInPage() {
                 body: JSON.stringify({ idToken }),
               })
               
-              console.log("Response status:", res.status)
-              console.log("Response headers:", Array.from(res.headers.entries()))
+              
               
               if (res.ok) {
                 const user = await res.json()
-                console.log("Google sign-in successful:", user)
-                console.log("Redirecting user with role:", user.role)
+                
                 // Redirect admins to admin page, others to home (modules page)
                 if (user.role === "ADMIN") {
                   window.location.href = "/admin"
@@ -283,7 +281,7 @@ export default function SignInPage() {
     }
 
     const renderGoogleButton = () => {
-      console.log("Rendering Google button")
+      
       if (gsiDivRef.current) {
         // Clear any existing content
         gsiDivRef.current.innerHTML = ""
