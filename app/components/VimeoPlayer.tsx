@@ -329,7 +329,8 @@ export default function VimeoPlayer({
         src={signedUrl}
         className="w-full h-full rounded-lg"
         frameBorder="0"
-        allow="autoplay; picture-in-picture"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowFullScreen
         title={title}
         onLoad={() => onLoad?.()}
         style={{
@@ -370,20 +371,46 @@ export default function VimeoPlayer({
       {/* Fullscreen Button - Bottom-Right, responsive positioning */}
       <button
         onClick={() => {
-          const container = document.getElementById('vimeo-container')
-          if (container) {
-            if (container.requestFullscreen) {
-              container.requestFullscreen()
-            } else if ((container as any).webkitRequestFullscreen) {
-              (container as any).webkitRequestFullscreen()
-            } else if ((container as any).mozRequestFullScreen) {
-              (container as any).mozRequestFullScreen()
-            } else if ((container as any).msRequestFullscreen) {
-              (container as any).msRequestFullscreen()
+          // Try iframe first (works better on mobile)
+          const iframe = iframeRef.current
+          if (iframe) {
+            // Try standard fullscreen on iframe
+            if (iframe.requestFullscreen) {
+              iframe.requestFullscreen().catch(() => {
+                // Fallback to container
+                tryContainerFullscreen()
+              })
+            } else if ((iframe as any).webkitRequestFullscreen) {
+              (iframe as any).webkitRequestFullscreen()
+            } else if ((iframe as any).webkitEnterFullscreen) {
+              // iOS Safari specific
+              (iframe as any).webkitEnterFullscreen()
+            } else if ((iframe as any).mozRequestFullScreen) {
+              (iframe as any).mozRequestFullScreen()
+            } else if ((iframe as any).msRequestFullscreen) {
+              (iframe as any).msRequestFullscreen()
+            } else {
+              // Fallback to container
+              tryContainerFullscreen()
+            }
+          }
+
+          function tryContainerFullscreen() {
+            const container = document.getElementById('vimeo-container')
+            if (container) {
+              if (container.requestFullscreen) {
+                container.requestFullscreen()
+              } else if ((container as any).webkitRequestFullscreen) {
+                (container as any).webkitRequestFullscreen()
+              } else if ((container as any).mozRequestFullScreen) {
+                (container as any).mozRequestFullScreen()
+              } else if ((container as any).msRequestFullscreen) {
+                (container as any).msRequestFullscreen()
+              }
             }
           }
         }}
-        className="absolute bg-black bg-opacity-70 text-white p-1.5 sm:p-2 rounded-md sm:rounded-lg hover:bg-gray-800 transition-all z-10 bottom-16 sm:bottom-20 right-2 sm:right-3"
+        className="absolute bg-black bg-opacity-70 text-white p-1.5 sm:p-2 rounded-md sm:rounded-lg hover:bg-gray-800 active:bg-gray-700 transition-all z-10 bottom-16 sm:bottom-20 right-2 sm:right-3 touch-manipulation"
         title="Fullscreen"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="sm:w-4 sm:h-4">
