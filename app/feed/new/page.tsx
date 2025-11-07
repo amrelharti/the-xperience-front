@@ -287,35 +287,20 @@ export default function NewPostPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="POST">
-                        <div className="flex items-center gap-2">
-                          <MessageSquare className="h-4 w-4" />
-                          Regular Post
-                        </div>
+                        Regular Post
                       </SelectItem>
                       <SelectItem value="ASSIGNMENT">
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          Assignment Submission
-                        </div>
+                        Assignment Submission
                       </SelectItem>
                       <SelectItem value="WEEKLY_SUMMARY">
-                        <div className="flex items-center gap-2">
-                          <BookOpen className="h-4 w-4" />
-                          Weekly Summary
-                        </div>
+                        Weekly Summary
                       </SelectItem>
                       <SelectItem value="FEEDBACK">
-                        <div className="flex items-center gap-2">
-                          <MessageSquare className="h-4 w-4" />
-                          Feedback
-                        </div>
+                        Feedback
                       </SelectItem>
                       {user?.role === 'ADMIN' && (
                         <SelectItem value="ANNOUNCEMENT">
-                          <div className="flex items-center gap-2">
-                            <Megaphone className="h-4 w-4" />
-                            Announcement
-                          </div>
+                          Announcement
                         </SelectItem>
                       )}
                     </SelectContent>
