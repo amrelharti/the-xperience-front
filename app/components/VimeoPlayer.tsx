@@ -282,24 +282,24 @@ export default function VimeoPlayer({
 
   if (showTerms && !termsAccepted) {
     return (
-      <div className={`bg-black rounded-lg ${className} overflow-y-auto`} style={{ minHeight: '400px' }}>
-        <div className="text-center text-white max-w-md mx-auto px-4 sm:px-6 py-6 sm:py-8 h-full flex flex-col justify-center">
-          <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Usage Rules</h3>
-          <div className="text-xs sm:text-sm text-gray-300 mb-5 sm:mb-6 text-left space-y-2">
+      <div className={`bg-black rounded-lg ${className}`} style={{ minHeight: 'min(400px, 80vh)' }}>
+        <div className="text-center text-white max-w-md mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col justify-center min-h-full">
+          <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4">Usage Rules</h3>
+          <div className="text-xs sm:text-sm text-gray-300 mb-4 sm:mb-5 md:mb-6 text-left space-y-2">
             <p className="font-medium">By accessing this video content, you agree to:</p>
-            <ul className="list-disc list-inside space-y-2 pl-2">
-              <li>Not share, download, or redistribute this content</li>
-              <li>Use this content only for educational purposes</li>
-              <li>Respect intellectual property rights</li>
-              <li>Not attempt to bypass security measures</li>
+            <ul className="list-disc list-inside space-y-1.5 sm:space-y-2 pl-2">
+              <li className="leading-relaxed">Not share, download, or redistribute this content</li>
+              <li className="leading-relaxed">Use this content only for educational purposes</li>
+              <li className="leading-relaxed">Respect intellectual property rights</li>
+              <li className="leading-relaxed">Not attempt to bypass security measures</li>
             </ul>
-            <p className="text-[10px] sm:text-xs text-gray-400 mt-3 sm:mt-4 italic">
+            <p className="text-[10px] sm:text-xs text-gray-400 mt-2 sm:mt-3 md:mt-4 italic leading-relaxed">
               Your access is logged and monitored for security purposes.
             </p>
           </div>
           <button
             onClick={acceptTerms}
-            className="w-full sm:w-auto px-6 py-3 sm:py-2 bg-green-600 text-white text-sm sm:text-base rounded-lg hover:bg-green-700 font-medium transition-colors shadow-lg"
+            className="w-full sm:w-auto px-6 py-2.5 sm:py-2 bg-green-600 text-white text-sm sm:text-base rounded-lg hover:bg-green-700 font-medium transition-colors shadow-lg"
           >
             ✓ I Accept Terms
           </button>

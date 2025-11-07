@@ -574,78 +574,78 @@ export default function FeedPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
-                  whileHover={{ scale: 1.02, y: -4 }}
-                  className="group relative overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-lg border border-gray-200 hover:border-[#0476D7]/30 cursor-pointer"
+                  whileHover={{ scale: 1.01, y: -2 }}
+                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-white shadow-sm transition-all duration-300 hover:shadow-xl border border-gray-200 hover:border-[#0476D7]/30 cursor-pointer"
                   onClick={() => window.location.href = getPostDetailUrl(post.id)}
                 >
                   {/* Gradient accent line */}
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#0476D7] via-[#005eb8] to-[#FFBC00] group-hover:w-2 transition-all duration-300" />
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#0476D7] via-[#005eb8] to-[#FFBC00] group-hover:w-1.5 sm:group-hover:w-2 transition-all duration-300" />
                   
-                  <div className="p-6 pl-8">
+                  <div className="p-4 sm:p-5 md:p-6 pl-5 sm:pl-7 md:pl-8">
                     {/* Post Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="relative">
-                          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center shadow-md">
+                    <div className="flex items-start justify-between mb-3 sm:mb-4 gap-2">
+                      <div className="flex items-start sm:items-center gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
+                        <div className="relative flex-shrink-0">
+                          <div className="h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center shadow-md">
                             {post.author.imageUrl ? (
                               <img
                                 src={post.author.imageUrl} 
                                 alt={post.author.name}
-                                className="h-12 w-12 rounded-xl object-cover"
+                                className="h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-lg sm:rounded-xl object-cover"
                               />
                             ) : (
-                              <span className="text-lg font-bold text-white">
+                              <span className="text-base sm:text-lg font-bold text-white">
                                 {post.author.name.charAt(0).toUpperCase()}
                               </span>
                             )}
                           </div>
                           {post.isPinned && (
-                            <div className="absolute -top-1 -right-1 h-5 w-5 bg-[#FFBC00] rounded-full flex items-center justify-center">
-                              <Pin className="h-3 w-3 text-white" />
+                            <div className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 bg-[#FFBC00] rounded-full flex items-center justify-center">
+                              <Pin className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-white" />
                             </div>
                           )}
                         </div>
-                        <div>
-                          <div className="flex items-center gap-3 mb-1">
-                            <div>
-                              <h3 className="font-bold text-gray-900 group-hover:text-[#0476D7] transition-colors">{post.author.name}</h3>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                            <div className="min-w-0">
+                              <h3 className="font-bold text-sm sm:text-base text-gray-900 group-hover:text-[#0476D7] transition-colors truncate">{post.author.name}</h3>
                               {post.author.title && (
-                                <p className="text-xs text-gray-500 mt-0.5">{post.author.title}</p>
+                                <p className="text-xs text-gray-500 mt-0.5 truncate">{post.author.title}</p>
                               )}
                             </div>
-                            <Badge className={`${getPostTypeColor(post.type)} rounded-full px-3 py-1 text-xs font-semibold`}>
+                            <Badge className={`${getPostTypeColor(post.type)} rounded-full px-2 sm:px-3 py-0.5 sm:py-1 text-xs font-semibold flex-shrink-0 w-fit`}>
                               {getPostIcon(post.type)}
                               <span className="ml-1">{post.type}</span>
                             </Badge>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <span>{formatTimeAgo(post.createdAt)}</span>
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-500">
+                            <span className="flex-shrink-0">{formatTimeAgo(post.createdAt)}</span>
                             {post.module && (
                               <>
-                                <span>•</span>
-                                <span className="font-medium text-[#0476D7]">{post.module.title}</span>
+                                <span className="hidden sm:inline">•</span>
+                                <span className="font-medium text-[#0476D7] truncate max-w-[150px] sm:max-w-none">{post.module.title}</span>
                               </>
                             )}
                             {post.class && (
                               <>
-                                <span>•</span>
-                                <span className="font-medium text-gray-700">{post.class.name}</span>
+                                <span className="hidden sm:inline">•</span>
+                                <span className="font-medium text-gray-700 truncate max-w-[100px] sm:max-w-none">{post.class.name}</span>
                               </>
                             )}
                           </div>
                           {/* Social Media Links */}
                           {(post.author.instagram || post.author.linkedin) && (
-                            <div className="flex items-center gap-2 mt-2">
+                            <div className="flex items-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2 flex-wrap">
                               {post.author.instagram && (
                                 <a
                                   href={`https://instagram.com/${post.author.instagram.replace('@', '')}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-pink-50 to-rose-50 hover:from-pink-100 hover:to-rose-100 border border-pink-300 rounded-full transition-all text-xs font-medium text-pink-700"
+                                  className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-pink-50 to-rose-50 hover:from-pink-100 hover:to-rose-100 border border-pink-300 rounded-full transition-all text-xs font-medium text-pink-700"
                                 >
-                                  <Instagram className="h-3.5 w-3.5" />
-                                  <span>{post.author.instagram}</span>
+                                  <Instagram className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                                  <span className="hidden xs:inline truncate max-w-[100px]">{post.author.instagram}</span>
                                 </a>
                               )}
                               {post.author.linkedin && (
@@ -654,10 +654,10 @@ export default function FeedPage() {
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-150 border border-blue-300 rounded-full transition-all text-xs font-medium text-blue-700"
+                                  className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-150 border border-blue-300 rounded-full transition-all text-xs font-medium text-blue-700"
                                 >
-                                  <Linkedin className="h-3.5 w-3.5" />
-                                  <span>LinkedIn</span>
+                                  <Linkedin className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                                  <span className="truncate">LinkedIn</span>
                                 </a>
                               )}
                             </div>
@@ -670,37 +670,37 @@ export default function FeedPage() {
                           variant="ghost"
                           size="sm"
                           onClick={(e) => handleTogglePin(post.id, e)}
-                          className={`ml-2 ${post.isPinned ? 'text-[#FFBC00] hover:text-[#FFA500]' : 'text-gray-400 hover:text-[#FFBC00]'}`}
+                          className={`ml-1 sm:ml-2 h-8 w-8 sm:h-9 sm:w-9 p-0 flex-shrink-0 ${post.isPinned ? 'text-[#FFBC00] hover:text-[#FFA500]' : 'text-gray-400 hover:text-[#FFBC00]'}`}
                           title={post.isPinned ? 'Unpin post' : 'Pin post'}
                         >
-                          <Pin className="h-5 w-5" />
+                          <Pin className="h-4 w-4 sm:h-5 sm:w-5" />
                         </Button>
                       )}
                     </div>
 
                     {/* Post Content */}
-                    <div className="mb-6">
+                    <div className="mb-4 sm:mb-5 md:mb-6">
                       {post.title && (
-                        <h2 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#0476D7] transition-colors">{post.title}</h2>
+                        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3 group-hover:text-[#0476D7] transition-colors leading-tight">{post.title}</h2>
                       )}
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{post.content}</p>
+                      <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-wrap line-clamp-3">{post.content}</p>
                       
                       {post.attachments && (
-                        <div className="mt-4">
+                        <div className="mt-3 sm:mt-4">
                           {post.attachments.startsWith('data:image') || post.attachments.startsWith('http://') || post.attachments.startsWith('https://') ? (
-                            <div className="relative w-full max-h-96 overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+                            <div className="relative w-full max-h-64 sm:max-h-80 md:max-h-96 overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 shadow-sm">
                               <img 
                                 src={post.attachments} 
                                 alt="Post attachment" 
-                                className="w-full h-auto object-contain max-h-96"
+                                className="w-full h-auto object-contain max-h-64 sm:max-h-80 md:max-h-96"
                                 onError={(e) => {
                                   e.currentTarget.style.display = 'none';
                                 }}
                               />
                             </div>
                           ) : (
-                            <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                              <p className="text-sm text-gray-600">{post.attachments}</p>
+                            <div className="p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl border border-gray-200">
+                              <p className="text-xs sm:text-sm text-gray-600 truncate">{post.attachments}</p>
                             </div>
                           )}
                         </div>
@@ -708,8 +708,8 @@ export default function FeedPage() {
                     </div>
 
                     {/* Post Actions */}
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                      <div className="flex items-center gap-6">
+                    <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100 gap-2">
+                      <div className="flex items-center gap-2 sm:gap-4 md:gap-6 flex-wrap">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -717,45 +717,45 @@ export default function FeedPage() {
                             e.stopPropagation();
                             handleLike(post.id);
                           }}
-                          className="flex items-center gap-2 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-xl px-4 py-2"
+                          className="flex items-center gap-1.5 sm:gap-2 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-lg sm:rounded-xl px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 h-auto"
                         >
-                          <Heart className="h-4 w-4" />
-                          <span className="font-medium">{post.likeCount}</span>
+                          <Heart className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                          <span className="font-medium text-xs sm:text-sm">{post.likeCount}</span>
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           asChild
-                          className="flex items-center gap-2 text-gray-600 hover:text-[#0476D7] hover:bg-blue-50 rounded-xl px-4 py-2"
+                          className="flex items-center gap-1.5 sm:gap-2 text-gray-600 hover:text-[#0476D7] hover:bg-blue-50 rounded-lg sm:rounded-xl px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 h-auto"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <Link href={getPostDetailUrl(post.id)}>
-                            <MessageSquare className="h-4 w-4" />
-                            <span className="font-medium">{post.commentCount}</span>
+                            <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span className="font-medium text-xs sm:text-sm">{post.commentCount}</span>
                           </Link>
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-xl px-4 py-2"
+                          className="flex items-center gap-1.5 sm:gap-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg sm:rounded-xl px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 h-auto"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <Share2 className="h-4 w-4" />
-                          <span className="font-medium">Share</span>
+                          <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                          <span className="font-medium text-xs sm:text-sm hidden xs:inline">Share</span>
                         </Button>
                       </div>
                       
                       {/* Show rating for assignment posts */}
                       {post.type === 'ASSIGNMENT' && post.avgScore !== undefined && (
                         <div 
-                          className="flex items-center gap-2 text-sm bg-yellow-50 px-3 py-2 rounded-xl border border-yellow-200"
+                          className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm bg-gradient-to-br from-yellow-50 to-amber-50 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl border border-yellow-200 shadow-sm flex-shrink-0"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <TrendingUp className="h-4 w-4 text-yellow-600" />
-                          <span className="font-semibold text-yellow-800">
+                          <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-yellow-600 flex-shrink-0" />
+                          <span className="font-bold text-yellow-800">
                             {post.avgScore.toFixed(1)}/10
                           </span>
-                          <span className="text-yellow-600">({post.scoreCount})</span>
+                          <span className="text-yellow-600 hidden xs:inline">({post.scoreCount})</span>
                         </div>
                       )}
                     </div>
