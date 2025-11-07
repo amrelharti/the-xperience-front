@@ -127,7 +127,13 @@ description: `${post.type === 'WEEKLY_SUMMARY' ? 'Weekly summary' : 'Assignment'
 
 ## Testing Checklist
 
-- [ ] Create a WEEKLY_SUMMARY post
+### Pre-Testing: Database Migration
+- [ ] **Apply database migration** (V46) - REQUIRED!
+- [ ] Verify constraint updated: `SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conname = 'chk_posts_post_type';`
+- [ ] Restart Spring Boot application
+
+### Feature Testing
+- [ ] Create a WEEKLY_SUMMARY post (should not get constraint error)
 - [ ] Verify rating section appears on the post
 - [ ] Test rating with values 1-9
 - [ ] **Test rating with value 10** (specifically requested by user)
@@ -158,21 +164,35 @@ Spring Boot automatically converts the query parameter string to Integer, so no 
 
 ## Deployment Steps
 
-1. **Backend:**
+### ⚠️ IMPORTANT: Database Migration Required!
+
+**A database constraint issue was discovered:** The `posts` table has a CHECK constraint that doesn't allow `WEEKLY_SUMMARY` or `FEEDBACK` post types.
+
+**Migration file created:** `V46__Add_Weekly_Summary_And_Feedback_Post_Types.sql`
+
+1. **Database Migration (REQUIRED FIRST):**
+   - The migration will run automatically when you restart Spring Boot (if Flyway is enabled)
+   - OR run manually:
+   ```sql
+   ALTER TABLE posts DROP CONSTRAINT IF EXISTS chk_posts_post_type;
+   ALTER TABLE posts ADD CONSTRAINT chk_posts_post_type 
+   CHECK (post_type IN ('POST', 'ASSIGNMENT', 'WEEKLY_SUMMARY', 'FEEDBACK', 'ANNOUNCEMENT', 'QUESTION'));
+   ```
+   - See `DATABASE_CONSTRAINT_FIX.md` for detailed instructions
+
+2. **Backend:**
    ```bash
    cd D:\Ali projet\the-xperience-back
    mvn clean package
-   # Deploy the new JAR file to your server
+   # Restart your Spring Boot application (migration runs automatically)
    ```
 
-2. **Frontend:**
+3. **Frontend:**
    ```bash
    cd D:\Ali projet\the-xperience-front
    npm run build
    # Deploy the build directory
    ```
-
-3. **No database migration needed** - existing schema supports this feature
 
 ## API Endpoint
 
