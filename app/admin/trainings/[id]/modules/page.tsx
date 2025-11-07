@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Plus, Edit, Trash2, BookOpen, Key, Copy, Video, Menu, X, Calendar, Users, GraduationCap } from "lucide-react"
+import { ArrowLeft, Plus, Edit, Trash2, BookOpen, Key, Copy, Video, Menu, X, Calendar, Users, GraduationCap, Lock, Unlock } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -58,33 +58,19 @@ export default function TrainingModulesPage() {
   const [loading, setLoading] = useState(true)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
-  const [showCodesDialog, setShowCodesDialog] = useState(false)
+  const [showAccessDialog, setShowAccessDialog] = useState(false)
   const [selectedModule, setSelectedModule] = useState<TrainingModule | null>(null)
-  const [selectedClass, setSelectedClass] = useState<string>("")
-  const [availableClasses, setAvailableClasses] = useState<Array<{id: string, name: string}>>([])
-  const [activeCode, setActiveCode] = useState<{
-    hasCode: boolean
-    code?: string
-    codeId?: string
-    classId?: string
-    className?: string
-    createdAt?: string
-    generatedBy?: string
-    usageCount?: number
-    recentUsage?: Array<{userName: string, userEmail: string, usedAt: string}>
-  } | null>(null)
-  const [allClassCodes, setAllClassCodes] = useState<Array<{
-    codeId: string
-    code: string
+  const [classAccess, setClassAccess] = useState<Array<{
     classId: string
     className: string
-    createdAt: string
-    generatedBy: string
-    usageCount: number
+    startDate?: string
+    endDate?: string
+    isUnlocked: boolean
+    updatedAt?: string | null
+    updatedBy?: string | null
   }>>([])
-  const [showGeneratedCode, setShowGeneratedCode] = useState(false)
-  const [newlyGeneratedCode, setNewlyGeneratedCode] = useState("")
-  const [loadingCodes, setLoadingCodes] = useState(false)
+  const [loadingClassAccess, setLoadingClassAccess] = useState(false)
+  const [updatingClassAccessId, setUpdatingClassAccessId] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const [formData, setFormData] = useState({
@@ -283,120 +269,92 @@ export default function TrainingModulesPage() {
     setShowEditDialog(true)
   }
 
-  const openCodesDialog = async (module: TrainingModule) => {
+  const openAccessDialog = async (module: TrainingModule) => {
     setSelectedModule(module)
-    setShowGeneratedCode(false)
-    setNewlyGeneratedCode("")
-    setSelectedClass("")
-    setShowCodesDialog(true)
-    await loadAvailableClasses()
-    await loadAllClassCodes(module.id)
+    setClassAccess([])
+    setShowAccessDialog(true)
+    await loadClassAccess(module.id)
   }
 
-  const loadAvailableClasses = async () => {
+  const loadClassAccess = async (moduleId: string) => {
     try {
-      const res = await fetch(`/api/courses/${trainingId}/classes`, {
+      setLoadingClassAccess(true)
+      const res = await fetch(`/api/admin/training-modules/${moduleId}/class-access`, {
         credentials: "include"
       })
-      if (res.ok) {
-        const data = await res.json()
-        setAvailableClasses(data)
-      }
-    } catch (error) {
-      console.error("Error loading classes:", error)
-    }
-  }
 
-  const loadAllClassCodes = async (moduleId: string) => {
-    try {
-      setLoadingCodes(true)
-      const res = await fetch(`/api/admin/training-modules/${moduleId}/access-codes`, {
-        credentials: "include"
-      })
-      
       if (res.ok) {
         const data = await res.json()
-        console.log("🔍 Loaded codes for all classes:", data)
-        
-        if (data.codes && Array.isArray(data.codes)) {
-          setAllClassCodes(data.codes)
+        console.log("🔍 Loaded class access data:", data)
+        if (Array.isArray(data)) {
+          setClassAccess(data)
         } else {
-          setAllClassCodes([])
-        }
-      }
-    } catch (error) {
-      console.error("Error loading codes:", error)
-    } finally {
-      setLoadingCodes(false)
-    }
-  }
-
-  const handleGenerateCode = async () => {
-    if (!selectedModule || !selectedClass) {
-      toast({
-        title: "Error",
-        description: "Please select a class first",
-        variant: "destructive"
-      })
-      return
-    }
-    
-    try {
-      const res = await fetch(`/api/admin/training-modules/${selectedModule.id}/access-codes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ classId: selectedClass })
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-        console.log("🔍 Response data:", data)
-        
-        if (data.code) {
-          setNewlyGeneratedCode(data.code)
-          setShowGeneratedCode(true)
-          
-          toast({
-            title: "Access Code Generated",
-            description: `Code generated for ${data.className}`
-          })
-          
-          // Reload all codes
-          await loadAllClassCodes(selectedModule.id)
-        } else {
-          console.error("❌ No code in response:", data)
-          toast({
-            title: "Error",
-            description: "Generated code was not returned properly",
-            variant: "destructive"
-          })
+          setClassAccess([])
         }
       } else {
-        const error = await res.json()
+        const error = await res.text()
+        console.error("❌ Failed to load class access:", error)
         toast({
           title: "Error",
-          description: error.error || "Failed to generate access code",
+          description: "Failed to load class access",
           variant: "destructive"
         })
       }
     } catch (error) {
-      console.error("Error generating code:", error)
+      console.error("Error loading class access:", error)
       toast({
         title: "Error",
-        description: "Failed to generate access code",
+        description: "Failed to load class access",
         variant: "destructive"
       })
+    } finally {
+      setLoadingClassAccess(false)
     }
   }
 
+  const handleToggleClassAccess = async (classId: string, isUnlocked: boolean) => {
+    if (!selectedModule) return
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast({
-      title: "Copied!",
-      description: "Access code copied to clipboard"
-    })
+    try {
+      setUpdatingClassAccessId(classId)
+      const res = await fetch(`/api/admin/training-modules/${selectedModule.id}/class-access/${classId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ isUnlocked: !isUnlocked })
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        setClassAccess(prev => prev.map(item =>
+          item.classId === classId
+            ? { ...item, isUnlocked: data.isUnlocked, updatedAt: data.updatedAt, updatedBy: data.updatedBy }
+            : item
+        ))
+
+        toast({
+          title: data.isUnlocked ? "Module unlocked" : "Module locked",
+          description: `${selectedModule.title} is now ${data.isUnlocked ? "unlocked" : "locked"} for this class.`
+        })
+      } else {
+        const error = await res.text()
+        console.error("❌ Failed to update class access:", error)
+        toast({
+          title: "Error",
+          description: "Failed to update class access",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      console.error("Error updating class access:", error)
+      toast({
+        title: "Error",
+        description: "Failed to update class access",
+        variant: "destructive"
+      })
+    } finally {
+      setUpdatingClassAccessId(null)
+    }
   }
 
   return (
@@ -641,7 +599,7 @@ export default function TrainingModulesPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => openCodesDialog(module)}
+                            onClick={() => openAccessDialog(module)}
                             title="Manage Access Codes"
                             className="hover:bg-[#FFBC00]/10 hover:border-[#FFBC00] hover:text-[#FFBC00] transition-all duration-200"
                           >
@@ -864,159 +822,92 @@ export default function TrainingModulesPage() {
             </DialogContent>
           </Dialog>
 
-          {/* Access Codes Dialog */}
-          <Dialog open={showCodesDialog} onOpenChange={setShowCodesDialog}>
+          {/* Class Access Dialog */}
+          <Dialog open={showAccessDialog} onOpenChange={setShowAccessDialog}>
             <DialogContent className="max-w-4xl mx-4 max-h-[85vh] overflow-y-auto border-0 bg-white/95 backdrop-blur-sm shadow-2xl">
               <DialogHeader className="pb-4 sm:pb-6 px-4 sm:px-6">
                 <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 flex items-center gap-2 sm:gap-3">
                   <div className="p-2 bg-gradient-to-br from-[#FFBC00] to-[#f59e0b] rounded-lg">
-                    <Key className="h-5 w-5 text-white" />
+                    <Lock className="h-5 w-5 text-white" />
                   </div>
-                  Module Access Codes
+                  Manage Class Access
                 </DialogTitle>
                 <DialogDescription className="text-slate-600 text-base">
-                  Generate class-specific access codes for <span className="font-semibold text-[#005eb8]">{selectedModule?.title}</span>. 
-                  Each class has its own unique code that all students in that class can use.
+                  Control which classes can access <span className="font-semibold text-[#005eb8]">{selectedModule?.title}</span>. 
+                  Toggle the lock/unlock switch for each class. Changes are saved automatically.
                 </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-6 py-4 px-4 sm:px-6">
-                {/* Newly Generated Code Banner */}
-                {showGeneratedCode && newlyGeneratedCode && (
-                  <Card className="border-2 border-emerald-500 bg-gradient-to-r from-emerald-50 to-green-50 shadow-lg">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-lg font-bold text-emerald-800 flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-lg">
-                          <Key className="h-4 w-4 text-white" />
-                        </div>
-                        ✨ New Code Generated Successfully!
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <p className="text-sm text-slate-700 font-semibold">Share this code with students in the selected class:</p>
-                      <div className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border-2 border-emerald-200">
-                        <code className="font-mono text-2xl text-emerald-800 font-bold tracking-wider">{newlyGeneratedCode}</code>
-                        <Button
-                          size="sm"
-                          onClick={() => copyToClipboard(newlyGeneratedCode)}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                        >
-                          <Copy className="h-4 w-4 mr-1" />
-                          Copy
-                        </Button>
-                      </div>
-                      <p className="text-xs text-emerald-700 font-semibold">✓ All students in this class can use the same code</p>
-                    </CardContent>
-                  </Card>
+                {loadingClassAccess ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#005eb8] mx-auto mb-4"></div>
+                    <p className="text-slate-600">Loading class access...</p>
+                  </div>
+                ) : classAccess.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Lock className="h-16 w-16 mx-auto mb-4 text-slate-300" />
+                    <p className="text-slate-600">No classes found for this training</p>
+                    <p className="text-sm text-slate-500 mt-2">Create classes for this training to manage module access</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground px-1">Toggle access for each class. Changes are saved automatically.</p>
+                    {classAccess.map((item) => (
+                      <Card key={item.classId} className="border-2 border-slate-200 hover:border-[#005eb8] transition-all">
+                        <CardContent className="p-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex-1 space-y-1">
+                              <h4 className="font-bold text-slate-800 text-lg">{item.className}</h4>
+                              {(item.startDate || item.endDate) && (
+                                <p className="text-xs text-slate-500 flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  {item.startDate ? new Date(item.startDate).toLocaleDateString() : ""}
+                                  {item.endDate ? ` - ${new Date(item.endDate).toLocaleDateString()}` : ""}
+                                </p>
+                              )}
+                              {item.updatedAt && item.updatedBy && (
+                                <p className="text-xs text-slate-400">
+                                  Last updated {new Date(item.updatedAt).toLocaleString()} by {item.updatedBy}
+                                </p>
+                              )}
+                            </div>
+                            <Button
+                              variant={item.isUnlocked ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => handleToggleClassAccess(item.classId, item.isUnlocked)}
+                              disabled={updatingClassAccessId === item.classId}
+                              className={`w-full sm:w-auto min-w-[120px] ${
+                                item.isUnlocked 
+                                  ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
+                                  : "border-red-300 text-red-600 hover:bg-red-50"
+                              }`}
+                            >
+                              {updatingClassAccessId === item.classId ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2"></div>
+                                  Saving...
+                                </>
+                              ) : (
+                                <>
+                                  {item.isUnlocked ? <Unlock className="h-4 w-4 mr-2" /> : <Lock className="h-4 w-4 mr-2" />}
+                                  {item.isUnlocked ? "Unlocked" : "Locked"}
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 )}
-
-                {/* Generate New Code Section */}
-                <Card className="border-0 bg-gradient-to-r from-blue-50/80 to-indigo-50/80 backdrop-blur-sm shadow-lg">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-lg font-bold text-slate-800">Generate Access Code</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label htmlFor="class-select" className="text-sm font-semibold text-slate-700 mb-2 block">
-                        Select Class <span className="text-red-500">*</span>
-                      </Label>
-                      <select
-                        id="class-select"
-                        value={selectedClass}
-                        onChange={(e) => setSelectedClass(e.target.value)}
-                        className="w-full h-12 px-4 border-2 border-slate-200 rounded-lg focus:border-[#005eb8] focus:ring-2 focus:ring-[#005eb8]/20 bg-white"
-                      >
-                        <option value="">-- Select a class --</option>
-                        {availableClasses.map((cls) => (
-                          <option key={cls.id} value={cls.id}>
-                            {cls.name}
-                          </option>
-                        ))}
-                      </select>
-                      <p className="text-xs text-slate-500 mt-2">
-                        Each class needs its own unique code
-                      </p>
-                    </div>
-                    <Button 
-                      onClick={handleGenerateCode}
-                      disabled={!selectedClass}
-                      className="w-full bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold py-6 disabled:opacity-50"
-                    >
-                      <Key className="h-5 w-5 mr-2" />
-                      Generate Code for Selected Class
-                    </Button>
-                    <p className="text-xs text-amber-600 text-center">
-                      ⚠️ Generating a new code will deactivate the previous code for this class
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* Existing Codes List */}
-                <Card className="border-0 bg-white shadow-lg">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-lg font-bold text-slate-800">Active Codes by Class</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {loadingCodes ? (
-                      <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#005eb8] mx-auto mb-4"></div>
-                        <p className="text-slate-600">Loading codes...</p>
-                      </div>
-                    ) : allClassCodes.length === 0 ? (
-                      <div className="text-center py-12">
-                        <Key className="h-16 w-16 mx-auto mb-4 text-slate-300" />
-                        <p className="text-slate-600">No codes generated yet</p>
-                        <p className="text-sm text-slate-500 mt-2">Select a class and generate a code to get started</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {allClassCodes.map((code) => (
-                          <Card key={code.codeId} className="border-2 border-slate-200 hover:border-[#005eb8] transition-all">
-                            <CardContent className="p-4">
-                              <div className="flex items-center justify-between mb-3">
-                                <div>
-                                  <h4 className="font-bold text-slate-800 text-lg">{code.className}</h4>
-                                  <p className="text-xs text-slate-500">
-                                    Generated {new Date(code.createdAt).toLocaleDateString()} by {code.generatedBy}
-                                  </p>
-                                </div>
-                                <Badge className="bg-emerald-500 text-white">
-                                  {code.usageCount} {code.usageCount === 1 ? 'use' : 'uses'}
-                                </Badge>
-                              </div>
-                              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                <code className="font-mono text-xl text-slate-800 font-bold tracking-wider">
-                                  {code.code}
-                                </code>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => copyToClipboard(code.code)}
-                                  className="hover:bg-[#005eb8] hover:text-white"
-                                >
-                                  <Copy className="h-4 w-4 mr-1" />
-                                  Copy
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
               </div>
 
               <DialogFooter className="pt-4 sm:pt-6 px-4 sm:px-6">
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => {
-                    setShowCodesDialog(false)
-                    setShowGeneratedCode(false)
-                    setNewlyGeneratedCode("")
-                    setSelectedClass("")
-                  }}
+                  onClick={() => setShowAccessDialog(false)}
                   className="hover:bg-slate-100 w-full sm:w-auto text-sm sm:text-base"
                 >
                   Close

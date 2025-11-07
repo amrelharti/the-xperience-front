@@ -65,9 +65,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
   const [selectedClassId, setSelectedClassId] = useState<string>("")
   const [loadingClasses, setLoadingClasses] = useState(false)
   const [enrollmentCode, setEnrollmentCode] = useState("")
-  const [unlockingModule, setUnlockingModule] = useState<string | null>(null)
-  const [moduleAccessCode, setModuleAccessCode] = useState("")
-  const [showUnlockDialog, setShowUnlockDialog] = useState(false)
+  const [selectedLockedModule, setSelectedLockedModule] = useState<any | null>(null)
+  const [showLockedDialog, setShowLockedDialog] = useState(false)
   const [isManuallySelectingClass, setIsManuallySelectingClass] = useState(false)
 
   // Check authentication when component mounts
@@ -336,91 +335,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
   }, [params.id, user?.id, loadModuleProgress, loadAvailableClasses, selectedClassId, isManuallySelectingClass])
 
 
-  const handleUnlockModule = async (moduleId: string) => {
-    setUnlockingModule(moduleId)
-    setShowUnlockDialog(true)
-  }
-
-  const submitUnlockCode = async () => {
-    if (!unlockingModule || !moduleAccessCode) {
-      alert("Please enter an access code")
-      return
-    }
-
-    // CRITICAL: Log the module ID being unlocked for debugging
-    console.log("🔓 Unlocking module:", unlockingModule)
-    console.log("🔑 Access code:", moduleAccessCode)
-    
-    // Validate we have a valid module ID
-    const moduleToUnlock = training?.modules?.find(m => m.id === unlockingModule)
-    if (!moduleToUnlock) {
-      alert("Error: Module not found")
-      return
-    }
-    console.log("📚 Target module:", moduleToUnlock.title)
-
-    try {
-      // Use new class-specific verification endpoint
-      const response = await fetch(`/api/training-modules/${unlockingModule}/verify-code`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ 
-          code: moduleAccessCode,
-          classId: selectedClassId
-        }),
-      })
-
-      console.log("🔓 Unlock response status:", response.status)
-      
-      if (response.ok) {
-        console.log("✅ Module unlocked successfully!")
-        alert("Module unlocked successfully!")
-        setShowUnlockDialog(false)
-        setModuleAccessCode("")
-        setUnlockingModule(null)
-        
-        // Reload to update module access status
-        await load()
-        
-        // Verify that ONLY the specific module was unlocked (backend bug check)
-        setTimeout(() => {
-          const updatedModules = training?.modules?.filter(m => m.status === "UNLOCKED")
-          if (updatedModules && updatedModules.length > 1) {
-            const expectedModule = updatedModules.find(m => m.id === unlockingModule)
-            if (expectedModule) {
-              console.warn("⚠️ WARNING: Multiple modules unlocked. Expected only:", moduleToUnlock.title)
-              console.warn("⚠️ This indicates a backend issue - access codes should unlock only ONE module")
-              console.warn("📊 Currently unlocked:", updatedModules.map(m => m.title))
-            }
-          }
-        }, 1000)
-      } else {
-        const errorText = await response.text()
-        let errorData
-        try {
-          errorData = JSON.parse(errorText)
-        } catch (e) {
-          errorData = { error: errorText }
-        }
-        
-        console.error("❌ Unlock failed!")
-        console.error("  - Status:", response.status)
-        console.error("  - Raw response:", errorText)
-        console.error("  - Parsed error:", JSON.stringify(errorData, null, 2))
-        console.error("  - Error message:", errorData.error || errorData.message || "Unknown error")
-        
-        const errorMsg = errorData.error || errorData.message || errorText || "Invalid or used code"
-        
-        // Show detailed error to user
-        alert(`⚠️ Unlock Failed!\n\nError: ${errorMsg}\n\nThis code may:\n- Have been used already (backend treating as single-use)\n- Belong to a different module\n- Be invalid or expired\n\nPlease check with admin or generate a new code.`)
-      }
-    } catch (error) {
-      console.error("Error unlocking module:", error)
-      alert("Network error. Please try again.")
-    }
+  const handleLockedModule = (module: any) => {
+    setSelectedLockedModule(module)
+    setShowLockedDialog(true)
   }
 
   const handleEnroll = async () => {
@@ -611,7 +528,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                     <NextImage
                       src={training.thumbnailUrl}
                       alt={training.title}
-                      width={208}
+                      width={400}
                       height={208}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />
@@ -767,13 +684,12 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleUnlockModule(module.id)}
+                        onClick={() => handleLockedModule(module)}
                         disabled={!isEnrolled}
-                        className="w-full sm:w-auto text-xs sm:text-sm"
+                        className="w-full sm:w-auto text-xs sm:text-sm border-red-300 text-red-600 hover:bg-red-50"
                       >
                         <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                        <span className="hidden sm:inline">Unlock Module</span>
-                        <span className="sm:hidden">Unlock</span>
+                        <span>Locked</span>
                       </Button>
                     ) : (
                       <Button asChild size="sm" className="bg-[#0476D7] hover:bg-[#0068A7] shadow-md hover:shadow-lg w-full sm:w-auto text-xs sm:text-sm">
@@ -790,43 +706,40 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           ))}
         </div>
 
-        {/* Unlock Dialog */}
-        {showUnlockDialog && (
+        {/* Locked Module Dialog */}
+        {showLockedDialog && selectedLockedModule && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <Card className="w-full max-w-md">
               <CardHeader className="px-4 sm:px-6">
-                <CardTitle className="text-lg sm:text-xl">Unlock Module</CardTitle>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-100 rounded-full">
+                    <Lock className="h-6 w-6 text-red-600" />
+                  </div>
+                  <CardTitle className="text-lg sm:text-xl">Module Locked</CardTitle>
+                </div>
               </CardHeader>
-              <CardContent className="space-y-4 px-4 sm:px-6">
-                <div>
-                  <label htmlFor="accessCode" className="text-xs sm:text-sm font-medium">
-                    Access Code
-                  </label>
-                  <Input
-                    id="accessCode"
-                    type="text"
-                    value={moduleAccessCode}
-                    onChange={(e) => setModuleAccessCode(e.target.value)}
-                    placeholder="Enter access code"
-                    className="mt-1 text-sm sm:text-base"
-                  />
+              <CardContent className="space-y-4 px-4 sm:px-6 pb-6">
+                <p className="text-sm sm:text-base text-slate-700">
+                  <strong className="text-slate-900">{selectedLockedModule.title}</strong> is currently locked for your class.
+                </p>
+                <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-800">
+                    <strong>Need Access?</strong>
+                  </p>
+                  <p className="text-xs sm:text-sm text-amber-700 mt-2">
+                    Please contact your instructor to unlock this module for your class.
+                  </p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                  <Button onClick={submitUnlockCode} className="flex-1 text-sm sm:text-base">
-                    Unlock
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setShowUnlockDialog(false)
-                      setModuleAccessCode("")
-                      setUnlockingModule(null)
-                    }}
-                    className="flex-1 sm:flex-initial text-sm sm:text-base"
-                  >
-                    Cancel
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowLockedDialog(false)
+                    setSelectedLockedModule(null)
+                  }}
+                  className="w-full"
+                >
+                  Close
+                </Button>
               </CardContent>
             </Card>
           </div>
