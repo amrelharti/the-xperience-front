@@ -583,7 +583,7 @@ export default function AdminFeedPage() {
                                     href={`https://instagram.com/${post.author.instagram.replace('@', '')}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-grey hover:from-pink-100 hover:to-rose-100 border border-pink-300 rounded-full transition-all text-xs font-medium text-pink-700"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-grey hover:from-pink-100 hover:to-rose-100 border border-pink-300 rounded-full transition-all text-xs font-medium text-grey-700"
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     <Instagram className="h-3.5 w-3.5" />
@@ -595,7 +595,7 @@ export default function AdminFeedPage() {
                                     href={post.author.linkedin.startsWith('http') ? post.author.linkedin : `https://${post.author.linkedin}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-grey hover:to-blue-150 border border-blue-300 rounded-full transition-all text-xs font-medium text-blue-700"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-grey hover:to-blue-150 border border-blue-300 rounded-full transition-all text-xs font-medium text-grey-700"
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     <Linkedin className="h-3.5 w-3.5" />

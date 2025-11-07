@@ -282,54 +282,24 @@ export default function VimeoPlayer({
 
   if (showTerms && !termsAccepted) {
     return (
-      <>
-        {/* Black placeholder matching video aspect ratio */}
-        <div className={`aspect-video bg-black rounded-lg ${className}`} />
-        
-        {/* Modal overlay with terms */}
-        <div 
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-        >
-          <div className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md mx-auto border-2 border-gray-700 max-h-[90vh] overflow-y-auto">
-            <div className="p-6 sm:p-8">
-              <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-white text-center">Usage Rules</h3>
-              <div className="text-sm sm:text-base text-gray-300 mb-6 sm:mb-8 space-y-3 sm:space-y-4">
-                <p className="font-semibold text-white">By accessing this video content, you agree to:</p>
-                <ul className="space-y-2 sm:space-y-3">
-                  <li className="flex items-start gap-3 leading-relaxed">
-                    <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                    <span>Not share, download, or redistribute this content</span>
-                  </li>
-                  <li className="flex items-start gap-3 leading-relaxed">
-                    <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                    <span>Use this content only for educational purposes</span>
-                  </li>
-                  <li className="flex items-start gap-3 leading-relaxed">
-                    <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                    <span>Respect intellectual property rights</span>
-                  </li>
-                  <li className="flex items-start gap-3 leading-relaxed">
-                    <span className="text-green-400 text-xl flex-shrink-0">✓</span>
-                    <span>Not attempt to bypass security measures</span>
-                  </li>
-                </ul>
-                <div className="pt-3 sm:pt-4 border-t border-gray-700">
-                  <p className="text-xs sm:text-sm text-gray-400 italic leading-relaxed">
-                    ⚠️ Your access is logged and monitored for security purposes.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={acceptTerms}
-                className="w-full px-6 py-4 bg-gradient-to-r from-green-600 to-green-500 text-white text-base sm:text-lg font-semibold rounded-xl hover:from-green-700 hover:to-green-600 active:from-green-800 active:to-green-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 touch-manipulation"
-              >
-                ✓ I Accept - Continue to Video
-              </button>
-            </div>
+      <div className={`bg-black rounded-lg flex items-center justify-center p-3 sm:p-6 ${className}`}>
+        <div className="text-center text-white w-full max-w-lg">
+          <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Usage Rules</h3>
+          <div className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-4 text-left space-y-1 sm:space-y-2">
+            <p className="font-medium text-center sm:text-left">By accessing this video content, you agree to:</p>
+            <ul className="list-disc list-inside space-y-0.5 sm:space-y-1 pl-1 sm:pl-2">
+              <li className="leading-snug sm:leading-relaxed">Not share, download, or redistribute this content</li>
+              <li className="leading-snug sm:leading-relaxed">Use this content only for educational purposes</li>
+            </ul>
           </div>
+          <button
+            onClick={acceptTerms}
+            className="w-full px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 text-white text-xs sm:text-base rounded-lg hover:bg-green-700 active:bg-green-800 font-medium transition-colors shadow-lg touch-manipulation"
+          >
+            ✓ I Accept Terms
+          </button>
         </div>
-      </>
+      </div>
     )
   }
 
