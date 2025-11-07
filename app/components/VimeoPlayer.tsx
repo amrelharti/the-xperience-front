@@ -256,9 +256,9 @@ export default function VimeoPlayer({
   if (loading) {
     return (
       <div className={`aspect-video bg-black rounded-lg flex items-center justify-center ${className}`}>
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Loading video...</p>
+        <div className="text-center text-white px-4">
+          <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-white mx-auto mb-3 sm:mb-4"></div>
+          <p className="text-sm sm:text-base">Loading video...</p>
         </div>
       </div>
     )
@@ -267,11 +267,11 @@ export default function VimeoPlayer({
   if (error) {
     return (
       <div className={`aspect-video bg-black rounded-lg flex items-center justify-center ${className}`}>
-        <div className="text-center text-white">
-          <p className="text-red-400 mb-4">{error}</p>
+        <div className="text-center text-white px-4">
+          <p className="text-red-400 mb-3 sm:mb-4 text-sm sm:text-base">{error}</p>
           <button 
             onClick={loadSignedUrl}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white text-sm sm:text-base rounded hover:bg-blue-700 transition-colors"
           >
             Retry
           </button>
@@ -282,26 +282,26 @@ export default function VimeoPlayer({
 
   if (showTerms && !termsAccepted) {
     return (
-      <div className={`aspect-video bg-black rounded-lg flex items-center justify-center ${className}`}>
-        <div className="text-center text-white max-w-md mx-auto p-6">
-          <h3 className="text-xl font-semibold mb-4">Terms of Service</h3>
-          <div className="text-sm text-gray-300 mb-6 text-left space-y-2">
-            <p>By accessing this video content, you agree to:</p>
-            <ul className="list-disc list-inside space-y-1">
+      <div className={`min-h-[300px] sm:aspect-video bg-black rounded-lg flex items-center justify-center ${className} overflow-y-auto`}>
+        <div className="text-center text-white max-w-md mx-auto p-4 sm:p-6 my-4">
+          <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Usage Rules</h3>
+          <div className="text-xs sm:text-sm text-gray-300 mb-4 sm:mb-6 text-left space-y-2">
+            <p className="font-medium">By accessing this video content, you agree to:</p>
+            <ul className="list-disc list-inside space-y-1.5 pl-2">
               <li>Not share, download, or redistribute this content</li>
               <li>Use this content only for educational purposes</li>
               <li>Respect intellectual property rights</li>
               <li>Not attempt to bypass security measures</li>
             </ul>
-            <p className="text-xs text-gray-400 mt-4">
+            <p className="text-[10px] sm:text-xs text-gray-400 mt-3 sm:mt-4 italic">
               Your access is logged and monitored for security purposes.
             </p>
           </div>
           <button
             onClick={acceptTerms}
-            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="w-full sm:w-auto px-6 py-2.5 sm:py-2 bg-green-600 text-white text-sm sm:text-base rounded-lg hover:bg-green-700 font-medium transition-colors"
           >
-            I Accept Terms
+            ✓ I Accept Terms
           </button>
         </div>
       </div>
@@ -344,17 +344,13 @@ export default function VimeoPlayer({
         }}
       />
       
-      {/* Security Warning Watermark - Top-right, slightly up */}
+      {/* Security Warning Watermark - Top-right, responsive */}
       <div 
-        className="absolute pointer-events-none z-10"
-        style={{ 
-          top: 'calc(1 / 4 * 5%)', 
-          right: 'calc(1 / 4 * 5%)' 
-        }}
+        className="absolute pointer-events-none z-10 top-2 right-2 sm:top-3 sm:right-3"
       >
-        <div className="bg-red-600 bg-opacity-30 text-white text-xs px-3 py-2 rounded-lg">
+        <div className="bg-red-600 bg-opacity-30 text-white text-[9px] sm:text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-md sm:rounded-lg">
           <div className="font-medium">SECURITY WARNING</div>
-          <div className="opacity-90">Content is monitored and logged</div>
+          <div className="opacity-90 hidden sm:block">Content is monitored and logged</div>
         </div>
       </div>
 
@@ -369,14 +365,14 @@ export default function VimeoPlayer({
             opacity: emailWatermarkOpacity
           }}
         >
-          <div className="bg-black bg-opacity-50 text-white text-lg px-6 py-4 rounded-lg border-2 border-white">
-            <div className="font-bold text-center">{user.email}</div>
-            <div className="text-sm text-center mt-1">Protected Content - Do Not Record</div>
+          <div className="bg-black bg-opacity-50 text-white text-sm sm:text-lg px-4 py-2 sm:px-6 sm:py-4 rounded-lg border-2 border-white max-w-[90%]">
+            <div className="font-bold text-center truncate">{user.email}</div>
+            <div className="text-xs sm:text-sm text-center mt-0.5 sm:mt-1">Protected Content - Do Not Record</div>
           </div>
         </div>
       )}
 
-      {/* Fullscreen Button - Bottom-Right with calc positioning, moved up */}
+      {/* Fullscreen Button - Bottom-Right, responsive positioning */}
       <button
         onClick={() => {
           const container = document.getElementById('vimeo-container')
@@ -392,14 +388,10 @@ export default function VimeoPlayer({
             }
           }
         }}
-        className="absolute bg-black text-white p-2 rounded-lg hover:bg-gray-800 transition-all z-10"
-        style={{ 
-          bottom: 'calc(var(--spacing) * 15)', 
-          right: 'calc(var(--spacing) * 2)' 
-        }}
+        className="absolute bg-black bg-opacity-70 text-white p-1.5 sm:p-2 rounded-md sm:rounded-lg hover:bg-gray-800 transition-all z-10 bottom-16 sm:bottom-20 right-2 sm:right-3"
         title="Fullscreen"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="sm:w-4 sm:h-4">
           <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
         </svg>
       </button>

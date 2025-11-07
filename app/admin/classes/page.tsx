@@ -811,22 +811,36 @@ export default function ClassManagementPage() {
                           Copy
                         </Button>
                       </div>
-                      <p className="text-xs text-emerald-700 mt-2 font-semibold">✓ This code will remain active and visible until you generate a new one.</p>
+                      <div className="space-y-2">
+                        <p className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
+                          <CheckCircle className="h-3 w-3" />
+                          Multi-use code: Can be shared with all students in this class
+                        </p>
+                        <p className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
+                          <CheckCircle className="h-3 w-3" />
+                          This code will remain active until you generate a new one
+                        </p>
+                      </div>
                       <div className="pt-2 border-t border-emerald-200 mt-2">
                         <p className="text-xs text-slate-600">
-                          Total codes: <span className="font-semibold text-emerald-700">{activeCode.codesCount || 0}</span>
+                          Total codes created: <span className="font-semibold text-emerald-700">{activeCode.codesCount || 0}</span>
                           {' • '}
-                          Unused: <span className="font-semibold text-emerald-700">{activeCode.unusedCount || 0}</span>
+                          Active codes: <span className="font-semibold text-emerald-700">{activeCode.unusedCount || 0}</span>
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="p-4 bg-amber-50 rounded-lg border-2 border-amber-200">
-                      <p className="text-sm text-amber-800 mb-2 font-semibold">
-                        An enrollment code exists but wasn't stored properly.
+                    <div className="p-4 bg-amber-50 rounded-lg border-2 border-amber-200 space-y-2">
+                      <p className="text-sm text-amber-800 font-semibold flex items-center gap-2">
+                        <Key className="h-4 w-4" />
+                        Legacy Code Detected
                       </p>
                       <p className="text-xs text-amber-700">
-                        Please generate a new code to see and share it with students.
+                        An enrollment code exists but was created before the plain-text storage update. 
+                        The code is still active in the database but cannot be displayed.
+                      </p>
+                      <p className="text-xs text-amber-800 font-semibold mt-2">
+                        👉 Please generate a new code below to get a visible, shareable code for your students.
                       </p>
                     </div>
                   )}
@@ -840,8 +854,8 @@ export default function ClassManagementPage() {
                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                     New Code Generated!
                   </h3>
-                  <div className="p-4 bg-gradient-to-r from-emerald-100 to-green-100 border-2 border-emerald-400 rounded-lg">
-                    <p className="text-xs text-slate-700 mb-2">Share this code with students:</p>
+                  <div className="p-4 bg-gradient-to-r from-emerald-100 to-green-100 border-2 border-emerald-400 rounded-lg space-y-3">
+                    <p className="text-xs text-slate-700 font-semibold">📋 Share this code with ALL students:</p>
                     <div className="flex items-center justify-between p-3 bg-white/80 rounded-lg">
                       <code className="font-mono text-lg text-emerald-800 font-bold tracking-wider">{newlyGeneratedCode}</code>
                       <Button
@@ -853,7 +867,17 @@ export default function ClassManagementPage() {
                         Copy
                       </Button>
                     </div>
-                    <p className="text-xs text-emerald-700 mt-2 font-semibold">✓ This code will remain active and visible until you generate a new one.</p>
+                    <div className="space-y-1 pt-2 border-t border-emerald-300">
+                      <p className="text-xs text-emerald-800 font-semibold flex items-center gap-1">
+                        ✓ Multi-use: This same code can be used by ALL students
+                      </p>
+                      <p className="text-xs text-emerald-800 font-semibold flex items-center gap-1">
+                        ✓ Persists: This code will remain visible even after page refresh
+                      </p>
+                      <p className="text-xs text-emerald-800 font-semibold flex items-center gap-1">
+                        ✓ Active until you generate a new one
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}

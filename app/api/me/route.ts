@@ -59,6 +59,8 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log('[API Route] PUT /api/me - Request body:', body)
+    
     const cookieHeader = request.headers.get('cookie') || '';
     
     // Extract JWT token from SESSION cookie
@@ -75,8 +77,11 @@ export async function PUT(request: NextRequest) {
     }
 
     if (!jwtToken) {
+      console.log('[API Route] PUT /api/me - No JWT token found')
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
+    
+    console.log('[API Route] PUT /api/me - JWT token found, forwarding to backend')
     
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -89,8 +94,11 @@ export async function PUT(request: NextRequest) {
       body: JSON.stringify(body),
     })
     
+    console.log('[API Route] PUT /api/me - Backend response status:', response.status)
+    
     if (!response.ok) {
       const errorText = await response.text()
+      console.log('[API Route] PUT /api/me - Backend error:', errorText)
       return NextResponse.json(
         { error: errorText || 'Failed to update profile' },
         { status: response.status }
@@ -98,9 +106,10 @@ export async function PUT(request: NextRequest) {
     }
     
     const data = await response.json()
+    console.log('[API Route] PUT /api/me - Success, returning data')
     return NextResponse.json(data, { status: response.status })
   } catch (error) {
-    console.error('Error updating profile:', error)
+    console.error('[API Route] PUT /api/me - Error:', error)
     return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
   }
 }

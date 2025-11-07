@@ -524,7 +524,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             <div className="w-full rounded-xl sm:rounded-2xl p-4 sm:p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 shadow-lg">
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 {training.thumbnailUrl && (
-                  <div className="w-full sm:w-40 md:w-52 h-40 sm:h-40 md:h-52 rounded-lg sm:rounded-2xl overflow-hidden flex-shrink-0 shadow-xl">
+                  <div className="w-full sm:w-60 md:w-65 h-40 sm:h-40 md:h-52 rounded-lg sm:rounded-2xl overflow-hidden flex-shrink-0 shadow-xl">
                     <NextImage
                       src={training.thumbnailUrl}
                       alt={training.title}

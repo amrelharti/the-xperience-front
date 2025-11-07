@@ -16,7 +16,7 @@ import Navbar from "../components/Navbar"
 import { useToast } from "@/hooks/use-toast"
 
 export default function ProfilePage() {
-  const { user, isLoading } = useUser()
+  const { user, isLoading, refreshUser } = useUser()
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({
     name: "",
@@ -126,6 +126,8 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     try {
+      console.log("Updating profile with data:", editForm)
+      
       const res = await fetch('/api/me', {
         method: "PUT",
         headers: {
@@ -135,16 +137,24 @@ export default function ProfilePage() {
         body: JSON.stringify(editForm)
       })
 
+      console.log("Profile update response status:", res.status)
+
       if (res.ok) {
+        const updatedData = await res.json()
+        console.log("Profile updated successfully:", updatedData)
+        
         toast({
           title: "Success",
           description: "Profile updated successfully",
         })
         setIsEditing(false)
-        // Refresh user data
-        window.location.reload()
+        
+        // Refresh user data by clearing cache and refetching
+        refreshUser()
       } else {
         const errorData = await res.json()
+        console.error("Profile update failed:", errorData)
+        
         toast({
           title: "Error",
           description: errorData.error || "Failed to update profile",
@@ -155,7 +165,7 @@ export default function ProfilePage() {
       console.error("Error updating profile:", error)
       toast({
         title: "Error",
-        description: "Failed to update profile",
+        description: "Failed to update profile. Please try again.",
         variant: "destructive",
       })
     }
