@@ -157,7 +157,7 @@ export default function SignInPage() {
 
     // Hardcoded Google Client ID for testing
     const clientId = "128297296458-8nj8i8ej0mcrq5drskb2iargscjl3s59.apps.googleusercontent.com"
-    console.log("Google Client ID:", clientId)
+    
     
     if (!clientId || clientId.includes("YOUR_ACTUAL_GOOGLE_CLIENT_ID")) {
       console.warn("Please replace YOUR_ACTUAL_GOOGLE_CLIENT_ID with your real Google Client ID")
@@ -288,7 +288,7 @@ export default function SignInPage() {
         
         // @ts-ignore
         if (window.google?.accounts?.id) {
-          console.log("Rendering Google button")
+          
           try {
             // @ts-ignore
             window.google.accounts.id.renderButton(gsiDivRef.current, { 
@@ -303,7 +303,7 @@ export default function SignInPage() {
             console.error("Error rendering Google button:", error)
           }
         } else {
-          console.log("Google accounts.id not available for button rendering")
+          
         }
       }
     }

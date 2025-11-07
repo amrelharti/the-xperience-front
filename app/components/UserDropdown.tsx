@@ -42,7 +42,7 @@ function UserDropdown({ user }: UserDropdownProps) {
 
   const handleSignOut = async () => {
     try {
-      console.log("Starting logout process...")
+      
       
       // Call the logout endpoint
       const res = await fetch(`/api/auth/logout`, {
@@ -50,10 +50,10 @@ function UserDropdown({ user }: UserDropdownProps) {
         credentials: "include",
       })
 
-      console.log("Logout response:", res.status)
+      
       
       // Clear all client-side storage
-      console.log("Clearing client-side storage...")
+   
       
       // Clear localStorage
       localStorage.clear()
@@ -76,7 +76,7 @@ function UserDropdown({ user }: UserDropdownProps) {
         document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=None; Secure;`
       }
       
-      console.log("Cleared all client-side data")
+      
       
       // Refresh user state to clear it
       refreshUser()

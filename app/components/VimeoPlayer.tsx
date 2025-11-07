@@ -37,6 +37,21 @@ export default function VimeoPlayer({
   const [emailWatermarkOpacity, setEmailWatermarkOpacity] = useState(0) // Start at 0% opacity (hidden)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [vimeoPlayerReady, setVimeoPlayerReady] = useState(false)
+  const [isPseudoFullscreen, setIsPseudoFullscreen] = useState(false)
+
+  // Handle escape key to exit pseudo-fullscreen
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isPseudoFullscreen) {
+        setIsPseudoFullscreen(false)
+        document.body.style.overflow = ''
+        console.log('❌ Exited pseudo-fullscreen via Escape key')
+      }
+    }
+
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [isPseudoFullscreen])
 
   const loadSignedUrl = useCallback(async () => {
     try {
@@ -392,9 +407,13 @@ export default function VimeoPlayer({
       className={`relative ${className}`}
       id="vimeo-container"
       style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%'
+        position: isPseudoFullscreen ? 'fixed' : 'relative',
+        width: isPseudoFullscreen ? '100vw' : '100%',
+        height: isPseudoFullscreen ? '100vh' : '100%',
+        top: isPseudoFullscreen ? 0 : 'auto',
+        left: isPseudoFullscreen ? 0 : 'auto',
+        zIndex: isPseudoFullscreen ? 2147483647 : 'auto',
+        backgroundColor: isPseudoFullscreen ? 'black' : 'transparent'
       }}
     >
       {/* Vimeo Player */}
@@ -416,11 +435,18 @@ export default function VimeoPlayer({
       {/* Security Warning Watermark - Top-right, responsive */}
       <div 
         id="security-watermark"
-        className="absolute pointer-events-none z-10 top-2 right-2 sm:top-3 sm:right-3"
+        className="absolute pointer-events-none z-10"
+        style={{
+          top: isPseudoFullscreen ? '1rem' : '0.5rem',
+          right: isPseudoFullscreen ? '1rem' : '0.5rem',
+          zIndex: isPseudoFullscreen ? 2147483646 : 10
+        }}
       >
-        <div className="bg-red-600 bg-opacity-30 text-white text-[9px] sm:text-xs px-2 py-1 sm:px-3 sm:py-2 rounded-md sm:rounded-lg">
+        <div className={`bg-red-600 bg-opacity-30 text-white px-2 py-1 sm:px-3 sm:py-2 rounded-md sm:rounded-lg ${
+          isPseudoFullscreen ? 'text-sm sm:text-base' : 'text-[9px] sm:text-xs'
+        }`}>
           <div className="font-medium">SECURITY WARNING</div>
-          <div className="opacity-90 hidden sm:block">Content is monitored and logged</div>
+          <div className={`opacity-90 ${isPseudoFullscreen ? 'block' : 'hidden sm:block'}`}>Content is monitored and logged</div>
         </div>
       </div>
 
@@ -433,25 +459,45 @@ export default function VimeoPlayer({
             top: '50%', 
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            opacity: emailWatermarkOpacity
+            opacity: isPseudoFullscreen ? 1 : emailWatermarkOpacity,
+            zIndex: isPseudoFullscreen ? 2147483646 : 20
           }}
         >
-          <div className="bg-black bg-opacity-50 text-white text-sm sm:text-lg px-4 py-2 sm:px-6 sm:py-4 rounded-lg border-2 border-white max-w-[90%]">
+          <div className={`bg-black bg-opacity-50 text-white px-4 py-2 sm:px-6 sm:py-4 rounded-lg border-2 border-white max-w-[90%] ${
+            isPseudoFullscreen ? 'text-xl sm:text-2xl' : 'text-sm sm:text-lg'
+          }`}>
             <div className="font-bold text-center truncate">{user.email}</div>
-            <div className="text-xs sm:text-sm text-center mt-0.5 sm:mt-1">Protected Content - Do Not Record</div>
+            <div className={`text-center mt-0.5 sm:mt-1 ${
+              isPseudoFullscreen ? 'text-base sm:text-lg' : 'text-xs sm:text-sm'
+            }`}>Protected Content - Do Not Record</div>
           </div>
         </div>
       )}
 
-      {/* Fullscreen Button - Bottom-Right, responsive positioning */}
-      <button
-        onClick={async () => {
-          // Always use the container for fullscreen to keep watermarks visible
-          // DO NOT use Vimeo's postMessage API as it only fullscreens the iframe
+      {/* Fullscreen Button - Bottom-Right, responsive positioning (hidden in pseudo-fullscreen) */}
+      {!isPseudoFullscreen && (
+        <button
+          onClick={async () => {
           const container = document.getElementById('vimeo-container')
           if (!container) return
 
-          console.log('🔍 Attempting container fullscreen to preserve watermarks...')
+          // Detect iOS devices
+          const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+          const isAndroid = /Android/i.test(navigator.userAgent)
+          
+          console.log('🔍 Device detected:', { isIOS, isAndroid })
+
+          // iOS Solution: Use pseudo-fullscreen (CSS-based)
+          if (isIOS) {
+            console.log('📱 iOS detected - using pseudo-fullscreen mode')
+            setIsPseudoFullscreen(true)
+            // Lock body scroll
+            document.body.style.overflow = 'hidden'
+            return
+          }
+
+          // Android and Desktop: Try native fullscreen API
+          console.log('🔍 Attempting native fullscreen...')
           
           try {
             // Try standard fullscreen API
@@ -459,15 +505,10 @@ export default function VimeoPlayer({
               await container.requestFullscreen()
               console.log('✅ Container fullscreen activated (standard)')
             } 
-            // Try webkit (Safari, Chrome on iOS)
+            // Try webkit (Safari, Chrome)
             else if ((container as any).webkitRequestFullscreen) {
               await (container as any).webkitRequestFullscreen()
               console.log('✅ Container fullscreen activated (webkit)')
-            }
-            // Try webkit enter fullscreen (older iOS)
-            else if ((container as any).webkitEnterFullscreen) {
-              await (container as any).webkitEnterFullscreen()
-              console.log('✅ Container fullscreen activated (webkitEnter)')
             }
             // Try Firefox
             else if ((container as any).mozRequestFullScreen) {
@@ -480,14 +521,15 @@ export default function VimeoPlayer({
               console.log('✅ Container fullscreen activated (ms)')
             }
             else {
-              console.log('❌ No fullscreen API available on this device')
-              // Show alert to user
-              alert('Fullscreen is not supported on this device. Please rotate your device to landscape mode for a better viewing experience.')
+              console.log('❌ No fullscreen API available - using pseudo-fullscreen')
+              setIsPseudoFullscreen(true)
+              document.body.style.overflow = 'hidden'
             }
           } catch (error) {
-            console.error('❌ Fullscreen failed:', error)
-            // On mobile, especially iOS, fullscreen might not be supported for divs
-            console.log('💡 Tip: On some mobile devices, tap the video and use the built-in fullscreen control')
+            console.error('❌ Native fullscreen failed:', error)
+            console.log('🔄 Falling back to pseudo-fullscreen')
+            setIsPseudoFullscreen(true)
+            document.body.style.overflow = 'hidden'
           }
         }}
         className="absolute bg-black bg-opacity-70 text-white p-1.5 sm:p-2 rounded-md sm:rounded-lg hover:bg-gray-800 active:bg-gray-700 transition-all z-10 bottom-16 sm:bottom-20 right-2 sm:right-3 touch-manipulation"
@@ -496,7 +538,25 @@ export default function VimeoPlayer({
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="sm:w-4 sm:h-4">
           <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
         </svg>
-      </button>
+        </button>
+      )}
+
+      {/* Exit Pseudo-Fullscreen Button - Only visible in pseudo-fullscreen mode */}
+      {isPseudoFullscreen && (
+        <button
+          onClick={() => {
+            setIsPseudoFullscreen(false)
+            document.body.style.overflow = ''
+            console.log('❌ Exited pseudo-fullscreen mode')
+          }}
+          className="absolute bg-black bg-opacity-70 text-white p-2 sm:p-3 rounded-lg hover:bg-gray-800 active:bg-gray-700 transition-all z-[2147483648] top-4 right-4 touch-manipulation"
+          title="Exit Fullscreen"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+      )}
     </div>
   )
 }

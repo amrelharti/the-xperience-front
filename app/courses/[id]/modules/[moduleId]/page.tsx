@@ -68,7 +68,7 @@ export default function ModuleDetailPage() {
   // Load classId from my-classes if not in URL
   useEffect(() => {
     const urlClassId = searchParams.get('class')
-    console.log("🔍 Module page - URL classId:", urlClassId)
+    
     
     if (urlClassId) {
       setClassId(urlClassId)
