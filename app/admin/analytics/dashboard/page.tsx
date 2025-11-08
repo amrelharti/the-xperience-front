@@ -258,6 +258,29 @@ export default function AnalyticsDashboard() {
         </header>
 
         <main className="container mx-auto px-6 py-8">
+          {/* Quick Access to Phase 1 Insights */}
+          <Card className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-500/30 mb-6">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-400" />
+                    Phase 1: Critical Insights
+                  </h3>
+                  <p className="text-sm text-white/70">
+                    Class rosters, completions, inactive students, progress overview & scores
+                  </p>
+                </div>
+                <Button asChild size="lg">
+                  <Link href="/admin/analytics/insights">
+                    View Insights
+                    <Award className="h-4 w-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="bg-black/30 border border-white/10">
               <TabsTrigger value="overview">Overview</TabsTrigger>
