@@ -193,9 +193,24 @@ export default function AdminPage() {
           // Invalidate cache and reload
           loadUsers()
         } else {
+          // Try to get error details from response
+          let errorMessage = "Failed to delete user"
+          try {
+            const errorData = await res.json()
+            errorMessage = errorData.error || errorData.message || errorMessage
+            
+            // Check for foreign key constraint violation
+            if (errorMessage.includes("foreign key") || errorMessage.includes("constraint")) {
+              errorMessage = "Cannot delete user: They have associated data (course progress, posts, etc.). Please apply the cascade delete migration (V5) to enable user deletion."
+            }
+          } catch {
+            // If response is not JSON, use default message
+            errorMessage = "Failed to delete user. The user may have associated data that needs to be deleted first."
+          }
+          
           toast({
             title: "Error",
-            description: "Failed to delete user",
+            description: errorMessage,
             variant: "destructive",
           })
         }
@@ -203,7 +218,7 @@ export default function AdminPage() {
         console.error("Error deleting user:", error)
         toast({
           title: "Error",
-          description: "Failed to delete user",
+          description: "Failed to delete user. Please check the console for details.",
           variant: "destructive",
         })
       }
