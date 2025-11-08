@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { 
   Users, 
   CheckCircle, 
@@ -17,7 +18,9 @@ import {
   Award,
   TrendingDown,
   Calendar,
-  Mail
+  Mail,
+  Filter,
+  X
 } from "lucide-react"
 import RequireAdmin from "@/app/components/RequireAdmin"
 import UserDropdown from "@/app/components/UserDropdown"
@@ -36,13 +39,25 @@ export default function Phase1Insights() {
   const [progressOverview, setProgressOverview] = useState<any>({})
   const [scores, setScores] = useState<any>({})
   
+  // Filter options
+  const [availableFilters, setAvailableFilters] = useState<any>({})
+  
   // Filter states
   const [inactiveDays, setInactiveDays] = useState(7)
-  const [selectedClassId, setSelectedClassId] = useState<string | null>(null)
+  const [selectedClassId, setSelectedClassId] = useState<string>("")
+  const [selectedTrainingId, setSelectedTrainingId] = useState<string>("")
+  const [selectedModuleId, setSelectedModuleId] = useState<string>("")
 
   useEffect(() => {
+    loadFilters()
     loadAllData()
   }, [])
+  
+  useEffect(() => {
+    if (activeTab === "progress") {
+      loadProgressOverview()
+    }
+  }, [selectedClassId, selectedTrainingId, selectedModuleId, activeTab])
 
   const loadAllData = async () => {
     setLoading(true)
@@ -104,9 +119,32 @@ export default function Phase1Insights() {
     }
   }
 
+  const loadFilters = async () => {
+    try {
+      const response = await fetch("/api/admin/analytics/filters", {
+        credentials: "include"
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setAvailableFilters(data)
+      }
+    } catch (error) {
+      console.error("Error loading filters:", error)
+    }
+  }
+
   const loadProgressOverview = async () => {
     try {
-      const response = await fetch("/api/admin/analytics/progress-overview", {
+      const params = new URLSearchParams()
+      if (selectedClassId) params.append("classId", selectedClassId)
+      if (selectedTrainingId) params.append("trainingId", selectedTrainingId)
+      if (selectedModuleId) params.append("moduleId", selectedModuleId)
+      
+      const url = params.toString() 
+        ? `/api/admin/analytics/progress-overview?${params.toString()}`
+        : "/api/admin/analytics/progress-overview"
+      
+      const response = await fetch(url, {
         credentials: "include"
       })
       if (response.ok) {
@@ -116,6 +154,22 @@ export default function Phase1Insights() {
     } catch (error) {
       console.error("Error loading progress overview:", error)
     }
+  }
+  
+  const clearFilters = () => {
+    setSelectedClassId("")
+    setSelectedTrainingId("")
+    setSelectedModuleId("")
+  }
+  
+  const hasActiveFilters = selectedClassId || selectedTrainingId || selectedModuleId
+  
+  const getFilterLabel = () => {
+    const parts = []
+    if (progressOverview.filters?.class) parts.push(progressOverview.filters.class.name)
+    if (progressOverview.filters?.training) parts.push(progressOverview.filters.training.title)
+    if (progressOverview.filters?.module) parts.push(progressOverview.filters.module.title)
+    return parts.length > 0 ? parts.join(" → ") : "All Students"
   }
 
   const loadScores = async () => {
@@ -429,6 +483,97 @@ export default function Phase1Insights() {
 
             {/* Progress Overview Tab */}
             <TabsContent value="progress" className="space-y-6">
+              {/* Filters */}
+              <Card className="bg-black/30 border-white/10">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Filter className="h-5 w-5" />
+                    Filter Progress View
+                  </CardTitle>
+                  <CardDescription className="text-white/60">
+                    View progress for specific class, training, or module
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="text-sm text-white/70 mb-2 block">Class</label>
+                      <Select value={selectedClassId} onValueChange={setSelectedClassId}>
+                        <SelectTrigger className="bg-white/5 border-white/10">
+                          <SelectValue placeholder="All Classes" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Classes</SelectItem>
+                          {availableFilters.classes?.map((cls: any) => (
+                            <SelectItem key={cls.id} value={cls.id}>
+                              {cls.name} {!cls.isActive && "(Inactive)"}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm text-white/70 mb-2 block">Training</label>
+                      <Select value={selectedTrainingId} onValueChange={setSelectedTrainingId}>
+                        <SelectTrigger className="bg-white/5 border-white/10">
+                          <SelectValue placeholder="All Trainings" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Trainings</SelectItem>
+                          {availableFilters.trainings?.map((training: any) => (
+                            <SelectItem key={training.id} value={training.id}>
+                              {training.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm text-white/70 mb-2 block">Module</label>
+                      <Select value={selectedModuleId} onValueChange={setSelectedModuleId}>
+                        <SelectTrigger className="bg-white/5 border-white/10">
+                          <SelectValue placeholder="All Modules" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Modules</SelectItem>
+                          {availableFilters.modules
+                            ?.filter((mod: any) => !selectedTrainingId || mod.trainingId === selectedTrainingId)
+                            .map((mod: any) => (
+                              <SelectItem key={mod.id} value={mod.id}>
+                                {mod.title} ({mod.trainingName})
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="flex items-end">
+                      {hasActiveFilters && (
+                        <Button
+                          onClick={clearFilters}
+                          variant="outline"
+                          className="w-full border-white/20 hover:bg-white/10"
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Clear Filters
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {hasActiveFilters && (
+                    <div className="mt-4 p-3 bg-purple-500/20 rounded border border-purple-500/30">
+                      <p className="text-sm">
+                        <span className="text-white/70">Showing progress for: </span>
+                        <span className="font-semibold">{getFilterLabel()}</span>
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
                 {[
                   { key: "notStarted", label: "Not Started", color: "gray", icon: Clock },
@@ -471,9 +616,15 @@ export default function Phase1Insights() {
                             key={student.id}
                             className="p-3 bg-white/5 rounded border border-white/10 flex items-center justify-between"
                           >
-                            <div>
+                            <div className="flex-1">
                               <p className="font-medium">{student.name}</p>
                               <p className="text-xs text-white/60">{student.email}</p>
+                              {student.classes && student.classes.length > 0 && (
+                                <p className="text-xs text-white/50 mt-1 flex items-center gap-1">
+                                  <School className="h-3 w-3" />
+                                  {student.classes.join(", ")}
+                                </p>
+                              )}
                             </div>
                             <div className="text-right">
                               <div className="font-bold">{student.completionRate}%</div>
