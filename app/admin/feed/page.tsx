@@ -659,7 +659,7 @@ export default function AdminFeedPage() {
                           <MessageSquare className="h-4 w-4" />
                           {post.commentCount} comments
                         </div>
-                        {post.isAssignment && (
+                        {(post.type === 'ASSIGNMENT' || post.type === 'WEEKLY_SUMMARY') && (
                           <div className="flex items-center gap-2 text-sm text-slate-600">
                             <FileText className="h-4 w-4" />
                             {post.avgScore ? `${post.avgScore.toFixed(1)}/10` : "No ratings"} ({post.scoreCount} ratings)

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import Link from "next/link"
 import { 
   BarChart3, 
   Eye, 
@@ -12,7 +13,8 @@ import {
   Clock, 
   TrendingUp,
   Search,
-  RefreshCw
+  RefreshCw,
+  ArrowRight
 } from "lucide-react"
 
 interface VideoAnalytics {
@@ -88,6 +90,26 @@ export default function VideoAnalyticsPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      {/* Quick Link to Comprehensive Dashboard */}
+      <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-purple-900 mb-1">Comprehensive Analytics Dashboard</h3>
+              <p className="text-sm text-purple-700">
+                View platform-wide analytics including user engagement, course performance, trends, and more
+              </p>
+            </div>
+            <Button asChild>
+              <Link href="/admin/analytics/dashboard">
+                View Dashboard
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Video Analytics</h1>
         <div className="flex items-center gap-4">

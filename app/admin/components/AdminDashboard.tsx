@@ -81,7 +81,14 @@ export default function AdminDashboard({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Button asChild variant="outline" className="h-20 flex-col gap-2">
+              <Link href="/admin/analytics/dashboard">
+                <BarChart3 className="h-6 w-6" />
+                <span>Analytics Dashboard</span>
+                <span className="text-xs text-muted-foreground">View platform insights</span>
+              </Link>
+            </Button>
             <Button asChild variant="outline" className="h-20 flex-col gap-2">
               <Link href="/admin/leaderboard">
                 <Trophy className="h-6 w-6" />
