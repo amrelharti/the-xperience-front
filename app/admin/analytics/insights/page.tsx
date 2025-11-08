@@ -45,6 +45,9 @@ export default function Phase1Insights() {
   const [scores, setScores] = useState<any>({})
   const [videoActivity, setVideoActivity] = useState<any[]>([])
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null)
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([])
+  const [comparisonMode, setComparisonMode] = useState(false)
+  const [comparisonData, setComparisonData] = useState<any[]>([])
   
   // Filter options
   const [availableFilters, setAvailableFilters] = useState<any>({})
@@ -212,6 +215,38 @@ export default function Phase1Insights() {
     setExpandedStudent(expandedStudent === studentId ? null : studentId)
   }
 
+  const toggleStudentSelection = (studentId: string) => {
+    setSelectedStudents(prev => 
+      prev.includes(studentId)
+        ? prev.filter(id => id !== studentId)
+        : [...prev, studentId]
+    )
+  }
+
+  const loadComparison = async () => {
+    if (selectedStudents.length === 0) return
+    
+    try {
+      const params = selectedStudents.map(id => `studentIds=${id}`).join('&')
+      const response = await fetch(`/api/admin/student-video-activity/compare?${params}`, {
+        credentials: "include"
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setComparisonData(data.students)
+        setComparisonMode(true)
+      }
+    } catch (error) {
+      console.error("Error loading comparison:", error)
+    }
+  }
+
+  const exitComparison = () => {
+    setComparisonMode(false)
+    setSelectedStudents([])
+    setComparisonData([])
+  }
+
   const handleInactiveDaysChange = async (days: number) => {
     setInactiveDays(days)
     await loadInactiveStudents(days)
@@ -353,6 +388,101 @@ export default function Phase1Insights() {
 
             {/* Video Activity Tab */}
             <TabsContent value="videos" className="space-y-6">
+              {/* Comparison Mode Toggle */}
+              {!comparisonMode && (
+                <Card className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-500/30">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-1">Compare Students</h3>
+                        <p className="text-sm text-white/70">
+                          {selectedStudents.length === 0 
+                            ? "Select students below to compare their video activity side-by-side" 
+                            : `${selectedStudents.length} student${selectedStudents.length > 1 ? 's' : ''} selected`}
+                        </p>
+                      </div>
+                      {selectedStudents.length > 0 && (
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={loadComparison}
+                            disabled={selectedStudents.length < 2}
+                            className="bg-blue-500 hover:bg-blue-600"
+                          >
+                            Compare {selectedStudents.length} Students
+                          </Button>
+                          <Button
+                            onClick={() => setSelectedStudents([])}
+                            variant="outline"
+                            className="border-white/20 hover:bg-white/10"
+                          >
+                            Clear
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Comparison View */}
+              {comparisonMode ? (
+                <Card className="bg-black/30 border-white/10">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Users className="h-5 w-5" />
+                          Comparing {comparisonData.length} Students
+                        </CardTitle>
+                        <CardDescription className="text-white/60">
+                          Side-by-side video activity comparison
+                        </CardDescription>
+                      </div>
+                      <Button
+                        onClick={exitComparison}
+                        variant="outline"
+                        className="border-white/20 hover:bg-white/10"
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Exit Comparison
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {comparisonData.map((student) => (
+                        <div key={student.id} className="p-4 bg-white/5 rounded-lg border border-white/10">
+                          <h4 className="font-bold text-lg mb-3">{student.name}</h4>
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-2 text-center">
+                              <div className="p-2 bg-green-500/20 rounded">
+                                <div className="text-2xl font-bold text-green-400">{student.videosWatched}</div>
+                                <div className="text-xs text-white/70">Watched</div>
+                              </div>
+                              <div className="p-2 bg-blue-500/20 rounded">
+                                <div className="text-2xl font-bold text-blue-400">{student.videosCompleted}</div>
+                                <div className="text-xs text-white/70">Completed</div>
+                              </div>
+                              <div className="p-2 bg-orange-500/20 rounded">
+                                <div className="text-2xl font-bold text-orange-400">{student.videosNotWatched}</div>
+                                <div className="text-xs text-white/70">Not Watched</div>
+                              </div>
+                              <div className="p-2 bg-purple-500/20 rounded">
+                                <div className="text-2xl font-bold text-purple-400">{student.watchTimeHours}h</div>
+                                <div className="text-xs text-white/70">Watch Time</div>
+                              </div>
+                            </div>
+                            <div className="text-xs text-white/60 space-y-1">
+                              <p>Classes: {student.enrolledClasses?.map((c: any) => c.name).join(", ")}</p>
+                              <p>Completion Rate: {Math.round((student.videosCompleted / student.totalVideosAvailable) * 100)}%</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
               <Card className="bg-black/30 border-white/10">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -360,7 +490,7 @@ export default function Phase1Insights() {
                     Student Video Activity
                   </CardTitle>
                   <CardDescription className="text-white/60">
-                    Track which videos each student has watched
+                    Track which videos each student has watched. Click checkboxes to select students for comparison.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -368,10 +498,19 @@ export default function Phase1Insights() {
                     {videoActivity.map((student) => (
                       <div key={student.id} className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
                         {/* Student Header */}
-                        <div 
-                          className="p-4 hover:bg-white/10 transition-colors cursor-pointer"
-                          onClick={() => toggleStudentExpand(student.id)}
-                        >
+                        <div className="p-4 hover:bg-white/10 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              checked={selectedStudents.includes(student.id)}
+                              onChange={() => toggleStudentSelection(student.id)}
+                              className="w-5 h-5 rounded"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <div 
+                              className="flex-1 cursor-pointer"
+                              onClick={() => toggleStudentExpand(student.id)}
+                            >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center gap-3 mb-2">
@@ -416,6 +555,7 @@ export default function Phase1Insights() {
                                 </div>
                               )}
                             </div>
+                          </div>
                           </div>
                         </div>
 
@@ -495,6 +635,7 @@ export default function Phase1Insights() {
                   </div>
                 </CardContent>
               </Card>
+              )}
             </TabsContent>
 
             {/* Completions Tab */}
