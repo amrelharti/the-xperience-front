@@ -480,7 +480,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-destructive mb-4">Error</h1>
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={() => load()}>Try Again</Button>
+            <Button onClick={() => load()}>Try again</Button>
           </div>
         </div>
       </div>
@@ -492,10 +492,10 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Training Not Found</h1>
+            <h1 className="text-2xl font-bold mb-4">Training not found</h1>
             <p className="text-muted-foreground mb-4">The training you're looking for doesn't exist.</p>
             <Button asChild>
-              <Link href="/courses">Back to Trainings</Link>
+              <Link href="/courses">Back to trainings</Link>
             </Button>
           </div>
         </div>
@@ -514,7 +514,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           <Button variant="ghost" asChild className="mb-4 sm:mb-6 -ml-2 sm:ml-0">
             <Link href="/" className="flex items-center gap-2 hover:text-[#0476D7] transition-colors text-sm sm:text-base">
               <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              Back to Trainings
+              Back to trainings
             </Link>
           </Button>
 
@@ -537,7 +537,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                 <div className="flex-1 w-full">
                   <div className="mb-3 sm:mb-4">
                     <Badge className="bg-gradient-to-r from-[#0476D7] to-[#0068A7] text-white mb-2 sm:mb-3 text-xs">
-                      Training Program
+                      Training program
                     </Badge>
                   </div>
                   <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 sm:mb-3 text-[#0476D7]">{training.title}</h1>
@@ -550,7 +550,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                         <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
                       </div>
                       <div>
-                        <div className="text-xs text-[#047690] font-medium">Total Modules</div>
+                        <div className="text-xs text-[#047690] font-medium">Total modules</div>
                         <div className="text-base sm:text-lg font-bold text-[#0476D7]">{totalModules}</div>
                       </div>
                     </div>
@@ -565,7 +565,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       <div className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 rounded-xl sm:rounded-2xl w-full max-w-2xl shadow-lg">
                         <p className="text-xs sm:text-sm font-semibold text-[#0476D7] mb-3 sm:mb-4 flex items-center gap-2 justify-center">
                           <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                          Class Community
+                          Class community
                         </p>
                         <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-center gap-2 sm:gap-3">
                         <Button 
@@ -576,7 +576,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                         >
                           <Link href={`/feed?training=${params.id}&class=${selectedClassId}`}>
                             <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                            Class Feed
+                            Class feed
                           </Link>
                         </Button>
                         <Button 
@@ -604,7 +604,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                             style={{ background: 'linear-gradient(90deg, #F1F5F9, #E2E8F0)', color: '#334155' }}
                           >
                             <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                            Switch Class
+                            Switch class
                           </Button>
                         )}
                         </div>
@@ -618,7 +618,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="h-1 w-8 sm:w-12 bg-gradient-to-r from-[#0476D7] to-[#FFBC00] rounded-full"></div>
-            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-[#0476D7]">Training Modules</h2>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-[#0476D7]">Training modules</h2>
           </div>
           {training.modules?.map((module, index) => (
             <Card key={module.id} className="hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden">
@@ -673,7 +673,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                         </div>
                         <div className="flex items-center gap-1">
                           <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                          <span>Live sessions</span>
+                          <span>Live session</span>
                         </div>
                       </div>
                     </div>
@@ -715,7 +715,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                   <div className="p-2 bg-red-100 rounded-full">
                     <Lock className="h-6 w-6 text-red-600" />
                   </div>
-                  <CardTitle className="text-lg sm:text-xl">Module Locked</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl">Module locked</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4 px-4 sm:px-6 pb-6">
@@ -724,7 +724,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                 </p>
                 <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-lg">
                   <p className="text-sm text-amber-800">
-                    <strong>Need Access?</strong>
+                    <strong>Need access?</strong>
                   </p>
                   <p className="text-xs sm:text-sm text-amber-700 mt-2">
                     Please contact your instructor to unlock this module for your class.
@@ -750,7 +750,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
             <Card className="w-full max-w-2xl my-8">
               <CardHeader className="px-4 sm:px-6">
-                <CardTitle className="text-lg sm:text-xl">Select a Class</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Select a class</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 px-4 sm:px-6">
                 {availableClasses.length > 0 ? (
@@ -765,7 +765,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       {/* Archived Classes Section */}
                       {availableClasses.filter((classItem) => !classItem.isActive && classItem.isArchived).length > 0 && (
                         <div>
-                          <h3 className="text-sm font-medium text-blue-600 mb-2">📚 Your Previous Classes (Archived)</h3>
+                          <h3 className="text-sm font-medium text-blue-600 mb-2">📚 Your previous classes (Archived)</h3>
                           <p className="text-xs text-muted-foreground mb-3">
                             Continue your training progress in classes you were enrolled in
                           </p>
@@ -825,7 +825,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       {/* Active Classes Section */}
                       {availableClasses.filter((classItem) => classItem.isActive && !classItem.isArchived).length > 0 && (
                         <div>
-                          <h3 className="text-sm font-medium text-green-600 mb-2">🆕 Available Active Classes</h3>
+                          <h3 className="text-sm font-medium text-green-600 mb-2">🆕 Available active classes</h3>
                           <p className="text-xs text-muted-foreground mb-3">
                             Enroll in new active classes for this training
                           </p>
@@ -888,7 +888,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                         <div className="text-center py-6">
                           <p className="text-gray-600 mb-4">No classes available for this training.</p>
                           <Button onClick={loadAvailableClasses} variant="outline">
-                            Load Available Classes for Enrollment
+                            Load available classes for enrollment
                           </Button>
                         </div>
                       )}
@@ -907,7 +907,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                     })() && (
                       <div className="space-y-2">
                         <label htmlFor="enrollmentCode" className="text-sm font-medium">
-                          Enrollment Code
+                          Enrollment code
                         </label>
                         <input
                           id="enrollmentCode"

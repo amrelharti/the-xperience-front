@@ -785,7 +785,7 @@ export default function PostDetailPage() {
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Post not found</h1>
             <Button asChild>
-              <Link href="/feed">Back to Feed</Link>
+              <Link href="/feed">Back to feed</Link>
             </Button>
           </div>
         </div>
@@ -1104,7 +1104,7 @@ export default function PostDetailPage() {
                     ) : (
                       <>
                         <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                        Post Comment
+                        Post comment
                       </>
                     )}
                   </Button>
@@ -1293,7 +1293,7 @@ export default function PostDetailPage() {
                                   ) : (
                                     <>
                                       <Send className="h-4 w-4 mr-2" />
-                                      Post Reply
+                                      Post reply
                                     </>
                                   )}
                                 </Button>

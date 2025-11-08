@@ -292,7 +292,7 @@ export default function LeaderboardPage() {
                 <div className="p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                     <Label htmlFor="class-select" className="text-xs sm:text-sm font-semibold text-gray-700">
-                      Select Class:
+                      Select class:
                     </Label>
                     <Select value={myClass?.id || ""} onValueChange={handleClassChange}>
                       <SelectTrigger id="class-select" className="w-full sm:w-[300px] border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-lg sm:rounded-xl text-sm sm:text-base">
@@ -327,7 +327,7 @@ export default function LeaderboardPage() {
                       <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-base sm:text-lg text-gray-900">Your Class</h3>
+                      <h3 className="font-bold text-base sm:text-lg text-gray-900">Your class</h3>
                       <p className="text-gray-600 text-sm sm:text-base">{myClass.name}</p>
                     </div>
                   </div>
@@ -500,7 +500,7 @@ export default function LeaderboardPage() {
                   <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center flex-shrink-0">
                     <Target className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                   </div>
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">How Rankings Work</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">How rankings work</h3>
                 </div>
               </div>
               <div className="p-4 sm:p-6">

@@ -162,7 +162,7 @@ export default function TrainingsPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
         <div className="mb-6 sm:mb-8 animate-slide-up">
           <h1 className="text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 font-[family-name:var(--font-montserrat)] tracking-tight bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">
-            Available Trainings
+            Trainings
           </h1>
           <p className="text-sm sm:text-base text-[#6b7280] mb-3 sm:mb-4 max-w-2xl">
             Choose a training and select a class to start your learning journey.
@@ -222,7 +222,7 @@ export default function TrainingsPage() {
                         <div className="bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg border-2 border-orange-300">
                           <div className="flex items-center gap-2 text-orange-600 font-bold">
                             <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                            <span className="text-sm">Coming Soon</span>
+                            <span className="text-sm">Coming soon</span>
                             <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
                           </div>
                         </div>
@@ -313,7 +313,7 @@ export default function TrainingsPage() {
                         <Button asChild className="w-full h-10 sm:h-12 text-sm sm:text-base shadow-md hover:shadow-lg group">
                           <Link href={`/courses/${module.id}`} className="flex items-center justify-center gap-2">
                             <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 transition-transform" />
-                            <span className="hidden sm:inline">{module.isEnrolled ? "Continue Learning" : "Start Learning"}</span>
+                            <span className="hidden sm:inline">{module.isEnrolled ? "Continue learning" : "Start learning"}</span>
                             <span className="sm:hidden">{module.isEnrolled ? "Continue" : "Start"}</span>
                             <span className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity hidden sm:inline">→</span>
                           </Link>

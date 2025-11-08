@@ -157,10 +157,10 @@ export default function ModuleDetailPage() {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Module Not Found</h1>
+            <h1 className="text-2xl font-bold mb-4">Module not found</h1>
             <p className="text-muted-foreground mb-4">{error || "This module doesn't exist."}</p>
             <Button asChild>
-              <Link href={`/courses/${trainingId}`}>Back to Training</Link>
+              <Link href={`/courses/${trainingId}`}>Back to training</Link>
             </Button>
           </div>
         </div>
@@ -176,7 +176,7 @@ export default function ModuleDetailPage() {
           <Button variant="ghost" asChild className="mb-4">
             <Link href={`/courses/${trainingId}`}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Training
+              Back to training
             </Link>
           </Button>
 
@@ -198,7 +198,7 @@ export default function ModuleDetailPage() {
 
         {/* Courses List */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-6">Video Lessons</h2>
+          <h2 className="text-2xl font-bold mb-6">Video lessons</h2>
           <div className="space-y-4">
             {module.courses
               .sort((a, b) => a.orderIndex - b.orderIndex)
@@ -235,7 +235,7 @@ export default function ModuleDetailPage() {
         {/* Live Session */}
         {liveSession && !loadingLiveSession && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-6">Live Session</h2>
+            <h2 className="text-2xl font-bold mb-6">Live session</h2>
             <LiveSessionCard
               liveSession={{
                 id: liveSession.id,

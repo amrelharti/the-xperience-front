@@ -422,7 +422,7 @@ export default function FeedPage() {
                   <div className="flex-1">
                     <Badge className="bg-white/20 text-white border-yellow-400 mb-3 sm:mb-4 rounded-full px-3 sm:px-4 py-1 text-xs sm:text-sm">
                       <MessageSquare className="h-3 w-3 mr-1.5 sm:mr-2" />
-                      Community Feed
+                      Community feed
                     </Badge>
                     <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">
                       Feed
@@ -459,7 +459,7 @@ export default function FeedPage() {
                 <Button variant="outline" asChild size="sm" className="border-gray-200 hover:border-[#0476D7]/30 hover:bg-blue-50/50 text-sm sm:text-base">
                   <Link href={`/courses/${training}`}>
                     <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                    Back to Training
+                    Back to training
                   </Link>
                 </Button>
               )}
@@ -468,7 +468,7 @@ export default function FeedPage() {
               <Button asChild size="sm" className="flex-1 bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white rounded-lg sm:rounded-xl px-6 sm:px-8 shadow-lg hover:shadow-xl transition-all font-semibold border-0 text-sm sm:text-base">
                 <Link href={newPostUrl}>
                   <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
-                  Create New Post
+                  Create new post
                 </Link>
               </Button>
             </div>
@@ -509,10 +509,10 @@ export default function FeedPage() {
                         <SelectValue placeholder="Type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="all">All types</SelectItem>
                         <SelectItem value="POST">Posts</SelectItem>
                         <SelectItem value="ASSIGNMENT">Assignments</SelectItem>
-                        <SelectItem value="WEEKLY_SUMMARY">Weekly Summary</SelectItem>
+                        <SelectItem value="WEEKLY_SUMMARY">Weekly summary</SelectItem>
                         <SelectItem value="FEEDBACK">Feedback</SelectItem>
                         <SelectItem value="ANNOUNCEMENT">Announcements</SelectItem>
                       </SelectContent>
@@ -522,7 +522,7 @@ export default function FeedPage() {
                         <SelectValue placeholder="Training Module" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All Modules</SelectItem>
+                        <SelectItem value="all">All modules</SelectItem>
                         {trainingModules.map((module) => (
                           <SelectItem key={module.id} value={module.id}>
                             {module.title}
@@ -563,7 +563,7 @@ export default function FeedPage() {
                   <Button asChild className="bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white rounded-xl px-8 shadow-lg hover:shadow-xl transition-all font-semibold border-0">
                     <Link href={newPostUrl}>
                       <Plus className="h-5 w-5 mr-2" />
-                      Create First Post
+                      Create first post
                     </Link>
                   </Button>
                 </div>
@@ -641,7 +641,7 @@ export default function FeedPage() {
                                   className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-grey hover:from-pink-100 hover:to-rose-100 border border-pink-300 rounded-full transition-all text-xs font-medium text-pink-700"
                                 >
                                   <Instagram className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
-                                  <span className="hidden xs:inline truncate max-w-[100px]">{post.author.instagram}</span>
+                                  <span className=" xs:inline truncate max-w-[100px]">{post.author.instagram}</span>
                                 </a>
                               )}
                               {post.author.linkedin && (
@@ -738,8 +738,7 @@ export default function FeedPage() {
                           className="flex items-center gap-1.5 sm:gap-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg sm:rounded-xl px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 h-auto"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                          <span className="font-medium text-xs sm:text-sm hidden xs:inline">Share</span>
+                          
                         </Button>
                       </div>
                       

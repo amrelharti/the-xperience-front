@@ -307,12 +307,12 @@ export default function ModuleDetailPage() {
             >
               <Sparkles className="h-12 w-12 text-red-500" />
             </motion.div>
-            <h1 className="text-3xl font-medium mb-4 text-gray-900">Module Not Found</h1>
+            <h1 className="text-3xl font-medium mb-4 text-gray-900">Module not found</h1>
             <p className="text-gray-600 mb-6">{error || "This module doesn't exist."}</p>
             <Button asChild size="lg" className="bg-[#0476D7] hover:bg-[#005eb8] text-white rounded-xl px-8">
               <Link href={`/courses/${trainingId}`}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Training
+                Back to training
               </Link>
             </Button>
           </div>
@@ -341,7 +341,7 @@ export default function ModuleDetailPage() {
             >
               <Link href={`/courses/${trainingId}`}>
                 <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                Back to Training
+                Back to training
               </Link>
             </Button>
             
@@ -394,7 +394,7 @@ export default function ModuleDetailPage() {
                         <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
                           <PlayCircle className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                         </div>
-                        Video Lessons
+                        Video lessons
                       </h2>
                       <p className="text-xs sm:text-sm text-gray-600">Explore and learn at your own pace</p>
                     </div>
@@ -476,7 +476,7 @@ export default function ModuleDetailPage() {
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                         <Trophy className="h-5 w-5 text-[#FFBC00]" />
-                        Module Progress
+                        Module progress
                       </h3>
                       <span className="text-2xl font-medium text-[#0476D7]">{moduleProgress}%</span>
                     </div>
@@ -514,7 +514,7 @@ export default function ModuleDetailPage() {
                     <Sparkles className="h-4 w-4 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900">Live Session</h3>
+                    <h3 className="font-medium text-gray-900">Live session</h3>
                     <p className="text-xs text-gray-500">Upcoming</p>
                   </div>
                 </div>

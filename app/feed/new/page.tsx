@@ -288,7 +288,7 @@ export default function NewPostPage() {
                   <Sparkles className="h-7 w-7 text-[#FFBC00]" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-black mb-1">Create New Post</h1>
+                  <h1 className="text-4xl font-black mb-1">Create new post</h1>
                   <p className="text-blue-100 text-lg">Share your thoughts, ask questions, or submit assignments</p>
                 </div>
               </div>
@@ -311,7 +311,7 @@ export default function NewPostPage() {
                     <MessageSquare className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-2xl font-bold text-gray-900">Post Details</CardTitle>
+                    <CardTitle className="text-2xl font-bold text-gray-900">Post details</CardTitle>
                     <CardDescription className="text-gray-600 mt-1">
                       Choose the type of post you want to create and fill in the details below.
                     </CardDescription>
@@ -326,7 +326,7 @@ export default function NewPostPage() {
                     <div className="h-5 w-5 rounded-md bg-gradient-to-br from-[#0476D7] to-[#0068A7] flex items-center justify-center">
                       <MessageSquare className="h-3 w-3 text-white" />
                     </div>
-                    Post Type *
+                    Post type *
                   </Label>
                   <Select value={postType} onValueChange={setPostType}>
                     <SelectTrigger className="h-12 border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl">
@@ -336,19 +336,19 @@ export default function NewPostPage() {
                       <SelectItem value="POST">
                         <div className="flex items-center gap-2">
                           <MessageSquare className="h-4 w-4 text-gray-500" />
-                          Regular Post
+                          Regular post
                         </div>
                       </SelectItem>
                       <SelectItem value="ASSIGNMENT">
                         <div className="flex items-center gap-2">
                           <FileText className="h-4 w-4 text-blue-500" />
-                          Assignment Submission
+                          Assignment submission
                         </div>
                       </SelectItem>
                       <SelectItem value="WEEKLY_SUMMARY">
                         <div className="flex items-center gap-2">
                           <BookOpen className="h-4 w-4 text-green-500" />
-                          Weekly Summary
+                          Weekly summary
                         </div>
                       </SelectItem>
                       <SelectItem value="FEEDBACK">
@@ -375,7 +375,7 @@ export default function NewPostPage() {
                     <div className="h-5 w-5 rounded-md bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
                       <BookOpen className="h-3 w-3 text-white" />
                     </div>
-                    Training Module <span className="text-gray-400 font-normal">(Optional)</span>
+                    Training module <span className="text-gray-400 font-normal">(Optional)</span>
                   </Label>
                   <Select value={selectedModuleId} onValueChange={setSelectedModuleId}>
                     <SelectTrigger className="h-12 border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl">
@@ -406,7 +406,7 @@ export default function NewPostPage() {
                     <div className="h-5 w-5 rounded-md bg-gradient-to-br from-[#FFBC00] to-orange-500 flex items-center justify-center">
                       <FileText className="h-3 w-3 text-white" />
                     </div>
-                    Title <span className="text-gray-400 font-normal">(Optional)</span>
+                    Title <span className="text-gray-400 font-normal"></span>
                   </Label>
                   <Input
                     id="title"
@@ -492,7 +492,7 @@ export default function NewPostPage() {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-blue-700 font-semibold">Assignment Submission</p>
+                        <p className="text-blue-700 font-semibold">Assignment submission</p>
                         <p className="text-blue-600 text-sm">Automatically counts for leaderboard points</p>
                       </div>
                     </div>
@@ -509,12 +509,12 @@ export default function NewPostPage() {
                     {loading ? (
                       <>
                         <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
-                        Creating Post...
+                        Creating post...
                       </>
                     ) : (
                       <>
                         <Send className="h-5 w-5 mr-2" />
-                        Create Post
+                        Create post
                       </>
                     )}
                   </Button>

@@ -191,7 +191,7 @@ export default function ProfilePage() {
           <div className="text-center">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Unable to load profile</h3>
             <Button asChild className="bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white rounded-xl px-8">
-              <Link href="/">Go Home</Link>
+              <Link href="/">Go home</Link>
             </Button>
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function ProfilePage() {
                   <div className="flex-1">
                     <Badge className="bg-white/20 text-white border-yellow-400 mb-4 rounded-full px-4 py-1">
                       <User className="h-3 w-3 mr-2" />
-                      Your Account
+                      Your account
                     </Badge>
                     <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">
                       Profile
@@ -231,7 +231,7 @@ export default function ProfilePage() {
                     <div className="flex flex-wrap items-center gap-6 text-blue-100">
                       <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
                         <Users className="h-5 w-5 text-yellow-300" />
-                        <span className="font-medium">Personal Info</span>
+                        <span className="font-medium">Personal info</span>
                       </div>
                     </div>
                   </div>
@@ -256,7 +256,7 @@ export default function ProfilePage() {
                         <User className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">Personal information</h3>
                         <p className="text-sm text-gray-600">Update your personal details and contact information</p>
                       </div>
                     </div>
@@ -268,7 +268,7 @@ export default function ProfilePage() {
                         className="border-gray-200 hover:border-[#0476D7]/30 hover:bg-blue-50/50"
                       >
                         <Edit className="h-4 w-4 mr-2" />
-                        Edit Profile
+                        Edit profile
                       </Button>
                     )}
                   </div>
@@ -295,7 +295,7 @@ export default function ProfilePage() {
                           <div className="absolute inset-0 bg-black/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <div className="text-white text-center">
                               <Camera className="h-8 w-8 mx-auto mb-2" />
-                              <p className="text-sm font-medium">Change Photo</p>
+                              <p className="text-sm font-medium">Change photo</p>
                               <p className="text-xs mt-1 text-gray-300">Click to crop & edit</p>
                             </div>
                           </div>
@@ -338,7 +338,7 @@ export default function ProfilePage() {
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="name" className="text-sm font-semibold text-gray-700">Full Name</Label>
+                        <Label htmlFor="name" className="text-sm font-semibold text-gray-700">Full name</Label>
                         {isEditing ? (
                           <Input
                             id="name"
@@ -355,7 +355,7 @@ export default function ProfilePage() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="email" className="text-sm font-semibold text-gray-700">Email Address</Label>
+                        <Label htmlFor="email" className="text-sm font-semibold text-gray-700">Email address</Label>
                         {isEditing ? (
                           <Input
                             id="email"
@@ -442,7 +442,7 @@ export default function ProfilePage() {
                         className="bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white rounded-xl px-8 shadow-lg hover:shadow-xl transition-all font-semibold border-0"
                       >
                         <Save className="h-4 w-4 mr-2" />
-                        Save Changes
+                        Save changes
                       </Button>
                       <Button 
                         variant="outline" 
@@ -470,19 +470,19 @@ export default function ProfilePage() {
                     <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#0476D7] to-[#005eb8] flex items-center justify-center">
                       <Mail className="h-5 w-5 text-white" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Account Summary</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Account summary</h3>
                   </div>
                 </div>
                 <div className="p-6">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 font-medium">Account Type</span>
+                      <span className="text-sm text-gray-600 font-medium">Account type</span>
                       <Badge className={user.role === "ADMIN" ? "bg-gradient-to-r from-[#0476D7] to-[#005eb8] text-white" : "bg-gradient-to-r from-[#FFBC00]/20 to-[#FFBC00]/10 text-yellow-700 border-yellow-300"}>
                         {user.role}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 font-medium">Member Since</span>
+                      <span className="text-sm text-gray-600 font-medium">Member since</span>
                       <span className="text-sm font-semibold text-gray-800">Recently</span>
                     </div>
                     <div className="flex items-center justify-between">
