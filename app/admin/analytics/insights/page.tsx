@@ -44,9 +44,9 @@ export default function Phase1Insights() {
   
   // Filter states
   const [inactiveDays, setInactiveDays] = useState(7)
-  const [selectedClassId, setSelectedClassId] = useState<string>("")
-  const [selectedTrainingId, setSelectedTrainingId] = useState<string>("")
-  const [selectedModuleId, setSelectedModuleId] = useState<string>("")
+  const [selectedClassId, setSelectedClassId] = useState<string>("all")
+  const [selectedTrainingId, setSelectedTrainingId] = useState<string>("all")
+  const [selectedModuleId, setSelectedModuleId] = useState<string>("all")
 
   useEffect(() => {
     loadFilters()
@@ -136,9 +136,9 @@ export default function Phase1Insights() {
   const loadProgressOverview = async () => {
     try {
       const params = new URLSearchParams()
-      if (selectedClassId) params.append("classId", selectedClassId)
-      if (selectedTrainingId) params.append("trainingId", selectedTrainingId)
-      if (selectedModuleId) params.append("moduleId", selectedModuleId)
+      if (selectedClassId && selectedClassId !== "all") params.append("classId", selectedClassId)
+      if (selectedTrainingId && selectedTrainingId !== "all") params.append("trainingId", selectedTrainingId)
+      if (selectedModuleId && selectedModuleId !== "all") params.append("moduleId", selectedModuleId)
       
       const url = params.toString() 
         ? `/api/admin/analytics/progress-overview?${params.toString()}`
@@ -157,12 +157,12 @@ export default function Phase1Insights() {
   }
   
   const clearFilters = () => {
-    setSelectedClassId("")
-    setSelectedTrainingId("")
-    setSelectedModuleId("")
+    setSelectedClassId("all")
+    setSelectedTrainingId("all")
+    setSelectedModuleId("all")
   }
   
-  const hasActiveFilters = selectedClassId || selectedTrainingId || selectedModuleId
+  const hasActiveFilters = selectedClassId !== "all" || selectedTrainingId !== "all" || selectedModuleId !== "all"
   
   const getFilterLabel = () => {
     const parts = []
@@ -503,7 +503,7 @@ export default function Phase1Insights() {
                           <SelectValue placeholder="All Classes" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Classes</SelectItem>
+                          <SelectItem value="all">All Classes</SelectItem>
                           {availableFilters.classes?.map((cls: any) => (
                             <SelectItem key={cls.id} value={cls.id}>
                               {cls.name} {!cls.isActive && "(Inactive)"}
@@ -520,7 +520,7 @@ export default function Phase1Insights() {
                           <SelectValue placeholder="All Trainings" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Trainings</SelectItem>
+                          <SelectItem value="all">All Trainings</SelectItem>
                           {availableFilters.trainings?.map((training: any) => (
                             <SelectItem key={training.id} value={training.id}>
                               {training.title}
@@ -537,9 +537,9 @@ export default function Phase1Insights() {
                           <SelectValue placeholder="All Modules" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Modules</SelectItem>
+                          <SelectItem value="all">All Modules</SelectItem>
                           {availableFilters.modules
-                            ?.filter((mod: any) => !selectedTrainingId || mod.trainingId === selectedTrainingId)
+                            ?.filter((mod: any) => selectedTrainingId === "all" || mod.trainingId === selectedTrainingId)
                             .map((mod: any) => (
                               <SelectItem key={mod.id} value={mod.id}>
                                 {mod.title} ({mod.trainingName})
