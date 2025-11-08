@@ -20,7 +20,12 @@ import {
   Calendar,
   Mail,
   Filter,
-  X
+  X,
+  Video,
+  Play,
+  ChevronDown,
+  ChevronUp,
+  Eye
 } from "lucide-react"
 import RequireAdmin from "@/app/components/RequireAdmin"
 import UserDropdown from "@/app/components/UserDropdown"
@@ -38,6 +43,8 @@ export default function Phase1Insights() {
   const [inactiveStudents, setInactiveStudents] = useState<any>({})
   const [progressOverview, setProgressOverview] = useState<any>({})
   const [scores, setScores] = useState<any>({})
+  const [videoActivity, setVideoActivity] = useState<any[]>([])
+  const [expandedStudent, setExpandedStudent] = useState<string | null>(null)
   
   // Filter options
   const [availableFilters, setAvailableFilters] = useState<any>({})
@@ -67,7 +74,8 @@ export default function Phase1Insights() {
         loadCompletions(),
         loadInactiveStudents(inactiveDays),
         loadProgressOverview(),
-        loadScores()
+        loadScores(),
+        loadVideoActivity()
       ])
     } catch (error) {
       console.error("Error loading data:", error)
@@ -186,6 +194,24 @@ export default function Phase1Insights() {
     }
   }
 
+  const loadVideoActivity = async () => {
+    try {
+      const response = await fetch("/api/admin/student-video-activity", {
+        credentials: "include"
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setVideoActivity(data.students)
+      }
+    } catch (error) {
+      console.error("Error loading video activity:", error)
+    }
+  }
+
+  const toggleStudentExpand = (studentId: string) => {
+    setExpandedStudent(expandedStudent === studentId ? null : studentId)
+  }
+
   const handleInactiveDaysChange = async (days: number) => {
     setInactiveDays(days)
     await loadInactiveStudents(days)
@@ -239,6 +265,10 @@ export default function Phase1Insights() {
               <TabsTrigger value="rosters">
                 <School className="h-4 w-4 mr-2" />
                 Class Rosters
+              </TabsTrigger>
+              <TabsTrigger value="videos">
+                <Video className="h-4 w-4 mr-2" />
+                Video Activity
               </TabsTrigger>
               <TabsTrigger value="completions">
                 <GraduationCap className="h-4 w-4 mr-2" />
@@ -317,6 +347,152 @@ export default function Phase1Insights() {
                       </div>
                     </div>
                   ))}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Video Activity Tab */}
+            <TabsContent value="videos" className="space-y-6">
+              <Card className="bg-black/30 border-white/10">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Video className="h-5 w-5" />
+                    Student Video Activity
+                  </CardTitle>
+                  <CardDescription className="text-white/60">
+                    Track which videos each student has watched
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {videoActivity.map((student) => (
+                      <div key={student.id} className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+                        {/* Student Header */}
+                        <div 
+                          className="p-4 hover:bg-white/10 transition-colors cursor-pointer"
+                          onClick={() => toggleStudentExpand(student.id)}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h4 className="font-semibold text-lg">{student.name}</h4>
+                                {expandedStudent === student.id ? (
+                                  <ChevronUp className="h-4 w-4 text-white/50" />
+                                ) : (
+                                  <ChevronDown className="h-4 w-4 text-white/50" />
+                                )}
+                              </div>
+                              <p className="text-sm text-white/60">{student.email}</p>
+                              {student.enrolledClasses && student.enrolledClasses.length > 0 && (
+                                <div className="flex items-center gap-2 mt-2">
+                                  <School className="h-3 w-3 text-white/50" />
+                                  <span className="text-xs text-white/50">
+                                    {student.enrolledClasses.join(", ")}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-right ml-4">
+                              <div className="grid grid-cols-3 gap-4 text-center">
+                                <div>
+                                  <div className="text-2xl font-bold text-green-400">{student.videosWatched}</div>
+                                  <div className="text-xs text-white/70">Watched</div>
+                                </div>
+                                <div>
+                                  <div className="text-2xl font-bold text-blue-400">{student.videosCompleted}</div>
+                                  <div className="text-xs text-white/70">Completed</div>
+                                </div>
+                                <div>
+                                  <div className="text-2xl font-bold text-orange-400">{student.videosNotWatched}</div>
+                                  <div className="text-xs text-white/70">Not Watched</div>
+                                </div>
+                              </div>
+                              <div className="mt-2 text-xs text-white/50">
+                                Total watch time: {student.totalWatchTimeMinutes} minutes
+                              </div>
+                              {student.lastVideoActivity && (
+                                <div className="mt-1 text-xs text-white/50">
+                                  Last activity: {new Date(student.lastVideoActivity).toLocaleDateString()}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Expanded Details */}
+                        {expandedStudent === student.id && (
+                          <div className="p-4 bg-black/20 border-t border-white/10">
+                            {/* Watched Videos */}
+                            {student.watchedVideos && student.watchedVideos.length > 0 && (
+                              <div className="mb-6">
+                                <h5 className="font-semibold mb-3 text-green-400 flex items-center gap-2">
+                                  <Eye className="h-4 w-4" />
+                                  Watched Videos ({student.watchedVideos.length})
+                                </h5>
+                                <div className="space-y-2">
+                                  {student.watchedVideos.map((video: any) => (
+                                    <div key={video.courseId} className="p-3 bg-white/5 rounded border border-green-500/20">
+                                      <div className="flex items-start justify-between">
+                                        <div className="flex-1">
+                                          <p className="font-medium">{video.title}</p>
+                                          <p className="text-xs text-white/60 mt-1">
+                                            {video.moduleName} • {video.trainingName}
+                                          </p>
+                                        </div>
+                                        <div className="text-right ml-4">
+                                          <Badge className={
+                                            video.status === "COMPLETED" 
+                                              ? "bg-green-500/20 text-green-300" 
+                                              : "bg-yellow-500/20 text-yellow-300"
+                                          }>
+                                            {video.status}
+                                          </Badge>
+                                          <div className="text-xs text-white/60 mt-1">
+                                            {Math.round(video.completionPercentage || 0)}% complete
+                                          </div>
+                                          <div className="text-xs text-white/50">
+                                            {Math.round((video.watchTimeSeconds || 0) / 60)} min watched
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Not Watched Videos */}
+                            {student.notWatchedVideos && student.notWatchedVideos.length > 0 && (
+                              <div>
+                                <h5 className="font-semibold mb-3 text-orange-400 flex items-center gap-2">
+                                  <AlertTriangle className="h-4 w-4" />
+                                  Not Watched Yet ({student.notWatchedVideos.length})
+                                </h5>
+                                <div className="space-y-2">
+                                  {student.notWatchedVideos.slice(0, 10).map((video: any) => (
+                                    <div key={video.courseId} className="p-3 bg-white/5 rounded border border-orange-500/20">
+                                      <p className="font-medium">{video.title}</p>
+                                      <p className="text-xs text-white/60 mt-1">
+                                        {video.moduleName} • {video.trainingName}
+                                      </p>
+                                      <p className="text-xs text-white/50 mt-1">
+                                        Duration: {Math.round(video.durationSeconds / 60)} minutes
+                                      </p>
+                                    </div>
+                                  ))}
+                                  {student.notWatchedVideos.length > 10 && (
+                                    <p className="text-xs text-white/50 text-center py-2">
+                                      + {student.notWatchedVideos.length - 10} more videos
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
