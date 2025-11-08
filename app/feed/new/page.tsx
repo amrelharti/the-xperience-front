@@ -110,8 +110,14 @@ export default function NewPostPage() {
           const dataUrl = reader.result as string
           
           try {
+            // Get the training ID (parent) from the selected module
+            const selectedModule = modules.find(m => m.id === selectedModuleId)
+            const trainingId = selectedModule ? selectedModule.trainingId : null
+            const trainingModuleId = selectedModuleId && selectedModuleId !== "none" ? selectedModuleId : null
+            
             const postData = {
-              moduleId: selectedModuleId && selectedModuleId !== "none" ? selectedModuleId : null,
+              moduleId: trainingId,
+              trainingModuleId: trainingModuleId,
               classId: classParam || null,
               postType: postType,
               title: title.trim() || null,
@@ -168,8 +174,14 @@ export default function NewPostPage() {
       }
       
       // If no file selected, proceed with original logic
+      // Get the training ID (parent) from the selected module
+      const selectedModule = modules.find(m => m.id === selectedModuleId)
+      const trainingId = selectedModule ? selectedModule.trainingId : null
+      const trainingModuleId = selectedModuleId && selectedModuleId !== "none" ? selectedModuleId : null
+      
       const postData = {
-        moduleId: selectedModuleId && selectedModuleId !== "none" ? selectedModuleId : null,
+        moduleId: trainingId,
+        trainingModuleId: trainingModuleId,
         classId: classParam || null,
         postType: postType,
         title: title.trim() || null,
