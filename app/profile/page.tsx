@@ -14,6 +14,7 @@ import UserDropdown from "../components/UserDropdown"
 import RequireAuth from "../components/RequireAuth"
 import Navbar from "../components/Navbar"
 import { useToast } from "@/hooks/use-toast"
+import { ImageCropper } from "@/components/ui/image-cropper"
 
 export default function ProfilePage() {
   const { user, isLoading, refreshUser } = useUser()
@@ -27,6 +28,8 @@ export default function ProfilePage() {
     linkedin: ""
   })
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
+  const [showCropper, setShowCropper] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
@@ -91,37 +94,20 @@ export default function ProfilePage() {
       return
     }
 
-    setUploadingImage(true)
+    // Open the cropper dialog
+    setSelectedImageFile(file)
+    setShowCropper(true)
+  }
 
-    try {
-      // Convert image to base64
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const base64String = reader.result as string
-        setEditForm({ ...editForm, imageUrl: base64String })
-        setUploadingImage(false)
-        toast({
-          title: "Success",
-          description: "Profile picture uploaded. Click 'Save Changes' to update.",
-        })
-      }
-      reader.onerror = () => {
-        setUploadingImage(false)
-        toast({
-          title: "Error",
-          description: "Failed to upload image",
-          variant: "destructive",
-        })
-      }
-      reader.readAsDataURL(file)
-    } catch (error) {
-      setUploadingImage(false)
-      toast({
-        title: "Error",
-        description: "Failed to upload image",
-        variant: "destructive",
-      })
-    }
+  const handleCropComplete = (croppedImageUrl: string) => {
+    setEditForm({ ...editForm, imageUrl: croppedImageUrl })
+    setShowCropper(false)
+    setSelectedImageFile(null)
+    
+    toast({
+      title: "Success",
+      description: "Profile picture ready! Click 'Save Changes' to update.",
+    })
   }
 
   const handleSave = async () => {
@@ -309,9 +295,8 @@ export default function ProfilePage() {
                           <div className="absolute inset-0 bg-black/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <div className="text-white text-center">
                               <Camera className="h-8 w-8 mx-auto mb-2" />
-                              <p className="text-sm font-medium">
-                                {uploadingImage ? "Uploading..." : "Change Photo"}
-                              </p>
+                              <p className="text-sm font-medium">Change Photo</p>
+                              <p className="text-xs mt-1 text-gray-300">Click to crop & edit</p>
                             </div>
                           </div>
                         )}
@@ -323,6 +308,20 @@ export default function ProfilePage() {
                         onChange={handleImageUpload}
                         className="hidden"
                       />
+                    </div>
+
+                    {/* Image Cropper Dialog */}
+                    <ImageCropper
+                      open={showCropper}
+                      onClose={() => {
+                        setShowCropper(false)
+                        setSelectedImageFile(null)
+                      }}
+                      imageFile={selectedImageFile}
+                      onCropComplete={handleCropComplete}
+                      cropShape="round"
+                      aspectRatio={1}
+                    />
                     </div>
                     <div className="mt-4 text-center">
                       <h3 className="text-2xl font-bold text-gray-900">{user.name}</h3>

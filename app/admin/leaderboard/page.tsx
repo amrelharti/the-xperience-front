@@ -330,9 +330,9 @@ export default function AdminLeaderboardPage() {
                   </div>
                   {selectedClass.name} Leaderboard
                 </CardTitle>
-                <CardDescription className="text-slate-600 text-xs sm:text-sm md:text-base">
-                  Student rankings based on assignment ratings
-                </CardDescription>
+              <CardDescription className="text-slate-600 text-xs sm:text-sm md:text-base">
+                Student rankings based on assignment and weekly summary ratings
+              </CardDescription>
               </CardHeader>
               <CardContent className="pt-3 sm:pt-4 px-4 sm:px-6">
                 {loadingLeaderboard ? (
@@ -347,7 +347,7 @@ export default function AdminLeaderboardPage() {
                     </div>
                     <h3 className="text-xl font-semibold mb-3 text-slate-700">No rankings yet</h3>
                     <p className="text-slate-600">
-                      No rated assignments in this class yet
+                      No rated assignments or weekly summaries in this class yet
                     </p>
                   </div>
                 ) : (
@@ -394,7 +394,7 @@ export default function AdminLeaderboardPage() {
                                   <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#005eb8] flex-shrink-0" />
                                   {entry.totalPoints.toFixed(1)} points
                                 </span>
-                                <span>{entry.assignmentCount} rated assignments</span>
+                                <span>{entry.assignmentCount} rated posts</span>
                                 <span>Avg: {entry.avgScore.toFixed(1)}/10</span>
                               </div>
                             </div>
@@ -427,11 +427,11 @@ export default function AdminLeaderboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 <div className="flex items-start gap-2 sm:gap-3">
                   <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#005eb8] mt-1.5 sm:mt-2 flex-shrink-0"></div>
-                  <p className="text-xs sm:text-sm md:text-base">Points are calculated as the sum of average scores from all rated assignments</p>
+                  <p className="text-xs sm:text-sm md:text-base">Points are calculated as the sum of average scores from all rated assignments and weekly summaries</p>
                 </div>
                 <div className="flex items-start gap-2 sm:gap-3">
                   <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#0476D7] mt-1.5 sm:mt-2 flex-shrink-0"></div>
-                  <p className="text-xs sm:text-sm md:text-base">Each assignment's average score is the mean of all ratings given by other students in the class</p>
+                  <p className="text-xs sm:text-sm md:text-base">Each post's average score is the mean of all ratings given by other students in the class</p>
                 </div>
                 <div className="flex items-start gap-2 sm:gap-3">
                   <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#005eb8] mt-1.5 sm:mt-2 flex-shrink-0"></div>
@@ -439,15 +439,15 @@ export default function AdminLeaderboardPage() {
                 </div>
                 <div className="flex items-start gap-2 sm:gap-3">
                   <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#005eb8] mt-1.5 sm:mt-2 flex-shrink-0"></div>
-                  <p className="text-xs sm:text-sm md:text-base">Once a student rates an assignment, they cannot change their rating</p>
+                  <p className="text-xs sm:text-sm md:text-base">Once a student rates a post, they cannot change their rating</p>
                 </div>
                 <div className="flex items-start gap-2 sm:gap-3">
                   <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#0476D7] mt-1.5 sm:mt-2 flex-shrink-0"></div>
-                  <p className="text-xs sm:text-sm md:text-base">Students cannot rate their own assignments</p>
+                  <p className="text-xs sm:text-sm md:text-base">Students cannot rate their own posts</p>
                 </div>
                 <div className="flex items-start gap-2 sm:gap-3">
                   <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#0476D7] mt-1.5 sm:mt-2 flex-shrink-0"></div>
-                  <p className="text-xs sm:text-sm md:text-base">Ratings range from 0-10 points per assignment</p>
+                  <p className="text-xs sm:text-sm md:text-base">Ratings range from 0-10 points per post</p>
                 </div>
               </div>
             </CardContent>

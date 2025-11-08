@@ -247,7 +247,7 @@ export default function LeaderboardPage() {
                       Leaderboard
                     </h1>
                     <p className="text-sm sm:text-base md:text-lg text-blue-100 mb-4 sm:mb-6 max-w-2xl">
-                      {myClass ? `${myClass.name} - ` : ""}Top performers based on assignment ratings
+                      {myClass ? `${myClass.name} - ` : ""}Top performers based on assignment and weekly summary ratings
                     </p>
                     <div className="flex flex-wrap items-center gap-6 text-blue-100">
                       <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
@@ -379,7 +379,7 @@ export default function LeaderboardPage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-base sm:text-lg font-semibold text-gray-900">{myClass?.name} Leaderboard</h3>
-                    <p className="text-xs sm:text-sm text-gray-600">Compete with your classmates! Rankings based on assignment ratings.</p>
+                    <p className="text-xs sm:text-sm text-gray-600">Compete with your classmates! Rankings based on assignment and weekly summary ratings.</p>
                   </div>
                 </div>
               </div>
@@ -391,7 +391,7 @@ export default function LeaderboardPage() {
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-3">No rankings yet</h3>
                     <p className="text-gray-600 max-w-md mx-auto">
-                      No rated assignments in your class yet. Be the first to submit and get rated!
+                      No rated assignments or weekly summaries in your class yet. Be the first to submit and get rated!
                     </p>
                   </div>
                 ) : (
@@ -462,7 +462,7 @@ export default function LeaderboardPage() {
                                     </div>
                                     <div className="flex items-center gap-1.5 bg-gray-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-gray-200">
                                       <Target className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600" />
-                                      <span className="font-medium">{entry.assignmentCount} assignments</span>
+                                      <span className="font-medium">{entry.assignmentCount} rated posts</span>
                                     </div>
                                     <div className="flex items-center gap-1.5 bg-green-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-green-100">
                                       <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
@@ -509,13 +509,13 @@ export default function LeaderboardPage() {
                     <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <span className="text-[#0476D7] text-xs font-bold">1</span>
                     </div>
-                    <p>Points are calculated as the sum of average scores from all your rated assignments</p>
+                    <p>Points are calculated as the sum of average scores from all your rated assignments and weekly summaries</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <span className="text-[#0476D7] text-xs font-bold">2</span>
                     </div>
-                    <p>Each assignment's average score is the mean of all ratings given by other students in your class</p>
+                    <p>Each post's average score is the mean of all ratings given by other students in your class</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -527,19 +527,19 @@ export default function LeaderboardPage() {
                     <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <span className="text-[#0476D7] text-xs font-bold">4</span>
                     </div>
-                    <p>Once you rate an assignment, you cannot change your rating</p>
+                    <p>Once you rate a post, you cannot change your rating</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <span className="text-[#0476D7] text-xs font-bold">5</span>
                     </div>
-                    <p>You cannot rate your own assignments</p>
+                    <p>You cannot rate your own posts</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <span className="text-[#0476D7] text-xs font-bold">6</span>
                     </div>
-                    <p>Ratings range from 0-10 points per assignment</p>
+                    <p>Ratings range from 0-10 points per post</p>
                   </div>
                 </div>
               </div>
