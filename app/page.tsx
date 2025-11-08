@@ -179,7 +179,23 @@ export default function TrainingsPage() {
             </p>
           </div>
           ) : (
-            modules.map((module) => (
+            modules
+              .slice()
+              .sort((a, b) => {
+                // Priority 1: Published courses first
+                const aPublished = a.isPublished ? 1 : 0;
+                const bPublished = b.isPublished ? 1 : 0;
+                if (aPublished !== bPublished) return bPublished - aPublished;
+                
+                // Priority 2: Enrolled courses first
+                const aEnrolled = a.isEnrolled ? 1 : 0;
+                const bEnrolled = b.isEnrolled ? 1 : 0;
+                if (aEnrolled !== bEnrolled) return bEnrolled - aEnrolled;
+                
+                // Priority 3: Keep original order
+                return 0;
+              })
+              .map((module) => (
               <Card 
                 key={module.id} 
                 className={`h-full flex flex-col transition-all duration-300 group relative overflow-hidden animate-fade-in ${
