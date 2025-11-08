@@ -511,8 +511,8 @@ export default function Phase1Insights() {
                               className="flex-1 cursor-pointer"
                               onClick={() => toggleStudentExpand(student.id)}
                             >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
                               <div className="flex items-center gap-3 mb-2">
                                 <h4 className="font-semibold text-lg">{student.name}</h4>
                                 {expandedStudent === student.id ? (
@@ -555,7 +555,8 @@ export default function Phase1Insights() {
                                 </div>
                               )}
                             </div>
-                          </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
