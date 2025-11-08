@@ -322,7 +322,6 @@ export default function ProfilePage() {
                       cropShape="round"
                       aspectRatio={1}
                     />
-                    </div>
                     <div className="mt-4 text-center">
                       <h3 className="text-2xl font-bold text-gray-900">{user.name}</h3>
                       {(user as any).title && (
