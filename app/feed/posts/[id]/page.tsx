@@ -28,6 +28,7 @@ import UserDropdown from "@/app/components/UserDropdown"
 import RequireAuth from "@/app/components/RequireAuth"
 import Navbar from "@/app/components/Navbar"
 import { useToast } from "@/hooks/use-toast"
+import { LinkifiedText } from "@/app/utils/linkify"
 
 interface Post {
   id: string
@@ -977,7 +978,9 @@ export default function PostDetailPage() {
                   {post.title && (
                     <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
                   )}
-                  <p className="text-gray-700 mb-4 whitespace-pre-wrap text-lg">{post.content}</p>
+                  <p className="text-gray-700 mb-4 whitespace-pre-wrap text-lg">
+                    <LinkifiedText text={post.content} />
+                  </p>
                 </>
               )}
               
@@ -1177,7 +1180,9 @@ export default function PostDetailPage() {
                             </div>
                           </div>
                         ) : (
-                          <p className="text-sm text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+                          <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                            <LinkifiedText text={comment.content} />
+                          </p>
                         )}
                         <div className="flex items-center gap-4 mt-2">
                           <Button 

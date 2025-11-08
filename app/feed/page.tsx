@@ -36,6 +36,7 @@ import Navbar from "@/app/components/Navbar"
 import { useToast } from "@/hooks/use-toast"
 import { logger } from "@/lib/logger"
 import { measureApiCall } from "@/lib/performance"
+import { LinkifiedText } from "@/app/utils/linkify"
 
 interface Post {
   id: string
@@ -678,7 +679,9 @@ export default function FeedPage() {
                       {post.title && (
                         <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3 group-hover:text-[#0476D7] transition-colors leading-tight">{post.title}</h2>
                       )}
-                      <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-wrap line-clamp-3">{post.content}</p>
+                      <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-wrap line-clamp-3">
+                        <LinkifiedText text={post.content} />
+                      </p>
                       
                       {post.attachments && (
                         <div className="mt-3 sm:mt-4">
