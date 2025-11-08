@@ -14,34 +14,25 @@ export async function GET(
       },
     })
     
+    if (!response.ok) {
+      return NextResponse.json({ error: 'Failed to fetch class codes' }, { status: response.status })
+    }
+    
     const data = await response.json()
     console.log("🔍 GET class codes response:", JSON.stringify(data, null, 2))
     
-    // Backend returns array of code objects: [{ id, code: "••••••••", isUsed, ... }]
-    // Codes are masked for security, so we can't show the actual code from GET
-    if (Array.isArray(data) && data.length > 0) {
-      // Find the most recent unused code
-      const unusedCodes = data.filter((c: any) => !c.isUsed)
-      const hasActiveCode = unusedCodes.length > 0
-      
-      return NextResponse.json({
-        hasCode: hasActiveCode,
-        code: null, // Code is masked by backend for security
-        codesCount: data.length,
-        unusedCount: unusedCodes.length,
-        codes: data
-      }, { status: response.status })
-    }
-    
-    return NextResponse.json({
+    // Backend now returns an object with { hasCode, code, codesCount, unusedCount, ... }
+    // Just pass through the backend response directly
+    return NextResponse.json(data, { status: response.status })
+  } catch (error) {
+    console.error('Error fetching class codes:', error)
+    return NextResponse.json({ 
       hasCode: false,
       code: null,
       codesCount: 0,
-      unusedCount: 0
-    }, { status: response.status })
-  } catch (error) {
-    console.error('Error fetching class codes:', error)
-    return NextResponse.json({ error: 'Failed to fetch class codes' }, { status: 500 })
+      unusedCount: 0,
+      error: 'Failed to fetch class codes' 
+    }, { status: 500 })
   }
 }
 

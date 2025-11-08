@@ -64,6 +64,7 @@ export default function ClassManagementPage() {
   } | null>(null)
   const [showGeneratedCode, setShowGeneratedCode] = useState(false)
   const [newlyGeneratedCode, setNewlyGeneratedCode] = useState("")
+  const [isGenerating, setIsGenerating] = useState(false)
 
   useEffect(() => {
     loadClasses()
@@ -199,12 +200,15 @@ export default function ClassManagementPage() {
 
   const loadActiveCode = async (classId: string) => {
     try {
+      console.log(`📥 Loading active code for class ID: ${classId}`)
       const res = await fetch(`/api/admin/classes/${classId}/codes`, {
         credentials: "include"
       })
+      console.log(`📡 Response status: ${res.status}`)
       if (res.ok) {
         const data = await res.json()
-        console.log("🔍 Loaded class active code data:", data)
+        console.log("🔍 Loaded class active code data:", JSON.stringify(data, null, 2))
+        console.log(`✅ Has code: ${data?.hasCode}, Code value: ${data?.code || 'NOT PROVIDED'}`)
         
         // Backend now returns the plain code directly for admins
         setActiveCode(data)
@@ -212,16 +216,23 @@ export default function ClassManagementPage() {
         // Hide the "newly generated" banner after loading
         if (data?.hasCode) {
           setShowGeneratedCode(false)
+          console.log("✓ Active code loaded successfully")
+        } else {
+          console.log("⚠️ No active code found for this class")
         }
+      } else {
+        const errorText = await res.text()
+        console.error(`❌ Failed to load active code. Status: ${res.status}, Error: ${errorText}`)
       }
     } catch (error) {
-      console.error("Error loading active code:", error)
+      console.error("❌ Error loading active code:", error)
     }
   }
 
   const handleGenerateCode = async () => {
-    if (!selectedClassForCode) return
+    if (!selectedClassForCode || isGenerating) return
     
+    setIsGenerating(true)
     try {
       const res = await fetch(`/api/admin/classes/${selectedClassForCode.id}/codes`, {
         method: "POST",
@@ -239,8 +250,14 @@ export default function ClassManagementPage() {
           setNewlyGeneratedCode(data.code)
           setShowGeneratedCode(true)
           
+          // Wait for transaction to commit before reloading
+          console.log("⏳ Waiting 500ms for database transaction to commit...")
+          await new Promise(resolve => setTimeout(resolve, 500))
+          
           // Reload to show in the active codes list
           await loadActiveCode(selectedClassForCode.id)
+          
+          alert("✅ Code generated successfully! Share it with your students.")
         } else {
           console.error("❌ No code in response:", data)
           alert("Generated code was not returned properly")
@@ -248,11 +265,13 @@ export default function ClassManagementPage() {
       } else {
         const error = await res.text()
         console.error("❌ Failed to generate code:", error)
-        alert("Failed to generate code")
+        alert("Failed to generate code: " + error)
       }
     } catch (error) {
       console.error("Error generating code:", error)
-      alert("Error generating code")
+      alert("Error generating code: " + error)
+    } finally {
+      setIsGenerating(false)
     }
   }
 
@@ -265,6 +284,7 @@ export default function ClassManagementPage() {
     setSelectedClassForCode(classItem)
     setShowGeneratedCode(false)
     setNewlyGeneratedCode("")
+    setIsGenerating(false)
     setShowCodeDialog(true)
     loadActiveCode(classItem.id)
   }
@@ -893,10 +913,20 @@ export default function ClassManagementPage() {
               {/* Generate/Regenerate Button */}
               <Button 
                 onClick={handleGenerateCode} 
-                className="w-full bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold"
+                disabled={isGenerating}
+                className="w-full bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Key className="h-4 w-4 mr-2" />
-                {activeCode?.hasCode ? "Regenerate Code" : "Generate Code"}
+                {isGenerating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Key className="h-4 w-4 mr-2" />
+                    {activeCode?.hasCode ? "Regenerate Code" : "Generate Code"}
+                  </>
+                )}
               </Button>
               {activeCode?.hasCode && (
                 <p className="text-xs text-amber-600 text-center">
