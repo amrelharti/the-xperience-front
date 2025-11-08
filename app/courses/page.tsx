@@ -46,13 +46,30 @@ export default function CoursesPage() {
     load()
   }, [])
 
-  const filteredCourses = useMemo(() => courses.filter((course) => {
-    const matchesSearch =
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.description.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesLevel = !selectedLevel // level not from API yet
-    return matchesSearch && matchesLevel
-  }), [courses, searchQuery, selectedLevel])
+  const filteredCourses = useMemo(() => {
+    return courses
+      .filter((course) => {
+        const matchesSearch =
+          course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          course.description.toLowerCase().includes(searchQuery.toLowerCase())
+        const matchesLevel = !selectedLevel // level not from API yet
+        return matchesSearch && matchesLevel
+      })
+      .sort((a, b) => {
+        // Priority 1: Published courses first
+        const aPublished = a.isPublished ? 1 : 0
+        const bPublished = b.isPublished ? 1 : 0
+        if (aPublished !== bPublished) return bPublished - aPublished
+        
+        // Priority 2: Enrolled courses (with progress) first
+        const aEnrolled = (a.progress?.totalModules || 0) > 0 ? 1 : 0
+        const bEnrolled = (b.progress?.totalModules || 0) > 0 ? 1 : 0
+        if (aEnrolled !== bEnrolled) return bEnrolled - aEnrolled
+        
+        // Priority 3: Keep original order for courses with same status
+        return 0
+      })
+  }, [courses, searchQuery, selectedLevel])
 
 
   return (
