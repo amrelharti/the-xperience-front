@@ -450,23 +450,39 @@ export default function CourseDetailPage() {
                             onPlayTimeUpdate={async (playTimeSeconds) => {
                               console.log(`⏱️ Watch time update: ${playTimeSeconds} seconds`)
                               // Save watch time to backend every 10 seconds
-                              if (playTimeSeconds % 10 === 0 && playTimeSeconds > 0) {
+                              if (playTimeSeconds % 10 === 0 && playTimeSeconds > 0 && classId) {
                                 try {
+                                  // Calculate completion percentage (watchTime / videoDuration * 100)
+                                  const completionPercentage = course?.durationSeconds 
+                                    ? Math.min((playTimeSeconds / course.durationSeconds) * 100, 100)
+                                    : 0.0
+                                  
+                                  console.log(`📊 Completion: ${completionPercentage.toFixed(1)}% (${playTimeSeconds}s / ${course?.durationSeconds || 0}s)`)
+                                  
                                   const response = await fetch(`/api/courses/${courseId}/progress`, {
                                     method: 'PUT',
                                     headers: { 'Content-Type': 'application/json' },
                                     credentials: 'include',
                                     body: JSON.stringify({
-                                      courseId: courseId,
                                       classId: classId,
-                                      watchTimeSeconds: playTimeSeconds,
-                                      status: courseProgress?.status || 'IN_PROGRESS'
+                                      watchTimeSeconds: Math.round(playTimeSeconds),
+                                      completionPercentage: Math.round(completionPercentage * 10) / 10  // Round to 1 decimal
                                     })
                                   })
+                                  
                                   if (response.ok) {
-                                    console.log(`✅ Watch time saved: ${playTimeSeconds}s`)
+                                    const data = await response.json()
+                                    console.log(`✅ Watch time saved: ${playTimeSeconds}s, completion: ${completionPercentage.toFixed(1)}%`)
                                     // Update local state
-                                    setCourseProgress(prev => prev ? { ...prev, watchTimeSeconds: playTimeSeconds } : null)
+                                    setCourseProgress(prev => prev ? { 
+                                      ...prev, 
+                                      watchTimeSeconds: playTimeSeconds,
+                                      completionPercentage: completionPercentage,
+                                      status: data.status || prev.status
+                                    } : null)
+                                  } else {
+                                    const errorData = await response.json()
+                                    console.error("❌ Error response:", errorData)
                                   }
                                 } catch (error) {
                                   console.error("❌ Error saving watch time:", error)

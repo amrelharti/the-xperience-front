@@ -7,12 +7,21 @@ export async function PUT(
   try {
     const { id: courseId } = params
     const body = await request.json()
-    const { classId, watchTimeSeconds, status } = body
+    const { classId, watchTimeSeconds, completionPercentage } = body
 
-    console.log(`📊 Updating progress for course ${courseId}:`, { classId, watchTimeSeconds, status })
+    console.log(`📊 Updating progress for course ${courseId}:`, { classId, watchTimeSeconds, completionPercentage })
+
+    if (!classId) {
+      return NextResponse.json(
+        { error: "classId is required" },
+        { status: 400 }
+      )
+    }
 
     // Forward to Spring Boot backend
-    const backendUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/progress`
+    // Backend expects: PUT /api/courses/{courseId}/progress?classId={classId}
+    // Body: { watchTimeSeconds, completionPercentage }
+    const backendUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}/progress?classId=${classId}`
     
     const response = await fetch(backendUrl, {
       method: "PUT",
@@ -22,10 +31,8 @@ export async function PUT(
       },
       credentials: "include",
       body: JSON.stringify({
-        courseId: courseId,
-        classId: classId,
-        watchTimeSeconds: watchTimeSeconds,
-        status: status,
+        watchTimeSeconds: watchTimeSeconds || 0,
+        completionPercentage: completionPercentage || 0.0,
       }),
     })
 
