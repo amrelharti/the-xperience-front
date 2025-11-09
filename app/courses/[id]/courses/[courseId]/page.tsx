@@ -443,6 +443,35 @@ export default function CourseDetailPage() {
                             className="w-full h-full"
                             onLoad={() => console.log("Vimeo video loaded")}
                             onError={(error) => console.error("Vimeo video error:", error)}
+                            onEnded={() => {
+                              console.log("🎬 Video ended - marking as complete")
+                              setShowConfirmDialog(true)
+                            }}
+                            onPlayTimeUpdate={async (playTimeSeconds) => {
+                              console.log(`⏱️ Watch time update: ${playTimeSeconds} seconds`)
+                              // Save watch time to backend every 10 seconds
+                              if (playTimeSeconds % 10 === 0 && playTimeSeconds > 0) {
+                                try {
+                                  const response = await fetch(`/api/courses/${courseId}/progress`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    credentials: 'include',
+                                    body: JSON.stringify({
+                                      classId: classId,
+                                      watchTimeSeconds: playTimeSeconds,
+                                      status: courseProgress?.status || 'IN_PROGRESS'
+                                    })
+                                  })
+                                  if (response.ok) {
+                                    console.log(`✅ Watch time saved: ${playTimeSeconds}s`)
+                                    // Update local state
+                                    setCourseProgress(prev => prev ? { ...prev, watchTimeSeconds: playTimeSeconds } : null)
+                                  }
+                                } catch (error) {
+                                  console.error("❌ Error saving watch time:", error)
+                                }
+                              }
+                            }}
                           />
                         ) : course.videoUrl.includes('youtube.com') || course.videoUrl.includes('youtu.be') ? (
                           <iframe
