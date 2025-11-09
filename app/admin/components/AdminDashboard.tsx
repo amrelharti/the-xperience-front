@@ -81,7 +81,14 @@ export default function AdminDashboard({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <Button asChild variant="outline" className="h-20 flex-col gap-2 border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20">
+              <Link href="/admin/students">
+                <Users className="h-6 w-6 text-purple-400" />
+                <span>Student Analysis</span>
+                <span className="text-xs text-muted-foreground">360° student view</span>
+              </Link>
+            </Button>
             <Button asChild variant="outline" className="h-20 flex-col gap-2">
               <Link href="/admin/analytics/dashboard">
                 <BarChart3 className="h-6 w-6" />

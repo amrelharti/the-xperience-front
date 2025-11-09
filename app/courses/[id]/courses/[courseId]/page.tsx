@@ -502,33 +502,31 @@ export default function CourseDetailPage() {
                     
                     {/* Course Navigation */}
                     {allCourses.length > 1 && (
-                      <div className="flex flex-col xs:flex-row justify-between items-stretch xs:items-center py-4 sm:py-6 border-t border-gray-200 gap-3 xs:gap-2">
+                      <div className="flex flex-col items-center justify-center py-6 sm:py-8 border-t border-gray-200 gap-3">
                         <Button 
                           variant="outline" 
-                          size="sm"
+                          size="default"
                           onClick={goToPreviousCourse}
                           disabled={currentCourseIndex === -1 ? allCourses.length <= 1 : currentCourseIndex <= 0}
-                          className="flex items-center justify-center px-4 sm:px-6 hover:bg-[#0476D7] hover:text-white transition-all duration-300 border-[#0476D7] text-xs sm:text-sm flex-1 xs:flex-initial"
+                          className="flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-white hover:bg-blue-50 border-2 border-[#0476D7] text-[#0476D7] rounded-full shadow-sm hover:shadow-md transition-all duration-300 text-sm sm:text-base font-medium w-full max-w-xs disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                          <span className="hidden sm:inline">Previous Course</span>
-                          <span className="sm:hidden">Previous</span>
+                          <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                          Previous Course
                         </Button>
                         
-                        <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#0476D7]/10 to-[#0068A7]/5 rounded-lg sm:rounded-xl border border-[#0476D7]/20 text-xs sm:text-sm font-semibold text-[#0476D7] text-center flex-shrink-0">
+                        <div className="px-6 sm:px-8 py-2.5 sm:py-3 bg-blue-100 border-2 border-[#0476D7] rounded-full text-sm sm:text-base font-semibold text-[#0476D7] text-center w-full max-w-xs">
                           {currentCourseIndex >= 0 ? currentCourseIndex + 1 : 1} of {allCourses.length}
                         </div>
                         
                         <Button 
                           variant="outline" 
-                          size="sm"
+                          size="default"
                           onClick={goToNextCourse}
                           disabled={currentCourseIndex === -1 ? allCourses.length <= 1 : currentCourseIndex >= allCourses.length - 1}
-                          className="flex items-center justify-center px-4 sm:px-6 hover:bg-[#0476D7] hover:text-white transition-all duration-300 border-[#0476D7] text-xs sm:text-sm flex-1 xs:flex-initial"
+                          className="flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-white hover:bg-blue-50 border-2 border-[#0476D7] text-[#0476D7] rounded-full shadow-sm hover:shadow-md transition-all duration-300 text-sm sm:text-base font-medium w-full max-w-xs disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <span className="hidden sm:inline">Next Course</span>
-                          <span className="sm:hidden">Next</span>
-                          <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-1.5 sm:ml-2 rotate-180" />
+                          Next Course
+                          <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 rotate-180" />
                         </Button>
                       </div>
                     )}
