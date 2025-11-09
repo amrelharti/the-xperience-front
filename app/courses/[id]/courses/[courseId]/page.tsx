@@ -457,6 +457,7 @@ export default function CourseDetailPage() {
                                     headers: { 'Content-Type': 'application/json' },
                                     credentials: 'include',
                                     body: JSON.stringify({
+                                      courseId: courseId,
                                       classId: classId,
                                       watchTimeSeconds: playTimeSeconds,
                                       status: courseProgress?.status || 'IN_PROGRESS'

@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { courseId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { courseId } = params
+    const { id: courseId } = params
     const body = await request.json()
     const { classId, watchTimeSeconds, status } = body
 
@@ -53,10 +53,10 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { courseId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { courseId } = params
+    const { id: courseId } = params
     const { searchParams } = new URL(request.url)
     const classId = searchParams.get("classId")
 
