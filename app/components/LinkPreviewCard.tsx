@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { ExternalLink, FileText, Youtube, Image as ImageIcon, File, Link as LinkIcon, Music, Video } from 'lucide-react';
 
@@ -243,7 +245,13 @@ function getLinkMetadata(url: string): LinkMetadata {
 }
 
 export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, onClick }) => {
+  // Debug: Log URL being rendered
+  console.log('🎴 LinkPreviewCard rendering:', url.substring(0, 50) + (url.length > 50 ? '...' : ''));
+  
   const metadata = getLinkMetadata(url);
+  
+  // Debug: Log metadata
+  console.log('📋 Metadata:', metadata.title, '|', metadata.domain);
   
   // Create the href (add https:// if it starts with www.)
   let href = url;
