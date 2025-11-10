@@ -315,42 +315,6 @@ export default function CourseDetailPage() {
     }
   }, [classId, courseId, loadCourseProgress])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading course...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error || !course || !module) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              {error || "Course not found"}
-            </h1>
-            <Button onClick={() => router.back()}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Go Back
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const isLocked = course.status === "LOCKED"
-  const durationMinutes = Math.round(course.durationSeconds / 60)
-
   // Memoize the video handlers to prevent video restarts
   const handleVideoEnded = useCallback(() => {
     setShowConfirmDialog(true)
@@ -411,6 +375,42 @@ export default function CourseDetailPage() {
       console.warn("⚠️ Cannot save progress: classId is missing")
     }
   }, [classId, courseId, course?.durationSeconds])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading course...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !course || !module) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              {error || "Course not found"}
+            </h1>
+            <Button onClick={() => router.back()}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Go Back
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const isLocked = course?.status === "LOCKED"
+  const durationMinutes = course ? Math.round(course.durationSeconds / 60) : 0
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
