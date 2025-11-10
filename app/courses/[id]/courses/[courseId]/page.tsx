@@ -315,7 +315,16 @@ export default function CourseDetailPage() {
     }
   }, [classId, courseId, loadCourseProgress])
 
+  // Memoize video ID to prevent VimeoPlayer remount
+  const vimeoVideoId = course?.videoUrl && isVimeoUrl(course.videoUrl) 
+    ? getVimeoVideoId(course.videoUrl) || ""
+    : ""
+
   // Memoize the video handlers to prevent video restarts
+  const handleVideoError = useCallback((error: string) => {
+    console.error("Vimeo video error:", error)
+  }, [])
+
   const handleVideoEnded = useCallback(() => {
     setShowConfirmDialog(true)
   }, [])
@@ -352,14 +361,26 @@ export default function CourseDetailPage() {
         
         if (response.ok) {
           const data = await response.json()
-          // Update local state so UI reflects progress immediately
-          // Use callback to avoid unnecessary re-renders
-          setCourseProgress(prevProgress => ({
-            ...prevProgress,
-            watchTimeSeconds: data.watchTimeSeconds,
-            completionPercentage: data.completionPercentage,
-            isStarted: data.isStarted || true
-          }))
+          // Only update state when crossing 90% threshold or every 20% to minimize re-renders
+          setCourseProgress(prevProgress => {
+            const prevPercentage = prevProgress?.completionPercentage || 0
+            const newPercentage = data.completionPercentage
+            
+            // Update if: crossing 90%, reaching 100%, or every 20%
+            const shouldUpdate = (prevPercentage < 90 && newPercentage >= 90) ||
+                                 newPercentage === 100 ||
+                                 Math.floor(prevPercentage / 20) !== Math.floor(newPercentage / 20)
+            
+            if (shouldUpdate) {
+              return {
+                ...prevProgress,
+                watchTimeSeconds: data.watchTimeSeconds,
+                completionPercentage: data.completionPercentage,
+                isStarted: data.isStarted || true
+              }
+            }
+            return prevProgress
+          })
         } else {
           const errorText = await response.text()
           console.error("❌ Error saving progress:", {
@@ -493,10 +514,11 @@ export default function CourseDetailPage() {
                       <div className="aspect-video bg-black rounded-lg sm:rounded-xl overflow-hidden shadow-2xl">
                         {isVimeoUrl(course.videoUrl) ? (
                           <VimeoPlayer
-                            videoId={getVimeoVideoId(course.videoUrl) || ""}
+                            key={vimeoVideoId}
+                            videoId={vimeoVideoId}
                             title={course.title}
                             className="w-full h-full"
-                            onError={(error) => console.error("Vimeo video error:", error)}
+                            onError={handleVideoError}
                             onEnded={handleVideoEnded}
                             onPlayTimeUpdate={handlePlayTimeUpdate}
                           />
