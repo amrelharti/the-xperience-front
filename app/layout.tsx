@@ -22,8 +22,12 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "The Xperience - Learn Through Video Courses",
-  description: "Premium video-based learning platform with structured courses and progress tracking",
+  description: "Premium learning platform with structured courses and progress tracking",
   generator: "v0.app",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
 }
 
 export default function RootLayout({

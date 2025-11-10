@@ -269,24 +269,26 @@ export default function Phase1Insights() {
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white">
         {/* Header */}
         <header className="bg-black/20 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
-          <div className="container mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Link href="/admin/analytics/dashboard" className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Critical Insights
+          <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <Link href="/admin/analytics/dashboard" className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  <span className="hidden sm:inline">Critical Insights</span>
+                  <span className="sm:hidden">Insights</span>
                 </Link>
-                <Badge variant="outline" className="border-green-400 text-green-400">
+                <Badge variant="outline" className="border-green-400 text-green-400 text-xs">
                   Phase 1
                 </Badge>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <Button
                   onClick={loadAllData}
                   variant="outline"
+                  size="sm"
                   className="border-white/20 hover:bg-white/10"
                 >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Refresh
+                  <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Refresh</span>
                 </Button>
                 <UserDropdown user={user} />
               </div>
@@ -294,85 +296,95 @@ export default function Phase1Insights() {
           </div>
         </header>
 
-        <main className="container mx-auto px-6 py-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="bg-black/30 border border-white/10">
-              <TabsTrigger value="rosters">
-                <School className="h-4 w-4 mr-2" />
-                Class Rosters
-              </TabsTrigger>
-              <TabsTrigger value="videos">
-                <Video className="h-4 w-4 mr-2" />
-                Video Activity
-              </TabsTrigger>
-              <TabsTrigger value="completions">
-                <GraduationCap className="h-4 w-4 mr-2" />
-                Completions
-              </TabsTrigger>
-              <TabsTrigger value="inactive">
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Inactive Students
-              </TabsTrigger>
-              <TabsTrigger value="progress">
-                <TrendingDown className="h-4 w-4 mr-2" />
-                Progress Overview
-              </TabsTrigger>
-              <TabsTrigger value="scores">
-                <Trophy className="h-4 w-4 mr-2" />
-                Scores
-              </TabsTrigger>
-            </TabsList>
+        <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
+            {/* Mobile: Horizontal scrolling tabs */}
+            <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+              <TabsList className="bg-black/30 border border-white/10 inline-flex min-w-full sm:min-w-0 w-max sm:w-auto">
+                <TabsTrigger value="rosters" className="text-xs sm:text-sm">
+                  <School className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Class Rosters</span>
+                  <span className="sm:hidden">Rosters</span>
+                </TabsTrigger>
+                <TabsTrigger value="videos" className="text-xs sm:text-sm">
+                  <Video className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Video Activity</span>
+                  <span className="sm:hidden">Videos</span>
+                </TabsTrigger>
+                <TabsTrigger value="completions" className="text-xs sm:text-sm">
+                  <GraduationCap className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Completions</span>
+                  <span className="sm:hidden">Complete</span>
+                </TabsTrigger>
+                <TabsTrigger value="inactive" className="text-xs sm:text-sm">
+                  <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Inactive Students</span>
+                  <span className="sm:hidden">Inactive</span>
+                </TabsTrigger>
+                <TabsTrigger value="progress" className="text-xs sm:text-sm">
+                  <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Progress Overview</span>
+                  <span className="sm:hidden">Progress</span>
+                </TabsTrigger>
+                <TabsTrigger value="scores" className="text-xs sm:text-sm">
+                  <Trophy className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  Scores
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Class Rosters Tab */}
-            <TabsContent value="rosters" className="space-y-6">
+            <TabsContent value="rosters" className="space-y-4 sm:space-y-6">
               <Card className="bg-black/30 border-white/10">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <School className="h-5 w-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                    <School className="h-4 w-4 sm:h-5 sm:w-5" />
                     Class Rosters
                   </CardTitle>
-                  <CardDescription className="text-white/60">
+                  <CardDescription className="text-white/60 text-sm">
                     See all enrolled students with their progress
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 sm:p-6">
                   {rosters.map((roster) => (
-                    <div key={roster.classId} className="mb-8">
-                      <div className="flex items-center justify-between mb-4 p-4 bg-white/5 rounded-lg">
-                        <div>
-                          <h3 className="text-xl font-bold">{roster.className}</h3>
-                          <p className="text-sm text-white/60">
+                    <div key={roster.classId} className="mb-6 sm:mb-8">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 p-3 sm:p-4 bg-white/5 rounded-lg">
+                        <div className="flex-1">
+                          <h3 className="text-lg sm:text-xl font-bold">{roster.className}</h3>
+                          <p className="text-xs sm:text-sm text-white/60">
                             {roster.startDate} {roster.endDate ? `- ${roster.endDate}` : "- Ongoing"}
                           </p>
                         </div>
-                        <div className="text-right">
-                          <div className="text-3xl font-bold">{roster.totalStudents}</div>
-                          <div className="text-sm text-white/70">Students</div>
+                        <div className="text-left sm:text-right">
+                          <div className="text-2xl sm:text-3xl font-bold">{roster.totalStudents}</div>
+                          <div className="text-xs sm:text-sm text-white/70">Students</div>
                         </div>
                       </div>
                       
-                      <div className="space-y-3">
+                      <div className="space-y-2 sm:space-y-3">
                         {roster.students.map((student: any) => (
                           <div
                             key={student.id}
-                            className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                            className="p-3 sm:p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
                           >
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h4 className="font-semibold">{student.name}</h4>
-                                <p className="text-sm text-white/60">{student.email}</p>
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-sm sm:text-base truncate">{student.name}</h4>
+                                <p className="text-xs sm:text-sm text-white/60 truncate">{student.email}</p>
                                 <p className="text-xs text-white/50 mt-1">
                                   Enrolled: {new Date(student.enrolledAt).toLocaleDateString()}
                                 </p>
                               </div>
-                              <div className="text-right ml-4">
-                                <div className="text-2xl font-bold">{student.completionRate}%</div>
-                                <div className="text-sm text-white/70">
-                                  {student.coursesCompleted}/{student.coursesTotal} courses
+                              <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-0 sm:text-right sm:ml-4">
+                                <div className="flex-1 sm:flex-none">
+                                  <div className="text-xl sm:text-2xl font-bold">{student.completionRate}%</div>
+                                  <div className="text-xs sm:text-sm text-white/70">
+                                    {student.coursesCompleted}/{student.coursesTotal} courses
+                                  </div>
                                 </div>
                                 {student.lastActivity && (
-                                  <p className="text-xs text-white/50 mt-1">
-                                    Last active: {new Date(student.lastActivity).toLocaleDateString()}
+                                  <p className="text-xs text-white/50 sm:mt-1">
+                                    Last: {new Date(student.lastActivity).toLocaleDateString()}
                                   </p>
                                 )}
                               </div>
@@ -387,32 +399,35 @@ export default function Phase1Insights() {
             </TabsContent>
 
             {/* Video Activity Tab */}
-            <TabsContent value="videos" className="space-y-6">
+            <TabsContent value="videos" className="space-y-4 sm:space-y-6">
               {/* Comparison Mode Toggle */}
               {!comparisonMode && (
                 <Card className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-500/30">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold mb-1">Compare Students</h3>
-                        <p className="text-sm text-white/70">
+                  <CardContent className="p-4 sm:pt-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="flex-1">
+                        <h3 className="text-base sm:text-lg font-semibold mb-1">Compare Students</h3>
+                        <p className="text-xs sm:text-sm text-white/70">
                           {selectedStudents.length === 0 
-                            ? "Select students below to compare their video activity side-by-side" 
+                            ? "Select students below to compare" 
                             : `${selectedStudents.length} student${selectedStudents.length > 1 ? 's' : ''} selected`}
                         </p>
                       </div>
                       {selectedStudents.length > 0 && (
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 w-full sm:w-auto">
                           <Button
                             onClick={loadComparison}
                             disabled={selectedStudents.length < 2}
-                            className="bg-blue-500 hover:bg-blue-600"
+                            size="sm"
+                            className="bg-blue-500 hover:bg-blue-600 flex-1 sm:flex-none"
                           >
-                            Compare {selectedStudents.length} Students
+                            <span className="hidden sm:inline">Compare {selectedStudents.length} Students</span>
+                            <span className="sm:hidden">Compare ({selectedStudents.length})</span>
                           </Button>
                           <Button
                             onClick={() => setSelectedStudents([])}
                             variant="outline"
+                            size="sm"
                             className="border-white/20 hover:bg-white/10"
                           >
                             Clear
@@ -427,54 +442,55 @@ export default function Phase1Insights() {
               {/* Comparison View */}
               {comparisonMode ? (
                 <Card className="bg-black/30 border-white/10">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          <Users className="h-5 w-5" />
+                  <CardHeader className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="flex-1">
+                        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                          <Users className="h-4 w-4 sm:h-5 sm:w-5" />
                           Comparing {comparisonData.length} Students
                         </CardTitle>
-                        <CardDescription className="text-white/60">
+                        <CardDescription className="text-white/60 text-sm">
                           Side-by-side video activity comparison
                         </CardDescription>
                       </div>
                       <Button
                         onClick={exitComparison}
                         variant="outline"
-                        className="border-white/20 hover:bg-white/10"
+                        size="sm"
+                        className="border-white/20 hover:bg-white/10 w-full sm:w-auto"
                       >
-                        <X className="h-4 w-4 mr-2" />
+                        <X className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                         Exit Comparison
                       </Button>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                       {comparisonData.map((student) => (
-                        <div key={student.id} className="p-4 bg-white/5 rounded-lg border border-white/10">
-                          <h4 className="font-bold text-lg mb-3">{student.name}</h4>
+                        <div key={student.id} className="p-3 sm:p-4 bg-white/5 rounded-lg border border-white/10">
+                          <h4 className="font-bold text-base sm:text-lg mb-3 truncate">{student.name}</h4>
                           <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-2 text-center">
                               <div className="p-2 bg-green-500/20 rounded">
-                                <div className="text-2xl font-bold text-green-400">{student.videosWatched}</div>
+                                <div className="text-xl sm:text-2xl font-bold text-green-400">{student.videosWatched}</div>
                                 <div className="text-xs text-white/70">Watched</div>
                               </div>
                               <div className="p-2 bg-blue-500/20 rounded">
-                                <div className="text-2xl font-bold text-blue-400">{student.videosCompleted}</div>
+                                <div className="text-xl sm:text-2xl font-bold text-blue-400">{student.videosCompleted}</div>
                                 <div className="text-xs text-white/70">Completed</div>
                               </div>
                               <div className="p-2 bg-orange-500/20 rounded">
-                                <div className="text-2xl font-bold text-orange-400">{student.videosNotWatched}</div>
+                                <div className="text-xl sm:text-2xl font-bold text-orange-400">{student.videosNotWatched}</div>
                                 <div className="text-xs text-white/70">Not Watched</div>
                               </div>
                               <div className="p-2 bg-purple-500/20 rounded">
-                                <div className="text-2xl font-bold text-purple-400">{student.watchTimeHours}h</div>
+                                <div className="text-xl sm:text-2xl font-bold text-purple-400">{student.watchTimeHours}h</div>
                                 <div className="text-xs text-white/70">Watch Time</div>
                               </div>
                             </div>
                             <div className="text-xs text-white/60 space-y-1">
-                              <p>Classes: {student.enrolledClasses?.map((c: any) => c.name).join(", ")}</p>
-                              <p>Completion Rate: {Math.round((student.videosCompleted / student.totalVideosAvailable) * 100)}%</p>
+                              <p className="truncate">Classes: {student.enrolledClasses?.map((c: any) => c.name).join(", ")}</p>
+                              <p>Completion: {Math.round((student.videosCompleted / student.totalVideosAvailable) * 100)}%</p>
                             </div>
                           </div>
                         </div>
@@ -484,77 +500,82 @@ export default function Phase1Insights() {
                 </Card>
               ) : (
               <Card className="bg-black/30 border-white/10">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Video className="h-5 w-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                    <Video className="h-4 w-4 sm:h-5 sm:w-5" />
                     Student Video Activity
                   </CardTitle>
-                  <CardDescription className="text-white/60">
-                    Track which videos each student has watched. Click checkboxes to select students for comparison.
+                  <CardDescription className="text-white/60 text-sm">
+                    Track videos. Select students to compare.
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
+                <CardContent className="p-3 sm:p-6">
+                  <div className="space-y-2 sm:space-y-3">
                     {videoActivity.map((student) => (
                       <div key={student.id} className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
                         {/* Student Header */}
-                        <div className="p-4 hover:bg-white/10 transition-colors">
-                          <div className="flex items-center gap-3">
+                        <div className="p-3 sm:p-4 hover:bg-white/10 transition-colors">
+                          <div className="flex items-start gap-2 sm:gap-3">
                             <input
                               type="checkbox"
                               checked={selectedStudents.includes(student.id)}
                               onChange={() => toggleStudentSelection(student.id)}
-                              className="w-5 h-5 rounded"
+                              className="w-4 h-4 sm:w-5 sm:h-5 rounded mt-1"
                               onClick={(e) => e.stopPropagation()}
                             />
                             <div 
-                              className="flex-1 cursor-pointer"
+                              className="flex-1 cursor-pointer min-w-0"
                               onClick={() => toggleStudentExpand(student.id)}
                             >
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <h4 className="font-semibold text-lg">{student.name}</h4>
-                                {expandedStudent === student.id ? (
-                                  <ChevronUp className="h-4 w-4 text-white/50" />
-                                ) : (
-                                  <ChevronDown className="h-4 w-4 text-white/50" />
-                                )}
-                              </div>
-                              <p className="text-sm text-white/60">{student.email}</p>
-                              {student.enrolledClasses && student.enrolledClasses.length > 0 && (
-                                <div className="flex items-center gap-2 mt-2">
-                                  <School className="h-3 w-3 text-white/50" />
-                                  <span className="text-xs text-white/50">
-                                    {student.enrolledClasses.join(", ")}
-                                  </span>
+                              <div className="flex flex-col gap-3">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <h4 className="font-semibold text-sm sm:text-lg truncate">{student.name}</h4>
+                                      {expandedStudent === student.id ? (
+                                        <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4 text-white/50 flex-shrink-0" />
+                                      ) : (
+                                        <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 text-white/50 flex-shrink-0" />
+                                      )}
+                                    </div>
+                                    <p className="text-xs sm:text-sm text-white/60 truncate">{student.email}</p>
+                                    {student.enrolledClasses && student.enrolledClasses.length > 0 && (
+                                      <div className="flex items-center gap-2 mt-1 sm:mt-2">
+                                        <School className="h-3 w-3 text-white/50 flex-shrink-0" />
+                                        <span className="text-xs text-white/50 truncate">
+                                          {student.enrolledClasses.join(", ")}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
-                              )}
-                            </div>
-                            <div className="text-right ml-4">
-                              <div className="grid grid-cols-3 gap-4 text-center">
-                                <div>
-                                  <div className="text-2xl font-bold text-green-400">{student.videosWatched}</div>
-                                  <div className="text-xs text-white/70">Watched</div>
+                                
+                                {/* Stats - Stacked on mobile, side-by-side on desktop */}
+                                <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                                  <div className="p-2 bg-green-500/10 rounded">
+                                    <div className="text-lg sm:text-2xl font-bold text-green-400">{student.videosWatched}</div>
+                                    <div className="text-xs text-white/70">Watched</div>
+                                  </div>
+                                  <div className="p-2 bg-blue-500/10 rounded">
+                                    <div className="text-lg sm:text-2xl font-bold text-blue-400">{student.videosCompleted}</div>
+                                    <div className="text-xs text-white/70">Complete</div>
+                                  </div>
+                                  <div className="p-2 bg-orange-500/10 rounded">
+                                    <div className="text-lg sm:text-2xl font-bold text-orange-400">{student.videosNotWatched}</div>
+                                    <div className="text-xs text-white/70">Not Yet</div>
+                                  </div>
                                 </div>
-                                <div>
-                                  <div className="text-2xl font-bold text-blue-400">{student.videosCompleted}</div>
-                                  <div className="text-xs text-white/70">Completed</div>
+                                
+                                {/* Additional info */}
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-white/50">
+                                  <span>Watch time: {student.totalWatchTimeMinutes} min</span>
+                                  {student.lastVideoActivity && (
+                                    <span className="hidden sm:inline">•</span>
+                                  )}
+                                  {student.lastVideoActivity && (
+                                    <span>Last: {new Date(student.lastVideoActivity).toLocaleDateString()}</span>
+                                  )}
                                 </div>
-                                <div>
-                                  <div className="text-2xl font-bold text-orange-400">{student.videosNotWatched}</div>
-                                  <div className="text-xs text-white/70">Not Watched</div>
-                                </div>
-                              </div>
-                              <div className="mt-2 text-xs text-white/50">
-                                Total watch time: {student.totalWatchTimeMinutes} minutes
-                              </div>
-                              {student.lastVideoActivity && (
-                                <div className="mt-1 text-xs text-white/50">
-                                  Last activity: {new Date(student.lastVideoActivity).toLocaleDateString()}
-                                </div>
-                              )}
-                            </div>
                               </div>
                             </div>
                           </div>
@@ -562,7 +583,7 @@ export default function Phase1Insights() {
 
                         {/* Expanded Details */}
                         {expandedStudent === student.id && (
-                          <div className="p-4 bg-black/20 border-t border-white/10">
+                          <div className="p-3 sm:p-4 bg-black/20 border-t border-white/10">
                             {/* Watched Videos */}
                             {student.watchedVideos && student.watchedVideos.length > 0 && (
                               <div className="mb-6">
@@ -640,29 +661,29 @@ export default function Phase1Insights() {
             </TabsContent>
 
             {/* Completions Tab */}
-            <TabsContent value="completions" className="space-y-6">
+            <TabsContent value="completions" className="space-y-4 sm:space-y-6">
               <Card className="bg-black/30 border-white/10">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <GraduationCap className="h-5 w-5" />
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                    <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5" />
                     Module Completions
                   </CardTitle>
-                  <CardDescription className="text-white/60">
+                  <CardDescription className="text-white/60 text-sm">
                     Students who completed entire modules
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="space-y-4 sm:space-y-6">
                     {completions.map((module) => (
-                      <div key={module.moduleId} className="p-6 bg-white/5 rounded-lg border border-white/10">
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <h3 className="text-lg font-bold">{module.moduleName}</h3>
-                            <p className="text-sm text-white/60">{module.trainingName}</p>
+                      <div key={module.moduleId} className="p-4 sm:p-6 bg-white/5 rounded-lg border border-white/10">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-0 mb-4">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-base sm:text-lg font-bold truncate">{module.moduleName}</h3>
+                            <p className="text-xs sm:text-sm text-white/60 truncate">{module.trainingName}</p>
                           </div>
-                          <div className="text-right">
-                            <div className="text-3xl font-bold text-green-400">{module.studentsCompleted}</div>
-                            <div className="text-sm text-white/70">Completed</div>
+                          <div className="text-left sm:text-right">
+                            <div className="text-2xl sm:text-3xl font-bold text-green-400">{module.studentsCompleted}</div>
+                            <div className="text-xs sm:text-sm text-white/70">Completed</div>
                           </div>
                         </div>
                         
