@@ -474,7 +474,8 @@ export default function CourseDetailPage() {
                                   
                                   if (response.ok) {
                                     const data = await response.json()
-                                    
+                                    // Update local state so UI reflects progress immediately
+                                    setCourseProgress(data)
                                   } else {
                                     const errorText = await response.text()
                                     console.error("❌ Error saving progress:", {
@@ -547,9 +548,7 @@ export default function CourseDetailPage() {
                         <span className="hidden xs:inline">I Finished Watching This Video</span><span className="xs:hidden">Finished Watching</span>
                       </Button>
                       {(courseProgress?.completionPercentage || 0) < 90 && (
-                        <p className="text-xs sm:text-sm text-center text-gray-500 mt-2">
-                          Watch at least 90% of the video to mark it as complete (Currently: {Math.round(courseProgress?.completionPercentage || 0)}%)
-                        </p>
+                        
                       )}
                     </div>
                     
