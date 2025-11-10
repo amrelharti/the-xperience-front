@@ -165,16 +165,16 @@ export default function CourseDetailPage() {
     }
     
     try {
-      console.log("📊 Loading progress for course:", courseId, "class:", classId)
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}/progress?classId=${classId}`, {
         credentials: "include"
       })
       
-      console.log("📊 Progress response status:", response.status)
+      
       
       if (response.ok) {
         const data = await response.json()
-        console.log("📊 Progress data received:", data)
+        
         setCourseProgress(data)
       } else {
         console.error("❌ Failed to load progress:", response.status)
@@ -196,20 +196,19 @@ export default function CourseDetailPage() {
     }
     
     try {
-      console.log("✅ Marking course as completed:", courseId, "class:", classId)
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}/complete?classId=${classId}`, {
         method: "POST",
         credentials: "include"
       })
       
-      console.log("✅ Complete response status:", response.status)
+      
       
       if (response.ok) {
         const responseData = await response.json()
-        console.log("✅ Completion response data:", responseData)
         
-        // Reload progress from the API to get the correct state
-        console.log("🔄 Reloading progress after completion...")
+        
+  
         await loadCourseProgress()
         
         toast({
@@ -261,31 +260,27 @@ export default function CourseDetailPage() {
   // Sync classId from URL params
   useEffect(() => {
     const urlClassId = searchParams.get('class')
-    console.log("🔍 URL classId:", urlClassId)
+    
     
     if (urlClassId) {
       setClassId(urlClassId)
     } else if (user) {
-      // Try to get classId from user enrollments
-      console.log("🔍 No classId in URL, fetching from my-classes...")
+      
       fetch('/api/classes/my-classes')
         .then(res => res.json())
         .then(classesData => {
-          console.log("🔍 Full my-classes data:", JSON.stringify(classesData, null, 2))
+          
           
           if (classesData && classesData.length > 0) {
-            console.log("📋 Found classes:", classesData)
             
             // Find class for this training
             const matchingClasses = classesData.filter((c: any) => {
-              console.log("🔍 Checking class:", c)
+             
               // Check if the class belongs to this training (moduleId matches trainingId)
               const matches = c.moduleId === trainingId
-              console.log(`  - moduleId: ${c.moduleId}, trainingId: ${trainingId}, matches: ${matches}`)
               return matches
             })
             
-            console.log(`📊 Found ${matchingClasses.length} matching classes`)
             
             // Prefer active classes over archived ones
             let trainingClass = matchingClasses.find((c: any) => c.isActive && !c.isArchived)
@@ -296,15 +291,12 @@ export default function CourseDetailPage() {
             
             if (trainingClass) {
               const foundClassId = trainingClass.id
-              console.log("✅ Found classId from my-classes:", foundClassId)
               if (foundClassId) {
                 setClassId(foundClassId)
               }
             } else {
-              console.log("⚠️ No class found for training:", trainingId)
             }
           } else {
-            console.log("⚠️ No classes found in my-classes data")
           }
         })
         .catch(err => console.error("❌ Error fetching my-classes:", err))
@@ -318,7 +310,6 @@ export default function CourseDetailPage() {
   }, [user, courseId, loadData])
 
   useEffect(() => {
-    console.log("🔍 Current classId state:", classId)
     if (classId && courseId) {
       loadCourseProgress()
     }
@@ -471,7 +462,6 @@ export default function CourseDetailPage() {
                                     ? Math.min((roundedSeconds / course.durationSeconds) * 100, 100)
                                     : 0.0
                                   
-                                  console.log(`📊 Saving progress at ${roundedSeconds}s:`, {
                                     courseId,
                                     classId,
                                     playTimeSeconds: roundedSeconds,
@@ -559,10 +549,16 @@ export default function CourseDetailPage() {
                         onClick={() => setShowConfirmDialog(true)}
                         variant="default"
                         size="default"
-                        className="w-full bg-gradient-to-r from-[#0476D7] to-[#0068A7] hover:from-[#0068A7] hover:to-[#005eb8] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base py-5 sm:py-6"
+                        disabled={(courseProgress?.completionPercentage || 0) < 90}
+                        className="w-full bg-gradient-to-r from-[#0476D7] to-[#0068A7] hover:from-[#0068A7] hover:to-[#005eb8] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base py-5 sm:py-6 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <span className="hidden xs:inline">I Finished Watching This Video</span><span className="xs:hidden">Finished Watching</span>
                       </Button>
+                      {(courseProgress?.completionPercentage || 0) < 90 && (
+                        <p className="text-xs sm:text-sm text-center text-gray-500 mt-2">
+                          Watch at least 90% of the video to mark it as complete (Currently: {Math.round(courseProgress?.completionPercentage || 0)}%)
+                        </p>
+                      )}
                     </div>
                     
                     {/* Course Navigation */}
