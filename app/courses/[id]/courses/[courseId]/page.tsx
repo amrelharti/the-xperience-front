@@ -435,7 +435,6 @@ export default function CourseDetailPage() {
                             videoId={getVimeoVideoId(course.videoUrl) || ""}
                             title={course.title}
                             className="w-full h-full"
-                            onLoad={() => console.log("Vimeo video loaded")}
                             onError={(error) => console.error("Vimeo video error:", error)}
                             onEnded={() => {
                               

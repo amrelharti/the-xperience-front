@@ -45,7 +45,6 @@ export default function VimeoPlayer({
       if (e.key === 'Escape' && isPseudoFullscreen) {
         setIsPseudoFullscreen(false)
         document.body.style.overflow = ''
-        console.log('❌ Exited pseudo-fullscreen via Escape key')
       }
     }
 
@@ -96,14 +95,11 @@ export default function VimeoPlayer({
         try {
           const parsed = JSON.parse(data)
           if (parsed.event === 'ready') {
-            console.log('✅ Vimeo player is ready')
             setVimeoPlayerReady(true)
             
             // Subscribe to events after player is ready
             const iframe = iframeRef.current
             if (iframe && iframe.contentWindow) {
-              console.log('🔔 Subscribing to Vimeo events...')
-              
               // Subscribe to playProgress event
               iframe.contentWindow.postMessage(JSON.stringify({
                 method: 'addEventListener',
@@ -127,8 +123,6 @@ export default function VimeoPlayer({
                 method: 'addEventListener',
                 value: 'ended'
               }), 'https://player.vimeo.com')
-              
-              console.log('✅ Subscribed to Vimeo events')
             }
           }
         } catch (e) {
@@ -155,23 +149,19 @@ export default function VimeoPlayer({
     let lastKnownSecond = 0
     
     const handleMessage = (event: MessageEvent) => {
-      console.log("📬 Vimeo message received from:", event.origin, "data:", event.data)
       if (event.origin !== 'https://player.vimeo.com') return
       
       const data = event.data
       if (typeof data === 'string') {
         try {
           const parsed = JSON.parse(data)
-          console.log("📺 Parsed Vimeo event:", parsed.event)
           
           if (parsed.event === 'finish') {
-            console.log("✅ Video finished! Calling onEnded callback")
             if (!hasTriggeredEnded) {
               hasTriggeredEnded = true
               onEnded()
             }
           } else if (parsed.event === 'ended') {
-            console.log("🏁 Video ended! Calling onEnded callback")
             if (!hasTriggeredEnded) {
               hasTriggeredEnded = true
               onEnded()
@@ -181,14 +171,10 @@ export default function VimeoPlayer({
             const { seconds, duration, percent } = parsed.data
             videoDuration = duration || 0
             
-            console.log("📊 playProgress data:", parsed.data)
-            
             // Track play time
             if (seconds > lastKnownSecond) {
               playTimeAccumulated += (seconds - lastKnownSecond)
               lastKnownSecond = seconds
-              
-              console.log("⏱️ Updating play time:", playTimeAccumulated, "onPlayTimeUpdate exists:", !!onPlayTimeUpdate)
               
               // Notify parent of play time
               if (onPlayTimeUpdate) {
@@ -196,23 +182,16 @@ export default function VimeoPlayer({
               }
             }
             
-            console.log("▶️ Play progress:", { seconds, duration, playTime: playTimeAccumulated })
-            
             // If we're within 2 seconds of the end OR at 95%+, consider it finished
             if (duration > 0) {
               const secondsRemaining = duration - seconds
               const hasReachedEnd = secondsRemaining <= 2 || percent >= 0.95
               
               if (hasReachedEnd && !hasTriggeredEnded) {
-                console.log("⏰ Video reached end! Calling onEnded callback", { seconds, duration, percent, secondsRemaining })
                 hasTriggeredEnded = true
                 onEnded()
               }
             }
-          } else if (parsed.event === 'pause') {
-            console.log("⏸️ Video paused")
-          } else if (parsed.event === 'play') {
-            console.log("▶️ Video playing")
           }
         } catch (e) {
           // Ignore non-JSON messages
@@ -516,12 +495,9 @@ export default function VimeoPlayer({
           // Detect iOS devices
           const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
           const isAndroid = /Android/i.test(navigator.userAgent)
-          
-          console.log('🔍 Device detected:', { isIOS, isAndroid })
 
           // iOS Solution: Use pseudo-fullscreen (CSS-based)
           if (isIOS) {
-            console.log('📱 iOS detected - using pseudo-fullscreen mode')
             setIsPseudoFullscreen(true)
             // Lock body scroll
             document.body.style.overflow = 'hidden'
@@ -529,37 +505,28 @@ export default function VimeoPlayer({
           }
 
           // Android and Desktop: Try native fullscreen API
-          console.log('🔍 Attempting native fullscreen...')
-          
           try {
             // Try standard fullscreen API
             if (container.requestFullscreen) {
               await container.requestFullscreen()
-              console.log('✅ Container fullscreen activated (standard)')
             } 
             // Try webkit (Safari, Chrome)
             else if ((container as any).webkitRequestFullscreen) {
               await (container as any).webkitRequestFullscreen()
-              console.log('✅ Container fullscreen activated (webkit)')
             }
             // Try Firefox
             else if ((container as any).mozRequestFullScreen) {
               await (container as any).mozRequestFullScreen()
-              console.log('✅ Container fullscreen activated (moz)')
             }
             // Try IE/Edge
             else if ((container as any).msRequestFullscreen) {
               await (container as any).msRequestFullscreen()
-              console.log('✅ Container fullscreen activated (ms)')
             }
             else {
-              console.log('❌ No fullscreen API available - using pseudo-fullscreen')
               setIsPseudoFullscreen(true)
               document.body.style.overflow = 'hidden'
             }
           } catch (error) {
-            console.error('❌ Native fullscreen failed:', error)
-            console.log('🔄 Falling back to pseudo-fullscreen')
             setIsPseudoFullscreen(true)
             document.body.style.overflow = 'hidden'
           }
@@ -579,7 +546,6 @@ export default function VimeoPlayer({
           onClick={() => {
             setIsPseudoFullscreen(false)
             document.body.style.overflow = ''
-            console.log('❌ Exited pseudo-fullscreen mode')
           }}
           className="absolute bg-black bg-opacity-70 text-white p-2 sm:p-3 rounded-lg hover:bg-gray-800 active:bg-gray-700 transition-all z-[2147483648] top-4 right-4 touch-manipulation"
           title="Exit Fullscreen"
