@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -70,6 +70,9 @@ export default function CourseDetailPage() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [allCourses, setAllCourses] = useState<Course[]>([])
   const [currentCourseIndex, setCurrentCourseIndex] = useState(-1)
+  
+  // Track last saved time to prevent duplicates
+  const lastSavedTimeRef = useRef(0)
 
   // Function to convert YouTube URL to embed URL
   const getYouTubeEmbedUrl = (url: string) => {
@@ -450,16 +453,19 @@ export default function CourseDetailPage() {
                             onPlayTimeUpdate={async (playTimeSeconds) => {
                               console.log(`⏱️ Watch time update: ${playTimeSeconds} seconds`)
                               
-                              // Save watch time to backend every 10 seconds
-                              // Check if we've crossed a 10-second threshold
-                              const currentThreshold = Math.floor(playTimeSeconds / 10)
-                              const previousThreshold = Math.floor((playTimeSeconds - 0.5) / 10)
+                              // Round to nearest second for comparison
+                              const roundedSeconds = Math.floor(playTimeSeconds)
                               
-                              // Only save when we cross a 10-second mark (10, 20, 30, etc.)
-                              if (currentThreshold > previousThreshold && playTimeSeconds >= 10 && classId) {
+                              // Only save every 10 seconds AND prevent duplicate saves
+                              if (roundedSeconds >= 10 && 
+                                  roundedSeconds % 10 === 0 && 
+                                  roundedSeconds !== lastSavedTimeRef.current && 
+                                  classId) {
+                                
+                                // Mark this time as saved to prevent duplicates
+                                lastSavedTimeRef.current = roundedSeconds
+                                
                                 try {
-                                  const roundedSeconds = Math.floor(playTimeSeconds)
-                                  
                                   // Calculate completion percentage (watchTime / videoDuration * 100)
                                   const completionPercentage = course?.durationSeconds 
                                     ? Math.min((roundedSeconds / course.durationSeconds) * 100, 100)
@@ -480,20 +486,13 @@ export default function CourseDetailPage() {
                                     body: JSON.stringify({
                                       classId: classId,
                                       watchTimeSeconds: roundedSeconds,
-                                      completionPercentage: Math.round(completionPercentage * 10) / 10  // Round to 1 decimal
+                                      completionPercentage: Math.round(completionPercentage * 10) / 10
                                     })
                                   })
                                   
                                   if (response.ok) {
                                     const data = await response.json()
-                                    console.log(`✅ Progress saved successfully at ${roundedSeconds}s:`, data)
-                                    // Update local state
-                                    setCourseProgress(prev => prev ? { 
-                                      ...prev, 
-                                      watchTimeSeconds: roundedSeconds,
-                                      completionPercentage: completionPercentage,
-                                      status: data.status || prev.status
-                                    } : null)
+                                    console.log(`✅ Progress saved to database at ${roundedSeconds}s:`, data)
                                   } else {
                                     const errorText = await response.text()
                                     console.error("❌ Error saving progress:", {
