@@ -547,9 +547,6 @@ export default function CourseDetailPage() {
                       >
                         <span className="hidden xs:inline">I Finished Watching This Video</span><span className="xs:hidden">Finished Watching</span>
                       </Button>
-                      {(courseProgress?.completionPercentage || 0) < 90 && (
-                        
-                      )}
                     </div>
                     
                     {/* Course Navigation */}
