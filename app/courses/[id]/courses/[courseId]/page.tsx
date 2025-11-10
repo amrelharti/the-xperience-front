@@ -451,17 +451,24 @@ export default function CourseDetailPage() {
                               console.log(`⏱️ Watch time update: ${playTimeSeconds} seconds`)
                               
                               // Save watch time to backend every 10 seconds
-                              if (playTimeSeconds % 10 === 0 && playTimeSeconds > 0 && classId) {
+                              // Check if we've crossed a 10-second threshold
+                              const currentThreshold = Math.floor(playTimeSeconds / 10)
+                              const previousThreshold = Math.floor((playTimeSeconds - 0.5) / 10)
+                              
+                              // Only save when we cross a 10-second mark (10, 20, 30, etc.)
+                              if (currentThreshold > previousThreshold && playTimeSeconds >= 10 && classId) {
                                 try {
+                                  const roundedSeconds = Math.floor(playTimeSeconds)
+                                  
                                   // Calculate completion percentage (watchTime / videoDuration * 100)
                                   const completionPercentage = course?.durationSeconds 
-                                    ? Math.min((playTimeSeconds / course.durationSeconds) * 100, 100)
+                                    ? Math.min((roundedSeconds / course.durationSeconds) * 100, 100)
                                     : 0.0
                                   
-                                  console.log(`📊 Saving progress:`, {
+                                  console.log(`📊 Saving progress at ${roundedSeconds}s:`, {
                                     courseId,
                                     classId,
-                                    playTimeSeconds,
+                                    playTimeSeconds: roundedSeconds,
                                     completionPercentage: completionPercentage.toFixed(1),
                                     videoDuration: course?.durationSeconds
                                   })
@@ -472,18 +479,18 @@ export default function CourseDetailPage() {
                                     credentials: 'include',
                                     body: JSON.stringify({
                                       classId: classId,
-                                      watchTimeSeconds: Math.round(playTimeSeconds),
+                                      watchTimeSeconds: roundedSeconds,
                                       completionPercentage: Math.round(completionPercentage * 10) / 10  // Round to 1 decimal
                                     })
                                   })
                                   
                                   if (response.ok) {
                                     const data = await response.json()
-                                    console.log(`✅ Progress saved successfully:`, data)
+                                    console.log(`✅ Progress saved successfully at ${roundedSeconds}s:`, data)
                                     // Update local state
                                     setCourseProgress(prev => prev ? { 
                                       ...prev, 
-                                      watchTimeSeconds: playTimeSeconds,
+                                      watchTimeSeconds: roundedSeconds,
                                       completionPercentage: completionPercentage,
                                       status: data.status || prev.status
                                     } : null)
@@ -498,7 +505,7 @@ export default function CourseDetailPage() {
                                 } catch (error) {
                                   console.error("❌ Exception saving watch time:", error)
                                 }
-                              } else if (!classId) {
+                              } else if (!classId && playTimeSeconds >= 10) {
                                 console.warn("⚠️ Cannot save progress: classId is missing")
                               }
                             }}
