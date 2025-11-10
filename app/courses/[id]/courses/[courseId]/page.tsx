@@ -449,6 +449,7 @@ export default function CourseDetailPage() {
                             }}
                             onPlayTimeUpdate={async (playTimeSeconds) => {
                               console.log(`⏱️ Watch time update: ${playTimeSeconds} seconds`)
+                              
                               // Save watch time to backend every 10 seconds
                               if (playTimeSeconds % 10 === 0 && playTimeSeconds > 0 && classId) {
                                 try {
@@ -457,7 +458,13 @@ export default function CourseDetailPage() {
                                     ? Math.min((playTimeSeconds / course.durationSeconds) * 100, 100)
                                     : 0.0
                                   
-                                  console.log(`📊 Completion: ${completionPercentage.toFixed(1)}% (${playTimeSeconds}s / ${course?.durationSeconds || 0}s)`)
+                                  console.log(`📊 Saving progress:`, {
+                                    courseId,
+                                    classId,
+                                    playTimeSeconds,
+                                    completionPercentage: completionPercentage.toFixed(1),
+                                    videoDuration: course?.durationSeconds
+                                  })
                                   
                                   const response = await fetch(`/api/courses/${courseId}/progress`, {
                                     method: 'PUT',
@@ -472,7 +479,7 @@ export default function CourseDetailPage() {
                                   
                                   if (response.ok) {
                                     const data = await response.json()
-                                    console.log(`✅ Watch time saved: ${playTimeSeconds}s, completion: ${completionPercentage.toFixed(1)}%`)
+                                    console.log(`✅ Progress saved successfully:`, data)
                                     // Update local state
                                     setCourseProgress(prev => prev ? { 
                                       ...prev, 
@@ -481,12 +488,18 @@ export default function CourseDetailPage() {
                                       status: data.status || prev.status
                                     } : null)
                                   } else {
-                                    const errorData = await response.json()
-                                    console.error("❌ Error response:", errorData)
+                                    const errorText = await response.text()
+                                    console.error("❌ Error saving progress:", {
+                                      status: response.status,
+                                      statusText: response.statusText,
+                                      body: errorText
+                                    })
                                   }
                                 } catch (error) {
-                                  console.error("❌ Error saving watch time:", error)
+                                  console.error("❌ Exception saving watch time:", error)
                                 }
+                              } else if (!classId) {
+                                console.warn("⚠️ Cannot save progress: classId is missing")
                               }
                             }}
                           />

@@ -156,21 +156,23 @@ export default function StudentAnalysisHub() {
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <header className="bg-white border-b sticky top-0 z-50 shadow-sm">
-          <div className="container mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Link href="/admin" className="text-2xl font-bold text-gray-900">
-                  Student Analysis Hub
+          <div className="container mx-auto px-3 sm:px-6 py-3 sm:py-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex-1 min-w-0">
+                <Link href="/admin" className="text-lg sm:text-2xl font-bold text-gray-900 block truncate">
+                  <span className="hidden sm:inline">Student Analysis Hub</span>
+                  <span className="sm:hidden">Students</span>
                 </Link>
-                <p className="text-sm text-muted-foreground mt-1">Complete 360° view of each student</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1 hidden sm:block">Complete 360° view of each student</p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <Button
                   onClick={loadData}
                   variant="outline"
+                  size="sm"
                 >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Refresh
+                  <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Refresh</span>
                 </Button>
                 <UserDropdown user={user} />
               </div>
@@ -178,76 +180,78 @@ export default function StudentAnalysisHub() {
           </div>
         </header>
 
-        <main className="container mx-auto px-6 py-8">
+        <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-8">
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mb-4 sm:mb-6">
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Total Students
+              <CardHeader className="pb-2 p-3 sm:p-4">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1 sm:gap-2">
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Total Students</span>
+                  <span className="sm:hidden">Total</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{summary.totalStudents || 0}</div>
+              <CardContent className="p-3 sm:p-4 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold">{summary.totalStudents || 0}</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Active (7d)
+              <CardHeader className="pb-2 p-3 sm:p-4">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1 sm:gap-2">
+                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                  Active
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-green-600">{summary.activeStudents || 0}</div>
+              <CardContent className="p-3 sm:p-4 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold text-green-600">{summary.activeStudents || 0}</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
+              <CardHeader className="pb-2 p-3 sm:p-4">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1 sm:gap-2">
+                  <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4" />
                   Inactive
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-orange-600">{summary.inactiveStudents || 0}</div>
+              <CardContent className="p-3 sm:p-4 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold text-orange-600">{summary.inactiveStudents || 0}</div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Trophy className="h-4 w-4" />
-                  High Performers
+            <Card className="col-span-2 sm:col-span-1">
+              <CardHeader className="pb-2 p-3 sm:p-4">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1 sm:gap-2">
+                  <Trophy className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">High Performers</span>
+                  <span className="sm:hidden">Top</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-yellow-600">{summary.highPerformers || 0}</div>
-                <p className="text-xs text-muted-foreground mt-1">Avg score ≥4.0</p>
+              <CardContent className="p-3 sm:p-4 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold text-yellow-600">{summary.highPerformers || 0}</div>
+                <p className="text-xs text-muted-foreground mt-1">Avg ≥4.0</p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
+            <Card className="hidden sm:block">
+              <CardHeader className="pb-2 p-3 sm:p-4">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-1 sm:gap-2">
+                  <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4" />
                   Needs Help
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-red-600">{summary.needsHelp || 0}</div>
-                <p className="text-xs text-muted-foreground mt-1">Avg score &lt;3.0</p>
+              <CardContent className="p-3 sm:p-4 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold text-red-600">{summary.needsHelp || 0}</div>
+                <p className="text-xs text-muted-foreground mt-1">Avg &lt;3.0</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Filters & Search */}
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="mb-4 sm:mb-6">
+            <CardContent className="p-4 sm:p-6 pt-4 sm:pt-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 <div>
                   <label className="text-sm text-muted-foreground mb-2 block">Search Student</label>
                   <div className="relative">
@@ -315,56 +319,58 @@ export default function StudentAnalysisHub() {
           <div className="space-y-4">
             {filteredStudents.map((student, index) => (
               <Card key={student.id} className="hover:shadow-lg transition-all">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   {/* Student Header */}
                   <div 
                     className="cursor-pointer"
                     onClick={() => toggleExpand(student.id)}
                   >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xl font-bold">
+                    <div className="flex flex-col gap-4 mb-4">
+                      {/* Student Info - Mobile Stacked, Desktop Side-by-side */}
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-lg sm:text-xl font-bold flex-shrink-0">
                           {student.name.charAt(0)}
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-1">
-                            <h3 className="text-xl font-bold">{student.name}</h3>
-                                {expandedStudent === student.id ? (
-                              <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-base sm:text-xl font-bold truncate">{student.name}</h3>
+                            {expandedStudent === student.id ? (
+                              <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0" />
                             ) : (
-                              <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                              <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0" />
                             )}
                           </div>
-                          <p className="text-sm text-muted-foreground">{student.email}</p>
-                          <div className="flex items-center gap-3 mt-2">
+                          <p className="text-xs sm:text-sm text-muted-foreground truncate">{student.email}</p>
+                          <div className="flex flex-wrap items-center gap-2 mt-2">
                             {student.enrollments?.map((enrollment: any) => (
-                              <Badge key={enrollment.classId} variant="outline" className="border-blue-500 text-blue-700">
+                              <Badge key={enrollment.classId} variant="outline" className="border-blue-500 text-blue-700 text-xs">
                                 <School className="h-3 w-3 mr-1" />
-                                {enrollment.className}
+                                <span className="hidden sm:inline">{enrollment.className}</span>
+                                <span className="sm:hidden">{enrollment.className.substring(0, 15)}{enrollment.className.length > 15 ? '...' : ''}</span>
                               </Badge>
                             ))}
                           </div>
                         </div>
                       </div>
 
-                      {/* Quick Stats */}
-                      <div className="grid grid-cols-4 gap-6 text-center">
-                        <div>
-                          <div className="text-3xl font-bold text-yellow-600">#{student.globalRank}</div>
+                      {/* Quick Stats - Responsive Grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 text-center">
+                        <div className="p-2 sm:p-0">
+                          <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-600">#{student.globalRank}</div>
                           <div className="text-xs text-muted-foreground">Rank</div>
                         </div>
-                        <div>
-                          <div className="text-3xl font-bold text-purple-600">{student.leaderboardStats?.totalPoints || 0}</div>
+                        <div className="p-2 sm:p-0">
+                          <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-600">{student.leaderboardStats?.totalPoints || 0}</div>
                           <div className="text-xs text-muted-foreground">Points</div>
                         </div>
-                        <div>
-                          <div className={`text-3xl font-bold ${getStatusColor((student.videoStatistics?.completed / student.videoStatistics?.total * 100) || 0).replace('text-', 'text-').replace('-400', '-600')}`}>
+                        <div className="p-2 sm:p-0">
+                          <div className={`text-xl sm:text-2xl lg:text-3xl font-bold ${getStatusColor((student.videoStatistics?.completed / student.videoStatistics?.total * 100) || 0).replace('text-', 'text-').replace('-400', '-600')}`}>
                             {student.videoStatistics?.completed || 0}/{student.videoStatistics?.total || 0}
                           </div>
                           <div className="text-xs text-muted-foreground">Videos</div>
                         </div>
-                        <div>
-                          <div className="text-3xl font-bold text-blue-600">
+                        <div className="p-2 sm:p-0">
+                          <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-600">
                             {student.leaderboardStats?.averageScore || 0}
                           </div>
                           <div className="text-xs text-muted-foreground">Avg Score</div>

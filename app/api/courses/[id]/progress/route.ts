@@ -9,9 +9,16 @@ export async function PUT(
     const body = await request.json()
     const { classId, watchTimeSeconds, completionPercentage } = body
 
-    console.log(`📊 Updating progress for course ${courseId}:`, { classId, watchTimeSeconds, completionPercentage })
+    console.log(`📊 [API Route] Received progress update:`, {
+      courseId,
+      classId,
+      watchTimeSeconds,
+      completionPercentage,
+      timestamp: new Date().toISOString()
+    })
 
     if (!classId) {
+      console.error("❌ [API Route] Missing classId")
       return NextResponse.json(
         { error: "classId is required" },
         { status: 400 }
@@ -22,6 +29,8 @@ export async function PUT(
     // Backend expects: PUT /api/courses/{courseId}/progress?classId={classId}
     // Body: { watchTimeSeconds, completionPercentage }
     const backendUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/courses/${courseId}/progress?classId=${classId}`
+    
+    console.log(`🔄 [API Route] Forwarding to backend:`, backendUrl)
     
     const response = await fetch(backendUrl, {
       method: "PUT",
@@ -36,23 +45,36 @@ export async function PUT(
       }),
     })
 
+    console.log(`📥 [API Route] Backend response:`, {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok
+    })
+
     if (!response.ok) {
       const errorText = await response.text()
-      console.error("❌ Backend error updating progress:", errorText)
+      console.error("❌ [API Route] Backend error:", {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText
+      })
       return NextResponse.json(
-        { error: "Failed to update progress" },
+        { error: "Failed to update progress", details: errorText },
         { status: response.status }
       )
     }
 
     const data = await response.json()
-    console.log("✅ Progress updated successfully:", data)
+    console.log("✅ [API Route] Progress updated successfully:", data)
     
     return NextResponse.json(data)
-  } catch (error) {
-    console.error("❌ Error updating course progress:", error)
+  } catch (error: any) {
+    console.error("❌ [API Route] Exception:", {
+      message: error?.message,
+      stack: error?.stack
+    })
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", details: error?.message },
       { status: 500 }
     )
   }
