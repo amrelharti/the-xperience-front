@@ -462,13 +462,6 @@ export default function CourseDetailPage() {
                                     ? Math.min((roundedSeconds / course.durationSeconds) * 100, 100)
                                     : 0.0
                                   
-                                    courseId,
-                                    classId,
-                                    playTimeSeconds: roundedSeconds,
-                                    completionPercentage: completionPercentage.toFixed(1),
-                                    videoDuration: course?.durationSeconds
-                                  })
-                                  
                                   const response = await fetch(`/api/courses/${courseId}/progress`, {
                                     method: 'PUT',
                                     headers: { 'Content-Type': 'application/json' },
