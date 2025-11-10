@@ -447,11 +447,11 @@ export default function CourseDetailPage() {
                             onLoad={() => console.log("Vimeo video loaded")}
                             onError={(error) => console.error("Vimeo video error:", error)}
                             onEnded={() => {
-                              console.log("🎬 Video ended - marking as complete")
+                              
                               setShowConfirmDialog(true)
                             }}
                             onPlayTimeUpdate={async (playTimeSeconds) => {
-                              console.log(`⏱️ Watch time update: ${playTimeSeconds} seconds`)
+                              
                               
                               // Round to nearest second for comparison
                               const roundedSeconds = Math.floor(playTimeSeconds)
@@ -492,7 +492,7 @@ export default function CourseDetailPage() {
                                   
                                   if (response.ok) {
                                     const data = await response.json()
-                                    console.log(`✅ Progress saved to database at ${roundedSeconds}s:`, data)
+                                    
                                   } else {
                                     const errorText = await response.text()
                                     console.error("❌ Error saving progress:", {

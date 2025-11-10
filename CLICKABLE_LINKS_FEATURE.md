@@ -21,9 +21,10 @@ Clickable links have:
 
 ## Where It's Applied
 
-✅ **Feed Page** (`/feed`) - Post content preview  
-✅ **Post Detail Page** (`/feed/posts/[id]`) - Full post content  
+✅ **Feed Page** (`/feed`) - Post content preview and attachments  
+✅ **Post Detail Page** (`/feed/posts/[id]`) - Full post content and attachments  
 ✅ **Comments Section** - All comment text  
+✅ **Admin Feed Page** (`/admin/feed`) - Post content and attachments for admins  
 
 ## Examples
 
@@ -47,11 +48,18 @@ Also visit [www.example.com ↗](https://www.example.com) for more info
 2. **`app/feed/page.tsx`** (MODIFIED)
    - Added LinkifiedText import
    - Wrapped post.content with LinkifiedText component
+   - Wrapped post.attachments with LinkifiedText component
 
 3. **`app/feed/posts/[id]/page.tsx`** (MODIFIED)
    - Added LinkifiedText import
    - Wrapped post.content with LinkifiedText component
+   - Wrapped post.attachments with LinkifiedText component
    - Wrapped comment.content with LinkifiedText component
+
+4. **`app/admin/feed/page.tsx`** (MODIFIED)
+   - Added LinkifiedText import
+   - Wrapped post.content with LinkifiedText component
+   - Wrapped post.attachments with LinkifiedText component
 
 ## User Instructions
 

@@ -28,6 +28,7 @@ import { useUser } from "../../hooks/useUser"
 import UserDropdown from "../../components/UserDropdown"
 import RequireAuth from "../../components/RequireAuth"
 import { useToast } from "@/hooks/use-toast"
+import { LinkifiedText } from "@/app/utils/linkify"
 
 interface Post {
   id: string
@@ -622,7 +623,9 @@ export default function AdminFeedPage() {
                       {post.title && (
                         <h1 className="text-xl font-semibold mb-3 text-slate-800">{post.title}</h1>
                       )}
-                      <p className="text-slate-700 mb-6 whitespace-pre-wrap text-base leading-relaxed">{post.content}</p>
+                      <p className="text-slate-700 mb-6 whitespace-pre-wrap text-base leading-relaxed">
+                        <LinkifiedText text={post.content} />
+                      </p>
                       
                       {post.attachments && (
                         <div className="mb-6">
@@ -643,8 +646,8 @@ export default function AdminFeedPage() {
                               />
                             </div>
                           ) : (
-                            <div className="p-4 bg-slate-50 rounded-xl border-2 border-slate-200">
-                              <p className="text-sm text-slate-600">{post.attachments}</p>
+                            <div className="attachment-content p-4 bg-slate-50 rounded-xl border-2 border-slate-200">
+                              <LinkifiedText text={post.attachments} className="text-sm text-slate-600" />
                             </div>
                           )}
                         </div>
