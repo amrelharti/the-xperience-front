@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   description: "Premium learning platform with structured courses and progress tracking",
   generator: "v0.app",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.png",
     apple: "/apple-icon.png",
   },
 }
