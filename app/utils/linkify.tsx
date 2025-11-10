@@ -12,7 +12,8 @@ export function linkifyText(text: string): React.ReactNode {
 
   // Regular expression to match URLs
   // Matches http://, https://, www. URLs, and data: URIs
-  const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(data:[^\s]+)/gi;
+  // For data URIs, match everything including the base64 content (A-Za-z0-9+/=)
+  const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(data:[^,\s]+(?:;base64)?,[A-Za-z0-9+/=]+)/gi;
 
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
