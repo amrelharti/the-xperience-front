@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -351,77 +351,66 @@ export default function CourseDetailPage() {
   const isLocked = course.status === "LOCKED"
   const durationMinutes = Math.round(course.durationSeconds / 60)
 
-  // Memoize the VimeoPlayer to prevent unnecessary re-renders
-  const vimeoPlayer = useMemo(() => {
-    if (!course.videoUrl || !isVimeoUrl(course.videoUrl)) return null
+  // Memoize the video handlers to prevent video restarts
+  const handleVideoEnded = useCallback(() => {
+    setShowConfirmDialog(true)
+  }, [])
+
+  const handlePlayTimeUpdate = useCallback(async (playTimeSeconds: number) => {
+    // Round to nearest second for comparison
+    const roundedSeconds = Math.floor(playTimeSeconds)
     
-    return (
-      <VimeoPlayer
-        videoId={getVimeoVideoId(course.videoUrl) || ""}
-        title={course.title}
-        className="w-full h-full"
-        onError={(error) => console.error("Vimeo video error:", error)}
-        onEnded={() => {
-          setShowConfirmDialog(true)
-        }}
-        onPlayTimeUpdate={async (playTimeSeconds) => {
-          // Round to nearest second for comparison
-          const roundedSeconds = Math.floor(playTimeSeconds)
-          
-          // Only save every 10 seconds AND prevent duplicate saves
-          if (roundedSeconds >= 10 && 
-              roundedSeconds % 10 === 0 && 
-              roundedSeconds !== lastSavedTimeRef.current && 
-              classId) {
-            
-            // Mark this time as saved to prevent duplicates
-            lastSavedTimeRef.current = roundedSeconds
-            
-            try {
-              // Calculate completion percentage (watchTime / videoDuration * 100)
-              const completionPercentage = course?.durationSeconds 
-                ? Math.min((roundedSeconds / course.durationSeconds) * 100, 100)
-                : 0.0
-              
-              const response = await fetch(`/api/courses/${courseId}/progress`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({
-                  classId: classId,
-                  watchTimeSeconds: roundedSeconds,
-                  completionPercentage: Math.round(completionPercentage * 10) / 10
-                })
-              })
-              
-              if (response.ok) {
-                const data = await response.json()
-                // Update local state so UI reflects progress immediately
-                // Use callback to avoid unnecessary re-renders
-                setCourseProgress(prevProgress => ({
-                  ...prevProgress,
-                  watchTimeSeconds: data.watchTimeSeconds,
-                  completionPercentage: data.completionPercentage,
-                  isStarted: data.isStarted || true
-                }))
-              } else {
-                const errorText = await response.text()
-                console.error("❌ Error saving progress:", {
-                  status: response.status,
-                  statusText: response.statusText,
-                  body: errorText
-                })
-              }
-            } catch (error) {
-              console.error("❌ Exception saving watch time:", error)
-            }
-          } else if (!classId && playTimeSeconds >= 10) {
-            console.warn("⚠️ Cannot save progress: classId is missing")
-          }
-        }}
-      />
-    )
-  }, [course.videoUrl, course.title, course.durationSeconds, courseId, classId])
+    // Only save every 10 seconds AND prevent duplicate saves
+    if (roundedSeconds >= 10 && 
+        roundedSeconds % 10 === 0 && 
+        roundedSeconds !== lastSavedTimeRef.current && 
+        classId) {
+      
+      // Mark this time as saved to prevent duplicates
+      lastSavedTimeRef.current = roundedSeconds
+      
+      try {
+        // Calculate completion percentage (watchTime / videoDuration * 100)
+        const completionPercentage = course?.durationSeconds 
+          ? Math.min((roundedSeconds / course.durationSeconds) * 100, 100)
+          : 0.0
+        
+        const response = await fetch(`/api/courses/${courseId}/progress`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            classId: classId,
+            watchTimeSeconds: roundedSeconds,
+            completionPercentage: Math.round(completionPercentage * 10) / 10
+          })
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          // Update local state so UI reflects progress immediately
+          // Use callback to avoid unnecessary re-renders
+          setCourseProgress(prevProgress => ({
+            ...prevProgress,
+            watchTimeSeconds: data.watchTimeSeconds,
+            completionPercentage: data.completionPercentage,
+            isStarted: data.isStarted || true
+          }))
+        } else {
+          const errorText = await response.text()
+          console.error("❌ Error saving progress:", {
+            status: response.status,
+            statusText: response.statusText,
+            body: errorText
+          })
+        }
+      } catch (error) {
+        console.error("❌ Exception saving watch time:", error)
+      }
+    } else if (!classId && playTimeSeconds >= 10) {
+      console.warn("⚠️ Cannot save progress: classId is missing")
+    }
+  }, [classId, courseId, course?.durationSeconds])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
@@ -503,7 +492,14 @@ export default function CourseDetailPage() {
                     {course.videoUrl ? (
                       <div className="aspect-video bg-black rounded-lg sm:rounded-xl overflow-hidden shadow-2xl">
                         {isVimeoUrl(course.videoUrl) ? (
-                          vimeoPlayer
+                          <VimeoPlayer
+                            videoId={getVimeoVideoId(course.videoUrl) || ""}
+                            title={course.title}
+                            className="w-full h-full"
+                            onError={(error) => console.error("Vimeo video error:", error)}
+                            onEnded={handleVideoEnded}
+                            onPlayTimeUpdate={handlePlayTimeUpdate}
+                          />
                         ) : course.videoUrl.includes('youtube.com') || course.videoUrl.includes('youtu.be') ? (
                           <iframe
                             src={getYouTubeEmbedUrl(course.videoUrl)}
