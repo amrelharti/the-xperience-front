@@ -86,7 +86,7 @@ export default function VimeoPlayer({
     }
   }, [user?.id, videoId, loadSignedUrl])
 
-  // Listen for Vimeo player ready event
+  // Listen for Vimeo player ready event and subscribe to events
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.origin !== 'https://player.vimeo.com') return
@@ -98,6 +98,38 @@ export default function VimeoPlayer({
           if (parsed.event === 'ready') {
             console.log('✅ Vimeo player is ready')
             setVimeoPlayerReady(true)
+            
+            // Subscribe to events after player is ready
+            const iframe = iframeRef.current
+            if (iframe && iframe.contentWindow) {
+              console.log('🔔 Subscribing to Vimeo events...')
+              
+              // Subscribe to playProgress event
+              iframe.contentWindow.postMessage(JSON.stringify({
+                method: 'addEventListener',
+                value: 'playProgress'
+              }), 'https://player.vimeo.com')
+              
+              // Subscribe to play event
+              iframe.contentWindow.postMessage(JSON.stringify({
+                method: 'addEventListener',
+                value: 'play'
+              }), 'https://player.vimeo.com')
+              
+              // Subscribe to pause event
+              iframe.contentWindow.postMessage(JSON.stringify({
+                method: 'addEventListener',
+                value: 'pause'
+              }), 'https://player.vimeo.com')
+              
+              // Subscribe to ended event
+              iframe.contentWindow.postMessage(JSON.stringify({
+                method: 'addEventListener',
+                value: 'ended'
+              }), 'https://player.vimeo.com')
+              
+              console.log('✅ Subscribed to Vimeo events')
+            }
           }
         } catch (e) {
           // Ignore non-JSON messages
