@@ -1,4 +1,4 @@
-"use client"
+/*"use client"
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
@@ -75,7 +75,7 @@ export default function CoursesPage() {
   return (
     <RequireAuth>
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Header *//*/}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
@@ -91,13 +91,13 @@ export default function CoursesPage() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Page Header */}
+        {/* Page Header *//*/}
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 font-[family-name:var(--font-space-grotesk)]">My Courses</h1>
           <p className="text-muted-foreground text-lg">Continue your learning journey</p>
         </div>
 
-        {/* Search and Filters */}
+        {/* Search and Filters */*/*}
         <div className="mb-8 flex flex-col md:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -140,7 +140,7 @@ export default function CoursesPage() {
           </div>
         </div>
 
-        {/* Courses Grid */}
+        {/* Courses Grid *//*}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course) => {
             const completed = course.progress?.completedModules || 0
@@ -228,3 +228,4 @@ export default function CoursesPage() {
     </RequireAuth>
   )
 }
+*/

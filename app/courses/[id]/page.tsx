@@ -86,7 +86,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       
       // If the saved class was selected by a different user, clear it
       if (savedClassId && savedUserId && savedUserId !== user.id) {
-        console.log("🧹 Clearing class selection from different user")
         localStorage.removeItem(storageKey)
         localStorage.removeItem(userKey)
       }
@@ -99,7 +98,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     try {
       // Get user's enrolled classes if classId not provided
       let selectedClassId = classId
-      console.log("📊 loadModuleProgress called with classId:", classId)
       if (!selectedClassId) {
         const enrollmentsResponse = await fetch("/api/classes/my-classes")
         if (enrollmentsResponse.ok) {
@@ -110,7 +108,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           )
           
           if (trainingClasses.length === 0) {
-            console.log("No classes found for this training")
             return
           } else if (trainingClasses.length === 1) {
             // Only one class - use it automatically
@@ -118,18 +115,15 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           } else {
             // Multiple classes - use the first one for now (class selector can be added later)
             selectedClassId = trainingClasses[0].id
-            console.log(`Multiple classes found for training, using: ${selectedClassId}`)
           }
         }
       }
 
       if (!selectedClassId) {
-        console.log("No class ID found for progress tracking")
         return
       }
 
       // Load progress for each module with class context
-      console.log("📊 Loading progress for classId:", selectedClassId)
       const progressPromises = trainingData.modules.map(async (module) => {
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${module.id}/training-progress?classId=${selectedClassId}`, {
@@ -137,17 +131,14 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           })
           if (response.ok) {
             const progressData = await response.json()
-            console.log(`📊 ${module.title} progress: ${progressData.progress || 0}% for class: ${selectedClassId}`)
             return { moduleId: module.id, progress: progressData.progress || 0 }
           }
         } catch (error) {
-          console.log(`Failed to load progress for module ${module.id}:`, error)
         }
         return { moduleId: module.id, progress: 0 }
       })
 
       const progressResults = await Promise.all(progressPromises)
-      console.log("📊 Progress results for all modules:", progressResults)
       
       // Update training with progress data
       setTraining(prevTraining => {
@@ -155,14 +146,12 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         
         const updatedModules = prevTraining.modules.map(module => {
           const progressData = progressResults.find(p => p.moduleId === module.id)
-          console.log(`📊 Updating ${module.title} progress to: ${progressData?.progress || 0}%`)
           return {
             ...module,
             progress: progressData?.progress || 0
           }
         })
         
-        console.log("📊 Updated modules with progress:", updatedModules.map(m => ({ title: m.title, progress: m.progress })))
         
         return {
           ...prevTraining,
@@ -170,25 +159,20 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         }
       })
     } catch (error) {
-      console.log("Error loading module progress:", error)
     }
   }, [user, params.id, selectedClassId])
 
   const loadAvailableClasses = useCallback(async () => {
     try {
       setLoadingClasses(true)
-      console.log("🔍 Loading available classes for training:", params.id)
       const response = await fetch(`/api/classes/module/${params.id}`)
       if (response.ok) {
         const newClasses = await response.json()
-        console.log("📚 Available classes from API:", newClasses)
         // Combine user's existing enrollments with new available classes
         setAvailableClasses(prevClasses => {
           const existingClassIds = prevClasses.map(c => c.id)
           const uniqueNewClasses = newClasses.filter((newClass: any) => !existingClassIds.includes(newClass.id))
-          console.log("🔄 Combining classes - existing:", prevClasses.length, "new:", uniqueNewClasses.length)
           const combined = [...prevClasses, ...uniqueNewClasses]
-          console.log("📋 Final combined classes:", combined)
           return combined
         })
         // Don't set showClassSelection here - let the caller decide
@@ -217,21 +201,17 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         if (savedClassId && savedUserId === user.id) {
           classIdToUse = savedClassId
           setSelectedClassId(savedClassId) // Update state immediately
-          console.log("📌 Using class from localStorage in load():", savedClassId)
         }
       }
       
       const classIdParam = classIdToUse ? `?classId=${classIdToUse}` : ''
-      console.log("🔄 Loading training with classId:", classIdToUse, "param:", classIdParam)
       const trainingResponse = await fetch(`/api/courses/${params.id}${classIdParam}`)
       if (!trainingResponse.ok) {
         throw new Error("Failed to load training")
       }
       const trainingData = await trainingResponse.json()
-      console.log("Training data from API:", trainingData)
-      console.log("📦 All module statuses for classId:", classIdToUse)
+     
       trainingData.modules?.forEach((module: any) => {
-        console.log(`  - ${module.title}: ${module.status}`)
       })
       setTraining(trainingData)
 
@@ -268,7 +248,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                 
               if (savedClass && savedClassId) {
                 // Student has a saved preference, use it (but we already loaded with it)
-                console.log("✅ Using saved class from localStorage:", savedClassId)
                 setIsEnrolled(true)
                 // Save the user ID who made this selection
                 localStorage.setItem(`classUser_${params.id}`, user.id)
@@ -279,7 +258,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                   const firstActiveClass = trainingEnrollments.find((c: any) => c.isActive && !c.isArchived)
                   const classToUse = firstActiveClass || trainingEnrollments[0]
                   
-                  console.log("🆕 Auto-selecting first available class:", classToUse.name)
                   setSelectedClassId(classToUse.id)
                   setIsEnrolled(true)
                   // Auto-save the selection so we don't ask again
@@ -293,7 +271,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
               } else if (trainingEnrollments.length === 1) {
                 // Only one class available, auto-select it
                 const singleClass = trainingEnrollments[0]
-                console.log("📌 Only one class available, selecting:", singleClass.name)
                 setSelectedClassId(singleClass.id)
                 setIsEnrolled(true)
                 // Save the selection
@@ -303,7 +280,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                 await loadAvailableClasses()
               }
             } else if (classIdToUse) {
-              console.log("✅ Already have classId, not changing:", classIdToUse)
             }
             // Always load available classes for switch button if enrolled
             if (enrolled && trainingEnrollments.length > 1 && !overrideClassId) {
@@ -311,13 +287,11 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             }
           }
         } catch (enrollError) {
-          console.log("Error loading enrolled classes:", enrollError)
         }
       }
 
       // If user is not enrolled in any classes for this training, load available classes and show modal
       if (!enrolled && user && user.id) {
-        console.log("🔍 User not enrolled, loading available classes")
         setShowClassSelection(true)
         await loadAvailableClasses()
       }
@@ -357,7 +331,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       }
 
       try {
-        console.log("🔍 Attempting enrollment with code:", enrollmentCode, "for class:", selectedClassId)
         
         const response = await fetch(`/api/classes/${selectedClassId}/enroll-with-code`, {
           method: "POST",
@@ -367,10 +340,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           body: JSON.stringify({ code: enrollmentCode }),
         })
 
-        console.log("🔍 Enrollment response status:", response.status)
 
         if (response.ok) {
-          console.log("✅ Enrollment successful!")
           alert("Successfully enrolled in class!")
           setIsEnrolled(true)
           setShowClassSelection(false)
@@ -421,19 +392,16 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
 
   // Debug: Track selectedClassId changes
   useEffect(() => {
-    console.log("🎯 selectedClassId changed to:", selectedClassId)
   }, [selectedClassId])
 
   // Debug: Track modal rendering
   useEffect(() => {
     if (showClassSelection) {
-      console.log("🎨 Modal opened - available classes:", availableClasses, "selectedClassId:", selectedClassId)
     }
   }, [showClassSelection, availableClasses, selectedClassId])
 
   // Debug: Track switch button visibility
   useEffect(() => {
-    console.log("🔍 Switch button check - availableClasses.length:", availableClasses.length, "isEnrolled:", isEnrolled, "should show:", availableClasses.length > 1 && isEnrolled)
   }, [availableClasses, isEnrolled])
 
 
@@ -780,7 +748,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                     : "border-blue-200 bg-blue-25 hover:border-blue-300"
                                 }`}
                                 onClick={(e) => {
-                                  console.log("📍 Label clicked for ARCHIVED class:", classItem.name)
                                   setIsManuallySelectingClass(true)
                                   setSelectedClassId(classItem.id)
                                   setTimeout(() => setIsManuallySelectingClass(false), 1000)
@@ -794,11 +761,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                     value={classItem.id}
                                     checked={selectedClassId === classItem.id}
                                     onChange={(e) => {
-                                      console.log("🖱️ Radio onChange ARCHIVED class:", classItem.name, "id:", classItem.id)
                                       setSelectedClassId(e.target.value)
                                     }}
                                     onClick={(e) => {
-                                      console.log("🎯 Radio onClick ARCHIVED class:", classItem.name)
                                       e.stopPropagation()
                                     }}
                                     className="w-0 h-0 opacity-0 absolute"
@@ -840,7 +805,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                     : "border-green-200 bg-green-25 hover:border-green-300"
                                 }`}
                                 onClick={(e) => {
-                                  console.log("📍 Label clicked for ACTIVE class:", classItem.name)
                                   setIsManuallySelectingClass(true)
                                   setSelectedClassId(classItem.id)
                                   setTimeout(() => setIsManuallySelectingClass(false), 1000)
@@ -854,11 +818,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                                     value={classItem.id}
                                     checked={selectedClassId === classItem.id}
                                     onChange={(e) => {
-                                      console.log("🖱️ Radio onChange ACTIVE class:", classItem.name, "id:", classItem.id)
                                       setSelectedClassId(e.target.value)
                                     }}
                                     onClick={(e) => {
-                                      console.log("🎯 Radio onClick ACTIVE class:", classItem.name)
                                       e.stopPropagation()
                                     }}
                                     className="w-0 h-0 opacity-0 absolute"
@@ -897,12 +859,10 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                     {/* Show enrollment code only for new active classes that student is NOT enrolled in */}
                     {selectedClassId && (() => {
                       const selectedClass = availableClasses.find(c => c.id === selectedClassId)
-                      console.log("🔍 Selected class for enrollment check:", selectedClass)
-                      console.log("🔍 Class properties - isActive:", selectedClass?.isActive, "isArchived:", selectedClass?.isArchived, "isEnrolled:", selectedClass?.isEnrolled)
                       // Check if this is a new class that requires enrollment (not already enrolled)
                       // We need to check if the class has an enrollment property or if it's a new class
                       const shouldShowEnrollmentCode = selectedClass && selectedClass.isActive && !selectedClass.isArchived && !selectedClass.isEnrolled
-                      console.log("🔍 Should show enrollment code:", shouldShowEnrollmentCode)
+                      
                       return shouldShowEnrollmentCode
                     })() && (
                       <div className="space-y-2">
@@ -931,12 +891,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       >
                         {(() => {
                           const selectedClass = availableClasses.find(c => c.id === selectedClassId)
-                          console.log("🔍 Button text logic - selectedClass:", selectedClass)
-                          console.log("🔍 Button text logic - isActive:", selectedClass?.isActive, "isArchived:", selectedClass?.isArchived, "isEnrolled:", selectedClass?.isEnrolled)
                           // Show "Enroll" for new classes, "Continue Training" for enrolled classes
                           const isNewClass = selectedClass && selectedClass.isActive && !selectedClass.isArchived && !selectedClass.isEnrolled
                           const buttonText = isNewClass ? "Enroll" : "Continue Training"
-                          console.log("🔍 Button text result:", buttonText)
                           return buttonText
                         })()}
                       </Button>
