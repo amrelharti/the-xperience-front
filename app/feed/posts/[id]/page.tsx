@@ -986,7 +986,7 @@ export default function PostDetailPage() {
               
               {post.attachments && (
                 <div className="mb-4">
-                  {post.attachments.startsWith('data:image') || post.attachments.startsWith('http://') || post.attachments.startsWith('https://') ? (
+                  {post.attachments.startsWith('data:image') ? (
                     <div className="relative w-full max-h-96 overflow-hidden rounded-lg border border-gray-200">
                       <img 
                         src={post.attachments} 
@@ -998,8 +998,8 @@ export default function PostDetailPage() {
                       />
                     </div>
                   ) : (
-                    <div className="p-3 bg-muted rounded-lg">
-                      <p className="text-sm text-muted-foreground">{post.attachments}</p>
+                    <div className="attachment-content">
+                      <LinkifiedText text={post.attachments} />
                     </div>
                   )}
                 </div>

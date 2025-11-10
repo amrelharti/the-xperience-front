@@ -33,7 +33,6 @@ export default function NewPostPage() {
   const [postType, setPostType] = useState("POST")
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
-  const [attachments, setAttachments] = useState("")
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [modulesLoading, setModulesLoading] = useState(true)
@@ -186,7 +185,7 @@ export default function NewPostPage() {
         postType: postType,
         title: title.trim() || null,
         content: content.trim(),
-        attachments: attachments.trim() || null,
+        attachments: null,
         isAssignment: postType === "ASSIGNMENT" // Automatically true for assignment posts
       }
       console.log('📤 Sending post data (no file):', postData)
@@ -459,22 +458,6 @@ export default function NewPostPage() {
                         currentFile={selectedFile}
                       />
                     </div>
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-200"></div>
-                      </div>
-                      <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">Or paste URLs below</span>
-                      </div>
-                    </div>
-                    <Textarea
-                      id="attachments"
-                      value={attachments}
-                      onChange={(e) => setAttachments(e.target.value)}
-                      placeholder="Links to files, images, or other resources"
-                      rows={2}
-                      className="resize-none border-gray-200 focus:border-[#0476D7] focus:ring-[#0476D7]/20 rounded-xl"
-                    />
                   </div>
                 </div>
 

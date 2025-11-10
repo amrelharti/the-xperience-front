@@ -685,7 +685,7 @@ export default function FeedPage() {
                       
                       {post.attachments && (
                         <div className="mt-3 sm:mt-4">
-                          {post.attachments.startsWith('data:image') || post.attachments.startsWith('http://') || post.attachments.startsWith('https://') ? (
+                          {post.attachments.startsWith('data:image') ? (
                             <div className="relative w-full max-h-64 sm:max-h-80 md:max-h-96 overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 shadow-sm">
                               <img 
                                 src={post.attachments} 
@@ -697,8 +697,8 @@ export default function FeedPage() {
                               />
                             </div>
                           ) : (
-                            <div className="p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl border border-gray-200">
-                              <p className="text-xs sm:text-sm text-gray-600 truncate">{post.attachments}</p>
+                            <div className="attachment-content">
+                              <LinkifiedText text={post.attachments} />
                             </div>
                           )}
                         </div>
