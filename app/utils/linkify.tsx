@@ -1,10 +1,11 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
+import { LinkPreviewCard } from '@/app/components/LinkPreviewCard';
 
 /**
- * Detects URLs in text and converts them to clickable links
+ * Detects URLs in text and converts them to clickable link preview cards
  * @param text - The text content to process
- * @returns JSX with clickable links
+ * @returns JSX with link preview cards
  */
 export function linkifyText(text: string): React.ReactNode {
   if (!text) return text;
@@ -29,25 +30,13 @@ export function linkifyText(text: string): React.ReactNode {
       parts.push(text.substring(lastIndex, startIndex));
     }
 
-    // Create the href (add https:// if it starts with www.)
-    let href = url;
-    if (url.startsWith('www.')) {
-      href = `https://${url}`;
-    }
-
-    // Add the clickable link
+    // Add the link preview card
     parts.push(
-      <a
+      <LinkPreviewCard
         key={startIndex}
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
+        url={url}
         onClick={(e) => e.stopPropagation()}
-        className="text-[#0476D7] hover:text-[#0068A7] underline decoration-2 underline-offset-2 hover:decoration-[#FFBC00] transition-all inline-flex items-center gap-1 font-medium break-all"
-      >
-        {url}
-        <ExternalLink className="h-3 w-3 inline-block flex-shrink-0" />
-      </a>
+      />
     );
 
     lastIndex = startIndex + url.length;
