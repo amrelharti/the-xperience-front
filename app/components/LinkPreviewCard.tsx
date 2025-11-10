@@ -22,6 +22,75 @@ interface LinkMetadata {
 function getLinkMetadata(url: string): LinkMetadata {
   const urlLower = url.toLowerCase();
   
+  // Handle data URIs (base64 encoded files)
+  if (urlLower.startsWith('data:')) {
+    const mimeMatch = url.match(/^data:([^;,]+)/i);
+    const mimeType = mimeMatch ? mimeMatch[1].toLowerCase() : '';
+    
+    // PDF data URI
+    if (mimeType.includes('pdf')) {
+      return {
+        title: 'PDF Document',
+        icon: <FileText className="h-5 w-5" />,
+        domain: 'Embedded File',
+        color: 'text-red-700',
+        bgColor: 'bg-red-50',
+        borderColor: 'border-red-200',
+        thumbnail: '📕'
+      };
+    }
+    
+    // Image data URI
+    if (mimeType.includes('image')) {
+      return {
+        title: 'Image File',
+        icon: <ImageIcon className="h-5 w-5" />,
+        domain: 'Embedded Image',
+        color: 'text-purple-700',
+        bgColor: 'bg-purple-50',
+        borderColor: 'border-purple-200',
+        thumbnail: '🖼️'
+      };
+    }
+    
+    // Video data URI
+    if (mimeType.includes('video')) {
+      return {
+        title: 'Video File',
+        icon: <Video className="h-5 w-5" />,
+        domain: 'Embedded Video',
+        color: 'text-red-700',
+        bgColor: 'bg-red-50',
+        borderColor: 'border-red-200',
+        thumbnail: '🎬'
+      };
+    }
+    
+    // Audio data URI
+    if (mimeType.includes('audio')) {
+      return {
+        title: 'Audio File',
+        icon: <Music className="h-5 w-5" />,
+        domain: 'Embedded Audio',
+        color: 'text-green-700',
+        bgColor: 'bg-green-50',
+        borderColor: 'border-green-200',
+        thumbnail: '🎵'
+      };
+    }
+    
+    // Generic data URI
+    return {
+      title: 'Embedded File',
+      icon: <File className="h-5 w-5" />,
+      domain: 'Base64 Encoded',
+      color: 'text-gray-700',
+      bgColor: 'bg-gray-50',
+      borderColor: 'border-gray-300',
+      thumbnail: '📎'
+    };
+  }
+  
   // Google Drive
   if (urlLower.includes('drive.google.com') || urlLower.includes('docs.google.com')) {
     const isDoc = urlLower.includes('/document/');
@@ -182,6 +251,18 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, onClick }
     href = `https://${url}`;
   }
   
+  // Create a display URL (shortened for data URIs)
+  let displayUrl = url;
+  if (url.startsWith('data:')) {
+    // For data URIs, show just the mime type and a truncated preview
+    const mimeMatch = url.match(/^data:([^;,]+)/i);
+    const mimeType = mimeMatch ? mimeMatch[1] : 'unknown';
+    displayUrl = `data:${mimeType};base64,... (embedded content)`;
+  } else if (url.length > 60) {
+    // Truncate very long URLs
+    displayUrl = url.substring(0, 60) + '...';
+  }
+  
   return (
     <a
       href={href}
@@ -218,7 +299,7 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, onClick }
         {/* URL preview (truncated) */}
         <div className="mt-2 pt-3 border-t border-gray-200/50">
           <p className="text-xs text-gray-500 truncate font-medium">
-            {url}
+            {displayUrl}
           </p>
         </div>
       </div>
