@@ -372,9 +372,19 @@ export default function CourseDetailPage() {
       
       try {
         // Calculate completion percentage (watchTime / videoDuration * 100)
-        const completionPercentage = course?.durationSeconds 
+        const calculatedPercentage = course?.durationSeconds 
           ? Math.min((roundedSeconds / course.durationSeconds) * 100, 100)
           : 0.0
+        
+        // IMPORTANT: Progress should NEVER go backwards!
+        // Only update if the new percentage is HIGHER than the current one
+        const currentPercentage = courseProgress?.completionPercentage || 0
+        const completionPercentage = Math.max(currentPercentage, calculatedPercentage)
+        
+        // Only send update if percentage actually increased
+        if (completionPercentage <= currentPercentage && currentPercentage > 0) {
+          return // Don't save if progress didn't increase
+        }
         
         const response = await fetch(`/api/courses/${courseId}/progress`, {
           method: 'PUT',
@@ -423,7 +433,7 @@ export default function CourseDetailPage() {
     } else if (!classId && playTimeSeconds >= 10) {
       console.warn("⚠️ Cannot save progress: classId is missing")
     }
-  }, [classId, courseId, course?.durationSeconds])
+  }, [classId, courseId, course?.durationSeconds, courseProgress?.completionPercentage])
 
   if (loading) {
     return (
