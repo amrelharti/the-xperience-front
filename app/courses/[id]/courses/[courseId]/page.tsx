@@ -572,7 +572,7 @@ export default function CourseDetailPage() {
                         onClick={() => setShowConfirmDialog(true)}
                         variant="default"
                         size="default"
-                        disabled={(courseProgress?.completionPercentage || 0) < 90}
+                        disabled={(courseProgress?.completionPercentage || 0) < 100}
                         className="w-full bg-gradient-to-r from-[#0476D7] to-[#0068A7] hover:from-[#0068A7] hover:to-[#005eb8] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base py-5 sm:py-6 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <span className="hidden xs:inline">I Finished Watching This Video</span><span className="xs:hidden">Finished Watching</span>

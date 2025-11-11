@@ -22,7 +22,8 @@ import {
   Menu,
   X,
   Instagram,
-  Linkedin
+  Linkedin,
+  FolderOpen
 } from "lucide-react"
 import { useUser } from "../../hooks/useUser"
 import UserDropdown from "../../components/UserDropdown"
@@ -32,7 +33,7 @@ import { LinkifiedText } from "@/app/utils/linkify"
 
 interface Post {
   id: string
-  type: 'POST' | 'ASSIGNMENT' | 'WEEKLY_SUMMARY' | 'FEEDBACK' | 'ANNOUNCEMENT'
+  type: 'POST' | 'ASSIGNMENT' | 'WEEKLY_SUMMARY' | 'FEEDBACK' | 'ANNOUNCEMENT' | 'RESOURCES'
   title?: string
   content: string
   attachments?: string
@@ -224,6 +225,7 @@ export default function AdminFeedPage() {
       case 'WEEKLY_SUMMARY': return <BookOpen className="h-4 w-4" />
       case 'FEEDBACK': return <MessageSquare className="h-4 w-4" />
       case 'ANNOUNCEMENT': return <Megaphone className="h-4 w-4" />
+      case 'RESOURCES': return <FolderOpen className="h-4 w-4" />
       default: return <MessageSquare className="h-4 w-4" />
     }
   }
@@ -234,6 +236,7 @@ export default function AdminFeedPage() {
       case 'WEEKLY_SUMMARY': return "bg-purple-100 text-purple-800"
       case 'FEEDBACK': return "bg-green-100 text-green-800"
       case 'ANNOUNCEMENT': return "bg-red-100 text-red-800"
+      case 'RESOURCES': return "bg-teal-100 text-teal-800"
       default: return "bg-gray-100 text-gray-800"
     }
   }
@@ -460,6 +463,7 @@ export default function AdminFeedPage() {
                       <SelectItem value="WEEKLY_SUMMARY">Weekly Summary</SelectItem>
                       <SelectItem value="FEEDBACK">Feedback</SelectItem>
                       <SelectItem value="ANNOUNCEMENT">Announcements</SelectItem>
+                      <SelectItem value="RESOURCES">Resources</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button 

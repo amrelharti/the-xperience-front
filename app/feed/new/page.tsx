@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Send, MessageSquare, FileText, HelpCircle, Megaphone, BookOpen, Sparkles, Upload, Image as ImageIcon } from "lucide-react"
+import { ArrowLeft, Send, MessageSquare, FileText, HelpCircle, Megaphone, BookOpen, Sparkles, Upload, Image as ImageIcon, FolderOpen } from "lucide-react"
 import { FileUpload } from "@/components/ui/file-upload"
 import { useUser } from "@/app/hooks/useUser"
 import UserDropdown from "@/app/components/UserDropdown"
@@ -231,6 +231,7 @@ export default function NewPostPage() {
       case 'WEEKLY_SUMMARY': return <BookOpen className="h-4 w-4" />
       case 'FEEDBACK': return <MessageSquare className="h-4 w-4" />
       case 'ANNOUNCEMENT': return <Megaphone className="h-4 w-4" />
+      case 'RESOURCES': return <FolderOpen className="h-4 w-4" />
       default: return <MessageSquare className="h-4 w-4" />
     }
   }
@@ -357,12 +358,20 @@ export default function NewPostPage() {
                         </div>
                       </SelectItem>
                       {user?.role === 'ADMIN' && (
-                        <SelectItem value="ANNOUNCEMENT">
-                          <div className="flex items-center gap-2">
-                            <Megaphone className="h-4 w-4 text-orange-500" />
-                            Announcement
-                          </div>
-                        </SelectItem>
+                        <>
+                          <SelectItem value="ANNOUNCEMENT">
+                            <div className="flex items-center gap-2">
+                              <Megaphone className="h-4 w-4 text-orange-500" />
+                              Announcement
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="RESOURCES">
+                            <div className="flex items-center gap-2">
+                              <FolderOpen className="h-4 w-4 text-teal-500" />
+                              Resources
+                            </div>
+                          </SelectItem>
+                        </>
                       )}
                     </SelectContent>
                   </Select>
