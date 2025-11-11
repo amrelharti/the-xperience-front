@@ -182,12 +182,10 @@ export default function VimeoPlayer({
               }
             }
             
-            // If we're within 2 seconds of the end OR at 95%+, consider it finished
-            if (duration > 0) {
-              const secondsRemaining = duration - seconds
-              const hasReachedEnd = secondsRemaining <= 2 || percent >= 0.95
-              
-              if (hasReachedEnd && !hasTriggeredEnded) {
+            // Only trigger onEnded when video reaches exactly 100% (percent >= 1.0)
+            // Don't trigger early, wait for the actual end
+            if (duration > 0 && percent >= 1.0) {
+              if (!hasTriggeredEnded) {
                 hasTriggeredEnded = true
                 onEnded()
               }

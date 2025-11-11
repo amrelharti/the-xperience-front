@@ -325,9 +325,37 @@ export default function CourseDetailPage() {
     console.error("Vimeo video error:", error)
   }, [])
 
-  const handleVideoEnded = useCallback(() => {
+  const handleVideoEnded = useCallback(async () => {
+    // When video ends, immediately save progress as 100% before showing dialog
+    if (classId && courseId && course?.durationSeconds) {
+      try {
+        await fetch(`/api/courses/${courseId}/progress`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            classId: classId,
+            watchTimeSeconds: course.durationSeconds,
+            completionPercentage: 100
+          })
+        })
+        
+        // Update local state
+        setCourseProgress(prevProgress => ({
+          ...prevProgress,
+          watchTimeSeconds: course.durationSeconds,
+          completionPercentage: 100,
+          isStarted: true,
+          status: prevProgress?.status || 'IN_PROGRESS',
+          isCompleted: prevProgress?.isCompleted || false
+        }))
+      } catch (error) {
+        console.error("❌ Error saving final progress:", error)
+      }
+    }
+    
     setShowConfirmDialog(true)
-  }, [])
+  }, [classId, courseId, course?.durationSeconds])
 
   const handlePlayTimeUpdate = useCallback(async (playTimeSeconds: number) => {
     // Round to nearest second for comparison
