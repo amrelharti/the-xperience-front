@@ -278,35 +278,35 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = ({ url, onClick }
       rel="noopener noreferrer"
       onClick={onClick}
       className={`
-        my-3 block max-w-xl transition-all duration-300 
+        my-3 block w-full max-w-xl transition-all duration-300 
         rounded-xl border-2 ${metadata.borderColor} ${metadata.bgColor}
         hover:shadow-lg hover:shadow-${metadata.color}/20 hover:-translate-y-0.5
         overflow-hidden group
       `}
     >
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         {/* Header with icon and title */}
-        <div className="flex items-start gap-3 mb-3">
+        <div className="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
           {/* Thumbnail/Icon */}
-          <div className={`flex-shrink-0 w-12 h-12 rounded-lg ${metadata.bgColor} border ${metadata.borderColor} flex items-center justify-center text-2xl shadow-sm`}>
+          <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg ${metadata.bgColor} border ${metadata.borderColor} flex items-center justify-center text-xl sm:text-2xl shadow-sm`}>
             {metadata.thumbnail}
           </div>
           
           {/* Title and domain */}
           <div className="flex-1 min-w-0">
-            <h4 className={`font-semibold text-base ${metadata.color} mb-1 group-hover:underline transition-all flex items-center gap-2`}>
-              {metadata.title}
-              <ExternalLink className="h-4 w-4 opacity-70" />
+            <h4 className={`font-semibold text-sm sm:text-base ${metadata.color} mb-1 group-hover:underline transition-all flex items-center gap-1.5 sm:gap-2 flex-wrap`}>
+              <span className="break-words">{metadata.title}</span>
+              <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-70 flex-shrink-0" />
             </h4>
-            <p className="text-xs text-gray-600 truncate font-mono bg-white/50 px-2 py-0.5 rounded">
+            <p className="text-xs text-gray-600 truncate font-mono bg-white/50 px-2 py-0.5 rounded break-all">
               {metadata.domain}
             </p>
           </div>
         </div>
         
         {/* URL preview (truncated) */}
-        <div className="mt-2 pt-3 border-t border-gray-200/50">
-          <p className="text-xs text-gray-500 truncate font-medium">
+        <div className="mt-2 pt-2 sm:pt-3 border-t border-gray-200/50">
+          <p className="text-xs text-gray-500 break-all font-medium">
             {displayUrl}
           </p>
         </div>

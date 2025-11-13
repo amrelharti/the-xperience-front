@@ -1134,8 +1134,8 @@ export default function PostDetailPage() {
                           </span>
                         )}
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="font-medium text-sm">{comment.author.name}</span>
                           <span className="text-xs text-muted-foreground">
                             {formatTimeAgo(comment.createdAt)}
@@ -1183,9 +1183,9 @@ export default function PostDetailPage() {
                             </div>
                           </div>
                         ) : (
-                          <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                          <div className="text-sm text-gray-700 whitespace-pre-wrap break-words">
                             <LinkifiedText text={comment.content} />
-                          </p>
+                          </div>
                         )}
                         <div className="flex items-center gap-4 mt-2">
                           <Button 
@@ -1372,7 +1372,9 @@ export default function PostDetailPage() {
                                       </div>
                                     </div>
                                   ) : (
-                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{reply.content}</p>
+                                    <div className="text-sm text-gray-700 whitespace-pre-wrap break-words">
+                                      <LinkifiedText text={reply.content} />
+                                    </div>
                                   )}
                                   <div className="flex items-center gap-4 mt-2">
                                     <Button 
