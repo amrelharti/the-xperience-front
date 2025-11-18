@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Menu, X, PlayCircle, User, Eye, MessageSquare } from "lucide-react"
+import { Menu, X, PlayCircle, User, Eye, MessageSquare, GraduationCap } from "lucide-react"
 
 interface Course {
   id: string
@@ -346,6 +346,10 @@ export default function AdminPage() {
                   Leaderboard
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
                 </Link>
+                <Link href="/admin/students" className="text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
+                  Students
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFBC00] group-hover:w-full transition-all duration-200"></span>
+                </Link>
               </nav>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -406,6 +410,13 @@ export default function AdminPage() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Leaderboard
+                </Link>
+                <Link 
+                  href="/admin/students" 
+                  className="block py-3 text-sm font-medium text-slate-600 hover:text-[#0476D7] transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Students
                 </Link>
               </nav>
             </div>
@@ -492,7 +503,7 @@ export default function AdminPage() {
               <p className="text-sm sm:text-base text-slate-600">Access your most important admin functions</p>
             </CardHeader>
             <CardContent className="px-4 sm:px-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
                 <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#005eb8] group">
                   <Link href="/admin/trainings">
                     <div className="p-2 sm:p-3 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg group-hover:scale-110 transition-transform duration-200">
@@ -515,6 +526,14 @@ export default function AdminPage() {
                       <User className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
                     <span className="font-semibold text-slate-700 text-xs sm:text-sm">Manage Users</span>
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-indigo-500 group">
+                  <Link href="/admin/students">
+                    <div className="p-2 sm:p-3 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    </div>
+                    <span className="font-semibold text-slate-700 text-xs sm:text-sm">View Students</span>
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-purple-500 group">
