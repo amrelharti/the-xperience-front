@@ -591,7 +591,7 @@ export default function StudentAnalysisHub() {
             <Card>
               <CardContent className="py-12 text-center">
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No students found matching your filters</p>
+                <p className="text-muted-foreground">No students found matching your filters.</p>
               </CardContent>
             </Card>
           )}
