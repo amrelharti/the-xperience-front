@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { CheckCircle2, ArrowRight, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { CheckCircle2, ArrowRight, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles } from "lucide-react"
 
 type Language = "en" | "fr"
 
@@ -22,9 +22,34 @@ interface Content {
     ctaPrimary: string
     ctaSecondary: string
   }
+  socialProof: {
+    title: string
+    stats: {
+      number: string
+      label: string
+    }[]
+  }
   problem: {
     title: string
-    points: string[]
+    reasons: {
+      number: string
+      title: string
+      description: string
+    }[]
+  }
+  trainer: {
+    title: string
+    name: string
+    role: string
+    bio: string[]
+    stats: {
+      label: string
+      value: string
+    }[]
+    social: {
+      instagram: string
+      linkedin: string
+    }
   }
   transformation: {
     title: string
@@ -79,14 +104,55 @@ const content: Record<Language, Content> = {
       ctaPrimary: "Join Xperience Pro – 1000 DH",
       ctaSecondary: "See what's inside",
     },
-    problem: {
-      title: "If this sounds like you, you're in the right place…",
-      points: [
-        "You send CVs and never hear back.",
-        "You're not sure how to adapt your CV to each job offer.",
-        "Your LinkedIn profile feels empty or useless.",
-        "You stress before interviews and don't know how to answer basic questions.",
+    socialProof: {
+      title: "Proven Method",
+      stats: [
+        { number: "+5000", label: "candidates accompanied" },
+        { number: "92%", label: "reached their professional goals" },
+        { number: "80%", label: "did it in less than 3 months" },
       ],
+    },
+    problem: {
+      title: "3 reasons why you don't reach your professional goals",
+      reasons: [
+        {
+          number: "01",
+          title: "You don't use the right tools (including AI) to adapt your CV to job offers",
+          description: "Generic CV with no keywords, not attractive to recruiters.",
+        },
+        {
+          number: "02",
+          title: "You don't know how to handle interviews like a pro",
+          description: "Your answers are not structured and not convincing.",
+        },
+        {
+          number: "03",
+          title: "You don't prepare in advance to seize opportunities",
+          description: "Great opportunities pass by and you end up accepting a job you don't really want.",
+        },
+      ],
+    },
+    trainer: {
+      title: "Meet your coach",
+      name: "Ali El Harti",
+      role: "Certified Trainer & Employability Manager",
+      bio: [
+        "Certified trainer with 7+ years of experience helping young people prepare for the job market.",
+        "Specializes in job and internship search techniques.",
+        "More than 5000 people have benefited from his career coaching.",
+        "Has spoken in over 100 conferences in Morocco and internationally.",
+        "Works as an Employability Manager and collaborates with several well-known universities in Morocco, focusing on company relations and industrial partnerships.",
+        "Has been invited by major media such as Al Aoula, Le Matin, and M24.",
+      ],
+      stats: [
+        { label: "Years of Experience", value: "7+" },
+        { label: "People Coached", value: "5000+" },
+        { label: "Conferences", value: "100+" },
+      ],
+      social: {
+        instagram: "https://instagram.com",
+        linkedin: "https://linkedin.com",
+      },
     },
     transformation: {
       title: "What you'll be able to do after Xperience Pro",
@@ -187,14 +253,55 @@ const content: Record<Language, Content> = {
       ctaPrimary: "Rejoindre Xperience Pro – 1000 DH",
       ctaSecondary: "Découvrir le programme",
     },
-    problem: {
-      title: "Si tu te reconnais ici, ce programme est fait pour toi…",
-      points: [
-        "Tu envoies des CV et tu n'as jamais de réponse.",
-        "Tu ne sais pas comment adapter ton CV à chaque nouvelle offre.",
-        "Ton profil LinkedIn est vide ou pas optimisé.",
-        "Tu stresses avant chaque entretien et tu ne sais pas quoi répondre.",
+    socialProof: {
+      title: "Méthode éprouvée",
+      stats: [
+        { number: "+5000", label: "candidats accompagnés" },
+        { number: "92%", label: "ont atteint leurs objectifs professionnels" },
+        { number: "80%", label: "l'ont fait en moins de 3 mois" },
       ],
+    },
+    problem: {
+      title: "3 raisons pour lesquelles tu n'atteins pas tes objectifs professionnels",
+      reasons: [
+        {
+          number: "01",
+          title: "Tu n'utilises pas les bons outils (dont l'IA) pour adapter ton CV aux offres d'emploi",
+          description: "CV générique, sans mots-clés, qui n'attire pas l'attention du recruteur.",
+        },
+        {
+          number: "02",
+          title: "Tu ne sais pas comment gérer ton entretien comme un pro",
+          description: "Tes réponses sont mal structurées, peu convaincantes.",
+        },
+        {
+          number: "03",
+          title: "Tu ne te prépares pas à l'avance pour saisir les opportunités",
+          description: "Les bonnes opportunités te passent sous le nez et tu te contentes d'un job qui ne t'intéresse pas.",
+        },
+      ],
+    },
+    trainer: {
+      title: "Préparez-vous au marché d'emploi avec notre expert",
+      name: "Ali El Harti",
+      role: "Formateur Certifié & Responsable Employabilité",
+      bio: [
+        "Formateur certifié avec plus de 7 ans d'expérience dans l'accompagnement des jeunes vers le marché de l'emploi.",
+        "Spécialisé dans les techniques de recherche d'emploi et de stage.",
+        "Plus de 5000 personnes ont bénéficié de son coaching de carrière.",
+        "A animé plus de 100 conférences au Maroc et à l'international.",
+        "Travaille en tant que Responsable Employabilité et collabore avec plusieurs universités reconnues au Maroc, axé sur les relations entreprises et partenariats industriels.",
+        "A été invité par les grands médias tels qu'Al Aoula, Le Matin et M24.",
+      ],
+      stats: [
+        { label: "Années d'expérience", value: "7+" },
+        { label: "Personnes coachées", value: "5000+" },
+        { label: "Conférences", value: "100+" },
+      ],
+      social: {
+        instagram: "https://instagram.com",
+        linkedin: "https://linkedin.com",
+      },
     },
     transformation: {
       title: "Ce que tu seras capable de faire après Xperience Pro",
@@ -283,8 +390,36 @@ const content: Record<Language, Content> = {
 export default function XperienceProLandingPage() {
   const [language, setLanguage] = useState<Language>("en")
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null)
+  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set())
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
 
   const t = content[language]
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = []
+
+    Object.keys(sectionRefs.current).forEach((key) => {
+      const element = sectionRefs.current[key]
+      if (element) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                setVisibleSections((prev) => new Set(prev).add(key))
+              }
+            })
+          },
+          { threshold: 0.1 }
+        )
+        observer.observe(element)
+        observers.push(observer)
+      }
+    })
+
+    return () => {
+      observers.forEach((observer) => observer.disconnect())
+    }
+  }, [])
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
@@ -394,25 +529,70 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
+      {/* Social Proof Section */}
+      <section className="py-12 md:py-16 bg-white border-y border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900">
+            {t.socialProof.title}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {t.socialProof.stats.map((stat, index) => (
+              <div
+                key={index}
+                ref={(el) => {
+                  sectionRefs.current[`stat-${index}`] = el
+                }}
+                className={`bg-gradient-to-br from-[#005eb8] to-[#0476D7] p-8 rounded-2xl shadow-xl text-white text-center transform transition-all duration-700 ${
+                  visibleSections.has(`stat-${index}`)
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <div className="text-5xl md:text-6xl font-bold mb-2 text-[#FFBC00]">
+                  {stat.number}
+                </div>
+                <div className="text-lg md:text-xl font-medium">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Problem Section */}
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
               {t.problem.title}
             </h2>
-            <div className="space-y-4">
-              {t.problem.points.map((point, index) => (
+            <div className="space-y-6">
+              {t.problem.reasons.map((reason, index) => (
                 <div
                   key={index}
-                  className="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500 flex items-start gap-4"
+                  ref={(el) => {
+                    sectionRefs.current[`problem-${index}`] = el
+                  }}
+                  className={`bg-white p-8 rounded-xl shadow-lg border-l-4 border-red-500 transform transition-all duration-700 ${
+                    visibleSections.has(`problem-${index}`)
+                      ? "opacity-100 translate-x-0"
+                      : "opacity-0 -translate-x-10"
+                  }`}
+                  style={{ transitionDelay: `${index * 150}ms` }}
                 >
-                  <div className="text-red-500 mt-1">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                  <div className="flex items-start gap-6">
+                    <div className="flex-shrink-0">
+                      <div className="bg-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">
+                        {reason.number}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
+                        {reason.title}
+                      </h3>
+                      <p className="text-lg text-gray-600 leading-relaxed">{reason.description}</p>
+                    </div>
                   </div>
-                  <p className="text-lg text-gray-700 flex-1">{point}</p>
                 </div>
               ))}
             </div>
@@ -420,8 +600,73 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
-      {/* Transformation Section */}
+      {/* Trainer Section */}
       <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+              {t.trainer.title}
+            </h2>
+            <div
+              ref={(el) => {
+                sectionRefs.current["trainer"] = el
+              }}
+              className={`bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-700 ${
+                visibleSections.has("trainer") ? "opacity-100 scale-100" : "opacity-0 scale-95"
+              }`}
+            >
+              <div className="md:flex">
+                <div className="md:w-1/3 bg-gradient-to-br from-[#005eb8] to-[#0476D7] p-8 md:p-12 text-white flex flex-col items-center justify-center">
+                  <div className="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center mb-6 border-4 border-white/30">
+                    <Users className="w-16 h-16 text-white" />
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-bold mb-2">{t.trainer.name}</h3>
+                  <p className="text-blue-200 text-center mb-6">{t.trainer.role}</p>
+                  <div className="flex gap-4">
+                    <a
+                      href={t.trainer.social.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white/20 hover:bg-white/30 rounded-full p-3 transition-all duration-200 transform hover:scale-110"
+                    >
+                      <Instagram className="w-6 h-6" />
+                    </a>
+                    <a
+                      href={t.trainer.social.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white/20 hover:bg-white/30 rounded-full p-3 transition-all duration-200 transform hover:scale-110"
+                    >
+                      <Linkedin className="w-6 h-6" />
+                    </a>
+                  </div>
+                </div>
+                <div className="md:w-2/3 p-8 md:p-12">
+                  <div className="grid grid-cols-3 gap-4 mb-8">
+                    {t.trainer.stats.map((stat, index) => (
+                      <div key={index} className="text-center">
+                        <div className="text-3xl font-bold text-[#005eb8] mb-1">{stat.value}</div>
+                        <div className="text-sm text-gray-600">{stat.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-4">
+                    {t.trainer.bio.map((paragraph, index) => (
+                      <div key={index} className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-[#005eb8] mt-1 flex-shrink-0" />
+                        <p className="text-gray-700 leading-relaxed">{paragraph}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Transformation Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
@@ -431,7 +676,15 @@ export default function XperienceProLandingPage() {
               {t.transformation.points.map((point, index) => (
                 <div
                   key={index}
-                  className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] p-6 rounded-lg shadow-lg text-white flex items-start gap-4"
+                  ref={(el) => {
+                    sectionRefs.current[`transformation-${index}`] = el
+                  }}
+                  className={`bg-gradient-to-r from-[#005eb8] to-[#0476D7] p-6 rounded-lg shadow-lg text-white flex items-start gap-4 transform transition-all duration-700 ${
+                    visibleSections.has(`transformation-${index}`)
+                      ? "opacity-100 translate-x-0"
+                      : "opacity-0 translate-x-10"
+                  }`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
                 >
                   <CheckCircle2 className="w-6 h-6 mt-1 flex-shrink-0 text-[#FFBC00]" />
                   <p className="text-lg flex-1">{point}</p>
@@ -452,7 +705,15 @@ export default function XperienceProLandingPage() {
             {t.modules.items.map((module, index) => (
               <div
                 key={index}
-                className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-200"
+                ref={(el) => {
+                  sectionRefs.current[`module-${index}`] = el
+                }}
+                className={`bg-white p-6 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 ${
+                  visibleSections.has(`module-${index}`)
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="bg-[#005eb8] text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">
@@ -511,24 +772,44 @@ export default function XperienceProLandingPage() {
       </section>
 
       {/* Price Section */}
-      <section id="price" className="py-16 md:py-24 bg-gradient-to-br from-[#005eb8] to-[#0476D7] text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+      <section
+        id="price"
+        ref={(el) => {
+          sectionRefs.current["price"] = el
+        }}
+        className="py-16 md:py-24 bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] text-white relative overflow-hidden"
+      >
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)'
+          }}></div>
+        </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div
+            className={`text-center mb-12 transform transition-all duration-700 ${
+              visibleSections.has("price") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
+          >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">{t.price.title}</h2>
             <div className="mb-6">
-              <div className="text-6xl md:text-7xl font-bold mb-2">{t.price.amount}</div>
+              <div className="text-6xl md:text-7xl font-bold mb-2 text-[#FFBC00]">{t.price.amount}</div>
               <p className="text-xl text-blue-200">{t.price.description}</p>
             </div>
             <p className="text-lg text-blue-100 mb-8">{t.price.included}</p>
           </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-white/20">
+          <div
+            className={`bg-white/10 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-white/20 transform transition-all duration-700 ${
+              visibleSections.has("price") ? "opacity-100 scale-100" : "opacity-0 scale-95"
+            }`}
+            style={{ transitionDelay: "200ms" }}
+          >
             <div className="text-center">
               <button
                 onClick={() => {
                   // TODO: Add payment integration
                   alert(language === "en" ? "Payment integration coming soon!" : "Intégration de paiement à venir !")
                 }}
-                className="bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-12 py-5 rounded-lg text-xl shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 mx-auto"
+                className="bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-12 py-5 rounded-lg text-xl shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 mx-auto animate-pulse hover:animate-none"
               >
                 {t.price.cta}
                 <ArrowRight className="w-6 h-6" />
