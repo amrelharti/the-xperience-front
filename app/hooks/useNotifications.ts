@@ -124,13 +124,19 @@ export function useNotifications() {
 
   // Check for new posts and create notifications
   const checkForNewPosts = useCallback(async () => {
-    if (!user?.id || isLoading) return
+    if (!user?.id || isLoading) {
+      console.log("🔔 Notification check skipped:", { userId: user?.id, isLoading })
+      return
+    }
 
+    console.log("🔔 Starting notification check for user:", user.id)
     setIsLoading(true)
     try {
       // Get user's enrollments
       const enrollments = await getUserEnrollments()
+      console.log("🔔 User enrollments:", enrollments)
       if (enrollments.length === 0) {
+        console.log("🔔 No enrollments found, skipping notification check")
         setIsLoading(false)
         return
       }
@@ -160,37 +166,67 @@ export function useNotifications() {
           if (res.ok) {
             const data = await res.json()
             const posts = data.posts || []
+            console.log(`🔔 Found ${posts.length} posts for class ${enrollment.classId}`)
 
             // Filter posts that match BOTH the training AND class
             const relevantPosts = posts.filter((post: any) => {
+              console.log(`🔔 Checking post ${post.id}:`, {
+                postClassId: post.class?.id,
+                enrollmentClassId: enrollment.classId,
+                postModuleId: post.moduleId,
+                enrollmentModuleId: enrollment.moduleId,
+                postAuthorId: post.author?.id,
+                currentUserId: user.id
+              })
+
               // Post must have the same class
               const postClassId = post.class?.id
-              if (!postClassId || postClassId !== enrollment.classId) return false
+              if (!postClassId || postClassId !== enrollment.classId) {
+                console.log(`🔔 Post ${post.id} filtered out: class mismatch`)
+                return false
+              }
 
               // Post must be from the same training
               // The enrollment.moduleId is actually the training ID
-              // Posts might have moduleId (training ID) or module.trainingId
-              // We need to check if the post belongs to this training
-              const postTrainingId = post.moduleId || post.module?.trainingId
+              // Posts should have moduleId (training ID) when created
+              const postTrainingId = post.moduleId
               
               // If post has a training ID, it must match
-              if (postTrainingId && postTrainingId !== enrollment.moduleId) return false
+              if (postTrainingId) {
+                if (postTrainingId !== enrollment.moduleId) {
+                  console.log(`🔔 Post ${post.id} filtered out: training mismatch (${postTrainingId} vs ${enrollment.moduleId})`)
+                  return false
+                }
+              } else {
+                // If post doesn't have moduleId, we'll still include it if class matches
+                // This handles edge cases, but log a warning
+                console.log(`🔔 Post ${post.id} has no moduleId, but class matches - including it`)
+              }
               
-              // If post doesn't have training ID info, we'll include it if it has the matching class
-              // This handles edge cases where the backend might not return training info
               return true
             })
+            
+            console.log(`🔔 Found ${relevantPosts.length} relevant posts after filtering`)
 
             // Create notifications for new posts (not created by current user)
             relevantPosts.forEach((post: any) => {
               // Skip if post is from current user
-              if (post.author?.id === user.id) return
+              if (post.author?.id === user.id) {
+                console.log(`🔔 Post ${post.id} skipped: created by current user`)
+                return
+              }
 
               // Skip if we've already seen this post
-              if (lastSeenIds.has(post.id)) return
+              if (lastSeenIds.has(post.id)) {
+                console.log(`🔔 Post ${post.id} skipped: already seen`)
+                return
+              }
 
               // Skip if we already have a notification for this post
-              if (currentNotifications.some(n => n.postId === post.id)) return
+              if (currentNotifications.some(n => n.postId === post.id)) {
+                console.log(`🔔 Post ${post.id} skipped: notification already exists`)
+                return
+              }
 
               // Create notification
               const notification: Notification = {
@@ -204,6 +240,7 @@ export function useNotifications() {
                 link: `/feed/posts/${post.id}`
               }
 
+              console.log(`🔔 Creating notification for post ${post.id}:`, notification)
               newNotifications.push(notification)
               newPostIds.add(post.id)
             })
@@ -215,10 +252,13 @@ export function useNotifications() {
 
       // Add new notifications to the beginning
       if (newNotifications.length > 0) {
+        console.log(`🔔 Adding ${newNotifications.length} new notifications`)
         const updatedNotifications = [...newNotifications, ...currentNotifications]
         // Keep only last 100 notifications
         const limitedNotifications = updatedNotifications.slice(0, 100)
         saveNotifications(limitedNotifications)
+      } else {
+        console.log("🔔 No new notifications to add")
       }
 
       // Update last seen post IDs

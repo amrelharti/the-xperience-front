@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/popover"
 import { useNotifications, Notification } from "../hooks/useNotifications"
 import { formatDistanceToNow } from "date-fns"
+import NotificationTestButton from "./NotificationTestButton"
 
 const getPostTypeIcon = (type: string) => {
   switch (type) {
@@ -109,6 +110,7 @@ export default function NotificationDropdown() {
               )}
             </div>
             <div className="flex items-center gap-1">
+              <NotificationTestButton />
               {unreadCount > 0 && (
                 <Button
                   variant="ghost"
