@@ -24,6 +24,7 @@ interface UserEnrollment {
 
 const NOTIFICATION_STORAGE_KEY = "notifications"
 const LAST_SEEN_POSTS_KEY = "lastSeenPostIds"
+const NOTIFICATION_INIT_KEY = "notificationsInitialized"
 const POLL_INTERVAL = 5000 // 5 seconds for near real-time
 
 // Global event to trigger notification refresh
@@ -136,6 +137,27 @@ export function useNotifications() {
     }
   }, [user?.id])
 
+  // Check if notifications have been initialized for this user
+  const isNotificationsInitialized = useCallback((): boolean => {
+    if (!user?.id) return false
+    try {
+      const initialized = localStorage.getItem(`${NOTIFICATION_INIT_KEY}_${user.id}`)
+      return initialized === "true"
+    } catch {
+      return false
+    }
+  }, [user?.id])
+
+  // Mark notifications as initialized
+  const markNotificationsInitialized = useCallback(() => {
+    if (!user?.id) return
+    try {
+      localStorage.setItem(`${NOTIFICATION_INIT_KEY}_${user.id}`, "true")
+    } catch (error) {
+      console.error("Error marking notifications as initialized:", error)
+    }
+  }, [user?.id])
+
   // Check for new posts and create notifications
   const checkForNewPosts = useCallback(async () => {
     if (!user?.id || isLoading) {
@@ -160,6 +182,12 @@ export function useNotifications() {
       
       // Get last seen post IDs
       const lastSeenIds = getLastSeenPostIds()
+      const isFirstRun = !isNotificationsInitialized()
+      
+      if (isFirstRun) {
+        console.log("🔔 First run - marking all existing posts as seen")
+      }
+      
       const newPostIds = new Set<string>()
       const newNotifications: Notification[] = []
 
@@ -230,11 +258,15 @@ export function useNotifications() {
             
             console.log(`🔔 Found ${relevantPosts.length} relevant posts after filtering`)
 
-            // Create notifications for new posts (not created by current user)
+            // Process posts
             relevantPosts.forEach((post: any) => {
               // Skip if post is from current user
               if (post.author?.id === user.id) {
                 console.log(`🔔 Post ${post.id} skipped: created by current user`)
+                // Still mark as seen even if it's from current user
+                if (isFirstRun) {
+                  newPostIds.add(post.id)
+                }
                 return
               }
 
@@ -250,7 +282,14 @@ export function useNotifications() {
                 return
               }
 
-              // Create notification
+              // On first run, mark all existing posts as seen without creating notifications
+              if (isFirstRun) {
+                console.log(`🔔 First run - marking post ${post.id} as seen (no notification)`)
+                newPostIds.add(post.id)
+                return
+              }
+
+              // Create notification for new posts (only after first run)
               const notification: Notification = {
                 id: `notif_${post.id}_${Date.now()}`,
                 postId: post.id,
@@ -287,6 +326,12 @@ export function useNotifications() {
       if (newPostIds.size > 0) {
         const updatedLastSeen = new Set([...lastSeenIds, ...newPostIds])
         saveLastSeenPostIds(updatedLastSeen)
+      }
+
+      // Mark as initialized after first successful run
+      if (isFirstRun) {
+        markNotificationsInitialized()
+        console.log("🔔 Notifications initialized - future posts will trigger notifications")
       }
     } catch (error) {
       console.error("Error checking for new posts:", error)
