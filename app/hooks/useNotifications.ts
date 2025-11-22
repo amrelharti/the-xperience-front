@@ -15,8 +15,9 @@ export interface Notification {
 }
 
 interface UserEnrollment {
+  id?: string // Class ID might be here
+  classId?: string // Or here
   moduleId: string // This is actually the training ID
-  classId: string
   isActive: boolean
   isArchived: boolean
 }
@@ -88,7 +89,20 @@ export function useNotifications() {
       })
       if (res.ok) {
         const enrollments = await res.json()
-        return enrollments.filter((e: UserEnrollment) => e.isActive && !e.isArchived)
+        console.log("🔔 Raw enrollments from API:", enrollments)
+        
+        // Filter active enrollments and normalize the structure
+        const normalized = enrollments
+          .filter((e: any) => e.isActive && !e.isArchived)
+          .map((e: any) => ({
+            ...e,
+            // The class ID might be in 'id' field, normalize it to classId
+            classId: e.classId || e.id,
+            moduleId: e.moduleId // This is the training ID
+          }))
+        
+        console.log("🔔 Normalized enrollments:", normalized)
+        return normalized
       }
     } catch (error) {
       console.error("Error fetching user enrollments:", error)
@@ -152,9 +166,17 @@ export function useNotifications() {
       // Check posts for each enrollment (training + class combination)
       for (const enrollment of enrollments) {
         try {
+          // Get the class ID - it might be in classId or id field
+          const classId = enrollment.classId || enrollment.id
+          
+          if (!classId) {
+            console.log("🔔 Enrollment missing classId:", enrollment)
+            continue
+          }
+
           // First, get all posts for this class
           const params = new URLSearchParams({
-            classId: enrollment.classId,
+            classId: classId,
             size: "50" // Check last 50 posts to be safe
           })
 
@@ -166,13 +188,13 @@ export function useNotifications() {
           if (res.ok) {
             const data = await res.json()
             const posts = data.posts || []
-            console.log(`🔔 Found ${posts.length} posts for class ${enrollment.classId}`)
+            console.log(`🔔 Found ${posts.length} posts for class ${classId}`)
 
             // Filter posts that match BOTH the training AND class
             const relevantPosts = posts.filter((post: any) => {
               console.log(`🔔 Checking post ${post.id}:`, {
                 postClassId: post.class?.id,
-                enrollmentClassId: enrollment.classId,
+                enrollmentClassId: classId,
                 postModuleId: post.moduleId,
                 enrollmentModuleId: enrollment.moduleId,
                 postAuthorId: post.author?.id,
@@ -181,8 +203,8 @@ export function useNotifications() {
 
               // Post must have the same class
               const postClassId = post.class?.id
-              if (!postClassId || postClassId !== enrollment.classId) {
-                console.log(`🔔 Post ${post.id} filtered out: class mismatch`)
+              if (!postClassId || postClassId !== classId) {
+                console.log(`🔔 Post ${post.id} filtered out: class mismatch (post: ${postClassId}, enrollment: ${classId})`)
                 return false
               }
 
