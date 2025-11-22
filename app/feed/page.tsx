@@ -30,6 +30,7 @@ import {
   FolderOpen
 } from "lucide-react"
 import { useUser } from "@/app/hooks/useUser"
+import { triggerNotificationRefresh } from "@/app/hooks/useNotifications"
 import { useDebounce } from "@/app/hooks/useDebounce"
 import UserDropdown from "@/app/components/UserDropdown"
 import RequireAuth from "@/app/components/RequireAuth"
@@ -138,6 +139,8 @@ export default function FeedPage() {
     // Only load posts after URL parameters have been processed
     if (urlParamsProcessed) {
       loadPosts()
+      // Trigger notification refresh when feed loads
+      triggerNotificationRefresh()
     }
   }, [currentPage, debouncedSearchQuery, filterType, filterTraining, filterModule, filterClass, urlParamsProcessed])
   

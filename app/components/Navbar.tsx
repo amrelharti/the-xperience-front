@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PlayCircle, Menu, X } from "lucide-react";
 import { useUser } from "../hooks/useUser";
 import UserDropdown from "./UserDropdown";
+import NotificationDropdown from "./NotificationDropdown";
 import { usePathname, useParams, useSearchParams } from "next/navigation";
 
 function Navbar() {
@@ -131,7 +132,10 @@ function Navbar() {
             {isLoading ? (
               <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
             ) : user ? (
-              <UserDropdown user={user} />
+              <>
+                <NotificationDropdown />
+                <UserDropdown user={user} />
+              </>
             ) : (
               <Button asChild size="sm">
                 <Link href="/auth/signin">Sign In</Link>
@@ -223,8 +227,11 @@ function Navbar() {
                   <div className="w-full h-10 rounded-lg bg-muted animate-pulse" />
                 </div>
               ) : user ? (
-                <div className="px-4 py-2">
-                  <UserDropdown user={user} />
+                <div className="px-4 py-2 flex items-center gap-3">
+                  <NotificationDropdown />
+                  <div className="flex-1">
+                    <UserDropdown user={user} />
+                  </div>
                 </div>
               ) : (
                 <div className="px-4">

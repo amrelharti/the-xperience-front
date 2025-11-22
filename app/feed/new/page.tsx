@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Send, MessageSquare, FileText, HelpCircle, Megaphone, BookOpen, Sparkles, Upload, Image as ImageIcon, FolderOpen } from "lucide-react"
 import { FileUpload } from "@/components/ui/file-upload"
 import { useUser } from "@/app/hooks/useUser"
+import { triggerNotificationRefresh } from "@/app/hooks/useNotifications"
 import UserDropdown from "@/app/components/UserDropdown"
 import RequireAuth from "@/app/components/RequireAuth"
 import Navbar from "@/app/components/Navbar"
@@ -136,6 +137,9 @@ export default function NewPostPage() {
             })
 
             if (res.ok) {
+              // Trigger immediate notification refresh for other users
+              triggerNotificationRefresh()
+              
               toast({
                 title: "Success",
                 description: "Post created successfully!",
@@ -200,6 +204,9 @@ export default function NewPostPage() {
       })
 
       if (res.ok) {
+        // Trigger immediate notification refresh for other users
+        triggerNotificationRefresh()
+        
         toast({
           title: "Success",
           description: "Post created successfully!",
