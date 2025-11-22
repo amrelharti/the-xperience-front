@@ -158,6 +158,82 @@ export function useNotifications() {
     }
   }, [user?.id])
 
+  // Request browser notification permission
+  const requestNotificationPermission = useCallback(async () => {
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      console.log("🔔 Browser does not support notifications")
+      return false
+    }
+
+    if (Notification.permission === "granted") {
+      return true
+    }
+
+    if (Notification.permission !== "denied") {
+      const permission = await Notification.requestPermission()
+      return permission === "granted"
+    }
+
+    return false
+  }, [])
+
+  // Show browser notification
+  const showBrowserNotification = useCallback((notification: Notification) => {
+    if (typeof window === "undefined") return
+
+    requestNotificationPermission().then((hasPermission) => {
+      if (hasPermission) {
+        const title = `${notification.authorName} posted a ${notification.postType}`
+        const body = notification.postTitle || "New post in your class"
+        
+        const browserNotification = new window.Notification(title, {
+          body: body,
+          icon: "/logos/favicon.png",
+          badge: "/logos/favicon.png",
+          tag: notification.postId, // Prevent duplicate notifications
+          requireInteraction: false,
+        })
+
+        // Click handler to open the post
+        browserNotification.onclick = () => {
+          window.focus()
+          window.location.href = notification.link
+          browserNotification.close()
+        }
+
+        // Auto close after 5 seconds
+        setTimeout(() => {
+          browserNotification.close()
+        }, 5000)
+      }
+    })
+  }, [requestNotificationPermission])
+
+  // Play notification sound
+  const playNotificationSound = useCallback(() => {
+    try {
+      // Create audio context for notification sound
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
+
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
+
+      // Pleasant notification sound (two-tone beep)
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime)
+      oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1)
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
+
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + 0.3)
+    } catch (error) {
+      console.log("🔔 Could not play notification sound:", error)
+    }
+  }, [])
+
   // Check for new posts and create notifications
   const checkForNewPosts = useCallback(async () => {
     if (!user?.id || isLoading) {
@@ -318,6 +394,10 @@ export function useNotifications() {
         // Keep only last 100 notifications
         const limitedNotifications = updatedNotifications.slice(0, 100)
         saveNotifications(limitedNotifications)
+        
+        // Show browser notification and play sound
+        showBrowserNotification(newNotifications[0])
+        playNotificationSound()
       } else {
         console.log("🔔 No new notifications to add")
       }
