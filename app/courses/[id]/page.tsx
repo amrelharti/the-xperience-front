@@ -160,7 +160,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       })
     } catch (error) {
     }
-  }, [user, params.id, selectedClassId])
+  }, [user, params.id]) // Removed selectedClassId - it's passed as a parameter, so no need to recreate function when it changes
 
   const loadAvailableClasses = useCallback(async () => {
     try {
@@ -306,7 +306,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     } finally {
       setLoading(false)
     }
-  }, [params.id, user?.id, loadModuleProgress, loadAvailableClasses, selectedClassId, isManuallySelectingClass])
+  }, [params.id, user?.id, loadModuleProgress, loadAvailableClasses, isManuallySelectingClass]) // Removed selectedClassId to prevent loop - it's handled inside the function
 
 
   const handleLockedModule = (module: any) => {

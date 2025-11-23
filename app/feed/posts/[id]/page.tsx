@@ -543,7 +543,7 @@ export default function PostDetailPage() {
     setSubmittingPostEdit(true);
     
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/feed/posts/${post.id}`, {
+      const res = await fetch(`/api/feed/posts/${post.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -592,7 +592,7 @@ export default function PostDetailPage() {
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/feed/posts/${post.id}`, {
+      const res = await fetch(`/api/feed/posts/${post.id}`, {
         method: "DELETE",
         credentials: "include"
       });
