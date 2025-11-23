@@ -620,10 +620,25 @@ export default function PostDetailPage() {
         } else if (contentType && contentType.includes("application/json")) {
           try {
             const error = await res.json();
-            errorMessage = error.error || errorMessage;
+            errorMessage = error.error || error.message || errorMessage;
+            
+            // Check for foreign key constraint violation
+            if (errorMessage.includes("foreign key") || errorMessage.includes("constraint") || errorMessage.includes("notifications")) {
+              errorMessage = "Cannot delete post: It has associated notifications. Please apply the cascade delete migration (V6) to enable post deletion.";
+            }
           } catch (jsonError) {
             // If JSON parsing fails, use the status-based message
             console.error("Error parsing error response:", jsonError);
+          }
+        } else {
+          // Try to get error text even if not JSON
+          try {
+            const errorText = await res.text();
+            if (errorText.includes("foreign key") || errorText.includes("notifications")) {
+              errorMessage = "Cannot delete post: It has associated notifications. Please apply the cascade delete migration (V6) to enable post deletion.";
+            }
+          } catch {
+            // If text parsing also fails, use default message
           }
         }
         
