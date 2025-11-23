@@ -9,6 +9,7 @@ export interface Notification {
   authorName: string
   postTitle: string | null
   postType: string
+  notificationType: string // POST_CREATED, COMMENT, LIKE, RATING
   createdAt: string
   read: boolean
   link: string
@@ -53,6 +54,7 @@ export function useNotifications() {
           authorName: n.authorName,
           postTitle: n.postTitle,
           postType: n.postType,
+          notificationType: n.notificationType || 'POST_CREATED', // Default for backward compatibility
           createdAt: n.createdAt,
           read: n.read,
           link: n.link
@@ -75,7 +77,7 @@ export function useNotifications() {
   // Request browser notification permission
   const requestNotificationPermission = useCallback(async () => {
     if (typeof window === "undefined" || !("Notification" in window)) {
-      console.log("🔔 Browser does not support notifications")
+
       return false
     }
 
@@ -97,11 +99,37 @@ export function useNotifications() {
 
     requestNotificationPermission().then((hasPermission) => {
       if (hasPermission) {
-        // More generic title that works for posts, comments, likes, and ratings
-        const title = `New activity on ${notification.postType}`
-        const body = notification.postTitle 
-          ? `${notification.authorName}: ${notification.postTitle}`
-          : `${notification.authorName} - New activity in your class`
+        // Different messages based on notification type
+        let title = ""
+        let body = ""
+        
+        switch (notification.notificationType) {
+          case 'COMMENT':
+            title = "New comment on your post"
+            body = notification.postTitle 
+              ? `${notification.authorName} commented on "${notification.postTitle}"`
+              : `${notification.authorName} commented on your ${notification.postType}`
+            break
+          case 'LIKE':
+            title = "Someone liked your post"
+            body = notification.postTitle 
+              ? `${notification.authorName} liked "${notification.postTitle}"`
+              : `${notification.authorName} liked your ${notification.postType}`
+            break
+          case 'RATING':
+            title = "New rating on your post"
+            body = notification.postTitle 
+              ? `${notification.authorName} rated "${notification.postTitle}"`
+              : `${notification.authorName} rated your ${notification.postType}`
+            break
+          case 'POST_CREATED':
+          default:
+            title = `New ${notification.postType} in your class`
+            body = notification.postTitle 
+              ? `${notification.authorName}: ${notification.postTitle}`
+              : `${notification.authorName} posted a new ${notification.postType}`
+            break
+        }
         
         const browserNotification = new window.Notification(title, {
           body: body,
@@ -147,18 +175,18 @@ export function useNotifications() {
       oscillator.start(audioContext.currentTime)
       oscillator.stop(audioContext.currentTime + 0.3)
     } catch (error) {
-      console.log("🔔 Could not play notification sound:", error)
+
     }
   }, [])
 
   // Check for new notifications from backend
   const checkForNewPosts = useCallback(async () => {
     if (!user?.id || isLoading) {
-      console.log("🔔 Notification check skipped:", { userId: user?.id, isLoading })
+
       return
     }
 
-    console.log("🔔 Checking for new notifications from backend")
+
     setIsLoading(true)
     try {
       // Get previous unread count to detect new notifications
@@ -177,6 +205,7 @@ export function useNotifications() {
           authorName: n.authorName,
           postTitle: n.postTitle,
           postType: n.postType,
+          notificationType: n.notificationType || 'POST_CREATED', // Default for backward compatibility
           createdAt: n.createdAt,
           read: n.read,
           link: n.link

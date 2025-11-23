@@ -1,0 +1,284 @@
+ .deployment-checklist.md                | 1 [32m+[m
+ BACKEND_FIX_TRAINING_MODULE_ACCESS.md   | 1 [32m+[m
+ BACKEND_LOGOUT_FIX_CHECKLIST.md         | 1 [32m+[m
+ CURRENT_SETUP_NOTE.md                   | 1 [32m+[m
+ DEPLOYMENT_FILES_SUMMARY.md             | 1 [32m+[m
+ DEPLOYMENT_GUIDE.md                     | 1 [32m+[m
+ DEPLOYMENT_QUICK_START.md               | 1 [32m+[m
+ DEPLOY_RIGHT_NOW.md                     | 1 [32m+[m
+ FEEDBACK_403_ERROR_DEBUG.md             | 1 [32m+[m
+ FIX_MIGRATION_ISSUE.md                  | 1 [32m+[m
+ FIX_SUMMARY.md                          | 1 [32m+[m
+ HOW_TO_DEPLOY.md                        | 1 [32m+[m
+ PRODUCTION_FIX_SUMMARY.md               | 1 [32m+[m
+ QUICK_DEPLOY_CARD.md                    | 1 [32m+[m
+ QUICK_FIX_NOW.sql                       | 1 [32m+[m
+ SETUP_LOCAL_DEVELOPMENT.md              | 1 [32m+[m
+ SETUP_WITH_LANDING_PAGE.md              | 1 [32m+[m
+ SUBDIRECTORY_DEPLOYMENT.md              | 1 [32m+[m
+ TRAINING_MODULE_ACCESS_CODE_FIX.md      | 1 [32m+[m
+ TRAINING_MODULE_ACCESS_FIX_SUMMARY.md   | 1 [32m+[m
+ VPS_DEPLOYMENT_GUIDE.md                 | 1 [32m+[m
+ app/components/NotificationDropdown.tsx | 2 [32m+[m[31m-[m
+ app/hooks/useNotifications.ts           | 9 [32m++++++[m[31m---[m
+ deploy-frontend.sh                      | 1 [32m+[m
+ setup-nginx-subdomain.sh                | 1 [32m+[m
+ setup-nginx.sh                          | 1 [32m+[m
+ 26 files changed, 31 insertions(+), 4 deletions(-)
+
+[1mdiff --git a/.deployment-checklist.md b/.deployment-checklist.md[m
+[1mindex aafd8e9..f858030 100644[m
+[1m--- a/.deployment-checklist.md[m
+[1m+++ b/.deployment-checklist.md[m
+[36m@@ -402,3 +402,4 @@[m [m_________________________________________________[m
+ [m
+ **You did it! Your app is live! 🚀**[m
+ [m
+[41m+[m
+[1mdiff --git a/BACKEND_FIX_TRAINING_MODULE_ACCESS.md b/BACKEND_FIX_TRAINING_MODULE_ACCESS.md[m
+[1mindex 05fbe5c..4669347 100644[m
+[1m--- a/BACKEND_FIX_TRAINING_MODULE_ACCESS.md[m
+[1m+++ b/BACKEND_FIX_TRAINING_MODULE_ACCESS.md[m
+[36m@@ -335,3 +335,4 @@[m [mOnce backend is fixed:[m
+ [m
+ [m
+ [m
+[41m+[m
+[1mdiff --git a/BACKEND_LOGOUT_FIX_CHECKLIST.md b/BACKEND_LOGOUT_FIX_CHECKLIST.md[m
+[1mindex 0e8f427..df8a12c 100644[m
+[1m--- a/BACKEND_LOGOUT_FIX_CHECKLIST.md[m
+[1m+++ b/BACKEND_LOGOUT_FIX_CHECKLIST.md[m
+[36m@@ -108,3 +108,4 @@[m [mAll should be empty after logout.[m
+ [m
+ Check the detailed guide in `LOGOUT_FIX_NOTES.md` for complete code examples.[m
+ [m
+[41m+[m
+[1mdiff --git a/CURRENT_SETUP_NOTE.md b/CURRENT_SETUP_NOTE.md[m
+[1mindex 85618cd..6bbf86b 100644[m
+[1m--- a/CURRENT_SETUP_NOTE.md[m
+[1m+++ b/CURRENT_SETUP_NOTE.md[m
+[36m@@ -155,3 +155,4 @@[m [mThe script is smart! It will:[m
+ [m
+ You just need to answer a few questions (database password, etc.)![m
+ [m
+[41m+[m
+[1mdiff --git a/DEPLOYMENT_FILES_SUMMARY.md b/DEPLOYMENT_FILES_SUMMARY.md[m
+[1mindex d7811a8..6c0d149 100644[m
+[1m--- a/DEPLOYMENT_FILES_SUMMARY.md[m
+[1m+++ b/DEPLOYMENT_FILES_SUMMARY.md[m
+[36m@@ -314,3 +314,4 @@[m [mOnce deployed:[m
+ [m
+ **Good luck with your deployment!** 🎊[m
+ [m
+[41m+[m
+[1mdiff --git a/DEPLOYMENT_GUIDE.md b/DEPLOYMENT_GUIDE.md[m
+[1mindex 340b373..b53d68e 100644[m
+[1m--- a/DEPLOYMENT_GUIDE.md[m
+[1m+++ b/DEPLOYMENT_GUIDE.md[m
+[36m@@ -222,3 +222,4 @@[m [mIf you encounter issues:[m
+ [m
+ [m
+ [m
+[41m+[m
+[1mdiff --git a/DEPLOYMENT_QUICK_START.md b/DEPLOYMENT_QUICK_START.md[m
+[1mindex b600cca..7a8cd2a 100644[m
+[1m--- a/DEPLOYMENT_QUICK_START.md[m
+[1m+++ b/DEPLOYMENT_QUICK_START.md[m
+[36m@@ -370,3 +370,4 @@[m [mCommon issues:[m
+ - **Connection Refused**: Service not started or firewall blocking[m
+ - **DNS errors**: DNS not propagated yet (wait 10-15 minutes)[m
+ [m
+[41m+[m
+[1mdiff --git a/DEPLOY_RIGHT_NOW.md b/DEPLOY_RIGHT_NOW.md[m
+[1mindex 175f7a6..e2efcce 100644[m
+[1m--- a/DEPLOY_RIGHT_NOW.md[m
+[1m+++ b/DEPLOY_RIGHT_NOW.md[m
+[36m@@ -196,3 +196,4 @@[m [mYour files are ready, just run the scripts and you're done![m
+ [m
+ **Let's deploy! 🚀**[m
+ [m
+[41m+[m
+[1mdiff --git a/FEEDBACK_403_ERROR_DEBUG.md b/FEEDBACK_403_ERROR_DEBUG.md[m
+[1mindex 6d53230..6502ebb 100644[m
+[1m--- a/FEEDBACK_403_ERROR_DEBUG.md[m
+[1m+++ b/FEEDBACK_403_ERROR_DEBUG.md[m
+[36m@@ -276,3 +276,4 @@[m [mfetch('/api/feed/posts', {[m
+ [m
+ **Next Step:** Check the backend logs when you try to create the FEEDBACK post. The logs will show the exact reason for the 403 error.[m
+ [m
+[41m+[m
+[1mdiff --git a/FIX_MIGRATION_ISSUE.md b/FIX_MIGRATION_ISSUE.md[m
+[1mindex 6ebc4b7..3f80b45 100644[m
+[1m--- a/FIX_MIGRATION_ISSUE.md[m
+[1m+++ b/FIX_MIGRATION_ISSUE.md[m
+[36m@@ -212,3 +212,4 @@[m [mThen try creating your WEEKLY_SUMMARY post again. It should work![m
+ [m
+ The other migrations (V40-V45) can be applied later when you restart Spring Boot.[m
+ [m
+[41m+[m
+[1mdiff --git a/FIX_SUMMARY.md b/FIX_SUMMARY.md[m
+[1mindex 2d926a2..b614c38 100644[m
+[1m--- a/FIX_SUMMARY.md[m
+[1m+++ b/FIX_SUMMARY.md[m
+[36m@@ -96,3 +96,4 @@[m [mThe fix is straightforward - it's about ensuring the database query matches both[m
+ [m
+ [m
+ [m
+[41m+[m
+[1mdiff --git a/HOW_TO_DEPLOY.md b/HOW_TO_DEPLOY.md[m
+[1mindex f965ddc..442af26 100644[m
+[1m--- a/HOW_TO_DEPLOY.md[m
+[1m+++ b/HOW_TO_DEPLOY.md[m
+[36m@@ -396,3 +396,4 @@[m [mTo understand what's happening:[m
+ [m
+ Good luck! 🎉[m
+ [m
+[41m+[m
+[1mdiff --git a/PRODUCTION_FIX_SUMMARY.md b/PRODUCTION_FIX_SUMMARY.md[m
+[1mindex e020649..aa97941 100644[m
+[1m--- a/PRODUCTION_FIX_SUMMARY.md[m
+[1m+++ b/PRODUCTION_FIX_SUMMARY.md[m
+[36m@@ -72,3 +72,4 @@[m [mnpm run dev[m
+ [m
+ [m
+ [m
+[41m+[m
+[1mdiff --git a/QUICK_DEPLOY_CARD.md b/QUICK_DEPLOY_CARD.md[m
+[1mindex 8042bbc..9bffbd9 100644[m
+[1m--- a/QUICK_DEPLOY_CARD.md[m
+[1m+++ b/QUICK_DEPLOY_CARD.md[m
+[36m@@ -154,3 +154,4 @@[m [mUser Journey:[m
+ [m
+ **You're ready to deploy! 🚀**[m
+ [m
+[41m+[m
+[1mdiff --git a/QUICK_FIX_NOW.sql b/QUICK_FIX_NOW.sql[m
+[1mindex 5ee7659..eadd80c 100644[m
+[1m--- a/QUICK_FIX_NOW.sql[m
+[1m+++ b/QUICK_FIX_NOW.sql[m
+[36m@@ -26,3 +26,4 @@[m [mAFTER THIS:[m
+ - This will update the Flyway history and keep everything in sync[m
+ */[m
+ [m
+[41m+[m
+[1mdiff --git a/SETUP_LOCAL_DEVELOPMENT.md b/SETUP_LOCAL_DEVELOPMENT.md[m
+[1mindex 6152f8f..f77283e 100644[m
+[1m--- a/SETUP_LOCAL_DEVELOPMENT.md[m
+[1m+++ b/SETUP_LOCAL_DEVELOPMENT.md[m
+[36m@@ -239,3 +239,4 @@[m [mRun into issues? Check:[m
+ 3. Is port 8080 or 3000 already in use?[m
+ 4. Check backend logs for errors[m
+ [m
+[41m+[m
+[1mdiff --git a/SETUP_WITH_LANDING_PAGE.md b/SETUP_WITH_LANDING_PAGE.md[m
+[1mindex f72f1d8..66e4c80 100644[m
+[1m--- a/SETUP_WITH_LANDING_PAGE.md[m
+[1m+++ b/SETUP_WITH_LANDING_PAGE.md[m
+[36m@@ -324,3 +324,4 @@[m [mThis setup gives you:[m
+ [m
+ Let's get started! 🚀[m
+ [m
+[41m+[m
+[1mdiff --git a/SUBDIRECTORY_DEPLOYMENT.md b/SUBDIRECTORY_DEPLOYMENT.md[m
+[1mindex c581ce3..b315008 100644[m
+[1m--- a/SUBDIRECTORY_DEPLOYMENT.md[m
+[1m+++ b/SUBDIRECTORY_DEPLOYMENT.md[m
+[36m@@ -419,3 +419,4 @@[m [mAPI:      https://api.the-xperience.com    (VPS)[m
+ [m
+ Need help implementing this? Let me know which approach you prefer![m
+ [m
+[41m+[m
+[1mdiff --git a/TRAINING_MODULE_ACCESS_CODE_FIX.md b/TRAINING_MODULE_ACCESS_CODE_FIX.md[m
+[1mindex 40633d8..186eaa9 100644[m
+[1m--- a/TRAINING_MODULE_ACCESS_CODE_FIX.md[m
+[1m+++ b/TRAINING_MODULE_ACCESS_CODE_FIX.md[m
+[36m@@ -208,3 +208,4 @@[m [mTraining[m
+ [m
+ [m
+ [m
+[41m+[m
+[1mdiff --git a/TRAINING_MODULE_ACCESS_FIX_SUMMARY.md b/TRAINING_MODULE_ACCESS_FIX_SUMMARY.md[m
+[1mindex d9bd229..629a622 100644[m
+[1m--- a/TRAINING_MODULE_ACCESS_FIX_SUMMARY.md[m
+[1m+++ b/TRAINING_MODULE_ACCESS_FIX_SUMMARY.md[m
+[36m@@ -167,3 +167,4 @@[m [mThe fix should take about 30 minutes for an experienced Spring Boot developer.[m
+ [m
+ [m
+ [m
+[41m+[m
+[1mdiff --git a/VPS_DEPLOYMENT_GUIDE.md b/VPS_DEPLOYMENT_GUIDE.md[m
+[1mindex da05524..f09ecd4 100644[m
+[1m--- a/VPS_DEPLOYMENT_GUIDE.md[m
+[1m+++ b/VPS_DEPLOYMENT_GUIDE.md[m
+[36m@@ -759,3 +759,4 @@[m [mShare the specific error messages and I can help you debug further![m
+ [m
+ **Good luck with your deployment! 🚀**[m
+ [m
+[41m+[m
+[1mdiff --git a/app/components/NotificationDropdown.tsx b/app/components/NotificationDropdown.tsx[m
+[1mindex 18db1c3..44d3e09 100644[m
+[1m--- a/app/components/NotificationDropdown.tsx[m
+[1m+++ b/app/components/NotificationDropdown.tsx[m
+[36m@@ -140,7 +140,7 @@[m [mexport default function NotificationDropdown() {[m
+                 <Bell className="h-12 w-12 text-muted-foreground mb-4 opacity-50" />[m
+                 <p className="text-sm text-muted-foreground font-medium">No notifications</p>[m
+                 <p className="text-xs text-muted-foreground mt-1">[m
+[31m-                  You'll be notified when someone posts in your classes[m
+[32m+[m[32m                  You'll be notified about new posts, comments, likes, and ratings[m
+                 </p>[m
+               </div>[m
+             ) : ([m
+[1mdiff --git a/app/hooks/useNotifications.ts b/app/hooks/useNotifications.ts[m
+[1mindex 250ca4b..f286c3c 100644[m
+[1m--- a/app/hooks/useNotifications.ts[m
+[1m+++ b/app/hooks/useNotifications.ts[m
+[36m@@ -97,8 +97,11 @@[m [mexport function useNotifications() {[m
+ [m
+     requestNotificationPermission().then((hasPermission) => {[m
+       if (hasPermission) {[m
+[31m-        const title = `${notification.authorName} posted a ${notification.postType}`[m
+[31m-        const body = notification.postTitle || "New post in your class"[m
+[32m+[m[32m        // More generic title that works for posts, comments, likes, and ratings[m
+[32m+[m[32m        const title = `New activity on ${notification.postType}`[m
+[32m+[m[32m        const body = notification.postTitle[m[41m [m
+[32m+[m[32m          ? `${notification.authorName}: ${notification.postTitle}`[m
+[32m+[m[32m          : `${notification.authorName} - New activity in your class`[m
+         [m
+         const browserNotification = new window.Notification(title, {[m
+           body: body,[m
+[36m@@ -161,7 +164,7 @@[m [mexport function useNotifications() {[m
+       // Get previous unread count to detect new notifications[m
+       const previousUnreadCount = unreadCount[m
+       [m
+[31m-      // Reload notifications from backend (they're automatically created when posts are created)[m
+[32m+[m[32m      // Reload notifications from backend (they're automatically created for posts, comments, likes, and ratings)[m
+       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/notifications?page=0&size=100`, {[m
+         credentials: "include"[m
+       })[m
+[1mdiff --git a/deploy-frontend.sh b/deploy-frontend.sh[m
+[1mindex fda51f0..46d17b3 100644[m
+[1m--- a/deploy-frontend.sh[m
+[1m+++ b/deploy-frontend.sh[m
+[36m@@ -143,3 +143,4 @@[m [mecho "  Status: pm2 status"[m
+ echo "  Monitor: pm2 monit"[m
+ echo ""[m
+ [m
+[41m+[m
+[1mdiff --git a/setup-nginx-subdomain.sh b/setup-nginx-subdomain.sh[m
+[1mindex c4f55c4..5e25fb5 100644[m
+[1m--- a/setup-nginx-subdomain.sh[m
+[1m+++ b/setup-nginx-subdomain.sh[m
+[36m@@ -223,3 +223,4 @@[m [mecho "  Status: systemctl status nginx"[m
+ echo "  View logs: tail -f /var/log/nginx/*.log"[m
+ echo ""[m
+ [m
+[41m+[m
+[1mdiff --git a/setup-nginx.sh b/setup-nginx.sh[m
+[1mindex 759f4b6..86c36f5 100644[m
+[1m--- a/setup-nginx.sh[m
+[1m+++ b/setup-nginx.sh[m
+[36m@@ -201,3 +201,4 @@[m [mecho "  Status: systemctl status nginx"[m
+ echo "  View logs: tail -f /var/log/nginx/*.log"[m
+ echo ""[m
+ [m
+[41m+[m

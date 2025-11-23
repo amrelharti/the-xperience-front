@@ -503,10 +503,27 @@ export default function PostDetailPage() {
           description: "Comment deleted successfully!",
         });
       } else {
-        const error = await res.json();
+        // Check if response has content before trying to parse JSON
+        const contentType = res.headers.get("content-type");
+        let errorMessage = "Failed to delete comment";
+        
+        if (res.status === 403) {
+          errorMessage = "You don't have permission to delete this comment";
+        } else if (res.status === 404) {
+          errorMessage = "Comment not found";
+        } else if (contentType && contentType.includes("application/json")) {
+          try {
+            const error = await res.json();
+            errorMessage = error.error || errorMessage;
+          } catch (jsonError) {
+            // If JSON parsing fails, use the status-based message
+            console.error("Error parsing error response:", jsonError);
+          }
+        }
+        
         toast({
           title: "Error",
-          description: error.error || "Failed to delete comment",
+          description: errorMessage,
           variant: "destructive",
         });
       }
@@ -592,10 +609,27 @@ export default function PostDetailPage() {
           window.location.href = "/feed";
         }
       } else {
-        const error = await res.json();
+        // Check if response has content before trying to parse JSON
+        const contentType = res.headers.get("content-type");
+        let errorMessage = "Failed to delete post";
+        
+        if (res.status === 403) {
+          errorMessage = "You don't have permission to delete this post";
+        } else if (res.status === 404) {
+          errorMessage = "Post not found";
+        } else if (contentType && contentType.includes("application/json")) {
+          try {
+            const error = await res.json();
+            errorMessage = error.error || errorMessage;
+          } catch (jsonError) {
+            // If JSON parsing fails, use the status-based message
+            console.error("Error parsing error response:", jsonError);
+          }
+        }
+        
         toast({
           title: "Error",
-          description: error.error || "Failed to delete post",
+          description: errorMessage,
           variant: "destructive",
         });
       }

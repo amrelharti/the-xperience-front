@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
-import { Bell, X, Check, Trash2, FileText, BookOpen, MessageSquare, Megaphone, FolderOpen, HelpCircle } from "lucide-react"
+import { Bell, X, Check, Trash2, FileText, BookOpen, MessageSquare, Megaphone, FolderOpen, HelpCircle, Heart, Star, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -32,6 +32,37 @@ const getPostTypeColor = (type: string) => {
     case 'ANNOUNCEMENT': return "bg-red-100 text-red-800"
     case 'RESOURCES': return "bg-teal-100 text-teal-800"
     default: return "bg-gray-100 text-gray-800"
+  }
+}
+
+const getNotificationMessage = (notification: Notification) => {
+  const authorName = notification.authorName
+  const postTitle = notification.postTitle || notification.postType
+  
+  switch (notification.notificationType) {
+    case 'COMMENT':
+      return `${authorName} commented on "${postTitle}"`
+    case 'LIKE':
+      return `${authorName} liked "${postTitle}"`
+    case 'RATING':
+      return `${authorName} rated "${postTitle}"`
+    case 'POST_CREATED':
+    default:
+      return `${authorName} posted a new ${notification.postType}`
+  }
+}
+
+const getNotificationIcon = (notificationType: string) => {
+  switch (notificationType) {
+    case 'COMMENT':
+      return <MessageCircle className="h-4 w-4" />
+    case 'LIKE':
+      return <Heart className="h-4 w-4" />
+    case 'RATING':
+      return <Star className="h-4 w-4" />
+    case 'POST_CREATED':
+    default:
+      return <Bell className="h-4 w-4" />
   }
 }
 
@@ -155,12 +186,12 @@ export default function NotificationDropdown() {
                     <div className={`p-4 ${!notification.read ? 'bg-blue-50/50' : ''}`}>
                       <div className="flex items-start gap-3">
                         <div className={`flex-shrink-0 h-8 w-8 rounded-lg flex items-center justify-center ${getPostTypeColor(notification.postType)}`}>
-                          {getPostTypeIcon(notification.postType)}
+                          {getNotificationIcon(notification.notificationType || 'POST_CREATED')}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-1">
-                            <p className="text-sm font-medium text-gray-900 line-clamp-1">
-                              {notification.authorName}
+                            <p className="text-sm font-medium text-gray-900 line-clamp-2">
+                              {getNotificationMessage(notification)}
                             </p>
                             {!notification.read && (
                               <div className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0 mt-1.5" />
@@ -174,11 +205,6 @@ export default function NotificationDropdown() {
                               {notification.postType}
                             </Badge>
                           </div>
-                          {notification.postTitle && (
-                            <p className="text-sm text-gray-700 line-clamp-2 mb-1">
-                              {notification.postTitle}
-                            </p>
-                          )}
                           <p className="text-xs text-muted-foreground">
                             {formatTime(notification.createdAt)}
                           </p>
