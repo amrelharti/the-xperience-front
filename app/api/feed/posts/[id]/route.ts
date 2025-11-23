@@ -12,14 +12,26 @@ export async function PUT(
     const body = await request.json()
     
     // Extract JWT token from SESSION cookie
+    // Handle cookies that may contain '=' in the value (JWT tokens)
     let jwtToken = null
     if (cookieHeader) {
       const cookies = cookieHeader.split(';')
       for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=')
-        if (name === 'SESSION' && value) {
-          jwtToken = value
-          break
+        const trimmed = cookie.trim()
+        const equalIndex = trimmed.indexOf('=')
+        if (equalIndex > 0) {
+          const name = trimmed.substring(0, equalIndex)
+          const value = trimmed.substring(equalIndex + 1)
+          if (name === 'SESSION' && value) {
+            // Decode the cookie value in case it's URL-encoded
+            try {
+              jwtToken = decodeURIComponent(value)
+            } catch {
+              // If decoding fails, use the original value
+              jwtToken = value
+            }
+            break
+          }
         }
       }
     }
@@ -28,9 +40,12 @@ export async function PUT(
       'Content-Type': 'application/json'
     }
     
+    // Forward both Authorization header and Cookie header for maximum compatibility
     if (jwtToken) {
       headers['Authorization'] = `Bearer ${jwtToken}`
-    } else {
+    }
+    // Always forward the cookie header as well
+    if (cookieHeader) {
       headers['Cookie'] = cookieHeader
     }
 
@@ -42,7 +57,14 @@ export async function PUT(
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
+      const errorText = await response.text().catch(() => '')
+      let errorData = {}
+      try {
+        errorData = errorText ? JSON.parse(errorText) : {}
+      } catch {
+        errorData = { error: errorText || 'Failed to update post' }
+      }
+      
       return NextResponse.json(
         { error: errorData.error || errorData.message || 'Failed to update post' },
         { status: response.status }
@@ -69,14 +91,26 @@ export async function DELETE(
     const cookieHeader = request.headers.get('cookie') || ''
     
     // Extract JWT token from SESSION cookie
+    // Handle cookies that may contain '=' in the value (JWT tokens)
     let jwtToken = null
     if (cookieHeader) {
       const cookies = cookieHeader.split(';')
       for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=')
-        if (name === 'SESSION' && value) {
-          jwtToken = value
-          break
+        const trimmed = cookie.trim()
+        const equalIndex = trimmed.indexOf('=')
+        if (equalIndex > 0) {
+          const name = trimmed.substring(0, equalIndex)
+          const value = trimmed.substring(equalIndex + 1)
+          if (name === 'SESSION' && value) {
+            // Decode the cookie value in case it's URL-encoded
+            try {
+              jwtToken = decodeURIComponent(value)
+            } catch {
+              // If decoding fails, use the original value
+              jwtToken = value
+            }
+            break
+          }
         }
       }
     }
@@ -85,11 +119,16 @@ export async function DELETE(
       'Content-Type': 'application/json'
     }
     
+    // Forward both Authorization header and Cookie header for maximum compatibility
     if (jwtToken) {
       headers['Authorization'] = `Bearer ${jwtToken}`
-    } else {
+    }
+    // Always forward the cookie header as well
+    if (cookieHeader) {
       headers['Cookie'] = cookieHeader
     }
+
+    console.log(`🗑️ Deleting post ${id}, has token: ${!!jwtToken}, has cookie: ${!!cookieHeader}`)
 
     const response = await fetch(`${BACKEND_URL}/api/feed/posts/${id}`, {
       method: 'DELETE',
@@ -98,13 +137,23 @@ export async function DELETE(
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
+      const errorText = await response.text().catch(() => '')
+      let errorData = {}
+      try {
+        errorData = errorText ? JSON.parse(errorText) : {}
+      } catch {
+        errorData = { error: errorText || 'Failed to delete post' }
+      }
+      
+      console.error(`❌ Failed to delete post ${id}:`, response.status, errorData)
+      
       return NextResponse.json(
         { error: errorData.error || errorData.message || 'Failed to delete post' },
         { status: response.status }
       )
     }
 
+    console.log(`✅ Successfully deleted post ${id}`)
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting post:', error)
