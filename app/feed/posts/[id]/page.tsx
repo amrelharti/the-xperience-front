@@ -25,6 +25,7 @@ import {
   FolderOpen
 } from "lucide-react"
 import { useUser } from "@/app/hooks/useUser"
+import { triggerNotificationRefresh } from "@/app/hooks/useNotifications"
 import UserDropdown from "@/app/components/UserDropdown"
 import RequireAuth from "@/app/components/RequireAuth"
 import Navbar from "@/app/components/Navbar"
@@ -207,6 +208,9 @@ export default function PostDetailPage() {
             avgScore: data.avgScore,
             scoreCount: data.scoreCount
           } : null)
+
+          // Trigger notification refresh to check for new rating notifications
+          triggerNotificationRefresh()
 
           toast({
             title: "Success",
@@ -670,6 +674,8 @@ export default function PostDetailPage() {
       if (res.ok) {
         const data = await res.json()
         setPost({ ...post, likeCount: data.likeCount })
+        // Trigger notification refresh to check for new like notifications
+        triggerNotificationRefresh()
       }
     } catch (error) {
       console.error("Error liking post:", error)
@@ -741,6 +747,9 @@ export default function PostDetailPage() {
             commentCount: (prev.commentCount || 0) + 1
           } : null)
           
+          // Trigger notification refresh to check for new comment notifications
+          triggerNotificationRefresh()
+          
           toast({
             title: "Success",
             description: "Comment posted successfully!",
@@ -750,6 +759,8 @@ export default function PostDetailPage() {
           // Even if JSON parsing fails, the comment might have been created
           // Reload the post to get updated comments
           loadPost()
+          // Trigger notification refresh to check for new comment notifications
+          triggerNotificationRefresh()
           toast({
             title: "Success",
             description: "Comment posted successfully!",

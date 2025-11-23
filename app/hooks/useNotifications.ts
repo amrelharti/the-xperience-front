@@ -159,6 +159,14 @@ export function useNotifications() {
     try {
       // Create audio context for notification sound
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      
+      // Resume audio context if suspended (required by some browsers)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume().catch(err => {
+          console.warn("Failed to resume audio context:", err)
+        })
+      }
+      
       const oscillator = audioContext.createOscillator()
       const gainNode = audioContext.createGain()
 
@@ -175,17 +183,15 @@ export function useNotifications() {
       oscillator.start(audioContext.currentTime)
       oscillator.stop(audioContext.currentTime + 0.3)
     } catch (error) {
-
+      console.error("Error playing notification sound:", error)
     }
   }, [])
 
   // Check for new notifications from backend
   const checkForNewPosts = useCallback(async () => {
     if (!user?.id || isLoading) {
-
       return
     }
-
 
     setIsLoading(true)
     try {
@@ -234,7 +240,7 @@ export function useNotifications() {
     } finally {
       setIsLoading(false)
     }
-  }, [user?.id, loadNotifications, isLoading, unreadCount, notifications])
+  }, [user?.id, isLoading, unreadCount, showBrowserNotification, playNotificationSound])
 
   // Mark notification as read
   const markAsRead = useCallback(async (notificationId: string) => {
