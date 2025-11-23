@@ -140,7 +140,7 @@ export default function NotificationDropdown() {
                 <Bell className="h-12 w-12 text-muted-foreground mb-4 opacity-50" />
                 <p className="text-sm text-muted-foreground font-medium">No notifications</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  You'll be notified when someone posts in your classes
+                  You'll be notified about new posts, comments, likes, and ratings
                 </p>
               </div>
             ) : (

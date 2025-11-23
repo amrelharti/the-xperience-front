@@ -97,8 +97,11 @@ export function useNotifications() {
 
     requestNotificationPermission().then((hasPermission) => {
       if (hasPermission) {
-        const title = `${notification.authorName} posted a ${notification.postType}`
-        const body = notification.postTitle || "New post in your class"
+        // More generic title that works for posts, comments, likes, and ratings
+        const title = `New activity on ${notification.postType}`
+        const body = notification.postTitle 
+          ? `${notification.authorName}: ${notification.postTitle}`
+          : `${notification.authorName} - New activity in your class`
         
         const browserNotification = new window.Notification(title, {
           body: body,
@@ -161,7 +164,7 @@ export function useNotifications() {
       // Get previous unread count to detect new notifications
       const previousUnreadCount = unreadCount
       
-      // Reload notifications from backend (they're automatically created when posts are created)
+      // Reload notifications from backend (they're automatically created for posts, comments, likes, and ratings)
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/notifications?page=0&size=100`, {
         credentials: "include"
       })
