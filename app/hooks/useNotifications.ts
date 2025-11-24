@@ -97,7 +97,10 @@ export function useNotifications() {
   const showBrowserNotification = useCallback((notification: Notification) => {
     if (typeof window === "undefined") return
 
+    console.log("🔔 Attempting to show browser notification:", notification)
+    
     requestNotificationPermission().then((hasPermission) => {
+      console.log("🔔 Notification permission:", hasPermission)
       if (hasPermission) {
         // Different messages based on notification type
         let title = ""
@@ -131,25 +134,33 @@ export function useNotifications() {
             break
         }
         
-        const browserNotification = new window.Notification(title, {
-          body: body,
-          icon: "/logos/favicon.png",
-          badge: "/logos/favicon.png",
-          tag: notification.postId, // Prevent duplicate notifications
-          requireInteraction: false,
-        })
+        try {
+          const browserNotification = new window.Notification(title, {
+            body: body,
+            icon: "/logos/favicon.png",
+            badge: "/logos/favicon.png",
+            tag: notification.postId, // Prevent duplicate notifications
+            requireInteraction: false,
+          })
 
-        // Click handler to open the post
-        browserNotification.onclick = () => {
-          window.focus()
-          window.location.href = notification.link
-          browserNotification.close()
+          console.log("🔔 Browser notification shown:", title)
+
+          // Click handler to open the post
+          browserNotification.onclick = () => {
+            window.focus()
+            window.location.href = notification.link
+            browserNotification.close()
+          }
+
+          // Auto close after 5 seconds
+          setTimeout(() => {
+            browserNotification.close()
+          }, 5000)
+        } catch (error) {
+          console.error("Error creating browser notification:", error)
         }
-
-        // Auto close after 5 seconds
-        setTimeout(() => {
-          browserNotification.close()
-        }, 5000)
+      } else {
+        console.warn("🔔 Notification permission not granted")
       }
     })
   }, [requestNotificationPermission])
@@ -157,33 +168,52 @@ export function useNotifications() {
   // Play notification sound
   const playNotificationSound = useCallback(() => {
     try {
+      console.log("🔊 Attempting to play notification sound...")
+      
       // Create audio context for notification sound
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
       
       // Resume audio context if suspended (required by some browsers)
       if (audioContext.state === 'suspended') {
-        audioContext.resume().catch(err => {
+        console.log("🔊 Audio context suspended, resuming...")
+        audioContext.resume().then(() => {
+          console.log("🔊 Audio context resumed")
+          playSoundWithContext(audioContext)
+        }).catch(err => {
           console.warn("Failed to resume audio context:", err)
+          // Try to play anyway
+          playSoundWithContext(audioContext)
         })
+      } else {
+        playSoundWithContext(audioContext)
       }
-      
-      const oscillator = audioContext.createOscillator()
-      const gainNode = audioContext.createGain()
-
-      oscillator.connect(gainNode)
-      gainNode.connect(audioContext.destination)
-
-      // Pleasant notification sound (two-tone beep)
-      oscillator.frequency.setValueAtTime(800, audioContext.currentTime)
-      oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1)
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
-
-      oscillator.start(audioContext.currentTime)
-      oscillator.stop(audioContext.currentTime + 0.3)
     } catch (error) {
       console.error("Error playing notification sound:", error)
+    }
+    
+    function playSoundWithContext(audioContext: AudioContext) {
+      try {
+        const oscillator = audioContext.createOscillator()
+        const gainNode = audioContext.createGain()
+
+        oscillator.connect(gainNode)
+        gainNode.connect(audioContext.destination)
+
+        // Pleasant notification sound (two-tone beep) - louder
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime)
+        oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1)
+        
+        // Increase volume
+        gainNode.gain.setValueAtTime(0.5, audioContext.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
+
+        oscillator.start(audioContext.currentTime)
+        oscillator.stop(audioContext.currentTime + 0.3)
+        
+        console.log("🔊 Sound played successfully")
+      } catch (error) {
+        console.error("Error in playSoundWithContext:", error)
+      }
     }
   }, [])
 
@@ -197,6 +227,7 @@ export function useNotifications() {
     try {
       // Get previous unread count to detect new notifications
       const previousUnreadCount = unreadCount
+      const previousNotificationIds = new Set(notifications.map(n => n.id))
       
       // Reload notifications from backend (they're automatically created for posts, comments, likes, and ratings)
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/notifications?page=0&size=100`, {
@@ -224,12 +255,18 @@ export function useNotifications() {
         const newUnreadCount = data.unreadCount || 0
         setUnreadCount(newUnreadCount)
         
-        // Check if we have new unread notifications
-        if (newUnreadCount > previousUnreadCount) {
-          // Find the newest unread notification
-          const newNotifications = notificationsList.filter((n: Notification) => !n.read)
-          if (newNotifications.length > 0) {
-            const newest = newNotifications[0]
+        // Check if we have new unread notifications (either by count or by new IDs)
+        const hasNewUnreadCount = newUnreadCount > previousUnreadCount
+        const newUnreadNotifications = notificationsList.filter((n: Notification) => !n.read && !previousNotificationIds.has(n.id))
+        
+        if (hasNewUnreadCount || newUnreadNotifications.length > 0) {
+          // Find the newest unread notification that we haven't seen before
+          const newest = newUnreadNotifications.length > 0 
+            ? newUnreadNotifications[0] 
+            : notificationsList.find((n: Notification) => !n.read)
+          
+          if (newest) {
+            console.log("🔔 New notification detected:", newest.notificationType, newest)
             showBrowserNotification(newest)
             playNotificationSound()
           }
@@ -240,7 +277,7 @@ export function useNotifications() {
     } finally {
       setIsLoading(false)
     }
-  }, [user?.id, isLoading, unreadCount, showBrowserNotification, playNotificationSound])
+  }, [user?.id, isLoading, unreadCount, notifications, showBrowserNotification, playNotificationSound])
 
   // Mark notification as read
   const markAsRead = useCallback(async (notificationId: string) => {

@@ -209,8 +209,10 @@ export default function PostDetailPage() {
             scoreCount: data.scoreCount
           } : null)
 
-          // Trigger notification refresh to check for new rating notifications
-          triggerNotificationRefresh()
+          // Trigger notification refresh after a short delay to allow backend to process
+          setTimeout(() => {
+            triggerNotificationRefresh()
+          }, 500)
 
           toast({
             title: "Success",
@@ -674,8 +676,10 @@ export default function PostDetailPage() {
       if (res.ok) {
         const data = await res.json()
         setPost({ ...post, likeCount: data.likeCount })
-        // Trigger notification refresh to check for new like notifications
-        triggerNotificationRefresh()
+        // Trigger notification refresh after a short delay to allow backend to process
+        setTimeout(() => {
+          triggerNotificationRefresh()
+        }, 500)
       }
     } catch (error) {
       console.error("Error liking post:", error)
@@ -747,8 +751,10 @@ export default function PostDetailPage() {
             commentCount: (prev.commentCount || 0) + 1
           } : null)
           
-          // Trigger notification refresh to check for new comment notifications
-          triggerNotificationRefresh()
+          // Trigger notification refresh after a short delay to allow backend to process
+          setTimeout(() => {
+            triggerNotificationRefresh()
+          }, 500)
           
           toast({
             title: "Success",
@@ -759,8 +765,10 @@ export default function PostDetailPage() {
           // Even if JSON parsing fails, the comment might have been created
           // Reload the post to get updated comments
           loadPost()
-          // Trigger notification refresh to check for new comment notifications
-          triggerNotificationRefresh()
+          // Trigger notification refresh after a short delay to allow backend to process
+          setTimeout(() => {
+            triggerNotificationRefresh()
+          }, 500)
           toast({
             title: "Success",
             description: "Comment posted successfully!",

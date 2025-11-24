@@ -325,8 +325,10 @@ export default function FeedPage() {
             ? { ...post, likeCount: data.likeCount }
             : post
         ))
-        // Trigger notification refresh to check for new like notifications
-        triggerNotificationRefresh()
+        // Trigger notification refresh after a short delay to allow backend to process
+        setTimeout(() => {
+          triggerNotificationRefresh()
+        }, 500)
       }
     } catch (error) {
       console.error("Error liking post:", error)
