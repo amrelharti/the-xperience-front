@@ -50,3 +50,4 @@ FOREIGN KEY (post_id)
 REFERENCES posts(id)
 ON DELETE CASCADE;
 
+

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useUser } from "./useUser"
 
 export interface Notification {
@@ -32,6 +32,7 @@ export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
+  const hasCompletedInitialLoad = useRef(false)
 
   // Load notifications from backend API
   const loadNotifications = useCallback(async () => {
@@ -259,7 +260,10 @@ export function useNotifications() {
         const hasNewUnreadCount = newUnreadCount > previousUnreadCount
         const newUnreadNotifications = notificationsList.filter((n: Notification) => !n.read && !previousNotificationIds.has(n.id))
         
-        if (hasNewUnreadCount || newUnreadNotifications.length > 0) {
+        const isFirstSuccessfulLoad = !hasCompletedInitialLoad.current
+        hasCompletedInitialLoad.current = true
+        
+        if (!isFirstSuccessfulLoad && (hasNewUnreadCount || newUnreadNotifications.length > 0)) {
           // Find the newest unread notification that we haven't seen before
           const newest = newUnreadNotifications.length > 0 
             ? newUnreadNotifications[0] 
