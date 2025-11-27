@@ -692,7 +692,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                 </p>
                 <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-lg">
                   <p className="text-sm text-amber-800">
-                    <strong>Need access?</strong>
+                    <strong>Need access ?</strong>
                   </p>
                   <p className="text-xs sm:text-sm text-amber-700 mt-2">
                     Please contact your instructor to unlock this module for your class.
