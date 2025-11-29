@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { FileUpload } from "@/components/ui/file-upload"
 import { Plus, Search, Edit, Trash2, ArrowLeft, Users, Mail, Calendar, Shield, Menu, X, Filter } from "lucide-react"
 import Navbar from "../../components/Navbar"
 import UserDropdown from "../../components/UserDropdown"
@@ -52,11 +51,8 @@ export default function UserManagementPage() {
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
-    password: "",
-    role: "STUDENT",
-    imageUrl: ""
+    role: "STUDENT"
   })
-  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
 
   useEffect(() => {
     loadUsers()
@@ -181,41 +177,6 @@ export default function UserManagementPage() {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      // Convert file to data URL if a file is selected
-      let imageUrl = newUser.imageUrl
-      if (selectedImageFile) {
-        // Check file size (2MB limit for data URLs to avoid database issues)
-        if (selectedImageFile.size > 2 * 1024 * 1024) {
-          alert("File size too large. Please select an image smaller than 2MB to avoid database issues.")
-          return
-        }
-        
-        const reader = new FileReader()
-        reader.onload = async () => {
-          const dataUrl = reader.result as string
-          const userData = { ...newUser, imageUrl: dataUrl }
-          
-          const res = await fetch("/api/admin/users", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(userData)
-          })
-          
-          if (res.ok) {
-            setNewUser({ name: "", email: "", password: "", role: "STUDENT", imageUrl: "" })
-            setSelectedImageFile(null)
-            setShowCreateUser(false)
-            loadUsers()
-          } else {
-            alert("Failed to create user")
-          }
-        }
-        reader.readAsDataURL(selectedImageFile)
-        return
-      }
-      
-      // If no file selected, proceed with original logic
       const res = await fetch("/api/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -224,8 +185,7 @@ export default function UserManagementPage() {
       })
       
       if (res.ok) {
-        setNewUser({ name: "", email: "", password: "", role: "STUDENT", imageUrl: "" })
-        setSelectedImageFile(null)
+        setNewUser({ name: "", email: "", role: "STUDENT" })
         setShowCreateUser(false)
         loadUsers()
       } else {
@@ -458,16 +418,6 @@ export default function UserManagementPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={newUser.password}
-                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
                   <Label htmlFor="role">Role</Label>
                   <Select value={newUser.role} onValueChange={(value) => setNewUser({ ...newUser, role: value })}>
                     <SelectTrigger>
@@ -478,18 +428,6 @@ export default function UserManagementPage() {
                       <SelectItem value="ADMIN">Admin</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div>
-                  <Label>Profile Image</Label>
-                  <FileUpload
-                    onFileSelect={setSelectedImageFile}
-                    accept={{
-                      'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp']
-                    }}
-                    placeholder="Drag and drop an image here, or click to select"
-                    currentFile={selectedImageFile}
-                    className="mt-2"
-                  />
                 </div>
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setShowCreateUser(false)}>
