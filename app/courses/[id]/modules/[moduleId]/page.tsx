@@ -66,21 +66,40 @@ export default function ModuleDetailPage() {
   }, [user, userLoading])
 
   // Load classId from URL, localStorage, or my-classes (in that order)
+  // Use a ref to track if we've already loaded the classId to prevent re-fetching
+  const classIdLoadedRef = useRef(false)
+  const initialClassIdRef = useRef<string | null>(null)
+  
   useEffect(() => {
+    // Priority 1: Always check URL first (even if we've loaded before, URL takes precedence)
     const urlClassId = searchParams.get('class')
     
     if (urlClassId) {
-      // Priority 1: Use classId from URL
-      setClassId(urlClassId)
-      console.log("✅ Module page - Using classId from URL:", urlClassId)
-    } else if (user?.id) {
-      // Priority 2: Check localStorage (same key format as course detail page)
+      // If URL has classId, use it (even if we already have one set)
+      if (classId !== urlClassId) {
+        setClassId(urlClassId)
+        initialClassIdRef.current = urlClassId
+        classIdLoadedRef.current = true
+        console.log("✅ Module page - Using classId from URL:", urlClassId)
+      }
+      return
+    }
+    
+    // Don't re-fetch if we already have a classId set or have already loaded it
+    if (classId || classIdLoadedRef.current) {
+      return
+    }
+    
+    // Priority 2: Check localStorage (same key format as course detail page)
+    if (user?.id) {
       const savedClassId = localStorage.getItem(`selectedClass_${trainingId}`)
       const savedUserId = localStorage.getItem(`classUser_${trainingId}`)
       
       if (savedClassId && savedUserId === user.id) {
         // Use the saved class selection from course detail page
         setClassId(savedClassId)
+        initialClassIdRef.current = savedClassId
+        classIdLoadedRef.current = true
         console.log("✅ Module page - Using classId from localStorage:", savedClassId)
         return
       }
@@ -106,13 +125,21 @@ export default function ModuleDetailPage() {
               if (trainingClass) {
                 console.log("✅ Module page - Found classId from my-classes:", trainingClass.id)
                 setClassId(trainingClass.id)
+                initialClassIdRef.current = trainingClass.id
+                classIdLoadedRef.current = true
               }
             }
           }
         })
         .catch(err => console.error("❌ Module page - Error fetching my-classes:", err))
     }
-  }, [searchParams, user, trainingId])
+  }, [searchParams, user, trainingId, classId])
+  
+  // Reset the ref when moduleId changes (new module = new page load)
+  useEffect(() => {
+    classIdLoadedRef.current = false
+    initialClassIdRef.current = null
+  }, [moduleId])
 
   useEffect(() => {
     if (user && moduleId) {
