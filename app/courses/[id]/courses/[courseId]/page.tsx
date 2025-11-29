@@ -73,6 +73,8 @@ export default function CourseDetailPage() {
   
   // Track last saved time to prevent duplicates
   const lastSavedTimeRef = useRef(0)
+  // Track if video has been marked as started to prevent duplicate initial saves
+  const hasStartedRef = useRef(false)
 
   // Function to convert YouTube URL to embed URL
   const getYouTubeEmbedUrl = (url: string) => {
@@ -176,6 +178,10 @@ export default function CourseDetailPage() {
         const data = await response.json()
         
         setCourseProgress(data)
+        // If progress exists, video has already been started
+        if (data && (data.watchTimeSeconds > 0 || data.isStarted)) {
+          hasStartedRef.current = true
+        }
       } else {
         console.error("❌ Failed to load progress:", response.status)
       }
@@ -311,6 +317,9 @@ export default function CourseDetailPage() {
 
   useEffect(() => {
     if (classId && courseId) {
+      // Reset start tracking when course or class changes
+      hasStartedRef.current = false
+      lastSavedTimeRef.current = 0
       loadCourseProgress()
     }
   }, [classId, courseId, loadCourseProgress])
@@ -324,6 +333,46 @@ export default function CourseDetailPage() {
   const handleVideoError = useCallback((error: string) => {
     console.error("Vimeo video error:", error)
   }, [])
+
+  const handleVideoStart = useCallback(async () => {
+    // When video starts playing, immediately create a progress record
+    // This ensures videos are tracked even if watched for less than 10 seconds
+    if (classId && courseId && !hasStartedRef.current) {
+      hasStartedRef.current = true
+      try {
+        // Create initial progress record with minimal watch time (1 second)
+        // This marks the video as "watched" in analytics
+        const response = await fetch(`/api/courses/${courseId}/progress`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            classId: classId,
+            watchTimeSeconds: 1, // Minimal watch time to mark as started
+            completionPercentage: course?.durationSeconds 
+              ? Math.min((1 / course.durationSeconds) * 100, 100) 
+              : 0.1
+          })
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          setCourseProgress(prevProgress => ({
+            ...prevProgress,
+            watchTimeSeconds: data.watchTimeSeconds || 1,
+            completionPercentage: data.completionPercentage || 0.1,
+            isStarted: true,
+            status: data.status || 'IN_PROGRESS'
+          }))
+          console.log("✅ Video marked as started in analytics")
+        }
+      } catch (error) {
+        console.error("❌ Error marking video as started:", error)
+        // Reset flag on error so we can retry
+        hasStartedRef.current = false
+      }
+    }
+  }, [classId, courseId, course?.durationSeconds])
 
   const handleVideoEnded = useCallback(async () => {
     // When video ends, immediately save progress as 100% before showing dialog
@@ -361,7 +410,41 @@ export default function CourseDetailPage() {
     // Round to nearest second for comparison
     const roundedSeconds = Math.floor(playTimeSeconds)
     
-    // Only save every 10 seconds AND prevent duplicate saves
+    // Ensure video is marked as started even if less than 10 seconds
+    if (!hasStartedRef.current && roundedSeconds >= 1 && classId) {
+      hasStartedRef.current = true
+      try {
+        // Create initial progress record
+        const response = await fetch(`/api/courses/${courseId}/progress`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            classId: classId,
+            watchTimeSeconds: roundedSeconds,
+            completionPercentage: course?.durationSeconds 
+              ? Math.min((roundedSeconds / course.durationSeconds) * 100, 100) 
+              : 0.1
+          })
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          setCourseProgress(prevProgress => ({
+            ...prevProgress,
+            watchTimeSeconds: data.watchTimeSeconds || roundedSeconds,
+            completionPercentage: data.completionPercentage || 0.1,
+            isStarted: true,
+            status: data.status || 'IN_PROGRESS'
+          }))
+        }
+      } catch (error) {
+        console.error("❌ Error marking video as started:", error)
+        hasStartedRef.current = false
+      }
+    }
+    
+    // Save progress every 10 seconds after initial start
     if (roundedSeconds >= 10 && 
         roundedSeconds % 10 === 0 && 
         roundedSeconds !== lastSavedTimeRef.current && 
@@ -559,6 +642,7 @@ export default function CourseDetailPage() {
                             onError={handleVideoError}
                             onEnded={handleVideoEnded}
                             onPlayTimeUpdate={handlePlayTimeUpdate}
+                            onPlay={handleVideoStart}
                           />
                         ) : course.videoUrl.includes('youtube.com') || course.videoUrl.includes('youtu.be') ? (
                           <iframe
@@ -568,6 +652,17 @@ export default function CourseDetailPage() {
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
                             title={course.title}
+                            onLoad={() => {
+                              // For YouTube, we'll track when iframe loads
+                              // Note: YouTube iframe API would be better for precise tracking
+                              // This is a fallback that marks as started when page loads with YouTube video
+                              if (classId && courseId && !hasStartedRef.current) {
+                                // Delay slightly to ensure iframe is ready
+                                setTimeout(() => {
+                                  handleVideoStart()
+                                }, 1000)
+                              }
+                            }}
                           />
                         ) : course.videoUrl.includes('.mp4') || course.videoUrl.includes('.webm') || course.videoUrl.includes('.mov') ? (
                           <video
@@ -575,6 +670,38 @@ export default function CourseDetailPage() {
                             className="w-full h-full"
                             src={course.videoUrl}
                             title={course.title}
+                            onPlay={handleVideoStart}
+                            onTimeUpdate={(e) => {
+                              const video = e.currentTarget
+                              if (video && classId && courseId) {
+                                const currentTime = Math.floor(video.currentTime)
+                                const duration = Math.floor(video.duration || 0)
+                                if (currentTime >= 1 && !hasStartedRef.current) {
+                                  handleVideoStart()
+                                }
+                                // Update progress every 10 seconds
+                                if (currentTime >= 10 && currentTime % 10 === 0 && currentTime !== lastSavedTimeRef.current) {
+                                  lastSavedTimeRef.current = currentTime
+                                  const completionPercentage = duration > 0 
+                                    ? Math.min((currentTime / duration) * 100, 100)
+                                    : 0
+                                  fetch(`/api/courses/${courseId}/progress`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    credentials: 'include',
+                                    body: JSON.stringify({
+                                      classId: classId,
+                                      watchTimeSeconds: currentTime,
+                                      completionPercentage: Math.round(completionPercentage * 10) / 10
+                                    })
+                                  }).catch(err => console.error("Error saving progress:", err))
+                                }
+                                // Check if video ended
+                                if (duration > 0 && currentTime >= duration - 1) {
+                                  handleVideoEnded()
+                                }
+                              }
+                            }}
                           >
                             Your browser does not support the video tag.
                           </video>

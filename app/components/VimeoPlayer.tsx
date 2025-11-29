@@ -11,6 +11,7 @@ interface VimeoPlayerProps {
   onError?: (error: string) => void
   onEnded?: () => void
   onPlayTimeUpdate?: (playTimeSeconds: number) => void
+  onPlay?: () => void
 }
 
 export default function VimeoPlayer({ 
@@ -20,7 +21,8 @@ export default function VimeoPlayer({
   onLoad,
   onError,
   onEnded,
-  onPlayTimeUpdate
+  onPlayTimeUpdate,
+  onPlay
 }: VimeoPlayerProps) {
   const { user } = useUser()
   const [signedUrl, setSignedUrl] = useState<string | null>(null)
@@ -156,7 +158,12 @@ export default function VimeoPlayer({
         try {
           const parsed = JSON.parse(data)
           
-          if (parsed.event === 'finish') {
+          if (parsed.event === 'play') {
+            // Video started playing - notify parent immediately
+            if (onPlay) {
+              onPlay()
+            }
+          } else if (parsed.event === 'finish') {
             if (!hasTriggeredEnded) {
               hasTriggeredEnded = true
               onEnded()
