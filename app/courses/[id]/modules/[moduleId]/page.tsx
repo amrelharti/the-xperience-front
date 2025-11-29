@@ -65,16 +65,28 @@ export default function ModuleDetailPage() {
     }
   }, [user, userLoading])
 
-  // Load classId from my-classes if not in URL
+  // Load classId from URL, localStorage, or my-classes (in that order)
   useEffect(() => {
     const urlClassId = searchParams.get('class')
     
-    
     if (urlClassId) {
+      // Priority 1: Use classId from URL
       setClassId(urlClassId)
-    } else if (user) {
-      // Try to get classId from my-classes
-      console.log("🔍 Module page - No classId in URL, fetching from my-classes...")
+      console.log("✅ Module page - Using classId from URL:", urlClassId)
+    } else if (user?.id) {
+      // Priority 2: Check localStorage (same key format as course detail page)
+      const savedClassId = localStorage.getItem(`selectedClass_${trainingId}`)
+      const savedUserId = localStorage.getItem(`classUser_${trainingId}`)
+      
+      if (savedClassId && savedUserId === user.id) {
+        // Use the saved class selection from course detail page
+        setClassId(savedClassId)
+        console.log("✅ Module page - Using classId from localStorage:", savedClassId)
+        return
+      }
+      
+      // Priority 3: Fall back to my-classes (prefer active classes)
+      console.log("🔍 Module page - No classId in URL or localStorage, fetching from my-classes...")
       fetch('/api/classes/my-classes')
         .then(res => res.json())
         .then(classesData => {

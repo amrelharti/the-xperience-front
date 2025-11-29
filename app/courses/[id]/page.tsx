@@ -739,7 +739,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       </Button>
                     ) : (
                       <Button asChild size="sm" className="bg-[#0476D7] hover:bg-[#0068A7] shadow-md hover:shadow-lg w-full sm:w-auto text-xs sm:text-sm">
-                        <Link href={`/courses/${params.id}/modules/${module.id}`} className="flex items-center justify-center">
+                        <Link href={`/courses/${params.id}/modules/${module.id}${selectedClassId ? `?class=${selectedClassId}` : ''}`} className="flex items-center justify-center">
                           <PlayCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                           {module.progress && module.progress > 0 ? "Continue" : "Start"}
                         </Link>
