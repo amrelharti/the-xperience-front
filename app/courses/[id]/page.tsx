@@ -210,10 +210,16 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         }
       }
       
+      // Check if user has manually selected a class (stored in localStorage)
+      // If they have, respect their choice and don't auto-switch
+      const hasManualSelection = user?.id && classIdToUse && 
+        localStorage.getItem(`selectedClass_${params.id}`) === classIdToUse &&
+        localStorage.getItem(`classUser_${params.id}`) === user.id
+      
       // Always fetch my-classes to verify classId is still active (same logic as module detail page)
       // This ensures we use the same active class that the module detail page uses
-      // BUT: If overrideClassId is provided (manual selection), respect it and don't force switch
-      if (user?.id && !overrideClassId) {
+      // BUT: If overrideClassId is provided (manual selection) OR user has manually selected a class, respect it and don't force switch
+      if (user?.id && !overrideClassId && !hasManualSelection) {
         // Only auto-select/verify classId if user didn't manually select one
         try {
           const enrollmentsResponse = await fetch("/api/classes/my-classes")
@@ -261,6 +267,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         } catch (error) {
           console.error("Error fetching my-classes for classId:", error)
         }
+      } else if (hasManualSelection) {
+        // User has manually selected a class, respect their choice
+        console.log("✅ Respecting manual class selection:", classIdToUse)
       }
       
       const classIdParam = classIdToUse ? `?classId=${classIdToUse}` : ''
@@ -285,12 +294,12 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           if (enrollmentsResponse.ok) {
             const enrollments = await enrollmentsResponse.json()
             // Filter for this training and only active classes
-            const trainingEnrollments = enrollments.filter((enrollment) => 
+            const trainingEnrollments = enrollments.filter((enrollment: any) => 
               enrollment.moduleId === params.id // moduleId is actually trainingId in backend
             )
             
             // Check if user has any active enrollments for this training
-            const activeEnrollments = trainingEnrollments.filter((enrollment) => 
+            const activeEnrollments = trainingEnrollments.filter((enrollment: any) => 
               enrollment.isActive && !enrollment.isArchived
             )
             
@@ -301,7 +310,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             
             // IMPORTANT: Load progress immediately after setting training data, using the SAME classId
             // This ensures progress is loaded with the same classId used for training data
-            if (enrolled && trainingData?.modules && classIdToUse) {
+            // Load progress if user has any enrollments (active or archived) and a classId is selected
+            if (trainingEnrollments.length > 0 && trainingData?.modules && classIdToUse) {
               console.log("📊 Loading progress immediately with same classId:", classIdToUse)
               await loadModuleProgress(trainingData, classIdToUse)
             }
@@ -312,7 +322,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
               if (trainingEnrollments.length > 1) {
                 // Check if student has a saved preference for this training
                 const savedClassId = localStorage.getItem(`selectedClass_${params.id}`)
-                const savedClass = savedClassId ? trainingEnrollments.find((c) => c.id === savedClassId) : null
+                const savedClass = savedClassId ? trainingEnrollments.find((c: any) => c.id === savedClassId) : null
                 
               if (savedClass && savedClassId) {
                 // Student has a saved preference, use it (but we already loaded with it)
@@ -689,11 +699,10 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       </div>
                       <p className="text-muted-foreground mb-3 text-sm sm:text-base">{module.description}</p>
                       
-                      {/* Progress Bar - Only show if module is unlocked and has progress */}
+                      {/* Progress Bar - Only show if module is unlocked and has progress data */}
                       {/* Locked modules should NOT show progress, even if progress exists */}
                       {module.status !== "LOCKED" && 
-                       typeof module.progress === 'number' && 
-                       module.progress > 0 && (
+                       typeof module.progress === 'number' && (
                         <div className="mb-3">
                           <div className="flex items-center justify-between text-xs sm:text-sm mb-1">
                             <span className="font-semibold text-foreground">Progress</span>
