@@ -212,7 +212,9 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       
       // Always fetch my-classes to verify classId is still active (same logic as module detail page)
       // This ensures we use the same active class that the module detail page uses
-      if (user?.id) {
+      // BUT: If overrideClassId is provided (manual selection), respect it and don't force switch
+      if (user?.id && !overrideClassId) {
+        // Only auto-select/verify classId if user didn't manually select one
         try {
           const enrollmentsResponse = await fetch("/api/classes/my-classes")
           if (enrollmentsResponse.ok) {
@@ -223,21 +225,35 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             
             if (trainingEnrollments.length > 0) {
               // Prefer active classes over archived ones (same as module detail page)
-              // Use EXACT same logic as module detail page: find first active class
-              let preferredClass = trainingEnrollments.find((c: any) => c.isActive && !c.isArchived)
-              if (!preferredClass) {
-                preferredClass = trainingEnrollments[0] // Fallback to first if no active
-              }
+              const activeEnrollments = trainingEnrollments.filter((c: any) => c.isActive && !c.isArchived)
+              let preferredClass = activeEnrollments.length > 0 ? activeEnrollments[0] : trainingEnrollments[0]
               
-              // Always use the preferred active class to ensure consistency with module detail page
-              // This ensures both pages use the same classId
-              if (preferredClass) {
-                if (!classIdToUse || classIdToUse !== preferredClass.id) {
-                  console.log(`🔄 Using preferred active class: ${preferredClass.id} (was: ${classIdToUse || 'none'})`)
+              // Only switch classId if:
+              // 1. No classId is set yet, OR
+              // 2. Current classId is inactive/archived (must switch), OR
+              // 3. Current classId doesn't exist in enrollments
+              if (classIdToUse) {
+                const currentClass = trainingEnrollments.find((c: any) => c.id === classIdToUse)
+                // Only switch if current class is inactive/archived or doesn't exist
+                // If it's active, keep using it
+                if (!currentClass || (!currentClass.isActive || currentClass.isArchived)) {
+                  if (preferredClass && preferredClass.id !== classIdToUse) {
+                    console.log(`🔄 Switching from inactive/archived class ${classIdToUse} to active class ${preferredClass.id}`)
+                    classIdToUse = preferredClass.id
+                    setSelectedClassId(preferredClass.id)
+                    localStorage.setItem(`selectedClass_${params.id}`, preferredClass.id)
+                    localStorage.setItem(`classUser_${params.id}`, user.id)
+                  }
+                }
+                // If current class is active, keep using it (don't force switch)
+              } else {
+                // No classId yet, use the preferred active class
+                if (preferredClass) {
                   classIdToUse = preferredClass.id
                   setSelectedClassId(preferredClass.id)
                   localStorage.setItem(`selectedClass_${params.id}`, preferredClass.id)
                   localStorage.setItem(`classUser_${params.id}`, user.id)
+                  console.log("📊 Using active class from my-classes:", classIdToUse)
                 }
               }
             }
