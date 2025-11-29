@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
   DialogContent,
@@ -108,6 +109,8 @@ export default function StudentProfilePage() {
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [selectedClassId, setSelectedClassId] = useState<string>("all")
+  const [availableClasses, setAvailableClasses] = useState<any[]>([])
   
   const [editForm, setEditForm] = useState({
     name: "",
@@ -116,31 +119,60 @@ export default function StudentProfilePage() {
   })
 
   useEffect(() => {
+    loadFilters()
+  }, [])
+
+  useEffect(() => {
     loadStudentData()
-  }, [studentId])
+  }, [studentId, selectedClassId])
+
+  const loadFilters = async () => {
+    try {
+      const response = await fetch("/api/admin/analytics/filters", {
+        credentials: "include"
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setAvailableClasses(data.classes || [])
+      }
+    } catch (error) {
+      console.error("Error loading filters:", error)
+    }
+  }
 
   const loadStudentData = async () => {
     setLoading(true)
     try {
-      // Load basic user info
-      const userRes = await fetch(`/api/admin/users`, {
-        credentials: "include"
-      })
-      if (userRes.ok) {
-        const users = await userRes.json()
-        const foundUser = users.find((u: UserBasic) => u.id === studentId)
-        if (foundUser) {
-          setUserBasic(foundUser)
-          setEditForm({
-            name: foundUser.name,
-            email: foundUser.email,
-            role: foundUser.role
-          })
+      // Load basic user info (only once, doesn't depend on class)
+      if (!userBasic) {
+        const userRes = await fetch(`/api/admin/users`, {
+          credentials: "include"
+        })
+        if (userRes.ok) {
+          const users = await userRes.json()
+          const foundUser = users.find((u: UserBasic) => u.id === studentId)
+          if (foundUser) {
+            setUserBasic(foundUser)
+            setEditForm({
+              name: foundUser.name,
+              email: foundUser.email,
+              role: foundUser.role
+            })
+          }
         }
       }
 
-      // Load detailed student analytics
-      const studentRes = await fetch("/api/admin/student-analysis/students", {
+      // Load detailed student analytics with class filter
+      const params = new URLSearchParams()
+      if (selectedClassId !== "all") {
+        params.append("classId", selectedClassId)
+      }
+      
+      const url = params.toString() 
+        ? `/api/admin/student-analysis/students?${params.toString()}`
+        : "/api/admin/student-analysis/students"
+      
+      const studentRes = await fetch(url, {
         credentials: "include"
       })
       if (studentRes.ok) {
@@ -356,11 +388,13 @@ export default function StudentProfilePage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => router.back()}
+                  asChild
                   className="flex items-center gap-2"
                 >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span className="hidden sm:inline">Back</span>
+                  <Link href="/admin/students">
+                    <ArrowLeft className="h-4 w-4" />
+                    <span className="hidden sm:inline">Back</span>
+                  </Link>
                 </Button>
                 <div>
                   <h1 className="text-lg sm:text-2xl font-bold text-gray-900">
@@ -395,6 +429,43 @@ export default function StudentProfilePage() {
         </header>
 
         <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-8">
+          {/* Class Filter */}
+          <Card className="mb-4 sm:mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <School className="h-5 w-5" />
+                Filter by Class
+              </CardTitle>
+              <CardDescription>
+                Select a class to view class-specific analytics for this student
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <Select value={selectedClassId} onValueChange={setSelectedClassId}>
+                  <SelectTrigger className="w-80">
+                    <SelectValue placeholder="Select a class..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Classes (General Analytics)</SelectItem>
+                    {availableClasses.map((cls: any) => (
+                      <SelectItem key={cls.id} value={cls.id}>
+                        {cls.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedClassId !== "all" && (
+                  <div className="text-sm text-muted-foreground bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+                    Showing analytics for: <span className="font-semibold text-blue-700">
+                      {availableClasses.find((c: any) => c.id === selectedClassId)?.name || "Selected Class"}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Basic Information Card */}
           <Card className="mb-4 sm:mb-6">
             <CardHeader>
