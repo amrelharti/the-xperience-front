@@ -197,7 +197,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       setLoading(true)
       setError(null)
 
-      // Priority: overrideClassId > selectedClassId > localStorage
+      // Priority: overrideClassId > selectedClassId > localStorage > my-classes (prefer active)
       let classIdToUse = overrideClassId || selectedClassId
       
       // If still no classId, check localStorage directly
@@ -207,6 +207,52 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         if (savedClassId && savedUserId === user.id) {
           classIdToUse = savedClassId
           setSelectedClassId(savedClassId) // Update state immediately
+        }
+      }
+      
+      // Always fetch my-classes to verify classId is still active (same logic as module detail page)
+      // This ensures we use the same active class that the module detail page uses
+      if (user?.id) {
+        try {
+          const enrollmentsResponse = await fetch("/api/classes/my-classes")
+          if (enrollmentsResponse.ok) {
+            const enrollments = await enrollmentsResponse.json()
+            const trainingEnrollments = enrollments.filter((enrollment: any) => 
+              enrollment.moduleId === params.id
+            )
+            
+            if (trainingEnrollments.length > 0) {
+              // Prefer active classes over archived ones (same as module detail page)
+              const activeEnrollments = trainingEnrollments.filter((c: any) => c.isActive && !c.isArchived)
+              let preferredClass = activeEnrollments.length > 0 ? activeEnrollments[0] : trainingEnrollments[0]
+              
+              // If we have a classIdToUse, verify it's still active
+              if (classIdToUse) {
+                const currentClass = trainingEnrollments.find((c: any) => c.id === classIdToUse)
+                // If current class is not active or doesn't exist, switch to preferred active class
+                if (!currentClass || (!currentClass.isActive || currentClass.isArchived)) {
+                  if (preferredClass && preferredClass.id !== classIdToUse) {
+                    console.log(`🔄 Switching from inactive/archived class ${classIdToUse} to active class ${preferredClass.id}`)
+                    classIdToUse = preferredClass.id
+                    setSelectedClassId(preferredClass.id)
+                    localStorage.setItem(`selectedClass_${params.id}`, preferredClass.id)
+                    localStorage.setItem(`classUser_${params.id}`, user.id)
+                  }
+                }
+              } else {
+                // No classId yet, use the preferred active class
+                if (preferredClass) {
+                  classIdToUse = preferredClass.id
+                  setSelectedClassId(preferredClass.id)
+                  localStorage.setItem(`selectedClass_${params.id}`, preferredClass.id)
+                  localStorage.setItem(`classUser_${params.id}`, user.id)
+                  console.log("📊 Using active class from my-classes:", classIdToUse)
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching my-classes for classId:", error)
         }
       }
       
