@@ -281,8 +281,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
               }
             } else if (classIdToUse) {
             }
-            // Always load available classes for switch button if enrolled
-            if (enrolled && trainingEnrollments.length > 1 && !overrideClassId) {
+            // Always load available classes for switch button if enrolled (to show all classes, not just enrolled ones)
+            if (enrolled && !overrideClassId) {
               await loadAvailableClasses()
             }
           }
