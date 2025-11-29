@@ -183,10 +183,18 @@ export default function ModuleDetailPage() {
   }
 
   const loadLiveSession = async () => {
+    if (!classId) {
+      // Don't load live session if no classId is available
+      setLiveSession(null)
+      setLoadingLiveSession(false)
+      return
+    }
+
     try {
       setLoadingLiveSession(true)
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${moduleId}/live-session`, {
+      // Pass classId as query parameter to get the live session for the specific class
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${moduleId}/live-session?classId=${classId}`, {
         credentials: "include"
       })
       
@@ -198,16 +206,14 @@ export default function ModuleDetailPage() {
         } else {
           setLiveSession(data)
           
-          // Check attendance only if classId is available
-          if (classId) {
-            const attendanceResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${moduleId}/live-session/attend?classId=${classId}`, {
-              credentials: "include"
-            })
-            
-            if (attendanceResponse.ok) {
-              const attendanceData = await attendanceResponse.json()
-              setIsAttended(attendanceData.attended || false)
-            }
+          // Check attendance for this class
+          const attendanceResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${moduleId}/live-session/attend?classId=${classId}`, {
+            credentials: "include"
+          })
+          
+          if (attendanceResponse.ok) {
+            const attendanceData = await attendanceResponse.json()
+            setIsAttended(attendanceData.attended || false)
           }
         }
       } else {

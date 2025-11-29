@@ -17,8 +17,14 @@ export async function POST(
     const cookieHeader = request.headers.get('cookie') || ''
     console.log('🍪 Cookie header length:', cookieHeader.length)
     
+    // Extract classId from body and add as query parameter
+    const classId = body.classId
+    const url = classId 
+      ? `${BACKEND_URL}/api/admin/modules/${params.id}/live-session?classId=${classId}`
+      : `${BACKEND_URL}/api/admin/modules/${params.id}/live-session`
+    
     const backendResponse = await fetch(
-      `${BACKEND_URL}/api/admin/modules/${params.id}/live-session`,
+      url,
       {
         method: 'POST',
         headers: {
@@ -56,8 +62,16 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Extract classId from query parameters
+    const { searchParams } = new URL(request.url)
+    const classId = searchParams.get('classId')
+    
+    const url = classId
+      ? `${BACKEND_URL}/api/admin/modules/${params.id}/live-session?classId=${classId}`
+      : `${BACKEND_URL}/api/admin/modules/${params.id}/live-session`
+    
     const backendResponse = await fetch(
-      `${BACKEND_URL}/api/admin/modules/${params.id}/live-session`,
+      url,
       {
         headers: {
           'Cookie': request.headers.get('cookie') || '',

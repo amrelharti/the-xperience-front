@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import RequireAdmin from "@/app/components/RequireAdmin"
 import { useUser } from "@/app/hooks/useUser"
@@ -50,6 +51,16 @@ interface LiveSession {
   meetingPassword: string
   durationMinutes: number
   instructorName: string
+  classId?: string
+  className?: string
+}
+
+interface Class {
+  id: string
+  name: string
+  description?: string
+  isActive: boolean
+  isArchived?: boolean
 }
 
 export default function AdminModuleDetailsPage() {
@@ -62,7 +73,9 @@ export default function AdminModuleDetailsPage() {
 
   const [training, setTraining] = useState<Training | null>(null)
   const [module, setModule] = useState<Module | null>(null)
-  const [liveSession, setLiveSession] = useState<LiveSession | null>(null)
+  const [classes, setClasses] = useState<Class[]>([])
+  const [liveSessions, setLiveSessions] = useState<Map<string, LiveSession>>(new Map())
+  const [selectedClassId, setSelectedClassId] = useState<string>("")
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [showDialog, setShowDialog] = useState(false)
@@ -75,14 +88,15 @@ export default function AdminModuleDetailsPage() {
     meetingUrl: "",
     meetingPassword: "",
     durationMinutes: 60,
-    instructorName: ""
+    instructorName: "",
+    classId: ""
   })
 
   const loadData = async () => {
     await Promise.all([
       loadTraining(),
       loadModule(),
-      loadLiveSession()
+      loadClasses()
     ])
     setLoading(false)
   }
@@ -120,21 +134,68 @@ export default function AdminModuleDetailsPage() {
     }
   }
 
-  const loadLiveSession = async () => {
+  const loadClasses = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${moduleId}/live-session`, {
+      const res = await fetch(`/api/courses/${trainingId}/classes`, {
         credentials: "include"
       })
       if (res.ok) {
         const data = await res.json()
-        if (data.message) {
-          setLiveSession(null)
+        setClasses(data)
+        // Load live sessions for all classes
+        await loadAllLiveSessions(data)
+      }
+    } catch (error) {
+      console.error("Error loading classes:", error)
+    }
+  }
+
+  const loadAllLiveSessions = async (classesList: Class[]) => {
+    const sessionsMap = new Map<string, LiveSession>()
+    
+    for (const classItem of classesList) {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${moduleId}/live-session?classId=${classItem.id}`, {
+          credentials: "include"
+        })
+        if (res.ok) {
+          const data = await res.json()
+          if (data && !data.message) {
+            sessionsMap.set(classItem.id, { ...data, classId: classItem.id, className: classItem.name })
+          }
+        }
+      } catch (error) {
+        console.log(`Live session not available for class ${classItem.id}:`, error)
+      }
+    }
+    
+    setLiveSessions(sessionsMap)
+  }
+
+  const loadLiveSessionForClass = async (classId: string) => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${moduleId}/live-session?classId=${classId}`, {
+        credentials: "include"
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data && !data.message) {
+          const classItem = classes.find(c => c.id === classId)
+          setLiveSessions(prev => {
+            const newMap = new Map(prev)
+            newMap.set(classId, { ...data, classId, className: classItem?.name })
+            return newMap
+          })
         } else {
-          setLiveSession(data)
+          setLiveSessions(prev => {
+            const newMap = new Map(prev)
+            newMap.delete(classId)
+            return newMap
+          })
         }
       }
     } catch (error) {
-      console.log("Live session not available:", error)
+      console.log(`Error loading live session for class ${classId}:`, error)
     }
   }
 
@@ -165,14 +226,25 @@ export default function AdminModuleDetailsPage() {
       const endsAtDate = new Date(startsAtDate)
       endsAtDate.setMinutes(endsAtDate.getMinutes() + liveSessionForm.durationMinutes)
 
+      if (!liveSessionForm.classId) {
+        toast({
+          title: "Error",
+          description: "Please select a class",
+          variant: "destructive"
+        })
+        return
+      }
+
       const formData = {
         ...liveSessionForm,
         moduleId: moduleId,
+        classId: liveSessionForm.classId,
         startsAt: startsAtDate.toISOString(),
         endsAt: endsAtDate.toISOString()
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${moduleId}/live-session`, {
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${moduleId}/live-session${liveSessionForm.classId ? `?classId=${liveSessionForm.classId}` : ''}`
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -181,7 +253,7 @@ export default function AdminModuleDetailsPage() {
 
       if (res.ok) {
         const data = await res.json()
-        setLiveSession(data)
+        await loadLiveSessionForClass(liveSessionForm.classId)
         setShowDialog(false)
         setIsEditing(false)
         toast({
@@ -204,17 +276,18 @@ export default function AdminModuleDetailsPage() {
     }
   }
 
-  const handleDeleteLiveSession = async () => {
+  const handleDeleteLiveSession = async (classId: string) => {
     if (!confirm("Are you sure you want to delete this live session?")) return
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${moduleId}/live-session`, {
+      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/modules/${moduleId}/live-session?classId=${classId}`
+      const res = await fetch(url, {
         method: "DELETE",
         credentials: "include"
       })
 
       if (res.ok) {
-        setLiveSession(null)
+        await loadLiveSessionForClass(classId)
         toast({
           title: "Success",
           description: "Live session deleted successfully"
@@ -225,18 +298,19 @@ export default function AdminModuleDetailsPage() {
     }
   }
 
-  const openEditDialog = () => {
-    if (liveSession) {
+  const openEditDialog = (classId?: string, existingSession?: LiveSession) => {
+    if (existingSession) {
       setLiveSessionForm({
-        title: liveSession.title,
-        description: liveSession.description,
-        startsAt: new Date(liveSession.startsAt).toISOString().slice(0, 16),
+        title: existingSession.title,
+        description: existingSession.description || "",
+        startsAt: new Date(existingSession.startsAt).toISOString().slice(0, 16),
         endsAt: "", // Will be calculated from startsAt + durationMinutes
-        location: liveSession.location,
-        meetingUrl: liveSession.meetingUrl,
-        meetingPassword: liveSession.meetingPassword,
-        durationMinutes: liveSession.durationMinutes,
-        instructorName: liveSession.instructorName
+        location: existingSession.location || "",
+        meetingUrl: existingSession.meetingUrl,
+        meetingPassword: existingSession.meetingPassword || "",
+        durationMinutes: existingSession.durationMinutes,
+        instructorName: existingSession.instructorName || "",
+        classId: existingSession.classId || classId || ""
       })
       setIsEditing(true)
     } else {
@@ -249,7 +323,8 @@ export default function AdminModuleDetailsPage() {
         meetingUrl: "",
         meetingPassword: "",
         durationMinutes: 60,
-        instructorName: ""
+        instructorName: "",
+        classId: classId || ""
       })
       setIsEditing(false)
     }
@@ -342,68 +417,106 @@ export default function AdminModuleDetailsPage() {
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Video className="h-5 w-5" />
-                  Live Session Management
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={openEditDialog} variant="outline">
-                    {liveSession ? "Edit Session" : "Create Session"}
-                  </Button>
-                  {liveSession && (
-                    <Button onClick={handleDeleteLiveSession} variant="destructive">
-                      Delete Session
-                    </Button>
-                  )}
+                  Live Session Management (Per Class)
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {liveSession ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-medium">Title</Label>
-                      <p className="text-sm text-muted-foreground">{liveSession.title}</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">Instructor</Label>
-                      <p className="text-sm text-muted-foreground">{liveSession.instructorName}</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">Start Time</Label>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(liveSession.startsAt).toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">Duration</Label>
-                      <p className="text-sm text-muted-foreground">{liveSession.durationMinutes} minutes</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">Meeting URL</Label>
-                      <p className="text-sm text-muted-foreground break-all">{liveSession.meetingUrl}</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">Password</Label>
-                      <p className="text-sm text-muted-foreground">{liveSession.meetingPassword}</p>
-                    </div>
-                  </div>
-                  {liveSession.description && (
-                    <div>
-                      <Label className="text-sm font-medium">Description</Label>
-                      <p className="text-sm text-muted-foreground">{liveSession.description}</p>
-                    </div>
-                  )}
+              {classes.length === 0 ? (
+                <div className="text-center py-8">
+                  <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No Classes Found</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Create classes for this training first, then you can add live sessions per class.
+                  </p>
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <Video className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No Live Session</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Create a live session for this module to enable live training.
-                  </p>
-                  <Button onClick={openEditDialog}>
-                    Create Live Session
-                  </Button>
+                <div className="space-y-6">
+                  {classes.map((classItem) => {
+                    const session = liveSessions.get(classItem.id)
+                    return (
+                      <Card key={classItem.id} className="border-l-4 border-l-blue-500">
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <CardTitle className="text-lg">{classItem.name}</CardTitle>
+                              {classItem.description && (
+                                <p className="text-sm text-muted-foreground mt-1">{classItem.description}</p>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button 
+                                onClick={() => openEditDialog(classItem.id, session)} 
+                                variant="outline"
+                                size="sm"
+                              >
+                                {session ? "Edit Session" : "Create Session"}
+                              </Button>
+                              {session && (
+                                <Button 
+                                  onClick={() => handleDeleteLiveSession(classItem.id)} 
+                                  variant="destructive"
+                                  size="sm"
+                                >
+                                  Delete
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          {session ? (
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <Label className="text-sm font-medium">Title</Label>
+                                  <p className="text-sm text-muted-foreground">{session.title}</p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium">Instructor</Label>
+                                  <p className="text-sm text-muted-foreground">{session.instructorName || "N/A"}</p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium">Start Time</Label>
+                                  <p className="text-sm text-muted-foreground">
+                                    {new Date(session.startsAt).toLocaleString()}
+                                  </p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium">Duration</Label>
+                                  <p className="text-sm text-muted-foreground">{session.durationMinutes} minutes</p>
+                                </div>
+                                <div>
+                                  <Label className="text-sm font-medium">Meeting URL</Label>
+                                  <p className="text-sm text-muted-foreground break-all">{session.meetingUrl}</p>
+                                </div>
+                                {session.meetingPassword && (
+                                  <div>
+                                    <Label className="text-sm font-medium">Password</Label>
+                                    <p className="text-sm text-muted-foreground">{session.meetingPassword}</p>
+                                  </div>
+                                )}
+                              </div>
+                              {session.description && (
+                                <div>
+                                  <Label className="text-sm font-medium">Description</Label>
+                                  <p className="text-sm text-muted-foreground">{session.description}</p>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-center py-4 border-2 border-dashed rounded-lg">
+                              <Video className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                              <p className="text-sm text-muted-foreground mb-2">No live session for this class</p>
+                              <Button onClick={() => openEditDialog(classItem.id)} variant="outline" size="sm">
+                                Create Live Session
+                              </Button>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
                 </div>
               )}
             </CardContent>
@@ -422,6 +535,28 @@ export default function AdminModuleDetailsPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
+              <div>
+                <Label htmlFor="classId">Class *</Label>
+                <Select
+                  value={liveSessionForm.classId}
+                  onValueChange={(value) => setLiveSessionForm({ ...liveSessionForm, classId: value })}
+                  disabled={isEditing}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a class" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {classes.map((classItem) => (
+                      <SelectItem key={classItem.id} value={classItem.id}>
+                        {classItem.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {isEditing && (
+                  <p className="text-xs text-muted-foreground mt-1">Class cannot be changed when editing</p>
+                )}
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="title">Title</Label>
