@@ -125,6 +125,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
 
       // Load progress for each module with class context
       // Load progress for all modules, but we'll hide it for locked modules in the UI
+      console.log("📊 Loading progress for all modules with classId:", selectedClassId)
       const progressPromises = trainingData.modules.map(async (module) => {
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${module.id}/training-progress?classId=${selectedClassId}`, {
@@ -132,10 +133,13 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           })
           if (response.ok) {
             const progressData = await response.json()
+            console.log(`✅ Progress loaded for ${module.title}:`, progressData)
             return { moduleId: module.id, progress: progressData.progress || 0 }
+          } else {
+            console.warn(`⚠️ Failed to load progress for ${module.title}:`, response.status)
           }
         } catch (error) {
-          console.error("Error loading progress for module:", module.id, error)
+          console.error("❌ Error loading progress for module:", module.id, module.title, error)
         }
         return { moduleId: module.id, progress: 0 }
       })
@@ -150,9 +154,16 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           const progressData = progressResults.find(p => p.moduleId === module.id)
           const progressValue = progressData?.progress ?? 0
           // Ensure progress is always a number, even if undefined
+          const finalProgress = typeof progressValue === 'number' ? progressValue : 0
+          console.log(`📊 Progress update for module ${module.id} (${module.title}):`, {
+            status: module.status,
+            hasAccess: module.hasAccess,
+            progressValue,
+            finalProgress
+          })
           return {
             ...module,
-            progress: typeof progressValue === 'number' ? progressValue : 0
+            progress: finalProgress
           }
         })
         
@@ -628,8 +639,21 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       <p className="text-muted-foreground mb-3 text-sm sm:text-base">{module.description}</p>
                       
                       {/* Progress Bar - Only show if module is unlocked and has progress */}
-                      {(module.status === "UNLOCKED" || (module.status !== "LOCKED" && module.hasAccess)) && 
-                       typeof module.progress === 'number' && module.progress > 0 && (
+                      {/* Show progress if module is not locked (same logic as the button) */}
+                      {(() => {
+                        const shouldShow = module.status !== "LOCKED" && 
+                                         typeof module.progress === 'number' && 
+                                         module.progress > 0
+                        if (module.id === '226720e5-4527-4607-a791-421377715e9d') {
+                          console.log('🔍 Progress display check for Week 3:', {
+                            status: module.status,
+                            progress: module.progress,
+                            progressType: typeof module.progress,
+                            shouldShow
+                          })
+                        }
+                        return shouldShow
+                      })() && (
                         <div className="mb-3">
                           <div className="flex items-center justify-between text-xs sm:text-sm mb-1">
                             <span className="font-semibold text-foreground">Progress</span>
