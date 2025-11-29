@@ -148,9 +148,11 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         
         const updatedModules = prevTraining.modules.map(module => {
           const progressData = progressResults.find(p => p.moduleId === module.id)
+          const progressValue = progressData?.progress ?? 0
+          // Ensure progress is always a number, even if undefined
           return {
             ...module,
-            progress: progressData?.progress || 0
+            progress: typeof progressValue === 'number' ? progressValue : 0
           }
         })
         
@@ -626,7 +628,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       <p className="text-muted-foreground mb-3 text-sm sm:text-base">{module.description}</p>
                       
                       {/* Progress Bar - Only show if module is unlocked and has progress */}
-                      {module.status !== "LOCKED" && module.hasAccess && module.progress !== undefined && module.progress > 0 && (
+                      {(module.status === "UNLOCKED" || (module.status !== "LOCKED" && module.hasAccess)) && 
+                       typeof module.progress === 'number' && module.progress > 0 && (
                         <div className="mb-3">
                           <div className="flex items-center justify-between text-xs sm:text-sm mb-1">
                             <span className="font-semibold text-foreground">Progress</span>
