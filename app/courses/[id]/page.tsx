@@ -264,11 +264,13 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       }
       
       const classIdParam = classIdToUse ? `?classId=${classIdToUse}` : ''
+      console.log(`📊 Loading training data with classId: ${classIdToUse || 'none'}`)
       const trainingResponse = await fetch(`/api/courses/${params.id}${classIdParam}`)
       if (!trainingResponse.ok) {
         throw new Error("Failed to load training")
       }
       const trainingData = await trainingResponse.json()
+      console.log(`📊 Training data loaded with classId: ${classIdToUse || 'none'}. Modules status:`, trainingData.modules?.map((m: any) => ({ id: m.id, title: m.title, status: m.status, hasAccess: m.hasAccess })))
      
       trainingData.modules?.forEach((module: any) => {
       })
@@ -296,6 +298,13 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
             availableClasses = trainingEnrollments // Store all enrollments for class selection
             setIsEnrolled(enrolled)
             setAvailableClasses(availableClasses)
+            
+            // IMPORTANT: Load progress immediately after setting training data, using the SAME classId
+            // This ensures progress is loaded with the same classId used for training data
+            if (enrolled && trainingData?.modules && classIdToUse) {
+              console.log("📊 Loading progress immediately with same classId:", classIdToUse)
+              await loadModuleProgress(trainingData, classIdToUse)
+            }
             
             // Smart class selection logic
             // ONLY auto-select if we're not in manual selection mode AND no override AND no existing selection
@@ -355,11 +364,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
         await loadAvailableClasses()
       }
 
-      // Load progress if user is enrolled - pass classId for class-specific progress
-      if (enrolled && user && trainingData?.modules) {
-        console.log("📊 Calling loadModuleProgress with classIdToUse:", classIdToUse)
-        await loadModuleProgress(trainingData, classIdToUse)
-      }
+      // Progress is already loaded earlier (line 304-307) with the same classId used for training data
+      // This ensures consistency between training data status and progress
     } catch (err) {
       console.error("Error loading training:", err)
       setError(err instanceof Error ? err.message : "An error occurred")
@@ -684,21 +690,10 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       <p className="text-muted-foreground mb-3 text-sm sm:text-base">{module.description}</p>
                       
                       {/* Progress Bar - Only show if module is unlocked and has progress */}
-                      {/* Show progress if module is not locked (same logic as the button) */}
-                      {(() => {
-                        const shouldShow = module.status !== "LOCKED" && 
-                                         typeof module.progress === 'number' && 
-                                         module.progress > 0
-                        if (module.id === '226720e5-4527-4607-a791-421377715e9d') {
-                          console.log('🔍 Progress display check for Week 3:', {
-                            status: module.status,
-                            progress: module.progress,
-                            progressType: typeof module.progress,
-                            shouldShow
-                          })
-                        }
-                        return shouldShow
-                      })() && (
+                      {/* Locked modules should NOT show progress, even if progress exists */}
+                      {module.status !== "LOCKED" && 
+                       typeof module.progress === 'number' && 
+                       module.progress > 0 && (
                         <div className="mb-3">
                           <div className="flex items-center justify-between text-xs sm:text-sm mb-1">
                             <span className="font-semibold text-foreground">Progress</span>
