@@ -31,6 +31,7 @@ export default function LiveSessionCard({
   classId,
 }: LiveSessionCardProps) {
   const [isLive, setIsLive] = useState(false)
+  const [isEnded, setIsEnded] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
@@ -154,7 +155,12 @@ export default function LiveSessionCard({
         {isValidDate ? (
           <CountdownTimer
             targetDate={liveSession.scheduledDate}
+            durationMinutes={liveSession.durationMinutes}
             onCountdownEnd={() => setIsLive(true)}
+            onSessionEnd={() => {
+              setIsLive(false)
+              setIsEnded(true)
+            }}
           />
         ) : (
           <div className="text-center py-8">
@@ -169,11 +175,22 @@ export default function LiveSessionCard({
       {/* Join Live Button */}
       <Button
         onClick={handleJoinLive}
-        disabled={!isLive}
-        className={`w-full ${isLive ? 'bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white shadow-lg hover:shadow-xl' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+        disabled={!isLive || isEnded}
+        className={`w-full ${
+          isEnded 
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+            : isLive 
+            ? 'bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white shadow-lg hover:shadow-xl' 
+            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+        }`}
         size="lg"
       >
-        {isLive ? (
+        {isEnded ? (
+          <>
+            <CheckCircle className="mr-2 h-5 w-5" />
+            Session Ended
+          </>
+        ) : isLive ? (
           <>
             <Video className="mr-2 h-5 w-5" />
             Join Live Session

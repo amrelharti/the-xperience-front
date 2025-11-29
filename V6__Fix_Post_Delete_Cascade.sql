@@ -51,3 +51,6 @@ REFERENCES posts(id)
 ON DELETE CASCADE;
 
 
+
+
+

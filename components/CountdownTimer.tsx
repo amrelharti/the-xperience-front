@@ -1,36 +1,97 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Clock } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Clock, CheckCircle2 } from "lucide-react"
 
 interface CountdownTimerProps {
   targetDate: string
+  durationMinutes?: number
   onCountdownEnd: () => void
+  onSessionEnd?: () => void
 }
 
 export default function CountdownTimer({
   targetDate,
+  durationMinutes,
   onCountdownEnd,
+  onSessionEnd,
 }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
     minutes: 0,
   })
-  const [isEnded, setIsEnded] = useState(false)
+  const [sessionState, setSessionState] = useState<'pending' | 'live' | 'ended'>('pending')
+  const callbacksCalledRef = useRef({ started: false, ended: false })
 
   useEffect(() => {
+    // Reset callbacks when targetDate or duration changes
+    callbacksCalledRef.current = { started: false, ended: false }
+    
     const calculateTimeLeft = () => {
-      const targetTime = new Date(targetDate).getTime()
+      const startTime = new Date(targetDate).getTime()
       const currentTime = new Date().getTime()
-      const difference = targetTime - currentTime
+      
+      // Calculate session end time if duration is provided
+      const endTime = durationMinutes 
+        ? startTime + (durationMinutes * 60 * 1000)
+        : null
+      
+      // Check if session has ended
+      if (endTime && currentTime >= endTime) {
+        setSessionState(prev => {
+          if (prev !== 'ended') {
+            setTimeLeft({ days: 0, hours: 0, minutes: 0 })
+            if (onSessionEnd && !callbacksCalledRef.current.ended) {
+              callbacksCalledRef.current.ended = true
+              onSessionEnd()
+            }
+            return 'ended'
+          }
+          return prev
+        })
+        return
+      }
+      
+      // Check if session is live (after start time, before end time)
+      if (currentTime >= startTime) {
+        if (endTime && currentTime < endTime) {
+          // Session is live
+          setSessionState(prev => {
+            if (prev !== 'live') {
+              setTimeLeft({ days: 0, hours: 0, minutes: 0 })
+              if (!callbacksCalledRef.current.started) {
+                callbacksCalledRef.current.started = true
+                onCountdownEnd()
+              }
+              return 'live'
+            }
+            return prev
+          })
+          return
+        } else if (!endTime) {
+          // No duration provided, assume session is live indefinitely after start
+          setSessionState(prev => {
+            if (prev !== 'live') {
+              setTimeLeft({ days: 0, hours: 0, minutes: 0 })
+              if (!callbacksCalledRef.current.started) {
+                callbacksCalledRef.current.started = true
+                onCountdownEnd()
+              }
+              return 'live'
+            }
+            return prev
+          })
+          return
+        }
+      }
+      
+      // Session hasn't started yet - show countdown
+      setSessionState(prev => prev === 'pending' ? prev : 'pending')
+      const difference = startTime - currentTime
 
       if (difference <= 0) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0 })
-        if (!isEnded) {
-          setIsEnded(true)
-          onCountdownEnd()
-        }
         return
       }
 
@@ -45,11 +106,25 @@ export default function CountdownTimer({
     const interval = setInterval(calculateTimeLeft, 1000)
 
     return () => clearInterval(interval)
-  }, [targetDate, onCountdownEnd, isEnded])
+  }, [targetDate, durationMinutes, onCountdownEnd, onSessionEnd])
 
   const formatNumber = (num: number) => String(num).padStart(2, "0")
 
-  if (isEnded) {
+  if (sessionState === 'ended') {
+    return (
+      <div className="text-center py-10">
+        <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-gray-400 to-gray-500 rounded-xl mb-4 shadow-lg">
+          <CheckCircle2 className="h-7 w-7 text-white" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">Session Ended</h3>
+        <p className="text-sm text-gray-600">
+          This live session has concluded
+        </p>
+      </div>
+    )
+  }
+
+  if (sessionState === 'live') {
     return (
       <div className="text-center py-10">
         <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-[#0476D7] to-[#005eb8] rounded-xl mb-4 shadow-lg">
