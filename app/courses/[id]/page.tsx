@@ -96,30 +96,21 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
     if (!user || !trainingData?.modules) return
 
     try {
-      // Get user's enrolled classes if classId not provided
+      // Use the provided classId - don't fetch classes here, caller should provide it
       let selectedClassId = classId
-      if (!selectedClassId) {
-        const enrollmentsResponse = await fetch("/api/classes/my-classes")
-        if (enrollmentsResponse.ok) {
-          const enrollments = await enrollmentsResponse.json()
-          // Find all classes for this training
-          const trainingClasses = enrollments.filter((enrollment: any) => 
-            enrollment.moduleId === params.id // moduleId is actually trainingId in backend
-          )
-          
-          if (trainingClasses.length === 0) {
-            return
-          } else if (trainingClasses.length === 1) {
-            // Only one class - use it automatically
-            selectedClassId = trainingClasses[0].id
-          } else {
-            // Multiple classes - use the first one for now (class selector can be added later)
-            selectedClassId = trainingClasses[0].id
-          }
+      
+      // If no classId provided, try to get it from localStorage (same logic as load function)
+      if (!selectedClassId && user?.id) {
+        const savedClassId = localStorage.getItem(`selectedClass_${params.id}`)
+        const savedUserId = localStorage.getItem(`classUser_${params.id}`)
+        if (savedClassId && savedUserId === user.id) {
+          selectedClassId = savedClassId
+          console.log("📊 Using classId from localStorage for progress:", selectedClassId)
         }
       }
 
       if (!selectedClassId) {
+        console.warn("⚠️ No classId provided to loadModuleProgress, skipping progress load")
         return
       }
 
@@ -313,6 +304,7 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
 
       // Load progress if user is enrolled - pass classId for class-specific progress
       if (enrolled && user && trainingData?.modules) {
+        console.log("📊 Calling loadModuleProgress with classIdToUse:", classIdToUse)
         await loadModuleProgress(trainingData, classIdToUse)
       }
     } catch (err) {
