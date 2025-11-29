@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock, Users, Video, CheckCircle, ExternalLink } from "lucide-react"
@@ -32,11 +32,36 @@ export default function LiveSessionCard({
 }: LiveSessionCardProps) {
   const [isLive, setIsLive] = useState(false)
   const [isEnded, setIsEnded] = useState(false)
+  const [isExpired, setIsExpired] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
   const sessionDate = new Date(liveSession.scheduledDate)
   const isValidDate = !isNaN(sessionDate.getTime())
+  
+  // Check if 5 hours have passed since session start
+  useEffect(() => {
+    if (!isValidDate) return
+    
+    const checkExpiration = () => {
+      const startTime = new Date(liveSession.scheduledDate).getTime()
+      const currentTime = new Date().getTime()
+      const fiveHoursInMs = 5 * 60 * 60 * 1000 // 5 hours in milliseconds
+      
+      // If current time is more than 5 hours after start time, expire the session
+      if (currentTime >= startTime + fiveHoursInMs) {
+        setIsExpired(true)
+      } else {
+        setIsExpired(false)
+      }
+    }
+    
+    checkExpiration()
+    // Check every minute to see if 5 hours have passed
+    const interval = setInterval(checkExpiration, 60000)
+    
+    return () => clearInterval(interval)
+  }, [liveSession.scheduledDate, isValidDate])
 
   const handleJoinLive = () => {
     window.open(liveSession.meetingUrl, "_blank", "noopener,noreferrer")
@@ -173,22 +198,33 @@ export default function LiveSessionCard({
       </div>
 
       {/* Join Live Button */}
+      {/* Note: Since sessions are hosted externally (e.g., Zoom), we estimate status 
+          based on scheduled time + duration. The actual session status on the external 
+          platform may differ. The join button is disabled 5 hours after the session start time. */}
       <Button
         onClick={handleJoinLive}
-        disabled={!isLive || isEnded}
+        disabled={!isLive && !isEnded || isExpired}
         className={`w-full ${
-          isEnded 
-            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+          isExpired
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            : isEnded 
+            ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 border border-gray-300' 
             : isLive 
             ? 'bg-gradient-to-r from-[#0476D7] to-[#005eb8] hover:from-[#005eb8] hover:to-[#0476D7] text-white shadow-lg hover:shadow-xl' 
             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
         }`}
         size="lg"
       >
-        {isEnded ? (
+        {isExpired ? (
           <>
-            <CheckCircle className="mr-2 h-5 w-5" />
-            Session Ended
+            <Clock className="mr-2 h-5 w-5" />
+            Session Expired
+          </>
+        ) : isEnded ? (
+          <>
+            <Video className="mr-2 h-5 w-5" />
+            Open Session Link
+            <ExternalLink className="ml-2 h-4 w-4" />
           </>
         ) : isLive ? (
           <>

@@ -124,7 +124,13 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       }
 
       // Load progress for each module with class context
+      // Only load progress for UNLOCKED modules
       const progressPromises = trainingData.modules.map(async (module) => {
+        // If module is locked, don't load progress (set to 0)
+        if (module.status === "LOCKED" || !module.hasAccess) {
+          return { moduleId: module.id, progress: 0 }
+        }
+        
         try {
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/modules/${module.id}/training-progress?classId=${selectedClassId}`, {
             credentials: "include"
@@ -623,8 +629,8 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
                       </div>
                       <p className="text-muted-foreground mb-3 text-sm sm:text-base">{module.description}</p>
                       
-                      {/* Progress Bar */}
-                      {module.progress !== undefined && module.progress > 0 && (
+                      {/* Progress Bar - Only show if module is unlocked */}
+                      {module.status !== "LOCKED" && module.progress !== undefined && module.progress > 0 && (
                         <div className="mb-3">
                           <div className="flex items-center justify-between text-xs sm:text-sm mb-1">
                             <span className="font-semibold text-foreground">Progress</span>

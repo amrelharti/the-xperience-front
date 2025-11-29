@@ -21,7 +21,7 @@ export default function CountdownTimer({
     hours: 0,
     minutes: 0,
   })
-  const [sessionState, setSessionState] = useState<'pending' | 'live' | 'ended'>('pending')
+  const [sessionState, setSessionState] = useState<'pending' | 'live' | 'ended' | 'expired'>('pending')
   const callbacksCalledRef = useRef({ started: false, ended: false })
 
   useEffect(() => {
@@ -31,13 +31,29 @@ export default function CountdownTimer({
     const calculateTimeLeft = () => {
       const startTime = new Date(targetDate).getTime()
       const currentTime = new Date().getTime()
+      const fiveHoursInMs = 5 * 60 * 60 * 1000 // 5 hours in milliseconds
       
-      // Calculate session end time if duration is provided
+      // Check if 5 hours have passed since session start - session expires
+      if (currentTime >= startTime + fiveHoursInMs) {
+        setSessionState(prev => {
+          if (prev !== 'expired') {
+            setTimeLeft({ days: 0, hours: 0, minutes: 0 })
+            return 'expired'
+          }
+          return prev
+        })
+        return
+      }
+      
+      // Calculate estimated session end time based on scheduled duration
+      // Note: Since sessions are hosted externally (e.g., Zoom), we estimate
+      // the end time from the scheduled start time + duration
+      // The actual session on the external platform may end at a different time
       const endTime = durationMinutes 
         ? startTime + (durationMinutes * 60 * 1000)
         : null
       
-      // Check if session has ended
+      // Check if estimated session end time has passed
       if (endTime && currentTime >= endTime) {
         setSessionState(prev => {
           if (prev !== 'ended') {
@@ -110,6 +126,20 @@ export default function CountdownTimer({
 
   const formatNumber = (num: number) => String(num).padStart(2, "0")
 
+  if (sessionState === 'expired') {
+    return (
+      <div className="text-center py-10">
+        <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-gray-400 to-gray-500 rounded-xl mb-4 shadow-lg">
+          <CheckCircle2 className="h-7 w-7 text-white" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">Session Expired</h3>
+        <p className="text-sm text-gray-600">
+          This session is no longer available to join
+        </p>
+      </div>
+    )
+  }
+
   if (sessionState === 'ended') {
     return (
       <div className="text-center py-10">
@@ -118,7 +148,7 @@ export default function CountdownTimer({
         </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">Session Ended</h3>
         <p className="text-sm text-gray-600">
-          This live session has concluded
+          The scheduled live session time has ended
         </p>
       </div>
     )
@@ -132,7 +162,7 @@ export default function CountdownTimer({
         </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">Session is Live</h3>
         <p className="text-sm text-gray-600">
-          Join the session now
+          The session is scheduled to be live now
         </p>
       </div>
     )

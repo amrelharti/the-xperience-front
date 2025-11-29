@@ -818,7 +818,7 @@ export default function CourseDetailPage() {
                     <div className="space-y-2 sm:space-y-3">
                       <div className="flex justify-between text-xs sm:text-sm">
                         
-                        <span className="font-bold text-[#0476D7]">{courseProgress?.completionPercentage || 0}%</span>
+                        <span className="font-bold text-[#0476D7]">{Math.round(courseProgress?.completionPercentage || 0)}%</span>
                       </div>
                       <Progress value={courseProgress?.completionPercentage || 0} className="w-full h-2 sm:h-3" />
                       <p className="text-xs text-gray-600">
