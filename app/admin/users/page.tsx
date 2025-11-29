@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { FileUpload } from "@/components/ui/file-upload"
-import { Plus, Search, Edit, Trash2, ArrowLeft, Users, Mail, Calendar, Shield, Menu, X } from "lucide-react"
+import { Plus, Search, Edit, Trash2, ArrowLeft, Users, Mail, Calendar, Shield, Menu, X, Filter } from "lucide-react"
 import Navbar from "../../components/Navbar"
 import UserDropdown from "../../components/UserDropdown"
 import { useUser } from "../../hooks/useUser"
@@ -23,6 +23,20 @@ interface User {
   createdAt: string
   lastLogin?: string
   imageUrl?: string
+  enrollments?: Array<{
+    classId: string
+    className: string
+    trainingName: string
+    enrolledAt: string
+  }>
+}
+
+interface Class {
+  id: string
+  name: string
+  description?: string
+  moduleId?: string
+  moduleName?: string
 }
 
 export default function UserManagementPage() {
@@ -30,6 +44,9 @@ export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [selectedClassId, setSelectedClassId] = useState<string>("all")
+  const [classes, setClasses] = useState<Class[]>([])
+  const [userEnrollments, setUserEnrollments] = useState<Record<string, Array<{ classId: string; className: string }>>>({})
   const [showCreateUser, setShowCreateUser] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [newUser, setNewUser] = useState({
@@ -43,7 +60,18 @@ export default function UserManagementPage() {
 
   useEffect(() => {
     loadUsers()
+    loadClasses()
   }, [])
+
+  useEffect(() => {
+    if (users.length > 0 && selectedClassId !== "all") {
+      // Only load enrollments when a specific class is selected
+      loadUserEnrollmentsForClass(selectedClassId)
+    } else if (users.length > 0 && selectedClassId === "all") {
+      // Clear enrollments when showing all users
+      setUserEnrollments({})
+    }
+  }, [users, selectedClassId])
 
   const loadUsers = async () => {
     try {
@@ -59,6 +87,94 @@ export default function UserManagementPage() {
       console.error("Error loading users:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadClasses = async () => {
+    try {
+      const res = await fetch("/api/classes", {
+        credentials: "include"
+      })
+      if (res.ok) {
+        const classesData = await res.json()
+        setClasses(classesData)
+      }
+    } catch (error) {
+      console.error("Error loading classes:", error)
+    }
+  }
+
+  const loadUserEnrollmentsForClass = async (classId: string) => {
+    try {
+      // Try to use class roster endpoint first (more efficient)
+      try {
+        const rosterRes = await fetch(`/api/admin/analytics/class-rosters?classId=${classId}`, {
+          credentials: "include"
+        })
+        if (rosterRes.ok) {
+          const rosterData = await rosterRes.json()
+          if (rosterData.rosters && rosterData.rosters.length > 0) {
+            const enrollmentsMap: Record<string, Array<{ classId: string; className: string }>> = {}
+            rosterData.rosters.forEach((roster: any) => {
+              if (roster.students) {
+                roster.students.forEach((student: any) => {
+                  if (!enrollmentsMap[student.id]) {
+                    enrollmentsMap[student.id] = []
+                  }
+                  enrollmentsMap[student.id].push({
+                    classId: classId,
+                    className: roster.className || classes.find(c => c.id === classId)?.name || "Unknown"
+                  })
+                })
+              }
+            })
+            setUserEnrollments(enrollmentsMap)
+            return
+          }
+        }
+      } catch (error) {
+        console.error("Error loading class roster:", error)
+      }
+
+      // Fallback: Load enrollments for all users (slower but works)
+      const enrollmentPromises = users.map(async (user) => {
+        try {
+          const res = await fetch(`/api/admin/users/${user.id}`, {
+            credentials: "include"
+          })
+          if (res.ok) {
+            const userData = await res.json()
+            if (userData.enrollments) {
+              const classEnrollments = userData.enrollments
+                .filter((e: any) => e.classId === classId)
+                .map((e: any) => ({
+                  classId: e.classId,
+                  className: e.className
+                }))
+              if (classEnrollments.length > 0) {
+                return {
+                  userId: user.id,
+                  enrollments: classEnrollments
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error(`Error loading enrollments for user ${user.id}:`, error)
+        }
+        return null
+      })
+
+      const enrollmentResults = await Promise.all(enrollmentPromises)
+      const enrollmentsMap: Record<string, Array<{ classId: string; className: string }>> = {}
+      enrollmentResults.forEach((result) => {
+        if (result) {
+          enrollmentsMap[result.userId] = result.enrollments
+        }
+      })
+      setUserEnrollments(enrollmentsMap)
+    } catch (error) {
+      console.error("Error loading user enrollments:", error)
     }
   }
 
@@ -141,11 +257,22 @@ export default function UserManagementPage() {
     }
   }
 
-  const filteredUsers = useMemo(() => users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.role.toLowerCase().includes(searchTerm.toLowerCase())
-  ), [users, searchTerm])
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      // Search filter
+      const matchesSearch = 
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.role.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      // Class filter
+      const matchesClass = selectedClassId === "all" || 
+        (userEnrollments[user.id]?.some(e => e.classId === selectedClassId) ?? false) ||
+        (user.enrollments?.some(e => e.classId === selectedClassId) ?? false)
+      
+      return matchesSearch && matchesClass
+    })
+  }, [users, searchTerm, selectedClassId, userEnrollments])
 
   if (loading) {
     return (
@@ -377,7 +504,7 @@ export default function UserManagementPage() {
 
         {/* Search and Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 animate-slide-up">
-          <Card className="lg:col-span-3 border-0 bg-white/80 backdrop-blur-sm shadow-lg">
+          <Card className="lg:col-span-2 border-0 bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-4 sm:p-6">
               <div className="relative">
                 <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4 sm:h-5 sm:w-5" />
@@ -392,11 +519,39 @@ export default function UserManagementPage() {
           </Card>
           <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-4 sm:p-6">
+              <div className="space-y-2">
+                <Label htmlFor="class-filter" className="text-xs sm:text-sm text-slate-600 flex items-center gap-2">
+                  <Filter className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  Filter by Class
+                </Label>
+                <Select value={selectedClassId} onValueChange={setSelectedClassId}>
+                  <SelectTrigger id="class-filter" className="h-10 sm:h-12 text-sm sm:text-base border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-lg sm:rounded-xl">
+                    <SelectValue placeholder="All Classes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Classes</SelectItem>
+                    {classes.map((classItem) => (
+                      <SelectItem key={classItem.id} value={classItem.id}>
+                        {classItem.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
+            <CardContent className="p-4 sm:p-6">
               <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-[#005eb8] mb-1.5 sm:mb-2">{users.length}</div>
-                <div className="text-xs sm:text-sm text-slate-600">Total Users</div>
+                <div className="text-2xl sm:text-3xl font-bold text-[#005eb8] mb-1.5 sm:mb-2">{filteredUsers.length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">
+                  {selectedClassId === "all" ? "Total Users" : "Filtered Users"}
+                </div>
                 <div className="mt-4 h-1 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-[#005eb8] to-[#0476D7] rounded-full w-4/5"></div>
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#005eb8] to-[#0476D7] rounded-full transition-all duration-300"
+                    style={{ width: `${users.length > 0 ? (filteredUsers.length / users.length) * 100 : 0}%` }}
+                  ></div>
                 </div>
               </div>
             </CardContent>
