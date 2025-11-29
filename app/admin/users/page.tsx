@@ -10,10 +10,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { FileUpload } from "@/components/ui/file-upload"
-import { Plus, Search, Edit, Trash2, ArrowLeft, Users, Mail, Calendar, Shield, Menu, X } from "lucide-react"
+import { Plus, Search, Edit, Trash2, ArrowLeft, Users, Mail, Calendar, Shield, Menu, X, Filter, XCircle } from "lucide-react"
 import Navbar from "../../components/Navbar"
 import UserDropdown from "../../components/UserDropdown"
 import { useUser } from "../../hooks/useUser"
+import { DatePicker } from "@/components/ui/date-picker"
 
 interface User {
   id: string
@@ -23,11 +24,34 @@ interface User {
   createdAt: string
   lastLogin?: string
   imageUrl?: string
+  enrollments?: Array<{
+    classId: string
+    className: string
+    trainingName: string
+    enrolledAt: string
+  }>
+}
+
+interface Class {
+  id: string
+  name: string
+  description: string
+  moduleId: string
+  moduleName: string
+  startDate: string
+  endDate: string
+  maxStudents: number
+  currentStudents: number
+  isActive: boolean
+  isArchived: boolean
+  createdAt: string
+  updatedAt: string
 }
 
 export default function UserManagementPage() {
   const { user } = useUser()
   const [users, setUsers] = useState<User[]>([])
+  const [classes, setClasses] = useState<Class[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [showCreateUser, setShowCreateUser] = useState(false)
@@ -40,9 +64,15 @@ export default function UserManagementPage() {
     imageUrl: ""
   })
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
+  
+  // Filter states
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined)
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
+  const [selectedClassId, setSelectedClassId] = useState<string>("all")
 
   useEffect(() => {
     loadUsers()
+    loadClasses()
   }, [])
 
   const loadUsers = async () => {
@@ -53,12 +83,45 @@ export default function UserManagementPage() {
       })
       if (res.ok) {
         const usersData = await res.json()
-        setUsers(usersData)
+        // Load enrollment data for each user (needed for class filtering)
+        // This could be optimized by having the backend return enrollments in the list endpoint
+        const usersWithEnrollments = await Promise.all(
+          usersData.map(async (user: User) => {
+            try {
+              const enrollmentRes = await fetch(`/api/admin/users/${user.id}`, {
+                credentials: "include"
+              })
+              if (enrollmentRes.ok) {
+                const userDetail = await enrollmentRes.json()
+                return { ...user, enrollments: userDetail.enrollments || [] }
+              }
+            } catch (error) {
+              // Silently fail - enrollment data is optional
+              console.debug(`Enrollment data not available for user ${user.id}`)
+            }
+            return { ...user, enrollments: [] }
+          })
+        )
+        setUsers(usersWithEnrollments)
       }
     } catch (error) {
       console.error("Error loading users:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadClasses = async () => {
+    try {
+      const res = await fetch("/api/classes", {
+        credentials: "include"
+      })
+      if (res.ok) {
+        const classesData = await res.json()
+        setClasses(classesData)
+      }
+    } catch (error) {
+      console.error("Error loading classes:", error)
     }
   }
 
@@ -141,11 +204,45 @@ export default function UserManagementPage() {
     }
   }
 
-  const filteredUsers = useMemo(() => users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.role.toLowerCase().includes(searchTerm.toLowerCase())
-  ), [users, searchTerm])
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      // Search filter
+      const matchesSearch = 
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.role.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      if (!matchesSearch) return false
+
+      // Date filter
+      if (startDate || endDate) {
+        const userDate = new Date(user.createdAt)
+        userDate.setHours(0, 0, 0, 0)
+        
+        if (startDate) {
+          const start = new Date(startDate)
+          start.setHours(0, 0, 0, 0)
+          if (userDate < start) return false
+        }
+        
+        if (endDate) {
+          const end = new Date(endDate)
+          end.setHours(23, 59, 59, 999)
+          if (userDate > end) return false
+        }
+      }
+
+      // Class filter
+      if (selectedClassId !== "all") {
+        const hasEnrollment = user.enrollments?.some(
+          enrollment => enrollment.classId === selectedClassId
+        )
+        if (!hasEnrollment) return false
+      }
+
+      return true
+    })
+  }, [users, searchTerm, startDate, endDate, selectedClassId])
 
   if (loading) {
     return (
@@ -375,18 +472,131 @@ export default function UserManagementPage() {
           </Dialog>
         </div>
 
+        {/* Filters */}
+        <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg animate-slide-up">
+          <CardHeader className="pb-4 px-4 sm:px-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Filter className="h-4 w-4 sm:h-5 sm:w-5" />
+              Filters
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+                <Input
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-10 border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-lg"
+                />
+              </div>
+
+              {/* Start Date */}
+              <div>
+                <Label className="text-xs text-slate-600 mb-2 block">Start Date</Label>
+                <DatePicker
+                  date={startDate}
+                  onSelect={setStartDate}
+                  placeholder="Select start date"
+                />
+              </div>
+
+              {/* End Date */}
+              <div>
+                <Label className="text-xs text-slate-600 mb-2 block">End Date</Label>
+                <DatePicker
+                  date={endDate}
+                  onSelect={setEndDate}
+                  placeholder="Select end date"
+                />
+              </div>
+
+              {/* Class Filter */}
+              <div>
+                <Label className="text-xs text-slate-600 mb-2 block">Class</Label>
+                <Select value={selectedClassId} onValueChange={setSelectedClassId}>
+                  <SelectTrigger className="h-10 border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-lg">
+                    <SelectValue placeholder="All Classes" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Classes</SelectItem>
+                    {classes
+                      .filter(c => c.isActive && !c.isArchived)
+                      .map((classItem) => (
+                        <SelectItem key={classItem.id} value={classItem.id}>
+                          {classItem.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Active Filters Display */}
+            {(startDate || endDate || selectedClassId !== "all") && (
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-slate-600">Active filters:</span>
+                {startDate && (
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    From: {startDate.toLocaleDateString()}
+                    <XCircle
+                      className="h-3 w-3 cursor-pointer hover:text-red-600"
+                      onClick={() => setStartDate(undefined)}
+                    />
+                  </Badge>
+                )}
+                {endDate && (
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    To: {endDate.toLocaleDateString()}
+                    <XCircle
+                      className="h-3 w-3 cursor-pointer hover:text-red-600"
+                      onClick={() => setEndDate(undefined)}
+                    />
+                  </Badge>
+                )}
+                {selectedClassId !== "all" && (
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    Class: {classes.find(c => c.id === selectedClassId)?.name || "Unknown"}
+                    <XCircle
+                      className="h-3 w-3 cursor-pointer hover:text-red-600"
+                      onClick={() => setSelectedClassId("all")}
+                    />
+                  </Badge>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 text-xs"
+                  onClick={() => {
+                    setStartDate(undefined)
+                    setEndDate(undefined)
+                    setSelectedClassId("all")
+                  }}
+                >
+                  Clear all
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Search and Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 animate-slide-up">
           <Card className="lg:col-span-3 border-0 bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-4 sm:p-6">
-              <div className="relative">
-                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4 sm:h-5 sm:w-5" />
-                <Input
-                  placeholder="Search users by name, email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 sm:pl-12 h-10 sm:h-12 text-sm sm:text-base md:text-lg border-2 border-slate-200 focus:border-[#005eb8] focus:ring-[#005eb8]/20 rounded-lg sm:rounded-xl"
-                />
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-[#005eb8] mb-1.5 sm:mb-2">{filteredUsers.length}</div>
+                <div className="text-xs sm:text-sm text-slate-600">
+                  {filteredUsers.length === users.length ? "Total Users" : "Filtered Users"}
+                </div>
+                <div className="mt-4 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#005eb8] to-[#0476D7] rounded-full transition-all duration-300"
+                    style={{ width: `${users.length > 0 ? (filteredUsers.length / users.length) * 100 : 0}%` }}
+                  ></div>
+                </div>
               </div>
             </CardContent>
           </Card>
