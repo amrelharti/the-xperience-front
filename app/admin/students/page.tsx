@@ -31,7 +31,8 @@ import {
   ArrowDown,
   FileDown,
   Mail,
-  UserCircle
+  UserCircle,
+  BookOpen
 } from "lucide-react"
 import RequireAdmin from "@/app/components/RequireAdmin"
 import UserDropdown from "@/app/components/UserDropdown"
@@ -704,51 +705,122 @@ export default function StudentAnalysisHub() {
                             <Video className="h-5 w-5 text-blue-600" />
                             Video Progress ({student.videos?.length || 0} total)
                           </h4>
-                          <div className="space-y-2 max-h-96 overflow-y-auto">
-                            {student.videos?.map((video: any) => (
-                              <div 
-                                key={video.courseId}
-                                className={`p-3 rounded border ${
-                                  video.completed 
-                                    ? "bg-green-50 border-green-200" 
-                                    : video.watched 
-                                      ? "bg-yellow-50 border-yellow-200"
-                                      : "bg-gray-50 border-gray-200"
-                                }`}
-                              >
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <p className="font-medium text-sm text-gray-900">{video.title}</p>
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      {video.moduleName} • {video.trainingName}
-                                    </p>
+                          <div className="space-y-4 max-h-96 overflow-y-auto">
+                            {(() => {
+                              // Group videos by training and module
+                              const groupedVideos = student.videos ? student.videos.reduce((acc: any, video: any) => {
+                                const trainingName = video.trainingName || "Unknown Training"
+                                const moduleName = video.moduleName || "Unknown Module"
+                                
+                                if (!acc[trainingName]) {
+                                  acc[trainingName] = {}
+                                }
+                                if (!acc[trainingName][moduleName]) {
+                                  acc[trainingName][moduleName] = []
+                                }
+                                acc[trainingName][moduleName].push(video)
+                                return acc
+                              }, {}) : {}
+
+                              // Sort training names and module names within each training
+                              const sortedTrainings = Object.keys(groupedVideos).sort()
+                              const sortedGroupedVideos = sortedTrainings.reduce((acc: any, training: string) => {
+                                acc[training] = {}
+                                const modules = Object.keys(groupedVideos[training]).sort()
+                                modules.forEach(module => {
+                                  // Sort videos within each module by completion status (completed first, then in progress, then not started)
+                                  acc[training][module] = groupedVideos[training][module].sort((a: any, b: any) => {
+                                    if (a.completed && !b.completed) return -1
+                                    if (!a.completed && b.completed) return 1
+                                    if (a.watched && !b.watched) return -1
+                                    if (!a.watched && b.watched) return 1
+                                    return 0
+                                  })
+                                })
+                                return acc
+                              }, {})
+
+                              return Object.entries(sortedGroupedVideos).map(([trainingName, modules]: [string, any]) => (
+                                <div key={trainingName} className="space-y-3">
+                                  {/* Training Header */}
+                                  <div className="sticky top-0 bg-white z-10 pb-2 border-b border-gray-200">
+                                    <h5 className="font-semibold text-sm text-gray-900 flex items-center gap-2">
+                                      <School className="h-4 w-4 text-indigo-600" />
+                                      {trainingName}
+                                    </h5>
                                   </div>
-                                  <div className="text-right ml-3">
-                                    {video.completed ? (
-                                      <Badge className="bg-green-100 text-green-700 border-green-300">
-                                        <CheckCircle className="h-3 w-3 mr-1" />
-                                        Done
-                                      </Badge>
-                                    ) : video.watched ? (
-                                      <div>
-                                        <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">
-                                          <PlayCircle className="h-3 w-3 mr-1" />
-                                          {Math.round(video.completionPercentage)}%
-                                        </Badge>
-                                        <p className="text-xs text-muted-foreground mt-1">
-                                          {Math.round(video.watchTimeSeconds / 60)}min
+                                  
+                                  {/* Modules within Training */}
+                                  {Object.entries(modules).map(([moduleName, videos]: [string, any]) => (
+                                    <div key={moduleName} className="space-y-2 ml-4">
+                                      {/* Module Header */}
+                                      <div className="mb-2">
+                                        <h6 className="font-medium text-xs text-gray-700 flex items-center gap-2">
+                                          <BookOpen className="h-3 w-3 text-blue-600" />
+                                          {moduleName}
+                                        </h6>
+                                        <p className="text-xs text-muted-foreground ml-5">
+                                          {videos.length} video{videos.length !== 1 ? 's' : ''}
                                         </p>
                                       </div>
-                                    ) : (
-                                      <Badge className="bg-gray-100 text-gray-700 border-gray-300">
-                                        <Clock className="h-3 w-3 mr-1" />
-                                        Not Started
-                                      </Badge>
-                                    )}
-                                  </div>
+                                      
+                                      {/* Videos in Module */}
+                                      <div className="space-y-2 ml-4">
+                                        {videos.map((video: any) => (
+                                          <div
+                                            key={video.courseId}
+                                            className={`p-3 rounded border ${
+                                              video.completed
+                                                ? "bg-green-50 border-green-200"
+                                                : video.watched
+                                                  ? "bg-yellow-50 border-yellow-200"
+                                                  : "bg-gray-50 border-gray-200"
+                                            }`}
+                                          >
+                                            <div className="flex items-start justify-between">
+                                              <div className="flex-1">
+                                                <p className="font-medium text-sm text-gray-900">{video.title}</p>
+                                                {video.watched && video.completionPercentage > 0 && (
+                                                  <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+                                                    <div
+                                                      className="bg-blue-500 h-1.5 rounded-full transition-all"
+                                                      style={{ width: `${Math.min(100, video.completionPercentage)}%` }}
+                                                    />
+                                                  </div>
+                                                )}
+                                              </div>
+                                              <div className="text-right ml-3">
+                                                {video.completed ? (
+                                                  <Badge className="bg-green-100 text-green-700 border-green-300">
+                                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                                    Done
+                                                  </Badge>
+                                                ) : video.watched ? (
+                                                  <div>
+                                                    <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">
+                                                      <PlayCircle className="h-3 w-3 mr-1" />
+                                                      {Math.round(video.completionPercentage)}%
+                                                    </Badge>
+                                                    <p className="text-xs text-muted-foreground mt-1">
+                                                      {Math.round(video.watchTimeSeconds / 60)}min
+                                                    </p>
+                                                  </div>
+                                                ) : (
+                                                  <Badge className="bg-gray-100 text-gray-700 border-gray-300">
+                                                    <Clock className="h-3 w-3 mr-1" />
+                                                    Not Started
+                                                  </Badge>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  ))}
                                 </div>
-                              </div>
-                            ))}
+                              ))
+                            })()}
                           </div>
                         </div>
 
