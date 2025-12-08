@@ -8,12 +8,6 @@ import { MessageSquare, X, Send, Loader2, Minimize2, Maximize2, Bot, User, Uploa
 import { useUser } from "@/app/hooks/useUser"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
-import * as pdfjsLib from "pdfjs-dist"
-
-// Configure PDF.js worker
-if (typeof window !== "undefined") {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
-}
 
 interface Message {
   id: string
@@ -219,6 +213,12 @@ export default function CVScorerChat() {
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
     try {
+      // Dynamically import pdfjs-dist only on client side
+      const pdfjsLib = await import("pdfjs-dist")
+      
+      // Configure PDF.js worker
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+      
       const arrayBuffer = await file.arrayBuffer()
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
       let fullText = ""

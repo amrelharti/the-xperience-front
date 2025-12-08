@@ -9,12 +9,6 @@ import { useToast } from "@/hooks/use-toast"
 import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp, FileCheck, Languages, Briefcase, FileSearch } from "lucide-react"
 import Navbar from "@/app/components/Navbar"
 import CVScorerChat from "@/components/CVScorerChat"
-import * as pdfjsLib from "pdfjs-dist"
-
-// Configure PDF.js worker
-if (typeof window !== "undefined") {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
-}
 
 interface CvScoreResponse {
   region: string
@@ -107,6 +101,12 @@ export default function CvScorerPage() {
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
     try {
+      // Dynamically import pdfjs-dist only on client side
+      const pdfjsLib = await import("pdfjs-dist")
+      
+      // Configure PDF.js worker
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+      
       const arrayBuffer = await file.arrayBuffer()
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
       let fullText = ""
