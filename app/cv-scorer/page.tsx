@@ -702,6 +702,55 @@ export default function CvScorerPage() {
                 <div className="space-y-4 sm:space-y-6 mt-6">
                   <h2 className="text-2xl sm:text-3xl mb-4 sm:mb-6 font-heading bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">Feedback by dimension</h2>
                   
+                     {/* Relevance & Targeting */}
+                     {result.feedback.dimensions.relevance_targeting && (
+                    <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
+                      <CardHeader className="border-b-2 bg-gradient-to-r from-primary/5 to-transparent">
+                        <div className="flex items-center justify-between gap-2">
+                          <CardTitle className="text-lg sm:text-xl">Relevance & targeting</CardTitle>
+                          <span className="text-base sm:text-lg font-black text-primary flex-shrink-0">
+                            {Math.min(result.scores.relevance_targeting.total, 20)}/20
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-6 sm:pt-8 space-y-5 sm:space-y-6">
+                        {result.feedback.dimensions.relevance_targeting.strengths && result.feedback.dimensions.relevance_targeting.strengths.length > 0 && (
+                          <div>
+                            <h4 className="mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
+                              <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                              Strengths
+                            </h4>
+                            <ul className="space-y-2 sm:space-y-2.5">
+                              {result.feedback.dimensions.relevance_targeting.strengths.map((strength, index) => (
+                                <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
+                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                                  <span className="leading-relaxed">{strength}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {result.feedback.dimensions.relevance_targeting.improvements && result.feedback.dimensions.relevance_targeting.improvements.length > 0 && (
+                          <div>
+                            <h4 className="mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
+                              <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+                              Areas for improvement
+                            </h4>
+                            <ul className="space-y-2 sm:space-y-2.5">
+                              {result.feedback.dimensions.relevance_targeting.improvements.map((improvement, index) => (
+                                <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
+                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                                  <span className="leading-relaxed">{improvement}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+
                   {/* Structure & Readability */}
                   {result.feedback.dimensions.structure_readability && (
                     <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
@@ -798,54 +847,7 @@ export default function CvScorerPage() {
                     </Card>
                   )}
 
-                  {/* Relevance & Targeting */}
-                  {result.feedback.dimensions.relevance_targeting && (
-                    <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
-                      <CardHeader className="border-b-2 bg-gradient-to-r from-primary/5 to-transparent">
-                        <div className="flex items-center justify-between gap-2">
-                          <CardTitle className="text-lg sm:text-xl">Relevance & targeting</CardTitle>
-                          <span className="text-base sm:text-lg font-black text-primary flex-shrink-0">
-                            {Math.min(result.scores.relevance_targeting.total, 20)}/20
-                          </span>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-6 sm:pt-8 space-y-5 sm:space-y-6">
-                        {result.feedback.dimensions.relevance_targeting.strengths && result.feedback.dimensions.relevance_targeting.strengths.length > 0 && (
-                          <div>
-                            <h4 className="mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
-                              <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
-                              Strengths
-                            </h4>
-                            <ul className="space-y-2 sm:space-y-2.5">
-                              {result.feedback.dimensions.relevance_targeting.strengths.map((strength, index) => (
-                                <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
-                                  <span className="leading-relaxed">{strength}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        {result.feedback.dimensions.relevance_targeting.improvements && result.feedback.dimensions.relevance_targeting.improvements.length > 0 && (
-                          <div>
-                            <h4 className="mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
-                              <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
-                              Areas for improvement
-                            </h4>
-                            <ul className="space-y-2 sm:space-y-2.5">
-                              {result.feedback.dimensions.relevance_targeting.improvements.map((improvement, index) => (
-                                <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
-                                  <span className="leading-relaxed">{improvement}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  )}
-
+               
                   {/* Professionalism & Language */}
                   {result.feedback.dimensions.professionalism_language && (
                     <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
