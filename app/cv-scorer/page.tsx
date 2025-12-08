@@ -181,7 +181,7 @@ export default function CvScorerPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">
-              CV Scorer
+              CV scorer
             </h1>
             <p className="text-muted-foreground text-lg">
               Get professional feedback on your Moroccan/Europass-style CV
@@ -191,7 +191,7 @@ export default function CvScorerPage() {
           {/* Upload Form */}
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>Upload Your CV</CardTitle>
+              <CardTitle>Upload your CV</CardTitle>
               <CardDescription>
                 Upload a PDF of your CV to receive detailed scoring and feedback
               </CardDescription>
@@ -200,7 +200,7 @@ export default function CvScorerPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* File Upload */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">CV File (PDF)</label>
+                  <label className="text-sm font-medium">CV file (PDF)</label>
                   <div className="border-2 border-dashed rounded-lg p-6 text-center transition-colors hover:border-primary/50">
                     <input
                       type="file"
@@ -237,7 +237,7 @@ export default function CvScorerPage() {
                 {/* Target Role */}
                 <div className="space-y-2">
                   <label htmlFor="target-role" className="text-sm font-medium">
-                    Target Role (Optional)
+                    Target role (Optional)
                   </label>
                   <Input
                     id="target-role"
@@ -252,7 +252,7 @@ export default function CvScorerPage() {
                 {/* Job Description */}
                 <div className="space-y-2">
                   <label htmlFor="job-description" className="text-sm font-medium">
-                    Job Description (Optional)
+                    Job description (Optional)
                   </label>
                   <textarea
                     id="job-description"
@@ -267,7 +267,7 @@ export default function CvScorerPage() {
                 {/* Feedback Language */}
                 <div className="space-y-2">
                   <label htmlFor="feedback-language" className="text-sm font-medium">
-                    Feedback Language
+                    Feedback language
                   </label>
                   <select
                     id="feedback-language"
@@ -300,7 +300,7 @@ export default function CvScorerPage() {
                   ) : (
                     <>
                       <TrendingUp className="h-4 w-4 mr-2" />
-                      Score My CV
+                      Score my CV
                     </>
                   )}
                 </Button>
@@ -335,7 +335,7 @@ export default function CvScorerPage() {
                         {result.final_score}
                       </span>
                     </div>
-                    <h2 className="text-2xl font-bold mb-2">Overall Score</h2>
+                    <h2 className="text-2xl font-bold mb-2">Overall score</h2>
                     <p className="text-muted-foreground">out of 100</p>
                     <Progress value={result.final_score} className="mt-4 h-3" />
                   </div>
@@ -346,7 +346,7 @@ export default function CvScorerPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Structure & Readability</CardTitle>
+                    <CardTitle className="text-lg">Structure & readability</CardTitle>
                     <CardDescription>
                       {result.scores.structure_readability.total}/20
                     </CardDescription>
@@ -361,7 +361,7 @@ export default function CvScorerPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Content Quality</CardTitle>
+                    <CardTitle className="text-lg">Content quality</CardTitle>
                     <CardDescription>
                       {result.scores.content_quality.total}/35
                     </CardDescription>
@@ -376,7 +376,7 @@ export default function CvScorerPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Relevance & Targeting</CardTitle>
+                    <CardTitle className="text-lg">Relevance & targeting</CardTitle>
                     <CardDescription>
                       {result.scores.relevance_targeting.total}/20
                     </CardDescription>
@@ -391,7 +391,7 @@ export default function CvScorerPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Professionalism & Language</CardTitle>
+                    <CardTitle className="text-lg">Professionalism & language</CardTitle>
                     <CardDescription>
                       {result.scores.professionalism_language.total}/15
                     </CardDescription>
@@ -452,7 +452,7 @@ export default function CvScorerPage() {
                     <div>
                       <h3 className="font-semibold mb-2 flex items-center gap-2">
                         <XCircle className="h-5 w-5 text-yellow-600" />
-                        Areas for Improvement
+                        Areas for improvement
                       </h3>
                       <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                         {result.feedback.improvements.map((improvement, index) => (
