@@ -104,8 +104,9 @@ export default function CvScorerPage() {
       // Dynamically import pdfjs-dist only on client side
       const pdfjsLib = await import("pdfjs-dist")
       
-      // Configure PDF.js worker - use unpkg CDN which is more reliable
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`
+      // Configure PDF.js worker - use jsdelivr CDN with legacy build path (better CORS support)
+      const version = pdfjsLib.version || "5.4.449"
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/legacy/build/pdf.worker.min.js`
       
       const arrayBuffer = await file.arrayBuffer()
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
