@@ -106,8 +106,8 @@ function Navbar() {
               </Link>
             </>
           ) : (
-            // Student navigation - hide on homepage
-            !isHomepage ? (
+            // Student navigation - only show for authenticated users, hide on homepage
+            user && !isHomepage ? (
               <>
                 <Link href="/" className="text-sm font-medium hover:text-[#0476D7] transition-all duration-200 hover:scale-105 relative group">
                   Trainings
@@ -196,7 +196,8 @@ function Navbar() {
                 </Link>
               </>
             ) : (
-              !isHomepage && (
+              // Student navigation - only show for authenticated users, hide on homepage
+              user && !isHomepage && (
                 <>
                   <Link 
                     href="/" 
