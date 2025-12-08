@@ -515,13 +515,13 @@ export default function CvScorerPage() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base">Structure & readability</CardTitle>
                       <span className="text-lg font-bold text-primary">
-                        {result.scores.structure_readability.total}/20
+                        {Math.min(result.scores.structure_readability.total, 20)}/20
                       </span>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <Progress
-                      value={(result.scores.structure_readability.total / 20) * 100}
+                      value={(Math.min(result.scores.structure_readability.total, 20) / 20) * 100}
                       className="h-2.5"
                     />
                   </CardContent>
@@ -532,13 +532,13 @@ export default function CvScorerPage() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base">Content quality</CardTitle>
                       <span className="text-lg font-bold text-primary">
-                        {result.scores.content_quality.total}/35
+                        {Math.min(result.scores.content_quality.total, 35)}/35
                       </span>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <Progress
-                      value={(result.scores.content_quality.total / 35) * 100}
+                      value={(Math.min(result.scores.content_quality.total, 35) / 35) * 100}
                       className="h-2.5"
                     />
                   </CardContent>
@@ -549,13 +549,13 @@ export default function CvScorerPage() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base">Relevance & targeting</CardTitle>
                       <span className="text-lg font-bold text-primary">
-                        {result.scores.relevance_targeting.total}/20
+                        {Math.min(result.scores.relevance_targeting.total, 20)}/20
                       </span>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <Progress
-                      value={(result.scores.relevance_targeting.total / 20) * 100}
+                      value={(Math.min(result.scores.relevance_targeting.total, 20) / 20) * 100}
                       className="h-2.5"
                     />
                   </CardContent>
@@ -566,13 +566,13 @@ export default function CvScorerPage() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base">Professionalism & language</CardTitle>
                       <span className="text-lg font-bold text-primary">
-                        {result.scores.professionalism_language.total}/15
+                        {Math.min(result.scores.professionalism_language.total, 15)}/15
                       </span>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <Progress
-                      value={(result.scores.professionalism_language.total / 15) * 100}
+                      value={(Math.min(result.scores.professionalism_language.total, 15) / 15) * 100}
                       className="h-2.5"
                     />
                   </CardContent>
@@ -583,13 +583,13 @@ export default function CvScorerPage() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base">Technical / ATS</CardTitle>
                       <span className="text-lg font-bold text-primary">
-                        {result.scores.technical_ats.total}/10
+                        {Math.min(result.scores.technical_ats.total, 10)}/10
                       </span>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <Progress
-                      value={(result.scores.technical_ats.total / 10) * 100}
+                      value={(Math.min(result.scores.technical_ats.total, 10) / 10) * 100}
                       className="h-2.5"
                     />
                   </CardContent>
@@ -664,7 +664,7 @@ export default function CvScorerPage() {
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-lg">Structure & readability</CardTitle>
                           <span className="text-sm font-semibold text-primary">
-                            {result.scores.structure_readability.total}/20
+                            {Math.min(result.scores.structure_readability.total, 20)}/20
                           </span>
                         </div>
                       </CardHeader>
@@ -712,7 +712,7 @@ export default function CvScorerPage() {
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-lg">Content quality</CardTitle>
                           <span className="text-sm font-semibold text-primary">
-                            {result.scores.content_quality.total}/35
+                            {Math.min(result.scores.content_quality.total, 35)}/35
                           </span>
                         </div>
                       </CardHeader>
@@ -760,7 +760,7 @@ export default function CvScorerPage() {
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-lg">Relevance & targeting</CardTitle>
                           <span className="text-sm font-semibold text-primary">
-                            {result.scores.relevance_targeting.total}/20
+                            {Math.min(result.scores.relevance_targeting.total, 20)}/20
                           </span>
                         </div>
                       </CardHeader>
@@ -808,7 +808,7 @@ export default function CvScorerPage() {
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-lg">Professionalism & language</CardTitle>
                           <span className="text-sm font-semibold text-primary">
-                            {result.scores.professionalism_language.total}/15
+                            {Math.min(result.scores.professionalism_language.total, 15)}/15
                           </span>
                         </div>
                       </CardHeader>
@@ -856,7 +856,7 @@ export default function CvScorerPage() {
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-lg">Technical / ATS</CardTitle>
                           <span className="text-sm font-semibold text-primary">
-                            {result.scores.technical_ats.total}/10
+                            {Math.min(result.scores.technical_ats.total, 10)}/10
                           </span>
                         </div>
                       </CardHeader>
