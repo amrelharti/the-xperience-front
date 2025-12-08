@@ -315,16 +315,21 @@ export default function CVScorerChat() {
             "sm:bottom-6 sm:right-6",
             // Mobile: full height, desktop: fixed height
             isMinimized 
-              ? "h-14 w-full sm:w-[320px]" 
+              ? "h-auto w-full sm:w-[360px]" 
               : "h-[calc(100vh-2rem)] sm:h-[650px] w-full sm:w-[420px]"
           )}
         >
-          <Card className="h-full flex flex-col shadow-2xl border-2 border-primary/20 bg-background/98 backdrop-blur-md rounded-2xl overflow-hidden">
+          <Card className={cn(
+            "flex flex-col shadow-2xl border-2 border-primary/20 bg-background/98 backdrop-blur-md rounded-2xl overflow-hidden transition-all duration-300",
+            isMinimized ? "h-fit" : "h-full"
+          )}>
             {/* Header */}
             <CardHeader 
               className={cn(
-                "flex flex-row items-center justify-between space-y-0 border-b-2 border-primary/20 bg-gradient-to-r from-[#0476D7]/10 via-[#0068A7]/5 to-transparent transition-all",
-                isMinimized ? "py-3 px-4 sm:px-5" : "pb-3 px-4 sm:px-5"
+                "flex flex-row items-center justify-between space-y-0 bg-gradient-to-r from-[#0476D7]/10 via-[#0068A7]/5 to-transparent transition-all",
+                isMinimized 
+                  ? "py-3 px-4 sm:px-5 border-0" 
+                  : "pb-3 px-4 sm:px-5 border-b-2 border-primary/20"
               )}
             >
               {isMinimized ? (
@@ -398,7 +403,7 @@ export default function CVScorerChat() {
             {!isMinimized && (
               <>
                 {/* Messages */}
-                <CardContent className="flex-1 p-0 overflow-hidden bg-gradient-to-b from-background via-background to-muted/10">
+                <CardContent className="flex-1 p-0 overflow-hidden bg-gradient-to-b from-background via-background to-muted/10 min-h-0">
                   <div 
                     className="h-full overflow-y-auto px-3 py-4 sm:px-4 sm:py-6 space-y-4 sm:space-y-6 scroll-smooth" 
                     ref={scrollAreaRef}
