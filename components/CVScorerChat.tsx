@@ -202,36 +202,36 @@ export default function CVScorerChat() {
             <CardHeader 
               className={cn(
                 "flex flex-row items-center justify-between space-y-0 border-b bg-gradient-to-r from-primary/10 via-primary/5 to-transparent transition-all",
-                isMinimized ? "py-2 px-4" : "pb-3"
+                isMinimized ? "py-2.5 px-3 sm:px-4" : "pb-3 px-4"
               )}
             >
               {isMinimized ? (
                 <>
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-md flex-shrink-0">
+                  <div className="flex items-center gap-2.5 flex-1 min-w-0 pr-2">
+                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-md flex-shrink-0">
                       <Bot className="h-4 w-4 text-primary-foreground" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <CardTitle className="text-sm font-semibold truncate">CV Scoring Assistant</CardTitle>
+                      <CardTitle className="text-sm font-semibold truncate leading-tight">CV Scoring Assistant</CardTitle>
                     </div>
                     <div className="h-2 w-2 rounded-full bg-green-500 flex-shrink-0 animate-pulse" />
                   </div>
-                  <div className="flex items-center gap-1 flex-shrink-0">
+                  <div className="flex items-center gap-0.5 flex-shrink-0">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 hover:bg-muted/80"
+                      className="h-8 w-8 hover:bg-muted/80 rounded-md"
                       onClick={() => setIsMinimized(!isMinimized)}
                     >
-                      <Maximize2 className="h-3.5 w-3.5" />
+                      <Maximize2 className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 hover:bg-destructive/10 hover:text-destructive"
+                      className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive rounded-md"
                       onClick={() => setIsOpen(false)}
                     >
-                      <X className="h-3.5 w-3.5" />
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
                 </>
