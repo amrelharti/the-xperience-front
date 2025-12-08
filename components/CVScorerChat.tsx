@@ -216,13 +216,18 @@ export default function CVScorerChat() {
       // Dynamically import pdfjs-dist only on client side
       const pdfjsLib = await import("pdfjs-dist")
       
-      // Configure PDF.js worker - try multiple CDN sources for better compatibility
-      const version = pdfjsLib.version || "5.4.449"
-      // Try jsdelivr first (best CORS support), fallback to cdnjs
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/legacy/build/pdf.worker.min.js`
+      // Disable worker to avoid CORS issues - will use main thread (works but slower)
+      // This is a workaround for CORS issues with worker files
+      pdfjsLib.GlobalWorkerOptions.workerSrc = ""
       
       const arrayBuffer = await file.arrayBuffer()
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+      const pdf = await pdfjsLib.getDocument({ 
+        data: arrayBuffer,
+        useWorkerFetch: false,
+        isEvalSupported: false,
+        useSystemFonts: true
+      }).promise
+      
       let fullText = ""
 
       for (let i = 1; i <= pdf.numPages; i++) {
