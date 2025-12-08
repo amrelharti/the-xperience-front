@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
 import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp, FileCheck, Languages, Briefcase, FileSearch } from "lucide-react"
-import RequireAuth from "@/app/components/RequireAuth"
 import Navbar from "@/app/components/Navbar"
 
 interface CvScoreResponse {
@@ -174,10 +173,9 @@ export default function CvScorerPage() {
   }
 
   return (
-    <RequireAuth>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
-        <Navbar />
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-yellow-50/30">
+      <Navbar />
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
           {/* Header */}
           <div className="mb-10">
             <div className="relative rounded-2xl overflow-hidden shadow-xl shadow-blue-500/10 mb-6">
@@ -632,9 +630,8 @@ export default function CvScorerPage() {
               </Card>
             </div>
           )}
-        </div>
       </div>
-    </RequireAuth>
+    </div>
   )
 }
 

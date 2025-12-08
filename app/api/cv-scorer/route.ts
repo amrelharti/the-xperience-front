@@ -17,20 +17,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get JWT token from cookies
-    const cookieHeader = request.headers.get('cookie') || ''
-    let jwtToken = null
-    if (cookieHeader) {
-      const cookies = cookieHeader.split(';')
-      for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=')
-        if (name === 'SESSION' && value) {
-          jwtToken = value
-          break
-        }
-      }
-    }
-
     // Create FormData for backend
     const backendFormData = new FormData()
     backendFormData.append('file', file)
@@ -44,13 +30,8 @@ export async function POST(request: NextRequest) {
       backendFormData.append('feedbackLanguage', feedbackLanguage)
     }
 
+    // No authentication required - public endpoint
     const headers: Record<string, string> = {}
-    
-    if (jwtToken) {
-      headers['Authorization'] = `Bearer ${jwtToken}`
-    } else {
-      headers['Cookie'] = cookieHeader
-    }
 
     const response = await fetch(`${BACKEND_URL}/api/score-cv`, {
       method: 'POST',
