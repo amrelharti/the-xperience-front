@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
-import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp } from "lucide-react"
+import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp, FileCheck, Languages, Briefcase, FileSearch } from "lucide-react"
 import RequireAuth from "@/app/components/RequireAuth"
 import Navbar from "@/app/components/Navbar"
 
@@ -179,142 +179,275 @@ export default function CvScorerPage() {
         <Navbar />
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">
-              CV scorer
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              Get professional feedback on your Moroccan/Europass-style CV
-            </p>
+          <div className="mb-10">
+            <div className="relative rounded-2xl overflow-hidden shadow-xl shadow-blue-500/10 mb-6">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#0476D7] via-[#0068A7] to-[#005A8F]" />
+              <div className="absolute inset-0 bg-grid-white/5 bg-[size:20px_20px] opacity-50" />
+              <div className="relative p-8 md:p-12 text-white">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="h-16 w-16 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <FileSearch className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-2">
+                      CV scorer
+                    </h1>
+                    <p className="text-white/90 text-lg">
+                      Get professional feedback on your Moroccan/Europass-style CV
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Upload Form */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Upload your CV</CardTitle>
-              <CardDescription>
-                Upload a PDF of your CV to receive detailed scoring and feedback
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* File Upload */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">CV file (PDF)</label>
-                  <div className="border-2 border-dashed rounded-lg p-6 text-center transition-colors hover:border-primary/50">
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      onChange={handleFileChange}
-                      className="hidden"
-                      id="cv-file"
-                      disabled={loading}
-                    />
-                    <label
-                      htmlFor="cv-file"
-                      className="cursor-pointer flex flex-col items-center gap-2"
-                    >
-                      {file ? (
-                        <div className="flex items-center gap-2 text-primary">
-                          <FileText className="h-8 w-8" />
-                          <span className="font-medium">{file.name}</span>
-                        </div>
-                      ) : (
-                        <>
-                          <Upload className="h-8 w-8 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">
-                            Click to upload or drag and drop
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            PDF only
-                          </span>
-                        </>
-                      )}
-                    </label>
+          <div className="grid lg:grid-cols-3 gap-6 mb-8">
+            {/* Main Form Card */}
+            <Card className="lg:col-span-2">
+              <CardHeader className="border-b">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Upload className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle>Upload your CV</CardTitle>
+                    <CardDescription>
+                      Upload a PDF file to get started
+                    </CardDescription>
                   </div>
                 </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* File Upload */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-semibold flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      CV file (PDF)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={handleFileChange}
+                        className="hidden"
+                        id="cv-file"
+                        disabled={loading}
+                      />
+                      <label
+                        htmlFor="cv-file"
+                        className={`block cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 ${
+                          file
+                            ? "border-primary bg-primary/5"
+                            : "border-muted-foreground/30 hover:border-primary/50 hover:bg-primary/5"
+                        } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                      >
+                        <div className="p-8 text-center">
+                          {file ? (
+                            <div className="flex flex-col items-center gap-3">
+                              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                                <FileCheck className="h-8 w-8 text-primary" />
+                              </div>
+                              <div>
+                                <p className="font-semibold text-primary">{file.name}</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {(file.size / 1024).toFixed(1)} KB
+                                </p>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  setFile(null)
+                                  setResult(null)
+                                  setError(null)
+                                }}
+                                className="mt-2"
+                              >
+                                Change file
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-3">
+                              <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
+                                <Upload className="h-8 w-8 text-muted-foreground" />
+                              </div>
+                              <div>
+                                <p className="font-medium mb-1">
+                                  Click to upload or drag and drop
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  PDF files only (max 10MB)
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </label>
+                    </div>
+                  </div>
 
-                {/* Target Role */}
-                <div className="space-y-2">
-                  <label htmlFor="target-role" className="text-sm font-medium">
-                    Target role (Optional)
-                  </label>
-                  <Input
-                    id="target-role"
-                    type="text"
-                    placeholder="e.g., Junior Full-Stack Developer"
-                    value={targetRole}
-                    onChange={(e) => setTargetRole(e.target.value)}
-                    disabled={loading}
-                  />
-                </div>
+                  {/* Optional Fields Grid */}
+                  <div className="grid md:grid-cols-2 gap-6 pt-4 border-t">
+                    {/* Target Role */}
+                    <div className="space-y-2">
+                      <label htmlFor="target-role" className="text-sm font-semibold flex items-center gap-2">
+                        <Briefcase className="h-4 w-4" />
+                        Target role
+                        <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
+                      </label>
+                      <Input
+                        id="target-role"
+                        type="text"
+                        placeholder="e.g., Junior Full-Stack Developer"
+                        value={targetRole}
+                        onChange={(e) => setTargetRole(e.target.value)}
+                        disabled={loading}
+                        className="h-11"
+                      />
+                    </div>
 
-                {/* Job Description */}
-                <div className="space-y-2">
-                  <label htmlFor="job-description" className="text-sm font-medium">
-                    Job description (Optional)
-                  </label>
-                  <textarea
-                    id="job-description"
-                    className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="Paste the job description here for better targeting..."
-                    value={jobDescription}
-                    onChange={(e) => setJobDescription(e.target.value)}
-                    disabled={loading}
-                  />
-                </div>
+                    {/* Feedback Language */}
+                    <div className="space-y-2">
+                      <label htmlFor="feedback-language" className="text-sm font-semibold flex items-center gap-2">
+                        <Languages className="h-4 w-4" />
+                        Feedback language
+                      </label>
+                      <select
+                        id="feedback-language"
+                        className="flex h-11 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={feedbackLanguage}
+                        onChange={(e) => setFeedbackLanguage(e.target.value as "FRENCH" | "ENGLISH" | "AUTO")}
+                        disabled={loading}
+                      >
+                        <option value="AUTO">Auto-detect (based on CV)</option>
+                        <option value="FRENCH">Français</option>
+                        <option value="ENGLISH">English</option>
+                      </select>
+                    </div>
+                  </div>
 
-                {/* Feedback Language */}
-                <div className="space-y-2">
-                  <label htmlFor="feedback-language" className="text-sm font-medium">
-                    Feedback language
-                  </label>
-                  <select
-                    id="feedback-language"
-                    className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={feedbackLanguage}
-                    onChange={(e) => setFeedbackLanguage(e.target.value as "FRENCH" | "ENGLISH" | "AUTO")}
-                    disabled={loading}
-                  >
-                    <option value="AUTO">Auto-detect (based on CV language)</option>
-                    <option value="FRENCH">Français</option>
-                    <option value="ENGLISH">English</option>
-                  </select>
-                  <p className="text-xs text-muted-foreground">
-                    Choose the language for feedback. Auto-detect will use the CV's language.
-                  </p>
-                </div>
+                  {/* Job Description */}
+                  <div className="space-y-2 pt-2">
+                    <label htmlFor="job-description" className="text-sm font-semibold">
+                      Job description
+                      <span className="text-xs font-normal text-muted-foreground ml-2">(Optional)</span>
+                    </label>
+                    <textarea
+                      id="job-description"
+                      className="flex min-h-[120px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                      placeholder="Paste the job description here for better targeting and relevance scoring..."
+                      value={jobDescription}
+                      onChange={(e) => setJobDescription(e.target.value)}
+                      disabled={loading}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Providing a job description helps us score relevance and keyword matching more accurately.
+                    </p>
+                  </div>
 
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  disabled={!file || loading}
-                  className="w-full"
-                  size="lg"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Scoring your CV...
-                    </>
-                  ) : (
-                    <>
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      Score my CV
-                    </>
-                  )}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                  {/* Submit Button */}
+                  <div className="pt-4">
+                    <Button
+                      type="submit"
+                      disabled={!file || loading}
+                      className="w-full h-12 text-base font-semibold"
+                      size="lg"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                          Analyzing your CV...
+                        </>
+                      ) : (
+                        <>
+                          <TrendingUp className="h-5 w-5 mr-2" />
+                          Score my CV
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* Info Sidebar */}
+            <div className="space-y-4">
+              <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileSearch className="h-5 w-5" />
+                    How it works
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm text-muted-foreground">
+                  <div className="flex gap-3">
+                    <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      1
+                    </div>
+                    <p>Upload your CV in PDF format</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      2
+                    </div>
+                    <p>AI analyzes 5 key dimensions</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      3
+                    </div>
+                    <p>Receive detailed feedback & scores</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Scoring dimensions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Structure</span>
+                    <span className="font-semibold">20 pts</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Content quality</span>
+                    <span className="font-semibold">35 pts</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Relevance</span>
+                    <span className="font-semibold">20 pts</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Professionalism</span>
+                    <span className="font-semibold">15 pts</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Technical / ATS</span>
+                    <span className="font-semibold">10 pts</span>
+                  </div>
+                  <div className="pt-2 mt-2 border-t flex justify-between items-center font-bold">
+                    <span>Total</span>
+                    <span className="text-primary">100 pts</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
 
           {/* Error Display */}
           {error && (
-            <Card className="border-destructive bg-destructive/10">
+            <Card className="border-destructive/50 bg-destructive/5 mb-8">
               <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <XCircle className="h-6 w-6 text-destructive" />
-                  <div>
+                <div className="flex items-start gap-4">
+                  <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                    <XCircle className="h-5 w-5 text-destructive" />
+                  </div>
+                  <div className="flex-1">
                     <h3 className="font-semibold text-destructive mb-1">Error</h3>
                     <p className="text-sm text-muted-foreground">{error}</p>
                   </div>
@@ -327,94 +460,116 @@ export default function CvScorerPage() {
           {result && (
             <div className="space-y-6">
               {/* Final Score */}
-              <Card className="bg-gradient-to-br from-[#0476D7]/10 to-[#0068A7]/5">
-                <CardContent className="pt-6">
+              <Card className="bg-gradient-to-br from-[#0476D7]/10 via-[#0068A7]/5 to-[#005A8F]/10 border-primary/20 shadow-lg">
+                <CardContent className="pt-8 pb-8">
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-[#0476D7] to-[#0068A7] mb-4">
-                      <span className="text-4xl font-bold text-white">
-                        {result.final_score}
-                      </span>
+                    <div className="relative inline-flex items-center justify-center mb-6">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#0476D7] to-[#0068A7] rounded-full blur-xl opacity-50"></div>
+                      <div className="relative inline-flex items-center justify-center w-36 h-36 rounded-full bg-gradient-to-br from-[#0476D7] to-[#0068A7] shadow-lg">
+                        <span className="text-5xl font-bold text-white">
+                          {result.final_score}
+                        </span>
+                      </div>
                     </div>
-                    <h2 className="text-2xl font-bold mb-2">Overall score</h2>
-                    <p className="text-muted-foreground">out of 100</p>
-                    <Progress value={result.final_score} className="mt-4 h-3" />
+                    <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">
+                      Overall score
+                    </h2>
+                    <p className="text-muted-foreground mb-6">out of 100</p>
+                    <div className="max-w-md mx-auto">
+                      <Progress value={result.final_score} className="h-4" />
+                      <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                        <span>0</span>
+                        <span>50</span>
+                        <span>100</span>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Dimension Scores */}
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Structure & readability</CardTitle>
-                    <CardDescription>
-                      {result.scores.structure_readability.total}/20
-                    </CardDescription>
+                <Card className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Structure & readability</CardTitle>
+                      <span className="text-lg font-bold text-primary">
+                        {result.scores.structure_readability.total}/20
+                      </span>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <Progress
                       value={(result.scores.structure_readability.total / 20) * 100}
-                      className="h-2"
+                      className="h-2.5"
                     />
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Content quality</CardTitle>
-                    <CardDescription>
-                      {result.scores.content_quality.total}/35
-                    </CardDescription>
+                <Card className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Content quality</CardTitle>
+                      <span className="text-lg font-bold text-primary">
+                        {result.scores.content_quality.total}/35
+                      </span>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <Progress
                       value={(result.scores.content_quality.total / 35) * 100}
-                      className="h-2"
+                      className="h-2.5"
                     />
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Relevance & targeting</CardTitle>
-                    <CardDescription>
-                      {result.scores.relevance_targeting.total}/20
-                    </CardDescription>
+                <Card className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Relevance & targeting</CardTitle>
+                      <span className="text-lg font-bold text-primary">
+                        {result.scores.relevance_targeting.total}/20
+                      </span>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <Progress
                       value={(result.scores.relevance_targeting.total / 20) * 100}
-                      className="h-2"
+                      className="h-2.5"
                     />
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Professionalism & language</CardTitle>
-                    <CardDescription>
-                      {result.scores.professionalism_language.total}/15
-                    </CardDescription>
+                <Card className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Professionalism & language</CardTitle>
+                      <span className="text-lg font-bold text-primary">
+                        {result.scores.professionalism_language.total}/15
+                      </span>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <Progress
                       value={(result.scores.professionalism_language.total / 15) * 100}
-                      className="h-2"
+                      className="h-2.5"
                     />
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Technical / ATS</CardTitle>
-                    <CardDescription>
-                      {result.scores.technical_ats.total}/10
-                    </CardDescription>
+                <Card className="hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Technical / ATS</CardTitle>
+                      <span className="text-lg font-bold text-primary">
+                        {result.scores.technical_ats.total}/10
+                      </span>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <Progress
                       value={(result.scores.technical_ats.total / 10) * 100}
-                      className="h-2"
+                      className="h-2.5"
                     />
                   </CardContent>
                 </Card>
@@ -422,26 +577,35 @@ export default function CvScorerPage() {
 
               {/* Feedback */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Feedback</CardTitle>
+                <CardHeader className="border-b">
+                  <CardTitle className="flex items-center gap-2">
+                    <FileSearch className="h-5 w-5" />
+                    Detailed feedback
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="pt-6 space-y-6">
                   {/* Summary */}
-                  <div>
-                    <h3 className="font-semibold mb-2">Summary</h3>
-                    <p className="text-muted-foreground">{result.feedback.summary}</p>
+                  <div className="p-4 rounded-lg bg-muted/50">
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Summary
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">{result.feedback.summary}</p>
                   </div>
 
                   {/* Strengths */}
                   {result.feedback.strengths && result.feedback.strengths.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold mb-2 flex items-center gap-2">
-                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                    <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/30">
+                      <h3 className="font-semibold mb-3 flex items-center gap-2 text-green-700 dark:text-green-400">
+                        <CheckCircle2 className="h-5 w-5" />
                         Strengths
                       </h3>
-                      <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                      <ul className="space-y-2">
                         {result.feedback.strengths.map((strength, index) => (
-                          <li key={index}>{strength}</li>
+                          <li key={index} className="flex gap-2 text-sm">
+                            <span className="text-green-600 dark:text-green-400 mt-1.5">•</span>
+                            <span className="text-muted-foreground flex-1">{strength}</span>
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -449,14 +613,17 @@ export default function CvScorerPage() {
 
                   {/* Improvements */}
                   {result.feedback.improvements && result.feedback.improvements.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold mb-2 flex items-center gap-2">
-                        <XCircle className="h-5 w-5 text-yellow-600" />
+                    <div className="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900/30">
+                      <h3 className="font-semibold mb-3 flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
+                        <XCircle className="h-5 w-5" />
                         Areas for improvement
                       </h3>
-                      <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                      <ul className="space-y-2">
                         {result.feedback.improvements.map((improvement, index) => (
-                          <li key={index}>{improvement}</li>
+                          <li key={index} className="flex gap-2 text-sm">
+                            <span className="text-yellow-600 dark:text-yellow-400 mt-1.5">•</span>
+                            <span className="text-muted-foreground flex-1">{improvement}</span>
+                          </li>
                         ))}
                       </ul>
                     </div>
