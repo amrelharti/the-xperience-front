@@ -213,36 +213,26 @@ export default function CVScorerChat() {
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
     try {
-      // Dynamically import pdfjs-dist only on client side
-      const pdfjsLib = await import("pdfjs-dist")
-      
-      // Disable worker to avoid CORS issues - will use main thread (works but slower)
-      // This is a workaround for CORS issues with worker files
-      pdfjsLib.GlobalWorkerOptions.workerSrc = ""
-      
-      const arrayBuffer = await file.arrayBuffer()
-      const pdf = await pdfjsLib.getDocument({ 
-        data: arrayBuffer,
-        useWorkerFetch: false,
-        isEvalSupported: false,
-        useSystemFonts: true
-      }).promise
-      
-      let fullText = ""
+      // Use backend extraction - faster and more reliable
+      const formData = new FormData()
+      formData.append("file", file)
 
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i)
-        const textContent = await page.getTextContent()
-        const pageText = textContent.items
-          .map((item: any) => item.str)
-          .join(" ")
-        fullText += pageText + "\n"
+      const response = await fetch("/api/extract-pdf-text", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Failed to extract text" }))
+        throw new Error(errorData.error || "Failed to extract text from PDF")
       }
 
-      return fullText.trim()
+      const data = await response.json()
+      return data.text || ""
     } catch (error) {
       console.error("Error extracting PDF text:", error)
-      throw new Error("Failed to extract text from PDF. Please ensure it's a valid PDF file.")
+      throw new Error(error instanceof Error ? error.message : "Failed to extract text from PDF. Please ensure it's a valid PDF file.")
     }
   }
 
