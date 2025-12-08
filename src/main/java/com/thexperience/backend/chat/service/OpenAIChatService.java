@@ -843,7 +843,7 @@ public class OpenAIChatService {
         this.objectMapper = new ObjectMapper();
     }
     
-    public String getChatResponse(String userMessage, List<Map<String, String>> conversationHistory) {
+    public String getChatResponse(String userMessage, List<Map<String, String>> conversationHistory, String cvContext) {
         if (apiKey == null || apiKey.isEmpty()) {
             throw new IllegalStateException("OpenAI API key is not configured");
         }
@@ -852,10 +852,26 @@ public class OpenAIChatService {
             // Build messages list
             List<Map<String, String>> messages = new ArrayList<>();
             
+            // Build system prompt with CV context if available
+            String systemPromptContent = SYSTEM_PROMPT;
+            if (cvContext != null && !cvContext.trim().isEmpty()) {
+                systemPromptContent = SYSTEM_PROMPT + "\n\n" +
+                    "────────────────────────────────\n" +
+                    "USER'S CV CONTEXT\n" +
+                    "────────────────────────────────\n" +
+                    "The user has uploaded their CV. Below is the extracted text from their CV. " +
+                    "Use this CV content to provide personalized advice and answer questions about their specific CV. " +
+                    "You can reference specific sections, content, or issues in their CV when providing guidance.\n\n" +
+                    "CV Content:\n" + cvContext + "\n\n" +
+                    "When answering questions, you can reference this CV to provide specific, personalized advice. " +
+                    "For example, if they ask about their headline, you can look at their actual headline and provide feedback. " +
+                    "If they ask about their experience section, you can reference their actual experience entries.";
+            }
+            
             // Add system prompt
             Map<String, String> systemMessage = new HashMap<>();
             systemMessage.put("role", "system");
-            systemMessage.put("content", SYSTEM_PROMPT);
+            systemMessage.put("content", systemPromptContent);
             messages.add(systemMessage);
             
             // Add conversation history (last 10 messages to avoid token limits)

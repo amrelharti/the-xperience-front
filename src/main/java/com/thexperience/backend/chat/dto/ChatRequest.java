@@ -6,6 +6,7 @@ import java.util.Map;
 public class ChatRequest {
     private String message;
     private List<Map<String, String>> conversationHistory;
+    private String cvContext;
     
     public String getMessage() {
         return message;
@@ -21,6 +22,14 @@ public class ChatRequest {
     
     public void setConversationHistory(List<Map<String, String>> conversationHistory) {
         this.conversationHistory = conversationHistory;
+    }
+    
+    public String getCvContext() {
+        return cvContext;
+    }
+    
+    public void setCvContext(String cvContext) {
+        this.cvContext = cvContext;
     }
 }
 

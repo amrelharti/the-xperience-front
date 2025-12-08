@@ -6,7 +6,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:80
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { message, conversationHistory } = body
+    const { message, conversationHistory, cvContext } = body
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json(
@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         message,
         conversationHistory: conversationHistory || [],
+        cvContext: cvContext || null,
       }),
     })
 

@@ -9,6 +9,12 @@ import { useToast } from "@/hooks/use-toast"
 import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp, FileCheck, Languages, Briefcase, FileSearch } from "lucide-react"
 import Navbar from "@/app/components/Navbar"
 import CVScorerChat from "@/components/CVScorerChat"
+import * as pdfjsLib from "pdfjs-dist"
+
+// Configure PDF.js worker
+if (typeof window !== "undefined") {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+}
 
 interface CvScoreResponse {
   region: string
@@ -99,7 +105,29 @@ export default function CvScorerPage() {
   const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+      let fullText = ""
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i)
+        const textContent = await page.getTextContent()
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(" ")
+        fullText += pageText + "\n"
+      }
+
+      return fullText.trim()
+    } catch (error) {
+      console.error("Error extracting PDF text:", error)
+      throw new Error("Failed to extract text from PDF")
+    }
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
     if (selectedFile) {
       if (selectedFile.type !== "application/pdf") {
@@ -113,6 +141,25 @@ export default function CvScorerPage() {
       setFile(selectedFile)
       setResult(null)
       setError(null)
+
+      // Extract text and store in localStorage for chat sharing
+      try {
+        const extractedText = await extractTextFromPDF(selectedFile)
+        const cvData = {
+          text: extractedText,
+          fileName: selectedFile.name,
+          timestamp: Date.now(),
+        }
+        localStorage.setItem("cv-scorer-cv-context", JSON.stringify(cvData))
+        
+        // Dispatch custom event to notify chat component
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("cv-uploaded", { detail: cvData }))
+        }
+      } catch (error) {
+        console.error("Error extracting CV text for chat:", error)
+        // Don't show error to user, just log it
+      }
     }
   }
 

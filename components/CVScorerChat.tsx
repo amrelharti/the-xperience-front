@@ -4,10 +4,16 @@ import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { MessageSquare, X, Send, Loader2, Minimize2, Maximize2, Bot, User } from "lucide-react"
+import { MessageSquare, X, Send, Loader2, Minimize2, Maximize2, Bot, User, Upload, FileText, XCircle } from "lucide-react"
 import { useUser } from "@/app/hooks/useUser"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
+import * as pdfjsLib from "pdfjs-dist"
+
+// Configure PDF.js worker
+if (typeof window !== "undefined") {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+}
 
 interface Message {
   id: string
@@ -22,8 +28,12 @@ export default function CVScorerChat() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [cvText, setCvText] = useState<string | null>(null)
+  const [cvFileName, setCvFileName] = useState<string | null>(null)
+  const [isExtractingPdf, setIsExtractingPdf] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const { user } = useUser()
   const { toast } = useToast()
 
@@ -33,6 +43,51 @@ export default function CVScorerChat() {
       loadConversationHistory()
     }
   }, [user, isOpen])
+
+  // Check for CV from cv-scorer page on mount and listen for new uploads
+  useEffect(() => {
+    // Check localStorage for recent CV
+    const checkStoredCV = () => {
+      try {
+        const stored = localStorage.getItem("cv-scorer-cv-context")
+        if (stored) {
+          const cvData = JSON.parse(stored)
+          // Only use if uploaded within last 24 hours
+          const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000
+          if (cvData.timestamp > oneDayAgo && cvData.text) {
+            setCvText(cvData.text)
+            setCvFileName(cvData.fileName || "CV from CV Scorer")
+          } else {
+            // Remove old CV data
+            localStorage.removeItem("cv-scorer-cv-context")
+          }
+        }
+      } catch (error) {
+        console.error("Error loading stored CV:", error)
+      }
+    }
+
+    checkStoredCV()
+
+    // Listen for new CV uploads from cv-scorer page
+    const handleCVUploaded = (event: CustomEvent) => {
+      const cvData = event.detail
+      if (cvData.text) {
+        setCvText(cvData.text)
+        setCvFileName(cvData.fileName || "CV from CV Scorer")
+        toast({
+          title: "CV loaded",
+          description: "Your CV from the CV scorer is now available in the chat.",
+        })
+      }
+    }
+
+    window.addEventListener("cv-uploaded" as any, handleCVUploaded as EventListener)
+
+    return () => {
+      window.removeEventListener("cv-uploaded" as any, handleCVUploaded as EventListener)
+    }
+  }, [])
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -120,6 +175,7 @@ export default function CVScorerChat() {
             role: msg.role,
             content: msg.content,
           })),
+          cvContext: cvText || undefined,
         }),
       })
 
@@ -159,6 +215,75 @@ export default function CVScorerChat() {
       e.preventDefault()
       handleSend()
     }
+  }
+
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+      let fullText = ""
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i)
+        const textContent = await page.getTextContent()
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(" ")
+        fullText += pageText + "\n"
+      }
+
+      return fullText.trim()
+    } catch (error) {
+      console.error("Error extracting PDF text:", error)
+      throw new Error("Failed to extract text from PDF. Please ensure it's a valid PDF file.")
+    }
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.type !== "application/pdf") {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a PDF file",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsExtractingPdf(true)
+    try {
+      const extractedText = await extractTextFromPDF(file)
+      setCvText(extractedText)
+      setCvFileName(file.name)
+      toast({
+        title: "CV uploaded successfully",
+        description: `"${file.name}" is now available for the chat to reference.`,
+      })
+    } catch (error) {
+      console.error("Error processing PDF:", error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to process PDF file",
+        variant: "destructive",
+      })
+    } finally {
+      setIsExtractingPdf(false)
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
+    }
+  }
+
+  const handleRemoveCV = () => {
+    setCvText(null)
+    setCvFileName(null)
+    toast({
+      title: "CV removed",
+      description: "The CV context has been cleared.",
+    })
   }
 
   if (!user) {
@@ -350,15 +475,56 @@ export default function CVScorerChat() {
                   </div>
                 </CardContent>
 
+                {/* CV Context Banner */}
+                {cvText && (
+                  <div className="border-t bg-primary/5 px-3 sm:px-4 py-2 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <FileText className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span className="text-xs sm:text-sm text-muted-foreground truncate">
+                        CV: {cvFileName || "Uploaded CV"}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
+                      onClick={handleRemoveCV}
+                    >
+                      <XCircle className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                )}
+
                 {/* Input */}
                 <div className="border-t bg-background/95 backdrop-blur-sm p-3 sm:p-4">
                   <div className="flex gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="application/pdf"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isLoading || isExtractingPdf}
+                      className="h-10 w-10 sm:h-12 sm:w-12 rounded-full flex-shrink-0 border-2 hover:bg-muted"
+                      title="Upload CV"
+                    >
+                      {isExtractingPdf ? (
+                        <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4 sm:h-5 sm:w-5" />
+                      )}
+                    </Button>
                     <Input
                       ref={inputRef}
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="Ask about CV scoring..."
+                      placeholder={cvText ? "Ask about your CV..." : "Ask about CV scoring..."}
                       disabled={isLoading}
                       className="flex-1 border-2 focus:border-primary/50 rounded-full px-3 py-4 sm:px-4 sm:py-6 bg-background transition-all text-sm sm:text-base"
                     />
@@ -376,7 +542,7 @@ export default function CVScorerChat() {
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2 text-center hidden sm:block">
-                    Press Enter to send
+                    {cvText ? "Chat has access to your CV" : "Press Enter to send • Upload a CV to get personalized advice"}
                   </p>
                 </div>
               </>
