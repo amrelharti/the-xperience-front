@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
 import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp, FileCheck, Languages, Briefcase, FileSearch } from "lucide-react"
 import Navbar from "@/app/components/Navbar"
+import CVScorerChat from "@/components/CVScorerChat"
 
 interface CvScoreResponse {
   region: string
@@ -631,6 +632,7 @@ export default function CvScorerPage() {
             </div>
           )}
       </div>
+      <CVScorerChat />
     </div>
   )
 }
