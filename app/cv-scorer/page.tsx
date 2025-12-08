@@ -64,6 +64,28 @@ interface CvScoreResponse {
     summary: string
     strengths: string[]
     improvements: string[]
+    dimensions?: {
+      structure_readability?: {
+        strengths: string[]
+        improvements: string[]
+      }
+      content_quality?: {
+        strengths: string[]
+        improvements: string[]
+      }
+      relevance_targeting?: {
+        strengths: string[]
+        improvements: string[]
+      }
+      professionalism_language?: {
+        strengths: string[]
+        improvements: string[]
+      }
+      technical_ats?: {
+        strengths: string[]
+        improvements: string[]
+      }
+    }
   }
 }
 
@@ -629,6 +651,253 @@ export default function CvScorerPage() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Per-Dimension Feedback */}
+              {result.feedback.dimensions && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-bold mb-4">Feedback by dimension</h2>
+                  
+                  {/* Structure & Readability */}
+                  {result.feedback.dimensions.structure_readability && (
+                    <Card className="hover:shadow-md transition-shadow">
+                      <CardHeader className="border-b">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">Structure & readability</CardTitle>
+                          <span className="text-sm font-semibold text-primary">
+                            {result.scores.structure_readability.total}/20
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-6 space-y-4">
+                        {result.feedback.dimensions.structure_readability.strengths && result.feedback.dimensions.structure_readability.strengths.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2 text-green-700 dark:text-green-400">
+                              <CheckCircle2 className="h-4 w-4" />
+                              Strengths
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {result.feedback.dimensions.structure_readability.strengths.map((strength, index) => (
+                                <li key={index} className="flex gap-2 text-sm text-muted-foreground">
+                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                                  <span>{strength}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {result.feedback.dimensions.structure_readability.improvements && result.feedback.dimensions.structure_readability.improvements.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
+                              <XCircle className="h-4 w-4" />
+                              Areas for improvement
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {result.feedback.dimensions.structure_readability.improvements.map((improvement, index) => (
+                                <li key={index} className="flex gap-2 text-sm text-muted-foreground">
+                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                                  <span>{improvement}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Content Quality */}
+                  {result.feedback.dimensions.content_quality && (
+                    <Card className="hover:shadow-md transition-shadow">
+                      <CardHeader className="border-b">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">Content quality</CardTitle>
+                          <span className="text-sm font-semibold text-primary">
+                            {result.scores.content_quality.total}/35
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-6 space-y-4">
+                        {result.feedback.dimensions.content_quality.strengths && result.feedback.dimensions.content_quality.strengths.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2 text-green-700 dark:text-green-400">
+                              <CheckCircle2 className="h-4 w-4" />
+                              Strengths
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {result.feedback.dimensions.content_quality.strengths.map((strength, index) => (
+                                <li key={index} className="flex gap-2 text-sm text-muted-foreground">
+                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                                  <span>{strength}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {result.feedback.dimensions.content_quality.improvements && result.feedback.dimensions.content_quality.improvements.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
+                              <XCircle className="h-4 w-4" />
+                              Areas for improvement
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {result.feedback.dimensions.content_quality.improvements.map((improvement, index) => (
+                                <li key={index} className="flex gap-2 text-sm text-muted-foreground">
+                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                                  <span>{improvement}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Relevance & Targeting */}
+                  {result.feedback.dimensions.relevance_targeting && (
+                    <Card className="hover:shadow-md transition-shadow">
+                      <CardHeader className="border-b">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">Relevance & targeting</CardTitle>
+                          <span className="text-sm font-semibold text-primary">
+                            {result.scores.relevance_targeting.total}/20
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-6 space-y-4">
+                        {result.feedback.dimensions.relevance_targeting.strengths && result.feedback.dimensions.relevance_targeting.strengths.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2 text-green-700 dark:text-green-400">
+                              <CheckCircle2 className="h-4 w-4" />
+                              Strengths
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {result.feedback.dimensions.relevance_targeting.strengths.map((strength, index) => (
+                                <li key={index} className="flex gap-2 text-sm text-muted-foreground">
+                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                                  <span>{strength}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {result.feedback.dimensions.relevance_targeting.improvements && result.feedback.dimensions.relevance_targeting.improvements.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
+                              <XCircle className="h-4 w-4" />
+                              Areas for improvement
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {result.feedback.dimensions.relevance_targeting.improvements.map((improvement, index) => (
+                                <li key={index} className="flex gap-2 text-sm text-muted-foreground">
+                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                                  <span>{improvement}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Professionalism & Language */}
+                  {result.feedback.dimensions.professionalism_language && (
+                    <Card className="hover:shadow-md transition-shadow">
+                      <CardHeader className="border-b">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">Professionalism & language</CardTitle>
+                          <span className="text-sm font-semibold text-primary">
+                            {result.scores.professionalism_language.total}/15
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-6 space-y-4">
+                        {result.feedback.dimensions.professionalism_language.strengths && result.feedback.dimensions.professionalism_language.strengths.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2 text-green-700 dark:text-green-400">
+                              <CheckCircle2 className="h-4 w-4" />
+                              Strengths
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {result.feedback.dimensions.professionalism_language.strengths.map((strength, index) => (
+                                <li key={index} className="flex gap-2 text-sm text-muted-foreground">
+                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                                  <span>{strength}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {result.feedback.dimensions.professionalism_language.improvements && result.feedback.dimensions.professionalism_language.improvements.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
+                              <XCircle className="h-4 w-4" />
+                              Areas for improvement
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {result.feedback.dimensions.professionalism_language.improvements.map((improvement, index) => (
+                                <li key={index} className="flex gap-2 text-sm text-muted-foreground">
+                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                                  <span>{improvement}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Technical / ATS */}
+                  {result.feedback.dimensions.technical_ats && (
+                    <Card className="hover:shadow-md transition-shadow">
+                      <CardHeader className="border-b">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">Technical / ATS</CardTitle>
+                          <span className="text-sm font-semibold text-primary">
+                            {result.scores.technical_ats.total}/10
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-6 space-y-4">
+                        {result.feedback.dimensions.technical_ats.strengths && result.feedback.dimensions.technical_ats.strengths.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2 text-green-700 dark:text-green-400">
+                              <CheckCircle2 className="h-4 w-4" />
+                              Strengths
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {result.feedback.dimensions.technical_ats.strengths.map((strength, index) => (
+                                <li key={index} className="flex gap-2 text-sm text-muted-foreground">
+                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                                  <span>{strength}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {result.feedback.dimensions.technical_ats.improvements && result.feedback.dimensions.technical_ats.improvements.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
+                              <XCircle className="h-4 w-4" />
+                              Areas for improvement
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {result.feedback.dimensions.technical_ats.improvements.map((improvement, index) => (
+                                <li key={index} className="flex gap-2 text-sm text-muted-foreground">
+                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
+                                  <span>{improvement}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )}
             </div>
           )}
       </div>
