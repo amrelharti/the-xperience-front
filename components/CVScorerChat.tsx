@@ -296,11 +296,11 @@ export default function CVScorerChat() {
             setIsOpen(true)
             setIsMinimized(false)
           }}
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 h-14 w-14 sm:h-16 sm:w-16 rounded-full shadow-2xl z-50 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all duration-300 hover:scale-110 hover:shadow-3xl"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 h-14 w-14 sm:h-16 sm:w-16 rounded-full shadow-2xl z-50 bg-gradient-to-br from-[#0476D7] to-[#0068A7] hover:from-[#0476D7]/90 hover:to-[#0068A7]/80 transition-all duration-300 hover:scale-110 hover:shadow-3xl border-2 border-white/20"
           size="icon"
         >
           <MessageSquare className="h-6 w-6 sm:h-7 sm:w-7" />
-          <span className="absolute -top-1 -right-1 h-3 w-3 sm:h-4 sm:w-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
+          <span className="absolute -top-1 -right-1 h-3.5 w-3.5 sm:h-4 sm:w-4 bg-green-500 rounded-full border-2 border-background animate-pulse shadow-lg" />
         </Button>
       )}
 
@@ -319,24 +319,24 @@ export default function CVScorerChat() {
               : "h-[calc(100vh-2rem)] sm:h-[650px] w-full sm:w-[420px]"
           )}
         >
-          <Card className="h-full flex flex-col shadow-2xl border-2 border-border/50 bg-background/95 backdrop-blur-sm">
+          <Card className="h-full flex flex-col shadow-2xl border-2 border-primary/20 bg-background/98 backdrop-blur-md rounded-2xl overflow-hidden">
             {/* Header */}
             <CardHeader 
               className={cn(
-                "flex flex-row items-center justify-between space-y-0 border-b bg-gradient-to-r from-primary/10 via-primary/5 to-transparent transition-all",
-                isMinimized ? "py-2.5 px-3 sm:px-4" : "pb-3 px-4"
+                "flex flex-row items-center justify-between space-y-0 border-b-2 border-primary/20 bg-gradient-to-r from-[#0476D7]/10 via-[#0068A7]/5 to-transparent transition-all",
+                isMinimized ? "py-2.5 px-3 sm:px-4" : "pb-3 px-4 sm:px-5"
               )}
             >
               {isMinimized ? (
                 <>
                   <div className="flex items-center gap-2.5 flex-1 min-w-0 pr-2">
-                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-md flex-shrink-0">
-                      <Bot className="h-4 w-4 text-primary-foreground" />
+                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#0476D7] to-[#0068A7] flex items-center justify-center shadow-lg border-2 border-white/20 flex-shrink-0">
+                      <Bot className="h-4 w-4 text-white" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <CardTitle className="text-sm font-semibold truncate leading-tight">CV Scoring Assistant</CardTitle>
+                      <CardTitle className="text-sm font-bold truncate leading-tight font-heading">CV Scoring Assistant</CardTitle>
                     </div>
-                    <div className="h-2 w-2 rounded-full bg-green-500 flex-shrink-0 animate-pulse" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-green-500 flex-shrink-0 animate-pulse shadow-md" />
                   </div>
                   <div className="flex items-center gap-0.5 flex-shrink-0">
                     <Button
@@ -360,12 +360,15 @@ export default function CVScorerChat() {
               ) : (
                 <>
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-md flex-shrink-0">
-                      <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
+                    <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-gradient-to-br from-[#0476D7] to-[#0068A7] flex items-center justify-center shadow-lg border-2 border-white/20 flex-shrink-0">
+                      <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                     </div>
                     <div className="min-w-0">
-                      <CardTitle className="text-base sm:text-lg font-semibold truncate">CV Scoring Assistant</CardTitle>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground">Online • Ready to help</p>
+                      <CardTitle className="text-base sm:text-lg font-bold truncate font-heading">CV Scoring Assistant</CardTitle>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        Online • Ready to help
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
@@ -393,18 +396,18 @@ export default function CVScorerChat() {
             {!isMinimized && (
               <>
                 {/* Messages */}
-                <CardContent className="flex-1 p-0 overflow-hidden bg-gradient-to-b from-background to-muted/20">
+                <CardContent className="flex-1 p-0 overflow-hidden bg-gradient-to-b from-background via-background to-muted/10">
                   <div 
                     className="h-full overflow-y-auto px-3 py-4 sm:px-4 sm:py-6 space-y-4 sm:space-y-6 scroll-smooth" 
                     ref={scrollAreaRef}
                   >
                     {messages.length === 0 && (
                       <div className="flex flex-col items-center justify-center h-full text-center py-6 sm:py-8 px-4">
-                        <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mb-3 sm:mb-4">
-                          <Bot className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                        <div className="h-14 w-14 sm:h-18 sm:w-18 rounded-full bg-gradient-to-br from-[#0476D7]/20 to-[#0068A7]/10 flex items-center justify-center mb-4 sm:mb-5 border-2 border-primary/20 shadow-lg">
+                          <Bot className="h-7 w-7 sm:h-9 sm:w-9 text-primary" />
                         </div>
-                        <h3 className="text-base sm:text-lg font-semibold mb-2">Start a conversation</h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground max-w-xs">
+                        <h3 className="text-base sm:text-lg font-bold mb-2 font-heading">Start a conversation</h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground max-w-xs leading-relaxed">
                           Ask me anything about CV scoring, best practices, or how to improve your resume!
                         </p>
                       </div>
@@ -419,17 +422,17 @@ export default function CVScorerChat() {
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
                         {message.role === "assistant" && (
-                          <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                            <Bot className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+                          <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-gradient-to-br from-[#0476D7]/20 to-[#0068A7]/10 flex items-center justify-center flex-shrink-0 mt-1 border border-primary/20 shadow-sm">
+                            <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                           </div>
                         )}
-                        <div className="flex flex-col gap-1 max-w-[85%] sm:max-w-[75%]">
+                        <div className="flex flex-col gap-1.5 max-w-[85%] sm:max-w-[75%]">
                           <div
                             className={cn(
-                              "rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-sm",
+                              "rounded-2xl px-4 py-2.5 sm:px-5 sm:py-3.5 shadow-md",
                               message.role === "user"
-                                ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-tr-sm"
-                                : "bg-card border border-border/50 text-card-foreground rounded-tl-sm"
+                                ? "bg-gradient-to-br from-[#0476D7] to-[#0068A7] text-white rounded-tr-sm border border-white/10"
+                                : "bg-card border-2 border-border/60 text-card-foreground rounded-tl-sm"
                             )}
                           >
                             <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words">
@@ -447,23 +450,23 @@ export default function CVScorerChat() {
                           </p>
                         </div>
                         {message.role === "user" && (
-                          <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                            <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+                          <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-gradient-to-br from-[#0476D7]/20 to-[#0068A7]/10 flex items-center justify-center flex-shrink-0 mt-1 border border-primary/20 shadow-sm">
+                            <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                           </div>
                         )}
                       </div>
                     ))}
                     {isLoading && (
                       <div className="flex gap-3 justify-start animate-in fade-in">
-                        <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                          <Bot className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+                        <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-gradient-to-br from-[#0476D7]/20 to-[#0068A7]/10 flex items-center justify-center flex-shrink-0 mt-1 border border-primary/20 shadow-sm">
+                          <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                         </div>
-                        <div className="flex flex-col gap-1">
-                          <div className="bg-card border border-border/50 rounded-2xl rounded-tl-sm px-3 py-2 sm:px-4 sm:py-3 shadow-sm">
-                            <div className="flex gap-1">
-                              <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "0ms" }} />
-                              <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "150ms" }} />
-                              <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: "300ms" }} />
+                        <div className="flex flex-col gap-1.5">
+                          <div className="bg-card border-2 border-border/60 rounded-2xl rounded-tl-sm px-4 py-3 sm:px-5 sm:py-4 shadow-md">
+                            <div className="flex gap-1.5">
+                              <div className="h-2.5 w-2.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: "0ms" }} />
+                              <div className="h-2.5 w-2.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: "150ms" }} />
+                              <div className="h-2.5 w-2.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: "300ms" }} />
                             </div>
                           </div>
                         </div>
@@ -474,27 +477,27 @@ export default function CVScorerChat() {
 
                 {/* CV Context Banner */}
                 {cvText && (
-                  <div className="border-t bg-primary/5 px-3 sm:px-4 py-2 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                      <FileText className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span className="text-xs sm:text-sm text-muted-foreground truncate">
+                  <div className="border-t-2 border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5 px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+                      <span className="text-xs sm:text-sm font-medium text-muted-foreground truncate">
                         CV: {cvFileName || "Uploaded CV"}
                       </span>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6 hover:bg-destructive/10 hover:text-destructive flex-shrink-0"
+                      className="h-7 w-7 hover:bg-destructive/10 hover:text-destructive flex-shrink-0 rounded-lg"
                       onClick={handleRemoveCV}
                     >
-                      <XCircle className="h-3.5 w-3.5" />
+                      <XCircle className="h-4 w-4" />
                     </Button>
                   </div>
                 )}
 
                 {/* Input */}
-                <div className="border-t bg-background/95 backdrop-blur-sm p-3 sm:p-4">
-                  <div className="flex gap-2">
+                <div className="border-t-2 border-primary/20 bg-background/98 backdrop-blur-md p-3 sm:p-4">
+                  <div className="flex gap-2.5">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -507,13 +510,13 @@ export default function CVScorerChat() {
                       size="icon"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isLoading || isExtractingPdf}
-                      className="h-10 w-10 sm:h-12 sm:w-12 rounded-full flex-shrink-0 border-2 hover:bg-muted"
+                      className="h-11 w-11 sm:h-12 sm:w-12 rounded-full flex-shrink-0 border-2 hover:bg-muted hover:border-primary/50 transition-all"
                       title="Upload CV"
                     >
                       {isExtractingPdf ? (
-                        <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                        <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-primary" />
                       ) : (
-                        <Upload className="h-4 w-4 sm:h-5 sm:w-5" />
+                        <Upload className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                       )}
                     </Button>
                     <Input
@@ -523,13 +526,13 @@ export default function CVScorerChat() {
                       onKeyDown={handleKeyDown}
                       placeholder={cvText ? "Ask about your CV..." : "Ask about CV scoring..."}
                       disabled={isLoading}
-                      className="flex-1 border-2 focus:border-primary/50 rounded-full px-3 py-4 sm:px-4 sm:py-6 bg-background transition-all text-sm sm:text-base"
+                      className="flex-1 border-2 focus:border-primary/50 rounded-full px-4 py-5 sm:px-5 sm:py-6 bg-background transition-all text-sm sm:text-base shadow-sm"
                     />
                     <Button
                       onClick={handleSend}
                       disabled={!input.trim() || isLoading}
                       size="icon"
-                      className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gradient-to-br from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                      className="h-11 w-11 sm:h-12 sm:w-12 rounded-full bg-gradient-to-br from-[#0476D7] to-[#0068A7] hover:from-[#0476D7]/90 hover:to-[#0068A7]/80 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 transition-all hover:scale-105"
                     >
                       {isLoading ? (
                         <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
@@ -538,7 +541,7 @@ export default function CVScorerChat() {
                       )}
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2 text-center hidden sm:block">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-2.5 text-center hidden sm:block">
                     {cvText ? "Chat has access to your CV" : "Press Enter to send • Upload a CV to get personalized advice"}
                   </p>
                 </div>
