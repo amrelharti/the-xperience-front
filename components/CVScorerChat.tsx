@@ -324,34 +324,36 @@ export default function CVScorerChat() {
             <CardHeader 
               className={cn(
                 "flex flex-row items-center justify-between space-y-0 border-b-2 border-primary/20 bg-gradient-to-r from-[#0476D7]/10 via-[#0068A7]/5 to-transparent transition-all",
-                isMinimized ? "py-2.5 px-3 sm:px-4" : "pb-3 px-4 sm:px-5"
+                isMinimized ? "py-3 px-4 sm:px-5" : "pb-3 px-4 sm:px-5"
               )}
             >
               {isMinimized ? (
                 <>
-                  <div className="flex items-center gap-2.5 flex-1 min-w-0 pr-2">
-                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#0476D7] to-[#0068A7] flex items-center justify-center shadow-lg border-2 border-white/20 flex-shrink-0">
-                      <Bot className="h-4 w-4 text-white" />
+                  <div className="flex items-center gap-3 flex-1 min-w-0 pr-3">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#0476D7] to-[#0068A7] flex items-center justify-center shadow-md border border-white/30 flex-shrink-0">
+                      <Bot className="h-5 w-5 text-white" />
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <CardTitle className="text-sm font-bold truncate leading-tight font-heading">CV Scoring Assistant</CardTitle>
+                    <div className="min-w-0 flex-1 flex items-center gap-2">
+                      <CardTitle className="text-sm truncate leading-tight">CV Scoring Assistant</CardTitle>
+                      <div className="h-2 w-2 rounded-full bg-green-500 flex-shrink-0 shadow-sm" />
                     </div>
-                    <div className="h-2.5 w-2.5 rounded-full bg-green-500 flex-shrink-0 animate-pulse shadow-md" />
                   </div>
-                  <div className="flex items-center gap-0.5 flex-shrink-0">
+                  <div className="flex items-center gap-1 flex-shrink-0">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 hover:bg-muted/80 rounded-md"
+                      className="h-8 w-8 hover:bg-muted/60 rounded-lg transition-colors"
                       onClick={() => setIsMinimized(!isMinimized)}
+                      title="Expand"
                     >
                       <Maximize2 className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive rounded-md"
+                      className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
                       onClick={() => setIsOpen(false)}
+                      title="Close"
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -364,7 +366,7 @@ export default function CVScorerChat() {
                       <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                     </div>
                     <div className="min-w-0">
-                      <CardTitle className="text-base sm:text-lg font-bold truncate font-heading">CV Scoring Assistant</CardTitle>
+                      <CardTitle className="text-base sm:text-lg truncate">CV Scoring Assistant</CardTitle>
                       <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1.5">
                         <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse"></span>
                         Online • Ready to help
@@ -406,7 +408,7 @@ export default function CVScorerChat() {
                         <div className="h-14 w-14 sm:h-18 sm:w-18 rounded-full bg-gradient-to-br from-[#0476D7]/20 to-[#0068A7]/10 flex items-center justify-center mb-4 sm:mb-5 border-2 border-primary/20 shadow-lg">
                           <Bot className="h-7 w-7 sm:h-9 sm:w-9 text-primary" />
                         </div>
-                        <h3 className="text-base sm:text-lg font-bold mb-2 font-heading">Start a conversation</h3>
+                        <h3 className="text-base sm:text-lg mb-2">Start a conversation</h3>
                         <p className="text-xs sm:text-sm text-muted-foreground max-w-xs leading-relaxed">
                           Ask me anything about CV scoring, best practices, or how to improve your resume!
                         </p>
