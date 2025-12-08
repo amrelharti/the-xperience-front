@@ -23,6 +23,7 @@ interface CvScoreResponse {
     }
     content_quality: {
       summary_headline: number
+      summary_paragraph: number
       experience_structure: number
       experience_action_verbs: number
       experience_impact: number
@@ -70,8 +71,10 @@ export default function CvScorerPage() {
   const [file, setFile] = useState<File | null>(null)
   const [targetRole, setTargetRole] = useState("")
   const [jobDescription, setJobDescription] = useState("")
+  const [feedbackLanguage, setFeedbackLanguage] = useState<"FRENCH" | "ENGLISH" | "AUTO">("AUTO")
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<CvScoreResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +90,7 @@ export default function CvScorerPage() {
       }
       setFile(selectedFile)
       setResult(null)
+      setError(null)
     }
   }
 
@@ -104,6 +108,7 @@ export default function CvScorerPage() {
 
     setLoading(true)
     setResult(null)
+    setError(null)
 
     try {
       const formData = new FormData()
@@ -114,6 +119,9 @@ export default function CvScorerPage() {
       if (jobDescription.trim()) {
         formData.append("jobDescription", jobDescription.trim())
       }
+      if (feedbackLanguage !== "AUTO") {
+        formData.append("feedbackLanguage", feedbackLanguage)
+      }
 
       const response = await fetch("/api/cv-scorer", {
         method: "POST",
@@ -121,12 +129,18 @@ export default function CvScorerPage() {
         credentials: "include",
       })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Failed to score CV")
+      const data = await response.json()
+
+      if (!response.ok || data.error) {
+        setError(data.error || "Failed to score CV")
+        toast({
+          title: "Error",
+          description: data.error || "Failed to score CV",
+          variant: "destructive",
+        })
+        return
       }
 
-      const data = await response.json()
       setResult(data)
       
       toast({
@@ -135,9 +149,11 @@ export default function CvScorerPage() {
       })
     } catch (error) {
       console.error("Error scoring CV:", error)
+      const errorMessage = error instanceof Error ? error.message : "Failed to score CV"
+      setError(errorMessage)
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to score CV",
+        description: errorMessage,
         variant: "destructive",
       })
     } finally {
@@ -248,6 +264,27 @@ export default function CvScorerPage() {
                   />
                 </div>
 
+                {/* Feedback Language */}
+                <div className="space-y-2">
+                  <label htmlFor="feedback-language" className="text-sm font-medium">
+                    Feedback Language
+                  </label>
+                  <select
+                    id="feedback-language"
+                    className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={feedbackLanguage}
+                    onChange={(e) => setFeedbackLanguage(e.target.value as "FRENCH" | "ENGLISH" | "AUTO")}
+                    disabled={loading}
+                  >
+                    <option value="AUTO">Auto-detect (based on CV language)</option>
+                    <option value="FRENCH">Français</option>
+                    <option value="ENGLISH">English</option>
+                  </select>
+                  <p className="text-xs text-muted-foreground">
+                    Choose the language for feedback. Auto-detect will use the CV's language.
+                  </p>
+                </div>
+
                 {/* Submit Button */}
                 <Button
                   type="submit"
@@ -270,6 +307,21 @@ export default function CvScorerPage() {
               </form>
             </CardContent>
           </Card>
+
+          {/* Error Display */}
+          {error && (
+            <Card className="border-destructive bg-destructive/10">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <XCircle className="h-6 w-6 text-destructive" />
+                  <div>
+                    <h3 className="font-semibold text-destructive mb-1">Error</h3>
+                    <p className="text-sm text-muted-foreground">{error}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Results */}
           {result && (

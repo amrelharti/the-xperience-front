@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File
     const jobDescription = formData.get('jobDescription') as string | null
     const targetRole = formData.get('targetRole') as string | null
+    const feedbackLanguage = formData.get('feedbackLanguage') as string | null
 
     if (!file) {
       return NextResponse.json(
@@ -38,6 +39,9 @@ export async function POST(request: NextRequest) {
     }
     if (targetRole) {
       backendFormData.append('targetRole', targetRole)
+    }
+    if (feedbackLanguage) {
+      backendFormData.append('feedbackLanguage', feedbackLanguage)
     }
 
     const headers: Record<string, string> = {}
