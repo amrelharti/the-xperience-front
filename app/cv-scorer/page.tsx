@@ -553,6 +553,24 @@ export default function CvScorerPage() {
               </Card>
 
               {/* Dimension Scores */}
+              
+              <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle className="text-base sm:text-lg">Relevance & targeting</CardTitle>
+                      <span className="text-lg sm:text-xl font-black text-primary flex-shrink-0">
+                        {Math.min(result.scores.relevance_targeting.total, 20)}/20
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <Progress
+                      value={(Math.min(result.scores.relevance_targeting.total, 20) / 20) * 100}
+                      className="h-3 rounded-full"
+                    />
+                  </CardContent>
+                </Card>
+
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
                   <CardHeader className="pb-3">
@@ -583,23 +601,6 @@ export default function CvScorerPage() {
                   <CardContent>
                     <Progress
                       value={(Math.min(result.scores.content_quality.total, 35) / 35) * 100}
-                      className="h-3 rounded-full"
-                    />
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <CardTitle className="text-base sm:text-lg">Relevance & targeting</CardTitle>
-                      <span className="text-lg sm:text-xl font-black text-primary flex-shrink-0">
-                        {Math.min(result.scores.relevance_targeting.total, 20)}/20
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <Progress
-                      value={(Math.min(result.scores.relevance_targeting.total, 20) / 20) * 100}
                       className="h-3 rounded-full"
                     />
                   </CardContent>
