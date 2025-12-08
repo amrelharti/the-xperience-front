@@ -489,11 +489,11 @@ export default function CvScorerPage() {
                   </div>
                   <div className="flex justify-between items-center py-1">
                     <span className="text-muted-foreground font-medium">Professionalism</span>
-                    <span className="font-bold text-primary">15 pts</span>
+                    <span className=" text-primary">15 pts</span>
                   </div>
                   <div className="flex justify-between items-center py-1">
                     <span className="text-muted-foreground font-medium">Technical / ATS</span>
-                    <span className="font-bold text-primary">10 pts</span>
+                    <span className=" text-primary">10 pts</span>
                   </div>
                   <div className="pt-3 mt-3 border-t-2 border-primary/20 flex justify-between items-center font-black text-base sm:text-lg">
                     <span>Total</span>
