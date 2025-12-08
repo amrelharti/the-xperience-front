@@ -498,8 +498,8 @@ export default function CVScorerChat() {
                 )}
 
                 {/* Input */}
-                <div className="border-t-2 border-primary/20 bg-background/98 backdrop-blur-md p-3 sm:p-4">
-                  <div className="flex gap-2.5">
+                <div className="border-t bg-muted/30 p-3 sm:p-4">
+                  <div className="flex gap-2 items-end">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -508,44 +508,43 @@ export default function CVScorerChat() {
                       className="hidden"
                     />
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="icon"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isLoading || isExtractingPdf}
-                      className="h-11 w-11 sm:h-12 sm:w-12 rounded-full flex-shrink-0 border-2 hover:bg-muted hover:border-primary/50 transition-all"
+                      className="h-9 w-9 rounded-lg flex-shrink-0 hover:bg-muted"
                       title="Upload CV"
                     >
                       {isExtractingPdf ? (
-                        <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-primary" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <Upload className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                        <Upload className="h-4 w-4" />
                       )}
                     </Button>
-                    <Input
-                      ref={inputRef}
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      placeholder={cvText ? "Ask about your CV..." : "Ask about CV scoring..."}
-                      disabled={isLoading}
-                      className="flex-1 border-2 focus:border-primary/50 rounded-full px-4 py-5 sm:px-5 sm:py-6 bg-background transition-all text-sm sm:text-base shadow-sm"
-                    />
+                    <div className="flex-1 relative">
+                      <Input
+                        ref={inputRef}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder={cvText ? "Ask about your CV..." : "Ask about CV scoring..."}
+                        disabled={isLoading}
+                        className="w-full border rounded-lg px-3 py-2 pr-10 bg-background text-sm"
+                      />
+                    </div>
                     <Button
                       onClick={handleSend}
                       disabled={!input.trim() || isLoading}
                       size="icon"
-                      className="h-11 w-11 sm:h-12 sm:w-12 rounded-full bg-gradient-to-br from-[#0476D7] to-[#0068A7] hover:from-[#0476D7]/90 hover:to-[#0068A7]/80 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 transition-all hover:scale-105"
+                      className="h-9 w-9 rounded-lg bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                     >
                       {isLoading ? (
-                        <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                        <Send className="h-4 w-4" />
                       )}
                     </Button>
                   </div>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-2.5 text-center hidden sm:block">
-                    {cvText ? "Chat has access to your CV" : "Press Enter to send • Upload a CV to get personalized advice"}
-                  </p>
                 </div>
               </>
             )}

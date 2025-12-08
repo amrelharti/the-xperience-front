@@ -254,7 +254,7 @@ export default function CvScorerPage() {
                     <FileSearch className="h-7 w-7 sm:h-8 sm:w-8" />
                   </div>
                   <div className="flex-1">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-2 sm:mb-3 font-heading tracking-tight">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-2 sm:mb-3 font-heading tracking-tight">
                       CV Scorer
                     </h1>
                     <p className="text-white/95 text-base sm:text-lg md:text-xl leading-relaxed">
@@ -276,7 +276,7 @@ export default function CvScorerPage() {
                     <Upload className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl sm:text-2xl font-bold font-heading">Upload your CV</CardTitle>
+                    <CardTitle className="text-xl sm:text-2xl font-heading">Upload your CV</CardTitle>
                     <CardDescription className="text-sm sm:text-base mt-1">
                       Upload a PDF file to get started with AI-powered analysis
                     </CardDescription>
@@ -287,7 +287,7 @@ export default function CvScorerPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* File Upload */}
                   <div className="space-y-3 sm:space-y-4">
-                    <label className="text-sm sm:text-base font-bold flex items-center gap-2 text-foreground">
+                    <label className="text-sm sm:text-base flex items-center gap-2 text-foreground">
                       <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                       CV file (PDF)
                     </label>
@@ -315,7 +315,7 @@ export default function CvScorerPage() {
                                 <FileCheck className="h-9 w-9 sm:h-10 sm:w-10 text-primary" />
                               </div>
                               <div className="space-y-1">
-                                <p className="font-bold text-base sm:text-lg text-primary">{file.name}</p>
+                                <p className="text-base sm:text-lg text-primary">{file.name}</p>
                                 <p className="text-xs sm:text-sm text-muted-foreground">
                                   {(file.size / 1024).toFixed(1)} KB
                                 </p>
@@ -341,7 +341,7 @@ export default function CvScorerPage() {
                                 <Upload className="h-9 w-9 sm:h-10 sm:w-10 text-muted-foreground" />
                               </div>
                               <div className="space-y-1">
-                                <p className="font-semibold text-base sm:text-lg mb-1">
+                                <p className="text-base sm:text-lg mb-1">
                                   Click to upload or drag and drop
                                 </p>
                                 <p className="text-xs sm:text-sm text-muted-foreground">
@@ -359,7 +359,7 @@ export default function CvScorerPage() {
                   <div className="grid md:grid-cols-2 gap-4 sm:gap-6 pt-6 border-t">
                     {/* Target Role */}
                     <div className="space-y-2.5">
-                      <label htmlFor="target-role" className="text-sm sm:text-base font-bold flex items-center gap-2 text-foreground">
+                      <label htmlFor="target-role" className="text-sm sm:text-base flex items-center gap-2 text-foreground">
                         <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                         Target role
                         <span className="text-xs font-normal text-muted-foreground">(Optional)</span>
@@ -377,7 +377,7 @@ export default function CvScorerPage() {
 
                     {/* Feedback Language */}
                     <div className="space-y-2.5">
-                      <label htmlFor="feedback-language" className="text-sm sm:text-base font-bold flex items-center gap-2 text-foreground">
+                      <label htmlFor="feedback-language" className="text-sm sm:text-base flex items-center gap-2 text-foreground">
                         <Languages className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                         Feedback language
                       </label>
@@ -397,7 +397,7 @@ export default function CvScorerPage() {
 
                   {/* Job Description */}
                   <div className="space-y-2.5 pt-4">
-                    <label htmlFor="job-description" className="text-sm sm:text-base font-bold text-foreground">
+                    <label htmlFor="job-description" className="text-sm sm:text-base text-foreground">
                       Job description
                       <span className="text-xs font-normal text-muted-foreground ml-2">(Optional)</span>
                     </label>
@@ -419,7 +419,7 @@ export default function CvScorerPage() {
                     <Button
                       type="submit"
                       disabled={!file || loading}
-                      className="w-full h-12 sm:h-14 text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] rounded-xl"
+                      className="w-full h-12 sm:h-14 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] rounded-xl"
                       size="lg"
                     >
                       {loading ? (
@@ -443,7 +443,7 @@ export default function CvScorerPage() {
             <div className="space-y-4 sm:space-y-6">
               <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 border-2 border-primary/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg sm:text-xl font-bold flex items-center gap-2.5 font-heading">
+                  <CardTitle className="text-lg sm:text-xl flex items-center gap-2.5 font-heading">
                     <FileSearch className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                     How it works
                   </CardTitle>
@@ -472,20 +472,20 @@ export default function CvScorerPage() {
 
               <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 border-2">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg sm:text-xl font-bold font-heading">Scoring dimensions</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl font-heading">Scoring dimensions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm sm:text-base">
                   <div className="flex justify-between items-center py-1">
                     <span className="text-muted-foreground font-medium">Structure</span>
-                    <span className="font-bold text-primary">20 pts</span>
+                    <span className="text-primary">20 pts</span>
                   </div>
                   <div className="flex justify-between items-center py-1">
                     <span className="text-muted-foreground font-medium">Content quality</span>
-                    <span className="font-bold text-primary">35 pts</span>
+                    <span className="text-primary">35 pts</span>
                   </div>
                   <div className="flex justify-between items-center py-1">
                     <span className="text-muted-foreground font-medium">Relevance</span>
-                    <span className="font-bold text-primary">20 pts</span>
+                    <span className="text-primary">20 pts</span>
                   </div>
                   <div className="flex justify-between items-center py-1">
                     <span className="text-muted-foreground font-medium">Professionalism</span>
@@ -513,7 +513,7 @@ export default function CvScorerPage() {
                     <XCircle className="h-5 w-5 sm:h-6 sm:w-6 text-destructive" />
                   </div>
                   <div className="flex-1 pt-0.5">
-                    <h3 className="font-bold text-base sm:text-lg text-destructive mb-1.5">Error</h3>
+                    <h3 className="text-base sm:text-lg text-destructive mb-1.5">Error</h3>
                     <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{error}</p>
                   </div>
                 </div>
@@ -536,7 +536,7 @@ export default function CvScorerPage() {
                         </span>
                       </div>
                     </div>
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2 sm:mb-3 bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent font-heading">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent font-heading">
                       Overall score
                     </h2>
                     <p className="text-muted-foreground mb-6 sm:mb-8 text-base sm:text-lg">out of 100</p>
@@ -557,7 +557,7 @@ export default function CvScorerPage() {
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between gap-2">
-                      <CardTitle className="text-base sm:text-lg font-bold">Structure & readability</CardTitle>
+                      <CardTitle className="text-base sm:text-lg">Structure & readability</CardTitle>
                       <span className="text-lg sm:text-xl font-black text-primary flex-shrink-0">
                         {Math.min(result.scores.structure_readability.total, 20)}/20
                       </span>
@@ -574,7 +574,7 @@ export default function CvScorerPage() {
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between gap-2">
-                      <CardTitle className="text-base sm:text-lg font-bold">Content quality</CardTitle>
+                      <CardTitle className="text-base sm:text-lg">Content quality</CardTitle>
                       <span className="text-lg sm:text-xl font-black text-primary flex-shrink-0">
                         {Math.min(result.scores.content_quality.total, 35)}/35
                       </span>
@@ -591,7 +591,7 @@ export default function CvScorerPage() {
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between gap-2">
-                      <CardTitle className="text-base sm:text-lg font-bold">Relevance & targeting</CardTitle>
+                      <CardTitle className="text-base sm:text-lg">Relevance & targeting</CardTitle>
                       <span className="text-lg sm:text-xl font-black text-primary flex-shrink-0">
                         {Math.min(result.scores.relevance_targeting.total, 20)}/20
                       </span>
@@ -608,7 +608,7 @@ export default function CvScorerPage() {
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between gap-2">
-                      <CardTitle className="text-base sm:text-lg font-bold">Professionalism & language</CardTitle>
+                      <CardTitle className="text-base sm:text-lg">Professionalism & language</CardTitle>
                       <span className="text-lg sm:text-xl font-black text-primary flex-shrink-0">
                         {Math.min(result.scores.professionalism_language.total, 15)}/15
                       </span>
@@ -625,7 +625,7 @@ export default function CvScorerPage() {
                 <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between gap-2">
-                      <CardTitle className="text-base sm:text-lg font-bold">Technical / ATS</CardTitle>
+                      <CardTitle className="text-base sm:text-lg">Technical / ATS</CardTitle>
                       <span className="text-lg sm:text-xl font-black text-primary flex-shrink-0">
                         {Math.min(result.scores.technical_ats.total, 10)}/10
                       </span>
@@ -643,7 +643,7 @@ export default function CvScorerPage() {
               {/* Feedback */}
               <Card className="shadow-lg border-2">
                 <CardHeader className="border-b-2 bg-gradient-to-r from-primary/5 to-transparent">
-                  <CardTitle className="flex items-center gap-2.5 text-xl sm:text-2xl font-bold font-heading">
+                  <CardTitle className="flex items-center gap-2.5 text-xl sm:text-2xl font-heading">
                     <FileSearch className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                     Detailed feedback
                   </CardTitle>
@@ -651,7 +651,7 @@ export default function CvScorerPage() {
                 <CardContent className="pt-6 sm:pt-8 space-y-6 sm:space-y-8">
                   {/* Summary */}
                   <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-muted/60 to-muted/40 border border-border/50 shadow-sm">
-                    <h3 className="font-bold text-base sm:text-lg mb-3 sm:mb-4 flex items-center gap-2.5">
+                    <h3 className="text-base sm:text-lg mb-3 sm:mb-4 flex items-center gap-2.5">
                       <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                       Summary
                     </h3>
@@ -661,14 +661,14 @@ export default function CvScorerPage() {
                   {/* Strengths */}
                   {result.feedback.strengths && result.feedback.strengths.length > 0 && (
                     <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-green-50 to-green-50/50 dark:bg-green-950/20 border-2 border-green-200 dark:border-green-900/30 shadow-sm">
-                      <h3 className="font-bold text-base sm:text-lg mb-4 flex items-center gap-2.5 text-green-700 dark:text-green-400">
+                      <h3 className="text-base sm:text-lg mb-4 flex items-center gap-2.5 text-green-700 dark:text-green-400">
                         <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
                         Strengths
                       </h3>
                       <ul className="space-y-2.5 sm:space-y-3">
                         {result.feedback.strengths.map((strength, index) => (
                           <li key={index} className="flex gap-3 text-sm sm:text-base">
-                            <span className="text-green-600 dark:text-green-400 mt-1.5 font-bold text-lg">•</span>
+                            <span className="text-green-600 dark:text-green-400 mt-1.5 text-lg">•</span>
                             <span className="text-muted-foreground flex-1 leading-relaxed">{strength}</span>
                           </li>
                         ))}
@@ -679,14 +679,14 @@ export default function CvScorerPage() {
                   {/* Improvements */}
                   {result.feedback.improvements && result.feedback.improvements.length > 0 && (
                     <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-yellow-50 to-yellow-50/50 dark:bg-yellow-950/20 border-2 border-yellow-200 dark:border-yellow-900/30 shadow-sm">
-                      <h3 className="font-bold text-base sm:text-lg mb-4 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400">
+                      <h3 className="text-base sm:text-lg mb-4 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400">
                         <XCircle className="h-5 w-5 sm:h-6 sm:w-6" />
                         Areas for improvement
                       </h3>
                       <ul className="space-y-2.5 sm:space-y-3">
                         {result.feedback.improvements.map((improvement, index) => (
                           <li key={index} className="flex gap-3 text-sm sm:text-base">
-                            <span className="text-yellow-600 dark:text-yellow-400 mt-1.5 font-bold text-lg">•</span>
+                            <span className="text-yellow-600 dark:text-yellow-400 mt-1.5 text-lg">•</span>
                             <span className="text-muted-foreground flex-1 leading-relaxed">{improvement}</span>
                           </li>
                         ))}
@@ -699,14 +699,14 @@ export default function CvScorerPage() {
               {/* Per-Dimension Feedback */}
               {result.feedback.dimensions && (
                 <div className="space-y-4 sm:space-y-6 mt-6">
-                  <h2 className="text-2xl sm:text-3xl font-black mb-4 sm:mb-6 font-heading bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">Feedback by dimension</h2>
+                  <h2 className="text-2xl sm:text-3xl mb-4 sm:mb-6 font-heading bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">Feedback by dimension</h2>
                   
                   {/* Structure & Readability */}
                   {result.feedback.dimensions.structure_readability && (
                     <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
                       <CardHeader className="border-b-2 bg-gradient-to-r from-primary/5 to-transparent">
                         <div className="flex items-center justify-between gap-2">
-                          <CardTitle className="text-lg sm:text-xl font-bold">Structure & readability</CardTitle>
+                          <CardTitle className="text-lg sm:text-xl">Structure & readability</CardTitle>
                           <span className="text-base sm:text-lg font-black text-primary flex-shrink-0">
                             {Math.min(result.scores.structure_readability.total, 20)}/20
                           </span>
@@ -715,14 +715,14 @@ export default function CvScorerPage() {
                       <CardContent className="pt-6 sm:pt-8 space-y-5 sm:space-y-6">
                         {result.feedback.dimensions.structure_readability.strengths && result.feedback.dimensions.structure_readability.strengths.length > 0 && (
                           <div>
-                            <h4 className="font-bold mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
+                            <h4 className="mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
                               <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
                               Strengths
                             </h4>
                             <ul className="space-y-2 sm:space-y-2.5">
                               {result.feedback.dimensions.structure_readability.strengths.map((strength, index) => (
                                 <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-green-600 dark:text-green-400 mt-1 font-bold">•</span>
+                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
                                   <span className="leading-relaxed">{strength}</span>
                                 </li>
                               ))}
@@ -731,14 +731,14 @@ export default function CvScorerPage() {
                         )}
                         {result.feedback.dimensions.structure_readability.improvements && result.feedback.dimensions.structure_readability.improvements.length > 0 && (
                           <div>
-                            <h4 className="font-bold mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
+                            <h4 className="mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
                               <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                               Areas for improvement
                             </h4>
                             <ul className="space-y-2 sm:space-y-2.5">
                               {result.feedback.dimensions.structure_readability.improvements.map((improvement, index) => (
                                 <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1 font-bold">•</span>
+                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
                                   <span className="leading-relaxed">{improvement}</span>
                                 </li>
                               ))}
@@ -754,7 +754,7 @@ export default function CvScorerPage() {
                     <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
                       <CardHeader className="border-b-2 bg-gradient-to-r from-primary/5 to-transparent">
                         <div className="flex items-center justify-between gap-2">
-                          <CardTitle className="text-lg sm:text-xl font-bold">Content quality</CardTitle>
+                          <CardTitle className="text-lg sm:text-xl">Content quality</CardTitle>
                           <span className="text-base sm:text-lg font-black text-primary flex-shrink-0">
                             {Math.min(result.scores.content_quality.total, 35)}/35
                           </span>
@@ -763,14 +763,14 @@ export default function CvScorerPage() {
                       <CardContent className="pt-6 sm:pt-8 space-y-5 sm:space-y-6">
                         {result.feedback.dimensions.content_quality.strengths && result.feedback.dimensions.content_quality.strengths.length > 0 && (
                           <div>
-                            <h4 className="font-bold mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
+                            <h4 className="mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
                               <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
                               Strengths
                             </h4>
                             <ul className="space-y-2 sm:space-y-2.5">
                               {result.feedback.dimensions.content_quality.strengths.map((strength, index) => (
                                 <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-green-600 dark:text-green-400 mt-1 font-bold">•</span>
+                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
                                   <span className="leading-relaxed">{strength}</span>
                                 </li>
                               ))}
@@ -779,14 +779,14 @@ export default function CvScorerPage() {
                         )}
                         {result.feedback.dimensions.content_quality.improvements && result.feedback.dimensions.content_quality.improvements.length > 0 && (
                           <div>
-                            <h4 className="font-bold mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
+                            <h4 className="mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
                               <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                               Areas for improvement
                             </h4>
                             <ul className="space-y-2 sm:space-y-2.5">
                               {result.feedback.dimensions.content_quality.improvements.map((improvement, index) => (
                                 <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1 font-bold">•</span>
+                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
                                   <span className="leading-relaxed">{improvement}</span>
                                 </li>
                               ))}
@@ -802,7 +802,7 @@ export default function CvScorerPage() {
                     <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
                       <CardHeader className="border-b-2 bg-gradient-to-r from-primary/5 to-transparent">
                         <div className="flex items-center justify-between gap-2">
-                          <CardTitle className="text-lg sm:text-xl font-bold">Relevance & targeting</CardTitle>
+                          <CardTitle className="text-lg sm:text-xl">Relevance & targeting</CardTitle>
                           <span className="text-base sm:text-lg font-black text-primary flex-shrink-0">
                             {Math.min(result.scores.relevance_targeting.total, 20)}/20
                           </span>
@@ -811,14 +811,14 @@ export default function CvScorerPage() {
                       <CardContent className="pt-6 sm:pt-8 space-y-5 sm:space-y-6">
                         {result.feedback.dimensions.relevance_targeting.strengths && result.feedback.dimensions.relevance_targeting.strengths.length > 0 && (
                           <div>
-                            <h4 className="font-bold mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
+                            <h4 className="mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
                               <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
                               Strengths
                             </h4>
                             <ul className="space-y-2 sm:space-y-2.5">
                               {result.feedback.dimensions.relevance_targeting.strengths.map((strength, index) => (
                                 <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-green-600 dark:text-green-400 mt-1 font-bold">•</span>
+                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
                                   <span className="leading-relaxed">{strength}</span>
                                 </li>
                               ))}
@@ -827,14 +827,14 @@ export default function CvScorerPage() {
                         )}
                         {result.feedback.dimensions.relevance_targeting.improvements && result.feedback.dimensions.relevance_targeting.improvements.length > 0 && (
                           <div>
-                            <h4 className="font-bold mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
+                            <h4 className="mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
                               <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                               Areas for improvement
                             </h4>
                             <ul className="space-y-2 sm:space-y-2.5">
                               {result.feedback.dimensions.relevance_targeting.improvements.map((improvement, index) => (
                                 <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1 font-bold">•</span>
+                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
                                   <span className="leading-relaxed">{improvement}</span>
                                 </li>
                               ))}
@@ -850,7 +850,7 @@ export default function CvScorerPage() {
                     <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
                       <CardHeader className="border-b-2 bg-gradient-to-r from-primary/5 to-transparent">
                         <div className="flex items-center justify-between gap-2">
-                          <CardTitle className="text-lg sm:text-xl font-bold">Professionalism & language</CardTitle>
+                          <CardTitle className="text-lg sm:text-xl">Professionalism & language</CardTitle>
                           <span className="text-base sm:text-lg font-black text-primary flex-shrink-0">
                             {Math.min(result.scores.professionalism_language.total, 15)}/15
                           </span>
@@ -859,14 +859,14 @@ export default function CvScorerPage() {
                       <CardContent className="pt-6 sm:pt-8 space-y-5 sm:space-y-6">
                         {result.feedback.dimensions.professionalism_language.strengths && result.feedback.dimensions.professionalism_language.strengths.length > 0 && (
                           <div>
-                            <h4 className="font-bold mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
+                            <h4 className="mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
                               <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
                               Strengths
                             </h4>
                             <ul className="space-y-2 sm:space-y-2.5">
                               {result.feedback.dimensions.professionalism_language.strengths.map((strength, index) => (
                                 <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-green-600 dark:text-green-400 mt-1 font-bold">•</span>
+                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
                                   <span className="leading-relaxed">{strength}</span>
                                 </li>
                               ))}
@@ -875,14 +875,14 @@ export default function CvScorerPage() {
                         )}
                         {result.feedback.dimensions.professionalism_language.improvements && result.feedback.dimensions.professionalism_language.improvements.length > 0 && (
                           <div>
-                            <h4 className="font-bold mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
+                            <h4 className="mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
                               <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                               Areas for improvement
                             </h4>
                             <ul className="space-y-2 sm:space-y-2.5">
                               {result.feedback.dimensions.professionalism_language.improvements.map((improvement, index) => (
                                 <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1 font-bold">•</span>
+                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
                                   <span className="leading-relaxed">{improvement}</span>
                                 </li>
                               ))}
@@ -898,7 +898,7 @@ export default function CvScorerPage() {
                     <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2">
                       <CardHeader className="border-b-2 bg-gradient-to-r from-primary/5 to-transparent">
                         <div className="flex items-center justify-between gap-2">
-                          <CardTitle className="text-lg sm:text-xl font-bold">Technical / ATS</CardTitle>
+                          <CardTitle className="text-lg sm:text-xl">Technical / ATS</CardTitle>
                           <span className="text-base sm:text-lg font-black text-primary flex-shrink-0">
                             {Math.min(result.scores.technical_ats.total, 10)}/10
                           </span>
@@ -907,14 +907,14 @@ export default function CvScorerPage() {
                       <CardContent className="pt-6 sm:pt-8 space-y-5 sm:space-y-6">
                         {result.feedback.dimensions.technical_ats.strengths && result.feedback.dimensions.technical_ats.strengths.length > 0 && (
                           <div>
-                            <h4 className="font-bold mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
+                            <h4 className="mb-3 flex items-center gap-2.5 text-green-700 dark:text-green-400 text-base sm:text-lg">
                               <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
                               Strengths
                             </h4>
                             <ul className="space-y-2 sm:space-y-2.5">
                               {result.feedback.dimensions.technical_ats.strengths.map((strength, index) => (
                                 <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-green-600 dark:text-green-400 mt-1 font-bold">•</span>
+                                  <span className="text-green-600 dark:text-green-400 mt-1">•</span>
                                   <span className="leading-relaxed">{strength}</span>
                                 </li>
                               ))}
@@ -923,14 +923,14 @@ export default function CvScorerPage() {
                         )}
                         {result.feedback.dimensions.technical_ats.improvements && result.feedback.dimensions.technical_ats.improvements.length > 0 && (
                           <div>
-                            <h4 className="font-bold mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
+                            <h4 className="mb-3 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400 text-base sm:text-lg">
                               <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                               Areas for improvement
                             </h4>
                             <ul className="space-y-2 sm:space-y-2.5">
                               {result.feedback.dimensions.technical_ats.improvements.map((improvement, index) => (
                                 <li key={index} className="flex gap-3 text-sm sm:text-base text-muted-foreground">
-                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1 font-bold">•</span>
+                                  <span className="text-yellow-600 dark:text-yellow-400 mt-1">•</span>
                                   <span className="leading-relaxed">{improvement}</span>
                                 </li>
                               ))}
