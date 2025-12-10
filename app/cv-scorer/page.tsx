@@ -641,62 +641,7 @@ export default function CvScorerPage() {
                 </Card>
               </div>
 
-              {/* Feedback */}
-              <Card className="shadow-lg border-2">
-                <CardHeader className="border-b-2 bg-gradient-to-r from-primary/5 to-transparent">
-                  <CardTitle className="flex items-center gap-2.5 text-xl sm:text-2xl font-heading">
-                    <FileSearch className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                    Detailed feedback
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-6 sm:pt-8 space-y-6 sm:space-y-8">
-                  {/* Summary */}
-                  <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-muted/60 to-muted/40 border border-border/50 shadow-sm">
-                    <h3 className="text-base sm:text-lg mb-3 sm:mb-4 flex items-center gap-2.5">
-                      <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                      Summary
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">{result.feedback.summary}</p>
-                  </div>
-
-                  {/* Strengths */}
-                  {result.feedback.strengths && result.feedback.strengths.length > 0 && (
-                    <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-green-50 to-green-50/50 dark:bg-green-950/20 border-2 border-green-200 dark:border-green-900/30 shadow-sm">
-                      <h3 className="text-base sm:text-lg mb-4 flex items-center gap-2.5 text-green-700 dark:text-green-400">
-                        <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
-                        Strengths
-                      </h3>
-                      <ul className="space-y-2.5 sm:space-y-3">
-                        {result.feedback.strengths.map((strength, index) => (
-                          <li key={index} className="flex gap-3 text-sm sm:text-base">
-                            <span className="text-green-600 dark:text-green-400 mt-1.5 text-lg">•</span>
-                            <span className="text-muted-foreground flex-1 leading-relaxed">{strength}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Improvements */}
-                  {result.feedback.improvements && result.feedback.improvements.length > 0 && (
-                    <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-yellow-50 to-yellow-50/50 dark:bg-yellow-950/20 border-2 border-yellow-200 dark:border-yellow-900/30 shadow-sm">
-                      <h3 className="text-base sm:text-lg mb-4 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400">
-                        <XCircle className="h-5 w-5 sm:h-6 sm:w-6" />
-                        Areas for improvement
-                      </h3>
-                      <ul className="space-y-2.5 sm:space-y-3">
-                        {result.feedback.improvements.map((improvement, index) => (
-                          <li key={index} className="flex gap-3 text-sm sm:text-base">
-                            <span className="text-yellow-600 dark:text-yellow-400 mt-1.5 text-lg">•</span>
-                            <span className="text-muted-foreground flex-1 leading-relaxed">{improvement}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
+             
               {/* Per-Dimension Feedback */}
               {result.feedback.dimensions && (
                 <div className="space-y-4 sm:space-y-6 mt-6">
@@ -945,6 +890,61 @@ export default function CvScorerPage() {
                   )}
                 </div>
               )}
+               {/* Feedback */}
+               <Card className="shadow-lg border-2">
+                <CardHeader className="border-b-2 bg-gradient-to-r from-primary/5 to-transparent">
+                  <CardTitle className="flex items-center gap-2.5 text-xl sm:text-2xl font-heading">
+                    <FileSearch className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                    Detailed feedback
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6 sm:pt-8 space-y-6 sm:space-y-8">
+                  {/* Summary */}
+                  <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-muted/60 to-muted/40 border border-border/50 shadow-sm">
+                    <h3 className="text-base sm:text-lg mb-3 sm:mb-4 flex items-center gap-2.5">
+                      <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                      Summary
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">{result.feedback.summary}</p>
+                  </div>
+
+                  {/* Strengths */}
+                  {result.feedback.strengths && result.feedback.strengths.length > 0 && (
+                    <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-green-50 to-green-50/50 dark:bg-green-950/20 border-2 border-green-200 dark:border-green-900/30 shadow-sm">
+                      <h3 className="text-base sm:text-lg mb-4 flex items-center gap-2.5 text-green-700 dark:text-green-400">
+                        <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
+                        Strengths
+                      </h3>
+                      <ul className="space-y-2.5 sm:space-y-3">
+                        {result.feedback.strengths.map((strength, index) => (
+                          <li key={index} className="flex gap-3 text-sm sm:text-base">
+                            <span className="text-green-600 dark:text-green-400 mt-1.5 text-lg">•</span>
+                            <span className="text-muted-foreground flex-1 leading-relaxed">{strength}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Improvements */}
+                  {result.feedback.improvements && result.feedback.improvements.length > 0 && (
+                    <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-yellow-50 to-yellow-50/50 dark:bg-yellow-950/20 border-2 border-yellow-200 dark:border-yellow-900/30 shadow-sm">
+                      <h3 className="text-base sm:text-lg mb-4 flex items-center gap-2.5 text-yellow-700 dark:text-yellow-400">
+                        <XCircle className="h-5 w-5 sm:h-6 sm:w-6" />
+                        Areas for improvement
+                      </h3>
+                      <ul className="space-y-2.5 sm:space-y-3">
+                        {result.feedback.improvements.map((improvement, index) => (
+                          <li key={index} className="flex gap-3 text-sm sm:text-base">
+                            <span className="text-yellow-600 dark:text-yellow-400 mt-1.5 text-lg">•</span>
+                            <span className="text-muted-foreground flex-1 leading-relaxed">{improvement}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           )}
       </div>
