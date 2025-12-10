@@ -895,7 +895,7 @@ export default function CvScorerPage() {
                 <CardHeader className="border-b-2 bg-gradient-to-r from-primary/5 to-transparent">
                   <CardTitle className="flex items-center gap-2.5 text-xl sm:text-2xl font-heading">
                     <FileSearch className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                    Detailed feedback
+                    General feedback
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6 sm:pt-8 space-y-6 sm:space-y-8">
