@@ -111,6 +111,7 @@ interface Content {
     }
     offerOptions: {
       xperiencePro: string
+      xperience: string
     }
   }
 }
@@ -234,9 +235,9 @@ const content: Record<Language, Content> = {
     },
     price: {
       title: "Join Xperience Pro today",
-      amount: "1000 DH",
+      amount: "",
       description: "One-time payment",
-      cta: "Join Xperience Pro – 1000 DH",
+      cta: "Join Xperience Pro",
       included: "Full access to all 5 modules, video lessons, exercises, and lifetime access to the platform.",
     },
     faq: {
@@ -311,6 +312,7 @@ const content: Record<Language, Content> = {
       },
       offerOptions: {
         xperiencePro: "Xperience Pro - 1000 DH",
+        xperience: "Xperience Pro - 1000 DH",
       },
     },
   },
@@ -508,7 +510,8 @@ const content: Record<Language, Content> = {
         reconversion: "Reconversion Professionnelle",
       },
       offerOptions: {
-        xperiencePro: "Xperience Pro - 1000 DH",
+        xperiencePro: "Xperience Pro - 999 DH",
+        xperience: "Xperience Pro - 699 DH",
       },
     },
   },
@@ -1304,6 +1307,7 @@ export default function XperienceProLandingPage() {
                 >
                   <option value="">{language === "en" ? "Select an offer" : "Sélectionnez une offre"}</option>
                   <option value={t.form.offerOptions.xperiencePro}>{t.form.offerOptions.xperiencePro}</option>
+                  <option value={t.form.offerOptions.xperience}>{t.form.offerOptions.xperiencePro}</option>
                 </select>
               </div>
 
