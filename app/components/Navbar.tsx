@@ -26,6 +26,10 @@ function Navbar() {
     // Check if we're on a training detail page
     const isTrainingPage = pathname?.startsWith("/courses/");
     
+    // Check if we're on a feed or leaderboard page
+    const isFeedPage = pathname === "/feed";
+    const isLeaderboardPage = pathname === "/leaderboard";
+    
     if (isTrainingPage && params?.id) {
       // We're on a training detail page
       const trainingId = params.id as string;
@@ -42,18 +46,66 @@ function Navbar() {
         setLeaderboardUrl(`/leaderboard?training=${trainingId}`);
       }
     } else if (currentTraining) {
-      // We're on feed or leaderboard page with training parameters
+      // We're on a page with training parameters (feed, leaderboard, post detail, etc.)
       if (currentClass) {
-        setFeedUrl(`/feed?training=${currentTraining}&class=${currentClass}`);
-        setLeaderboardUrl(`/leaderboard?training=${currentTraining}&class=${currentClass}`);
+        const feedUrlWithParams = `/feed?training=${currentTraining}&class=${currentClass}`;
+        const leaderboardUrlWithParams = `/leaderboard?training=${currentTraining}&class=${currentClass}`;
+        
+        setFeedUrl(feedUrlWithParams);
+        setLeaderboardUrl(leaderboardUrlWithParams);
+        
+        // Store feed context in localStorage when on feed/leaderboard pages
+        if (isFeedPage || isLeaderboardPage) {
+          localStorage.setItem('lastFeedContext', JSON.stringify({
+            training: currentTraining,
+            class: currentClass
+          }));
+        }
       } else {
-        setFeedUrl(`/feed?training=${currentTraining}`);
-        setLeaderboardUrl(`/leaderboard?training=${currentTraining}`);
+        const feedUrlWithParams = `/feed?training=${currentTraining}`;
+        const leaderboardUrlWithParams = `/leaderboard?training=${currentTraining}`;
+        
+        setFeedUrl(feedUrlWithParams);
+        setLeaderboardUrl(leaderboardUrlWithParams);
+        
+        // Store feed context in localStorage when on feed/leaderboard pages
+        if (isFeedPage || isLeaderboardPage) {
+          localStorage.setItem('lastFeedContext', JSON.stringify({
+            training: currentTraining,
+            class: null
+          }));
+        }
       }
     } else {
-      // Reset to default URLs when no training context
-      setFeedUrl("/feed");
-      setLeaderboardUrl("/leaderboard");
+      // No training params in current URL - check localStorage for last known context
+      try {
+        const savedContext = localStorage.getItem('lastFeedContext');
+        if (savedContext) {
+          const context = JSON.parse(savedContext);
+          if (context.training) {
+            if (context.class) {
+              setFeedUrl(`/feed?training=${context.training}&class=${context.class}`);
+              setLeaderboardUrl(`/leaderboard?training=${context.training}&class=${context.class}`);
+            } else {
+              setFeedUrl(`/feed?training=${context.training}`);
+              setLeaderboardUrl(`/leaderboard?training=${context.training}`);
+            }
+          } else {
+            // No saved context, use defaults
+            setFeedUrl("/feed");
+            setLeaderboardUrl("/leaderboard");
+          }
+        } else {
+          // No saved context, use defaults
+          setFeedUrl("/feed");
+          setLeaderboardUrl("/leaderboard");
+        }
+      } catch (error) {
+        // If localStorage parsing fails, use defaults
+        console.error('Error reading feed context from localStorage:', error);
+        setFeedUrl("/feed");
+        setLeaderboardUrl("/leaderboard");
+      }
     }
   }, [pathname, params, searchParams]);
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { CheckCircle2, ArrowRight, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles } from "lucide-react"
+import { CheckCircle2, ArrowRight, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles, Menu, X, Star, Quote } from "lucide-react"
 
 type Language = "en" | "fr"
 
@@ -84,6 +84,35 @@ interface Content {
       answer: string
     }[]
   }
+  testimonials: {
+    title: string
+    items: {
+      name: string
+      role: string
+      text: string
+      rating: number
+    }[]
+  }
+  form: {
+    title: string
+    subtitle: string
+    fields: {
+      fullName: string
+      phone: string
+      lookingFor: string
+      offer: string
+      submit: string
+    }
+    lookingForOptions: {
+      stagePFE: string
+      premierEmploi: string
+      progresserCarriere: string
+      reconversion: string
+    }
+    offerOptions: {
+      xperiencePro: string
+    }
+  }
 }
 
 const content: Record<Language, Content> = {
@@ -150,8 +179,8 @@ const content: Record<Language, Content> = {
         { label: "Conferences", value: "100+" },
       ],
       social: {
-        instagram: "https://instagram.com",
-        linkedin: "https://linkedin.com",
+        instagram: "https://instagram.com/ali_el_harti", // TODO: Update with actual Instagram URL
+        linkedin: "https://linkedin.com/in/ali-el-harti", // TODO: Update with actual LinkedIn URL
       },
     },
     transformation: {
@@ -235,6 +264,55 @@ const content: Record<Language, Content> = {
         },
       ],
     },
+    testimonials: {
+      title: "What our students say",
+      items: [
+        {
+          name: "Sarah M.",
+          role: "Recent Graduate",
+          text: "Xperience Pro completely transformed my job search. I went from zero responses to multiple interviews in just 2 months. The CV adaptation techniques are game-changers!",
+          rating: 5,
+        },
+        {
+          name: "Ahmed K.",
+          role: "Career Changer",
+          text: "I was stuck in a job I didn't like. This program gave me the confidence and tools to make a successful career transition. The interview preparation module is excellent.",
+          rating: 5,
+        },
+        {
+          name: "Fatima L.",
+          role: "Student",
+          text: "As a student with no experience, I thought finding an internship would be impossible. Xperience Pro showed me how to highlight my skills and I got 3 internship offers!",
+          rating: 5,
+        },
+        {
+          name: "Youssef B.",
+          role: "Job Seeker",
+          text: "The LinkedIn optimization tips alone are worth the investment. I started getting messages from recruiters within weeks. Highly recommend!",
+          rating: 5,
+        },
+      ],
+    },
+    form: {
+      title: "Join Xperience Pro",
+      subtitle: "Fill out the form and we'll contact you via WhatsApp",
+      fields: {
+        fullName: "Full Name",
+        phone: "Phone Number",
+        lookingFor: "What are you looking for?",
+        offer: "Which offer interests you?",
+        submit: "Send via WhatsApp",
+      },
+      lookingForOptions: {
+        stagePFE: "Stage PFE",
+        premierEmploi: "Premier Emploi",
+        progresserCarriere: "Progresser ma carrière",
+        reconversion: "Reconversion Professionnelle",
+      },
+      offerOptions: {
+        xperiencePro: "Xperience Pro - 1000 DH",
+      },
+    },
   },
   fr: {
     header: {
@@ -299,8 +377,8 @@ const content: Record<Language, Content> = {
         { label: "Conférences", value: "100+" },
       ],
       social: {
-        instagram: "https://instagram.com",
-        linkedin: "https://linkedin.com",
+        instagram: "https://instagram.com/ali_el_harti", // TODO: Update with actual Instagram URL
+        linkedin: "https://linkedin.com/in/ali-el-harti", // TODO: Update with actual LinkedIn URL
       },
     },
     transformation: {
@@ -384,6 +462,55 @@ const content: Record<Language, Content> = {
         },
       ],
     },
+    testimonials: {
+      title: "Ce que disent nos étudiants",
+      items: [
+        {
+          name: "Sarah M.",
+          role: "Diplômée récente",
+          text: "Xperience Pro a complètement transformé ma recherche d'emploi. Je suis passée de zéro réponse à plusieurs entretiens en seulement 2 mois. Les techniques d'adaptation de CV sont révolutionnaires !",
+          rating: 5,
+        },
+        {
+          name: "Ahmed K.",
+          role: "Reconversion professionnelle",
+          text: "J'étais coincé dans un job qui ne me plaisait pas. Ce programme m'a donné la confiance et les outils pour faire une transition de carrière réussie. Le module de préparation aux entretiens est excellent.",
+          rating: 5,
+        },
+        {
+          name: "Fatima L.",
+          role: "Étudiante",
+          text: "En tant qu'étudiante sans expérience, je pensais que trouver un stage serait impossible. Xperience Pro m'a montré comment mettre en valeur mes compétences et j'ai reçu 3 offres de stage !",
+          rating: 5,
+        },
+        {
+          name: "Youssef B.",
+          role: "Demandeur d'emploi",
+          text: "Les conseils d'optimisation LinkedIn à eux seuls valent l'investissement. J'ai commencé à recevoir des messages de recruteurs en quelques semaines. Je recommande vivement !",
+          rating: 5,
+        },
+      ],
+    },
+    form: {
+      title: "Rejoindre Xperience Pro",
+      subtitle: "Remplissez le formulaire et nous vous contacterons via WhatsApp",
+      fields: {
+        fullName: "Nom complet",
+        phone: "Numéro de téléphone",
+        lookingFor: "Que recherchez-vous ?",
+        offer: "Quelle offre vous intéresse ?",
+        submit: "Envoyer via WhatsApp",
+      },
+      lookingForOptions: {
+        stagePFE: "Stage PFE",
+        premierEmploi: "Premier Emploi",
+        progresserCarriere: "Progresser ma carrière",
+        reconversion: "Reconversion Professionnelle",
+      },
+      offerOptions: {
+        xperiencePro: "Xperience Pro - 1000 DH",
+      },
+    },
   },
 }
 
@@ -391,7 +518,18 @@ export default function XperienceProLandingPage() {
   const [language, setLanguage] = useState<Language>("en")
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null)
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set())
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [showForm, setShowForm] = useState(false)
+  const [formData, setFormData] = useState({
+    fullName: "",
+    phone: "",
+    lookingFor: "",
+    offer: "",
+  })
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
+  
+  // WhatsApp number - TODO: Update with actual admin WhatsApp number (format: 212XXXXXXXXX for Morocco)
+  const ADMIN_WHATSAPP_NUMBER = "212XXXXXXXXX" // Replace with actual number
 
   const t = content[language]
 
@@ -425,7 +563,39 @@ export default function XperienceProLandingPage() {
     const element = document.getElementById(id)
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" })
+      setMobileMenuOpen(false)
     }
+  }
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    const t = content[language]
+    const lookingForText = formData.lookingFor === "stagePFE" 
+      ? t.form.lookingForOptions.stagePFE
+      : formData.lookingFor === "premierEmploi"
+      ? t.form.lookingForOptions.premierEmploi
+      : formData.lookingFor === "progresserCarriere"
+      ? t.form.lookingForOptions.progresserCarriere
+      : t.form.lookingForOptions.reconversion
+
+    const message = language === "en"
+      ? `Hi, my name is ${formData.fullName} and I'm looking for ${lookingForText}. I chose this offer: ${formData.offer}. My phone number is ${formData.phone}.`
+      : `Bonjour, je m'appelle ${formData.fullName} et je recherche ${lookingForText}. J'ai choisi cette offre : ${formData.offer}. Mon numéro de téléphone est ${formData.phone}.`
+
+    const encodedMessage = encodeURIComponent(message)
+    const whatsappUrl = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodedMessage}`
+    
+    window.open(whatsappUrl, "_blank")
+    
+    // Reset form
+    setFormData({
+      fullName: "",
+      phone: "",
+      lookingFor: "",
+      offer: "",
+    })
+    setShowForm(false)
   }
 
   return (
@@ -459,6 +629,12 @@ export default function XperienceProLandingPage() {
                 {t.header.nav.price}
               </button>
               <button
+                onClick={() => scrollToSection("testimonials")}
+                className="text-gray-700 hover:text-[#005eb8] transition-colors font-medium"
+              >
+                {language === "en" ? "Testimonials" : "Témoignages"}
+              </button>
+              <button
                 onClick={() => scrollToSection("faq")}
                 className="text-gray-700 hover:text-[#005eb8] transition-colors font-medium"
               >
@@ -486,8 +662,54 @@ export default function XperienceProLandingPage() {
               >
                 FR
               </button>
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden ml-2 p-2 text-gray-700 hover:text-[#005eb8] transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
+          
+          {/* Mobile menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden border-t border-gray-200 py-4">
+              <nav className="flex flex-col space-y-3">
+                <button
+                  onClick={() => scrollToSection("program")}
+                  className="text-left px-4 py-2 text-gray-700 hover:text-[#005eb8] hover:bg-gray-50 rounded-md transition-colors font-medium"
+                >
+                  {t.header.nav.program}
+                </button>
+                <button
+                  onClick={() => scrollToSection("for-who")}
+                  className="text-left px-4 py-2 text-gray-700 hover:text-[#005eb8] hover:bg-gray-50 rounded-md transition-colors font-medium"
+                >
+                  {t.header.nav.forWho}
+                </button>
+                <button
+                  onClick={() => scrollToSection("price")}
+                  className="text-left px-4 py-2 text-gray-700 hover:text-[#005eb8] hover:bg-gray-50 rounded-md transition-colors font-medium"
+                >
+                  {t.header.nav.price}
+                </button>
+                <button
+                  onClick={() => scrollToSection("testimonials")}
+                  className="text-left px-4 py-2 text-gray-700 hover:text-[#005eb8] hover:bg-gray-50 rounded-md transition-colors font-medium"
+                >
+                  {language === "en" ? "Testimonials" : "Témoignages"}
+                </button>
+                <button
+                  onClick={() => scrollToSection("faq")}
+                  className="text-left px-4 py-2 text-gray-700 hover:text-[#005eb8] hover:bg-gray-50 rounded-md transition-colors font-medium"
+                >
+                  {t.header.nav.faq}
+                </button>
+              </nav>
+            </div>
+          )}
         </div>
       </header>
 
@@ -805,11 +1027,8 @@ export default function XperienceProLandingPage() {
           >
             <div className="text-center">
               <button
-                onClick={() => {
-                  // TODO: Add payment integration
-                  alert(language === "en" ? "Payment integration coming soon!" : "Intégration de paiement à venir !")
-                }}
-                className="bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-12 py-5 rounded-lg text-xl shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 mx-auto animate-pulse hover:animate-none"
+                onClick={() => setShowForm(true)}
+                className="bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-12 py-5 rounded-lg text-xl shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 mx-auto"
               >
                 {t.price.cta}
                 <ArrowRight className="w-6 h-6" />
@@ -819,8 +1038,52 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+            {t.testimonials.title}
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+            {t.testimonials.items.map((testimonial, index) => (
+              <div
+                key={index}
+                ref={(el) => {
+                  sectionRefs.current[`testimonial-${index}`] = el
+                }}
+                className={`bg-gradient-to-br from-gray-50 to-blue-50 p-6 md:p-8 rounded-xl shadow-lg border border-gray-200 transform transition-all duration-700 ${
+                  visibleSections.has(`testimonial-${index}`)
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <div className="flex items-center gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-[#FFBC00] text-[#FFBC00]" />
+                  ))}
+                </div>
+                <Quote className="w-8 h-8 text-[#005eb8] mb-4 opacity-50" />
+                <p className="text-gray-700 mb-6 leading-relaxed italic">
+                  "{testimonial.text}"
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">{testimonial.name}</div>
+                    <div className="text-sm text-gray-600">{testimonial.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FAQ Section */}
-      <section id="faq" className="py-16 md:py-24 bg-white">
+      <section id="faq" className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
             {t.faq.title}
@@ -859,13 +1122,130 @@ export default function XperienceProLandingPage() {
           <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#FFBC00] to-[#e6a800] bg-clip-text text-transparent">
             {t.header.logo}
           </h3>
-          <p className="text-gray-400">
+          <p className="text-gray-400 mb-6">
             {language === "en"
               ? "Transform your job search. Get real results."
               : "Transforme ta recherche d'emploi. Obtiens de vrais résultats."}
           </p>
+          <div className="flex justify-center gap-4">
+            <a
+              href={t.trainer.social.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-white transition-colors"
+              aria-label="Instagram"
+            >
+              <Instagram className="w-6 h-6" />
+            </a>
+            <a
+              href={t.trainer.social.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-white transition-colors"
+              aria-label="LinkedIn"
+            >
+              <Linkedin className="w-6 h-6" />
+            </a>
+          </div>
         </div>
       </footer>
+
+      {/* Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-gray-900">{t.form.title}</h3>
+              <button
+                onClick={() => {
+                  setShowForm(false)
+                  setFormData({ fullName: "", phone: "", lookingFor: "", offer: "" })
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <form onSubmit={handleFormSubmit} className="p-6 space-y-6">
+              <p className="text-gray-600 text-sm">{t.form.subtitle}</p>
+              
+              <div>
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+                  {t.form.fields.fullName} *
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  required
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] focus:border-transparent outline-none transition-all"
+                  placeholder={t.form.fields.fullName}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                  {t.form.fields.phone} *
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  required
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] focus:border-transparent outline-none transition-all"
+                  placeholder="+212 6XX XXX XXX"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="lookingFor" className="block text-sm font-medium text-gray-700 mb-2">
+                  {t.form.fields.lookingFor} *
+                </label>
+                <select
+                  id="lookingFor"
+                  required
+                  value={formData.lookingFor}
+                  onChange={(e) => setFormData({ ...formData, lookingFor: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] focus:border-transparent outline-none transition-all bg-white"
+                >
+                  <option value="">{language === "en" ? "Select an option" : "Sélectionnez une option"}</option>
+                  <option value="stagePFE">{t.form.lookingForOptions.stagePFE}</option>
+                  <option value="premierEmploi">{t.form.lookingForOptions.premierEmploi}</option>
+                  <option value="progresserCarriere">{t.form.lookingForOptions.progresserCarriere}</option>
+                  <option value="reconversion">{t.form.lookingForOptions.reconversion}</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="offer" className="block text-sm font-medium text-gray-700 mb-2">
+                  {t.form.fields.offer} *
+                </label>
+                <select
+                  id="offer"
+                  required
+                  value={formData.offer}
+                  onChange={(e) => setFormData({ ...formData, offer: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] focus:border-transparent outline-none transition-all bg-white"
+                >
+                  <option value="">{language === "en" ? "Select an offer" : "Sélectionnez une offre"}</option>
+                  <option value={t.form.offerOptions.xperiencePro}>{t.form.offerOptions.xperiencePro}</option>
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-6 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <MessageSquare className="w-5 h-5" />
+                {t.form.fields.submit}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
