@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { CheckCircle2, ArrowRight, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles, Menu, X, Star, Quote } from "lucide-react"
+import { CheckCircle2, ArrowRight, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles, Menu, X, Star, Quote, FileCheck } from "lucide-react"
 
 type Language = "en" | "fr"
 
@@ -37,6 +37,14 @@ interface Content {
       title: string
       description: string
     }[]
+  }
+  cvScorer: {
+    title: string
+    subtitle: string
+    description: string
+    features: string[]
+    cta: string
+    ctaSecondary: string
   }
   trainer: {
     title: string
@@ -175,11 +183,25 @@ const content: Record<Language, Content> = {
         },
       ],
     },
+    cvScorer: {
+      title: "Try Our Free CV Scorer",
+      subtitle: "Get instant feedback on your CV",
+      description: "Upload your CV and get a detailed analysis with scores on structure, content quality, relevance, professionalism, and ATS compatibility. Get personalized feedback to improve your CV before applying.",
+      features: [
+        "AI-powered CV analysis in seconds",
+        "5-dimension scoring system",
+        "Personalized improvement suggestions",
+        "ATS compatibility check",
+        "Match your CV to job descriptions",
+      ],
+      cta: "Score My CV Now",
+      ctaSecondary: "Learn More",
+    },
     trainer: {
       title: "Meet your coach",
       name: "Ali El Harti",
       role: "Certified Trainer & Employability Manager",
-      image: "/images/trainer-ali.jpg", // TODO: Add trainer image to /public/images/trainer-ali.jpg
+      image: "/ali.jpg", // Trainer image located in /public/ali.jpg
       bio: [
         "Certified trainer with 7+ years of experience helping young people prepare for the job market.",
         "Specializes in job and internship search techniques.",
@@ -399,11 +421,25 @@ const content: Record<Language, Content> = {
         },
       ],
     },
+    cvScorer: {
+      title: "Essayez Notre Évaluateur de CV Gratuit",
+      subtitle: "Obtenez un retour instantané sur votre CV",
+      description: "Téléchargez votre CV et obtenez une analyse détaillée avec des scores sur la structure, la qualité du contenu, la pertinence, le professionnalisme et la compatibilité ATS. Recevez des suggestions personnalisées pour améliorer votre CV avant de postuler.",
+      features: [
+        "Analyse de CV par IA en quelques secondes",
+        "Système de notation à 5 dimensions",
+        "Suggestions d'amélioration personnalisées",
+        "Vérification de compatibilité ATS",
+        "Adaptez votre CV aux descriptions de poste",
+      ],
+      cta: "Évaluer mon CV maintenant",
+      ctaSecondary: "En savoir plus",
+    },
     trainer: {
       title: "Préparez-vous au marché d'emploi avec notre expert",
       name: "Ali El Harti",
       role: "Formateur Certifié & Responsable Employabilité",
-      image: "/images/trainer-ali.jpg", // TODO: Add trainer image to /public/images/trainer-ali.jpg
+      image: "/ali.jpg", // Trainer image located in /public/ali.jpg
       bio: [
         "Formateur certifié avec plus de 7 ans d'expérience dans l'accompagnement des jeunes vers le marché de l'emploi.",
         "Spécialisé dans les techniques de recherche d'emploi et de stage.",
@@ -955,6 +991,103 @@ export default function XperienceProLandingPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CV Scorer Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <div
+              ref={(el) => {
+                sectionRefs.current["cv-scorer"] = el
+              }}
+              className={`bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-700 ${
+                visibleSections.has("cv-scorer") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              }`}
+            >
+              <div className="md:flex">
+                {/* Left side - Content */}
+                <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                  <div className="inline-block mb-4">
+                    <span className="bg-[#FFBC00] text-gray-900 px-4 py-1 rounded-full text-sm font-bold">
+                      {language === "en" ? "FREE TOOL" : "OUTIL GRATUIT"}
+                    </span>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    {t.cvScorer.title}
+                  </h2>
+                  <p className="text-xl text-[#005eb8] font-semibold mb-4">
+                    {t.cvScorer.subtitle}
+                  </p>
+                  <p className="text-gray-600 mb-6 leading-relaxed">
+                    {t.cvScorer.description}
+                  </p>
+                  <ul className="space-y-3 mb-8">
+                    {t.cvScorer.features.map((feature, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-[#005eb8] mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <a
+                      href="/cv-scorer"
+                      className="bg-[#005eb8] hover:bg-[#0476D7] text-white font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      <FileCheck className="w-5 h-5" />
+                      {t.cvScorer.cta}
+                    </a>
+                    <button
+                      onClick={() => scrollToSection("program")}
+                      className="bg-white border-2 border-[#005eb8] text-[#005eb8] hover:bg-blue-50 font-bold px-8 py-4 rounded-lg text-lg transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      {t.cvScorer.ctaSecondary}
+                      <ArrowRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Right side - Visual/Preview */}
+                <div className="md:w-1/2 bg-gradient-to-br from-[#005eb8] to-[#0476D7] p-8 md:p-12 flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute inset-0" style={{
+                      backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)'
+                    }}></div>
+                  </div>
+                  <div className="relative z-10 text-center text-white w-full">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+                      <FileCheck className="w-20 h-20 mx-auto mb-6 text-[#FFBC00]" />
+                      <div className="space-y-4">
+                        <div className="bg-white/20 rounded-lg p-4">
+                          <div className="text-sm text-blue-200 mb-2">{language === "en" ? "Structure & Readability" : "Structure & Lisibilité"}</div>
+                          <div className="w-full bg-white/20 rounded-full h-2">
+                            <div className="bg-[#FFBC00] h-2 rounded-full" style={{ width: "85%" }}></div>
+                          </div>
+                        </div>
+                        <div className="bg-white/20 rounded-lg p-4">
+                          <div className="text-sm text-blue-200 mb-2">{language === "en" ? "Content Quality" : "Qualité du Contenu"}</div>
+                          <div className="w-full bg-white/20 rounded-full h-2">
+                            <div className="bg-[#FFBC00] h-2 rounded-full" style={{ width: "78%" }}></div>
+                          </div>
+                        </div>
+                        <div className="bg-white/20 rounded-lg p-4">
+                          <div className="text-sm text-blue-200 mb-2">{language === "en" ? "ATS Compatibility" : "Compatibilité ATS"}</div>
+                          <div className="w-full bg-white/20 rounded-full h-2">
+                            <div className="bg-[#FFBC00] h-2 rounded-full" style={{ width: "92%" }}></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-6 text-3xl font-bold text-[#FFBC00]">
+                        {language === "en" ? "Score: 85/100" : "Score : 85/100"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
