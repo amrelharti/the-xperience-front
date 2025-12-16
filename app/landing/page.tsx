@@ -72,10 +72,21 @@ interface Content {
   }
   price: {
     title: string
-    amount: string
-    description: string
-    cta: string
-    included: string
+    plans: {
+      basic: {
+        name: string
+        originalPrice: string
+        currentPrice: string
+        features: string[]
+      }
+      premium: {
+        name: string
+        originalPrice: string
+        currentPrice: string
+        specialOffer: string
+        features: string[]
+      }
+    }
   }
   faq: {
     title: string
@@ -131,7 +142,7 @@ const content: Record<Language, Content> = {
       headline: "Xperience Pro: Stop applying in the dark. Start getting real interviews.",
       subheading: "A step-by-step program to build a winning CV, adapt it to each job, master LinkedIn, and feel confident in interviews.",
       forWho: "For students, employees, and job seekers who are tired of sending CVs and getting no answers.",
-      ctaPrimary: "Join Xperience Pro – 1000 DH",
+      ctaPrimary: "Join Xperience Pro",
       ctaSecondary: "See what's inside",
     },
     socialProof: {
@@ -234,11 +245,35 @@ const content: Record<Language, Content> = {
       ],
     },
     price: {
-      title: "Join Xperience Pro today",
-      amount: "",
-      description: "One-time payment",
-      cta: "Join Xperience Pro",
-      included: "Full access to all 5 modules, video lessons, exercises, and lifetime access to the platform.",
+      title: "Choose Your Plan",
+      plans: {
+        basic: {
+          name: "COACHING BASIC",
+          originalPrice: "1000 DH",
+          currentPrice: "700 DH",
+          features: [
+            "Access to a single module of the program. You choose between:",
+            "Mastered interview techniques",
+            "Professional CV",
+            "Personal branding and analysis of offers on LinkedIn",
+          ],
+        },
+        premium: {
+          name: "COACHING PREMIUM",
+          originalPrice: "1500 DH",
+          currentPrice: "999 DH",
+          specialOffer: "SPECIAL OFFER",
+          features: [
+            "Access to all modules of the program:",
+            "Professional CV",
+            "Mastered interview techniques",
+            "Personal branding and analysis of offers on LinkedIn",
+            "Free ebooks and resources",
+            "Regular WhatsApp follow-up",
+            "1 month of training: 4 live sessions and 18 recorded capsules",
+          ],
+        },
+      },
     },
     faq: {
       title: "Frequently Asked Questions",
@@ -311,8 +346,8 @@ const content: Record<Language, Content> = {
         reconversion: "Reconversion Professionnelle",
       },
       offerOptions: {
-        xperiencePro: "Xperience Pro - 1000 DH",
-        xperience: "Xperience Pro - 1000 DH",
+        xperiencePro: "COACHING PREMIUM - 999 DH",
+        xperience: "COACHING BASIC - 700 DH",
       },
     },
   },
@@ -433,11 +468,35 @@ const content: Record<Language, Content> = {
       ],
     },
     price: {
-      title: "Rejoins Xperience Pro dès aujourd'hui",
-      amount: "1000 DH",
-      description: "Paiement unique",
-      cta: "Rejoindre Xperience Pro – 1000 DH",
-      included: "Accès complet aux 5 modules, leçons vidéo, exercices et accès à vie à la plateforme.",
+      title: "Choisissez votre formule",
+      plans: {
+        basic: {
+          name: "COACHING BASIC",
+          originalPrice: "1000 DH",
+          currentPrice: "700 DH",
+          features: [
+            "Accès à un seul module du programme. Tu choisis entre:",
+            "Techniques d'entretien maîtrisées",
+            "CV professionnel",
+            "Personal branding et analyse des offres sur LinkedIn",
+          ],
+        },
+        premium: {
+          name: "COACHING PREMIUM",
+          originalPrice: "1500 DH",
+          currentPrice: "999 DH",
+          specialOffer: "OFFRE SPÉCIALE",
+          features: [
+            "Accès à l'ensemble des modules du programme:",
+            "CV professionnel",
+            "Techniques d'entretien maîtrisées",
+            "Personal branding et analyse des offres sur LinkedIn",
+            "Ebooks et ressources gratuites",
+            "Suivi régulier sur Whatsapp",
+            "1 mois de formation: 4 séances live et 18 capsules enregistrées",
+          ],
+        },
+      },
     },
     faq: {
       title: "Questions fréquentes",
@@ -510,8 +569,8 @@ const content: Record<Language, Content> = {
         reconversion: "Reconversion Professionnelle",
       },
       offerOptions: {
-        xperiencePro: "Xperience Pro - 999 DH",
-        xperience: "Xperience Pro - 699 DH",
+        xperiencePro: "COACHING PREMIUM - 999 DH",
+        xperience: "COACHING BASIC - 700 DH",
       },
     },
   },
@@ -1074,39 +1133,84 @@ export default function XperienceProLandingPage() {
         ref={(el) => {
           sectionRefs.current["price"] = el
         }}
-        className="py-16 md:py-24 bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] text-white relative overflow-hidden"
+        className="py-16 md:py-24 bg-white"
       >
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)'
-          }}></div>
-        </div>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div
-            className={`text-center mb-12 transform transition-all duration-700 ${
-              visibleSections.has("price") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t.price.title}</h2>
-            <div className="mb-6">
-              <div className="text-6xl md:text-7xl font-bold mb-2 text-[#FFBC00]">{t.price.amount}</div>
-              <p className="text-xl text-blue-200">{t.price.description}</p>
-            </div>
-            <p className="text-lg text-blue-100 mb-8">{t.price.included}</p>
-          </div>
-          <div
-            className={`bg-white/10 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-white/20 transform transition-all duration-700 ${
-              visibleSections.has("price") ? "opacity-100 scale-100" : "opacity-0 scale-95"
-            }`}
-            style={{ transitionDelay: "200ms" }}
-          >
-            <div className="text-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+            {t.price.title}
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
+            {/* Basic Plan Card */}
+            <div
+              className={`bg-white rounded-2xl shadow-xl border border-gray-200 p-8 transform transition-all duration-700 ${
+                visibleSections.has("price") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              }`}
+            >
+              <div className="text-center mb-6">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <span className="text-lg text-gray-500 line-through">{t.price.plans.basic.originalPrice}</span>
+                </div>
+                <div className="text-5xl md:text-6xl font-bold text-gray-900 mb-2">
+                  {t.price.plans.basic.currentPrice}
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mt-4">{t.price.plans.basic.name}</h3>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {t.price.plans.basic.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-gray-600 text-sm leading-relaxed">- {feature}</span>
+                  </li>
+                ))}
+              </ul>
               <button
-                onClick={() => setShowForm(true)}
-                className="bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-12 py-5 rounded-lg text-xl shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 mx-auto"
+                onClick={() => {
+                  setFormData({ ...formData, offer: t.form.offerOptions.xperience })
+                  setShowForm(true)
+                }}
+                className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 px-6 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200"
               >
-                {t.price.cta}
-                <ArrowRight className="w-6 h-6" />
+                {language === "en" ? "Choose Basic" : "Choisir Basic"}
+              </button>
+            </div>
+
+            {/* Premium Plan Card */}
+            <div
+              className={`bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] rounded-2xl shadow-xl border-2 border-[#FFBC00] p-8 transform transition-all duration-700 relative ${
+                visibleSections.has("price") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              }`}
+              style={{ transitionDelay: "100ms" }}
+            >
+              {/* Special Offer Badge */}
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <span className="bg-[#FFBC00] text-gray-900 font-bold px-4 py-1 rounded-full text-sm shadow-lg">
+                  {t.price.plans.premium.specialOffer}
+                </span>
+              </div>
+              
+              <div className="text-center mb-6 text-white">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <span className="text-lg text-blue-200 line-through">{t.price.plans.premium.originalPrice}</span>
+                </div>
+                <div className="text-5xl md:text-6xl font-bold text-[#FFBC00] mb-2">
+                  {t.price.plans.premium.currentPrice}
+                </div>
+                <h3 className="text-2xl font-bold text-white mt-4">{t.price.plans.premium.name}</h3>
+              </div>
+              <ul className="space-y-3 mb-8 text-white">
+                {t.price.plans.premium.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-white/90 text-sm leading-relaxed">- {feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => {
+                  setFormData({ ...formData, offer: t.form.offerOptions.xperiencePro })
+                  setShowForm(true)
+                }}
+                className="w-full bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold py-4 px-6 rounded-lg text-lg shadow-2xl transform hover:scale-105 transition-all duration-200"
+              >
+                {language === "en" ? "Choose Premium" : "Choisir Premium"}
               </button>
             </div>
           </div>
@@ -1306,8 +1410,8 @@ export default function XperienceProLandingPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] focus:border-transparent outline-none transition-all bg-white"
                 >
                   <option value="">{language === "en" ? "Select an offer" : "Sélectionnez une offre"}</option>
+                  <option value={t.form.offerOptions.xperience}>{t.form.offerOptions.xperience}</option>
                   <option value={t.form.offerOptions.xperiencePro}>{t.form.offerOptions.xperiencePro}</option>
-                  <option value={t.form.offerOptions.xperience}>{t.form.offerOptions.xperiencePro}</option>
                 </select>
               </div>
 
