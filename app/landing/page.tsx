@@ -179,7 +179,7 @@ const content: Record<Language, Content> = {
         { label: "Conferences", value: "100+" },
       ],
       social: {
-        instagram: "https://instagram.com/ali_el_harti", // TODO: Update with actual Instagram URL
+        instagram: "https://www.instagram.com/alielharti_ma/", // TODO: Update with actual Instagram URL
         linkedin: "https://linkedin.com/in/ali-el-harti", // TODO: Update with actual LinkedIn URL
       },
     },
@@ -377,7 +377,7 @@ const content: Record<Language, Content> = {
         { label: "Conférences", value: "100+" },
       ],
       social: {
-        instagram: "https://instagram.com/ali_el_harti", // TODO: Update with actual Instagram URL
+        instagram: "https://www.instagram.com/alielharti_ma/", // TODO: Update with actual Instagram URL
         linkedin: "https://linkedin.com/in/ali-el-harti", // TODO: Update with actual LinkedIn URL
       },
     },
@@ -528,8 +528,8 @@ export default function XperienceProLandingPage() {
   })
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
   
-  // WhatsApp number - TODO: Update with actual admin WhatsApp number (format: 212XXXXXXXXX for Morocco)
-  const ADMIN_WHATSAPP_NUMBER = "212XXXXXXXXX" // Replace with actual number
+  // WhatsApp number - Clean format: only digits, country code + number (e.g., 212773213060)
+  const ADMIN_WHATSAPP_NUMBER = "212773213060"
 
   const t = content[language]
 
@@ -567,6 +567,31 @@ export default function XperienceProLandingPage() {
     }
   }
 
+  // Clean phone number - remove all non-digit characters
+  const cleanPhoneNumber = (phone: string): string => {
+    return phone.replace(/\D/g, "")
+  }
+
+  // Format WhatsApp number - ensure it's clean and properly formatted
+  const formatWhatsAppNumber = (phone: string): string => {
+    const cleaned = cleanPhoneNumber(phone)
+    // If it starts with +, remove it
+    // If it starts with 00, replace with country code
+    if (cleaned.startsWith("00212")) {
+      return cleaned.replace("00212", "212")
+    }
+    // If it starts with 0, replace with country code
+    if (cleaned.startsWith("0")) {
+      return "212" + cleaned.substring(1)
+    }
+    // If it already has country code, return as is
+    if (cleaned.startsWith("212")) {
+      return cleaned
+    }
+    // Otherwise, assume it's a local number and add country code
+    return "212" + cleaned
+  }
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -583,10 +608,57 @@ export default function XperienceProLandingPage() {
       ? `Hi, my name is ${formData.fullName} and I'm looking for ${lookingForText}. I chose this offer: ${formData.offer}. My phone number is ${formData.phone}.`
       : `Bonjour, je m'appelle ${formData.fullName} et je recherche ${lookingForText}. J'ai choisi cette offre : ${formData.offer}. Mon numéro de téléphone est ${formData.phone}.`
 
-    const encodedMessage = encodeURIComponent(message)
-    const whatsappUrl = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodedMessage}`
+    // Clean and format the WhatsApp number - ensure only digits
+    let cleanedNumber = cleanPhoneNumber(ADMIN_WHATSAPP_NUMBER)
     
-    window.open(whatsappUrl, "_blank")
+    // For WhatsApp Business, ensure proper format
+    // Remove leading + or 00 if present
+    if (cleanedNumber.startsWith("00212")) {
+      cleanedNumber = cleanedNumber.replace("00212", "212")
+    }
+    if (cleanedNumber.startsWith("+212")) {
+      cleanedNumber = cleanedNumber.replace("+212", "212")
+    }
+    // Remove leading 0 if country code is missing
+    if (cleanedNumber.startsWith("0") && !cleanedNumber.startsWith("212")) {
+      cleanedNumber = "212" + cleanedNumber.substring(1)
+    }
+    // Ensure it starts with country code
+    if (!cleanedNumber.startsWith("212")) {
+      cleanedNumber = "212" + cleanedNumber
+    }
+    
+    // Validate number format
+    if (cleanedNumber.length < 10 || cleanedNumber.length > 15) {
+      alert(language === "en" 
+        ? "Invalid phone number format. Please check the WhatsApp number configuration."
+        : "Format de numéro invalide. Veuillez vérifier la configuration du numéro WhatsApp.")
+      return
+    }
+    
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(message)
+    
+    // Try multiple WhatsApp URL formats for business numbers
+    // Primary: wa.me (works for both personal and business)
+    const whatsappUrl1 = `https://wa.me/${cleanedNumber}?text=${encodedMessage}`
+    
+    // Alternative: api.whatsapp.com (sometimes works better for business)
+    const whatsappUrl2 = `https://api.whatsapp.com/send?phone=${cleanedNumber}&text=${encodedMessage}`
+    
+    // Try primary format first, with fallback
+    try {
+      const win = window.open(whatsappUrl1, "_blank", "noopener,noreferrer")
+      // If window didn't open (blocked), try alternative
+      if (!win || win.closed || typeof win.closed === "undefined") {
+        setTimeout(() => {
+          window.open(whatsappUrl2, "_blank", "noopener,noreferrer")
+        }, 100)
+      }
+    } catch (error) {
+      // Fallback to alternative format
+      window.open(whatsappUrl2, "_blank", "noopener,noreferrer")
+    }
     
     // Reset form
     setFormData({
