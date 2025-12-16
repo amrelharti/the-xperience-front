@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { CheckCircle2, ArrowRight, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles, Menu, X, Star, Quote } from "lucide-react"
 
 type Language = "en" | "fr"
@@ -41,6 +42,7 @@ interface Content {
     title: string
     name: string
     role: string
+    image: string
     bio: string[]
     stats: {
       label: string
@@ -177,6 +179,7 @@ const content: Record<Language, Content> = {
       title: "Meet your coach",
       name: "Ali El Harti",
       role: "Certified Trainer & Employability Manager",
+      image: "/images/trainer-ali.jpg", // TODO: Add trainer image to /public/images/trainer-ali.jpg
       bio: [
         "Certified trainer with 7+ years of experience helping young people prepare for the job market.",
         "Specializes in job and internship search techniques.",
@@ -400,6 +403,7 @@ const content: Record<Language, Content> = {
       title: "Préparez-vous au marché d'emploi avec notre expert",
       name: "Ali El Harti",
       role: "Formateur Certifié & Responsable Employabilité",
+      image: "/images/trainer-ali.jpg", // TODO: Add trainer image to /public/images/trainer-ali.jpg
       bio: [
         "Formateur certifié avec plus de 7 ans d'expérience dans l'accompagnement des jeunes vers le marché de l'emploi.",
         "Spécialisé dans les techniques de recherche d'emploi et de stage.",
@@ -973,8 +977,19 @@ export default function XperienceProLandingPage() {
             >
               <div className="md:flex">
                 <div className="md:w-1/3 bg-gradient-to-br from-[#005eb8] to-[#0476D7] p-8 md:p-12 text-white flex flex-col items-center justify-center">
-                  <div className="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center mb-6 border-4 border-white/30">
-                    <Users className="w-16 h-16 text-white" />
+                  <div className="w-32 h-32 rounded-full mb-6 border-4 border-white/30 overflow-hidden bg-white/20 flex items-center justify-center relative">
+                    {t.trainer.image ? (
+                      <Image
+                        src={t.trainer.image}
+                        alt={t.trainer.name}
+                        width={128}
+                        height={128}
+                        className="object-cover rounded-full"
+                        priority
+                      />
+                    ) : (
+                      <Users className="w-16 h-16 text-white" />
+                    )}
                   </div>
                   <h3 className="text-2xl md:text-3xl font-bold mb-2">{t.trainer.name}</h3>
                   <p className="text-blue-200 text-center mb-6">{t.trainer.role}</p>
