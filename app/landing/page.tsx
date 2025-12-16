@@ -112,6 +112,7 @@ interface Content {
       role: string
       text: string
       rating: number
+      image: string
     }[]
   }
   form: {
@@ -333,24 +334,28 @@ const content: Record<Language, Content> = {
           role: "Recent Graduate",
           text: "Xperience Pro completely transformed my job search. I went from zero responses to multiple interviews in just 2 months. The CV adaptation techniques are game-changers!",
           rating: 5,
+          image: "/public/ali.jpg", // TODO: Replace with actual testimonial images
         },
         {
           name: "Ahmed K.",
           role: "Career Changer",
           text: "I was stuck in a job I didn't like. This program gave me the confidence and tools to make a successful career transition. The interview preparation module is excellent.",
           rating: 5,
+          image: "/placeholder-user.jpg", // TODO: Replace with actual testimonial images
         },
         {
           name: "Fatima L.",
           role: "Student",
           text: "As a student with no experience, I thought finding an internship would be impossible. Xperience Pro showed me how to highlight my skills and I got 3 internship offers!",
           rating: 5,
+          image: "/placeholder-user.jpg", // TODO: Replace with actual testimonial images
         },
         {
           name: "Youssef B.",
           role: "Job Seeker",
           text: "The LinkedIn optimization tips alone are worth the investment. I started getting messages from recruiters within weeks. Highly recommend!",
           rating: 5,
+          image: "/placeholder-user.jpg", // TODO: Replace with actual testimonial images
         },
       ],
     },
@@ -390,7 +395,7 @@ const content: Record<Language, Content> = {
       headline: "Xperience Pro : Arrête de postuler dans le vide. Commence à décrocher de vrais entretiens.",
       subheading: "Un programme étape par étape pour créer un CV qui donne envie de te rencontrer, l'adapter à chaque offre, maîtriser LinkedIn et arriver préparé(e) en entretien.",
       forWho: "Pour les étudiants, salariés et personnes en recherche d'emploi qui en ont marre d'envoyer des CV sans aucune réponse.",
-      ctaPrimary: "Rejoindre Xperience Pro – 1000 DH",
+      ctaPrimary: "Rejoindre Xperience Pro ",
       ctaSecondary: "Découvrir le programme",
     },
     socialProof: {
@@ -571,24 +576,28 @@ const content: Record<Language, Content> = {
           role: "Diplômée récente",
           text: "Xperience Pro a complètement transformé ma recherche d'emploi. Je suis passée de zéro réponse à plusieurs entretiens en seulement 2 mois. Les techniques d'adaptation de CV sont révolutionnaires !",
           rating: 5,
+          image: "/placeholder-user.jpg", // TODO: Replace with actual testimonial images
         },
         {
           name: "Ahmed K.",
           role: "Reconversion professionnelle",
           text: "J'étais coincé dans un job qui ne me plaisait pas. Ce programme m'a donné la confiance et les outils pour faire une transition de carrière réussie. Le module de préparation aux entretiens est excellent.",
           rating: 5,
+          image: "/placeholder-user.jpg", // TODO: Replace with actual testimonial images
         },
         {
           name: "Fatima L.",
           role: "Étudiante",
           text: "En tant qu'étudiante sans expérience, je pensais que trouver un stage serait impossible. Xperience Pro m'a montré comment mettre en valeur mes compétences et j'ai reçu 3 offres de stage !",
           rating: 5,
+          image: "/placeholder-user.jpg", // TODO: Replace with actual testimonial images
         },
         {
           name: "Youssef B.",
           role: "Demandeur d'emploi",
           text: "Les conseils d'optimisation LinkedIn à eux seuls valent l'investissement. J'ai commencé à recevoir des messages de recruteurs en quelques semaines. Je recommande vivement !",
           rating: 5,
+          image: "/placeholder-user.jpg", // TODO: Replace with actual testimonial images
         },
       ],
     },
@@ -779,9 +788,16 @@ export default function XperienceProLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-[#005eb8] to-[#0476D7] bg-clip-text text-transparent">
-                {t.header.logo}
-              </h1>
+              <a href="/" className="flex items-center gap-2 sm:gap-3 group hover:opacity-80 transition-opacity duration-200">
+                <img 
+                  src="/logos/dark blue secondary logo.svg" 
+                  alt="XPERIENCE Logo" 
+                  className="h-8 sm:h-10 w-auto"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </a>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
               <button
@@ -1395,8 +1411,14 @@ export default function XperienceProLandingPage() {
                   "{testimonial.text}"
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-full flex items-center justify-center text-white font-bold text-lg">
-                    {testimonial.name.charAt(0)}
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#005eb8] flex-shrink-0">
+                    <Image
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      width={48}
+                      height={48}
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                   <div>
                     <div className="font-semibold text-gray-900">{testimonial.name}</div>
