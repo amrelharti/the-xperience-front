@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { CheckCircle2, ArrowRight, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles, Menu, X, Star, Quote, FileCheck } from "lucide-react"
+import { CheckCircle2, ArrowRight, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles, Menu, X, Star, Quote, FileCheck, ChevronLeft, ChevronRight } from "lucide-react"
 
 type Language = "en" | "fr"
 
@@ -631,6 +631,7 @@ export default function XperienceProLandingPage() {
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set())
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showForm, setShowForm] = useState(false)
+  const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0)
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -638,6 +639,18 @@ export default function XperienceProLandingPage() {
     offer: "",
   })
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
+  
+  // Testimonial images from clients_reviews folder
+  const testimonialImages = [
+    "/clients_reviews/screen1.jpg",
+    "/clients_reviews/screen2.jpg",
+    "/clients_reviews/screen3.jpg",
+    "/clients_reviews/screen4.jpg",
+    "/clients_reviews/screen5.jpg",
+    "/clients_reviews/screen6.jpg",
+    "/clients_reviews/screen7.jpg",
+    "/clients_reviews/screen8.jpg",
+  ]
   
   // WhatsApp number - Clean format: only digits, country code + number (e.g., 212773213060)
   const ADMIN_WHATSAPP_NUMBER = "212773213060"
@@ -941,77 +954,6 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
-      {/* Social Proof Section */}
-      <section className="py-12 md:py-16 bg-white border-y border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900">
-            {t.socialProof.title}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {t.socialProof.stats.map((stat, index) => (
-              <div
-                key={index}
-                ref={(el) => {
-                  sectionRefs.current[`stat-${index}`] = el
-                }}
-                className={`bg-gradient-to-br from-[#005eb8] to-[#0476D7] p-8 rounded-2xl shadow-xl text-white text-center transform transition-all duration-700 ${
-                  visibleSections.has(`stat-${index}`)
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-10"
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
-              >
-                <div className="text-5xl md:text-6xl font-bold mb-2 text-[#FFBC00]">
-                  {stat.number}
-                </div>
-                <div className="text-lg md:text-xl font-medium">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Problem Section */}
-      <section className="py-16 md:py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
-              {t.problem.title}
-            </h2>
-            <div className="space-y-6">
-              {t.problem.reasons.map((reason, index) => (
-                <div
-                  key={index}
-                  ref={(el) => {
-                    sectionRefs.current[`problem-${index}`] = el
-                  }}
-                  className={`bg-white p-8 rounded-xl shadow-lg border-l-4 border-red-500 transform transition-all duration-700 ${
-                    visibleSections.has(`problem-${index}`)
-                      ? "opacity-100 translate-x-0"
-                      : "opacity-0 -translate-x-10"
-                  }`}
-                  style={{ transitionDelay: `${index * 150}ms` }}
-                >
-                  <div className="flex items-start gap-6">
-                    <div className="flex-shrink-0">
-                      <div className="bg-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">
-                        {reason.number}
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
-                        {reason.title}
-                      </h3>
-                      <p className="text-lg text-gray-600 leading-relaxed">{reason.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CV Scorer Section */}
       <section className="py-16 md:py-24 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1104,6 +1046,77 @@ export default function XperienceProLandingPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof Section */}
+      <section className="py-12 md:py-16 bg-white border-y border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900">
+            {t.socialProof.title}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {t.socialProof.stats.map((stat, index) => (
+              <div
+                key={index}
+                ref={(el) => {
+                  sectionRefs.current[`stat-${index}`] = el
+                }}
+                className={`bg-gradient-to-br from-[#005eb8] to-[#0476D7] p-8 rounded-2xl shadow-xl text-white text-center transform transition-all duration-700 ${
+                  visibleSections.has(`stat-${index}`)
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <div className="text-5xl md:text-6xl font-bold mb-2 text-[#FFBC00]">
+                  {stat.number}
+                </div>
+                <div className="text-lg md:text-xl font-medium">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Problem Section */}
+      <section className="py-16 md:py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+              {t.problem.title}
+            </h2>
+            <div className="space-y-6">
+              {t.problem.reasons.map((reason, index) => (
+                <div
+                  key={index}
+                  ref={(el) => {
+                    sectionRefs.current[`problem-${index}`] = el
+                  }}
+                  className={`bg-white p-8 rounded-xl shadow-lg border-l-4 border-red-500 transform transition-all duration-700 ${
+                    visibleSections.has(`problem-${index}`)
+                      ? "opacity-100 translate-x-0"
+                      : "opacity-0 -translate-x-10"
+                  }`}
+                  style={{ transitionDelay: `${index * 150}ms` }}
+                >
+                  <div className="flex items-start gap-6">
+                    <div className="flex-shrink-0">
+                      <div className="bg-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">
+                        {reason.number}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
+                        {reason.title}
+                      </h3>
+                      <p className="text-lg text-gray-600 leading-relaxed">{reason.description}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -1381,50 +1394,119 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Testimonials Section - Carousel */}
       <section id="testimonials" className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
             {t.testimonials.title}
           </h2>
-          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
-            {t.testimonials.items.map((testimonial, index) => (
+          <div className="relative">
+            {/* Carousel Container */}
+            <div className="overflow-hidden rounded-2xl">
+              <div 
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentTestimonialIndex * 100}%)` }}
+              >
+                {testimonialImages.map((image, index) => (
+                  <div
+                    key={index}
+                    className="min-w-full flex-shrink-0"
+                  >
+                    <div className="mx-auto max-w-4xl">
+                      <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+                        <Image
+                          src={image}
+                          alt={`Testimonial ${index + 1}`}
+                          width={800}
+                          height={600}
+                          className="w-full h-auto object-contain"
+                          priority={index === 0}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Navigation Buttons */}
+            <button
+              onClick={() => setCurrentTestimonialIndex((prev) => 
+                prev === 0 ? testimonialImages.length - 1 : prev - 1
+              )}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              aria-label="Previous testimonial"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={() => setCurrentTestimonialIndex((prev) => 
+                prev === testimonialImages.length - 1 ? 0 : prev + 1
+              )}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              aria-label="Next testimonial"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+            
+            {/* Dots Indicator */}
+            <div className="flex justify-center gap-2 mt-6">
+              {testimonialImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentTestimonialIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                    index === currentTestimonialIndex
+                      ? "bg-[#005eb8] w-8"
+                      : "bg-gray-300 hover:bg-gray-400"
+                  }`}
+                  aria-label={`Go to testimonial ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Partners Section */}
+      <section className="py-16 md:py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+            {language === "en" ? "They trusted us" : "Ils nous ont fait C*confiance"}
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 md:gap-8">
+            {[
+              "/partenaires/AIESEC.png",
+              "/partenaires/Al_Aoula_Tv_Logo.png",
+              "/partenaires/EMSI.png",
+              "/partenaires/ENCG Casa.png",
+              "/partenaires/ENCG Kenitra.png",
+              "/partenaires/ENCG Oujda.png",
+              "/partenaires/ENCG Tanger.png",
+              "/partenaires/ENCG-S.png",
+              "/partenaires/ENSA Kenitra.png",
+              "/partenaires/ENSA Tetouan.png",
+              "/partenaires/Le-Matinma.png",
+              "/partenaires/logo_alowla.png",
+              "/partenaires/logo_alowla1.png",
+              "/partenaires/Logo_groupe_ISCAE.jpg",
+              "/partenaires/Logo_iav.png",
+              "/partenaires/Logo_inpt.PNG",
+              "/partenaires/Logo_Université_Euromed_de_Fès.png",
+              "/partenaires/M24_tv_logo.jpg",
+              "/partenaires/Universite_Cadi_Ayyad.png",
+            ].map((logo, index) => (
               <div
                 key={index}
-                ref={(el) => {
-                  sectionRefs.current[`testimonial-${index}`] = el
-                }}
-                className={`bg-gradient-to-br from-gray-50 to-blue-50 p-6 md:p-8 rounded-xl shadow-lg border border-gray-200 transform transition-all duration-700 ${
-                  visibleSections.has(`testimonial-${index}`)
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-10"
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center h-24 md:h-32 group hover:scale-105"
               >
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-[#FFBC00] text-[#FFBC00]" />
-                  ))}
-                </div>
-                <Quote className="w-8 h-8 text-[#005eb8] mb-4 opacity-50" />
-                <p className="text-gray-700 mb-6 leading-relaxed italic">
-                  "{testimonial.text}"
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#005eb8] flex-shrink-0">
-                    <Image
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      width={48}
-                      height={48}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">{testimonial.name}</div>
-                    <div className="text-sm text-gray-600">{testimonial.role}</div>
-                  </div>
-                </div>
+                <Image
+                  src={logo}
+                  alt={`Partner ${index + 1}`}
+                  width={120}
+                  height={80}
+                  className="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                />
               </div>
             ))}
           </div>
@@ -1468,9 +1550,15 @@ export default function XperienceProLandingPage() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#FFBC00] to-[#e6a800] bg-clip-text text-transparent">
-            {t.header.logo}
-          </h3>
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/logo_white.png"
+              alt="XPERIENCE Logo"
+              width={200}
+              height={60}
+              className="h-12 md:h-16 w-auto"
+            />
+          </div>
           <p className="text-gray-400 mb-6">
             {language === "en"
               ? "Transform your job search. Get real results."
