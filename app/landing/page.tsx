@@ -548,7 +548,7 @@ const content: Record<Language, Content> = {
       items: [
         {
           question: "Comment j'accède au programme après le paiement ?",
-          answer: "Après le paiement, tu recevras un email avec tes identifiants de connexion et l'accès à la plateforme en ligne sous 24 heures.",
+          answer: "",
         },
         {
           question: "Est-ce adapté aux débutants ?",
@@ -560,7 +560,7 @@ const content: Record<Language, Content> = {
         },
         {
           question: "Et si je ne suis pas satisfait(e) ?",
-          answer: "Nous sommes confiants que tu vas adorer le programme. Si tu n'es pas satisfait(e) dans les 7 premiers jours, contacte-nous pour un remboursement complet.",
+          answer: "",
         },
         {
           question: "Je peux y accéder sur mobile ?",
@@ -1096,7 +1096,7 @@ export default function XperienceProLandingPage() {
                   ref={(el) => {
                     sectionRefs.current[`problem-${index}`] = el
                   }}
-                  className={`bg-white p-8 rounded-xl shadow-lg border-l-4 border-black-500 transform transition-all duration-700 ${
+                  className={`bg-white p-8 rounded-xl shadow-lg border-l-4 border-black transform transition-all duration-700 ${
                     visibleSections.has(`problem-${index}`)
                       ? "opacity-100 translate-x-0"
                       : "opacity-0 -translate-x-10"
@@ -1105,7 +1105,7 @@ export default function XperienceProLandingPage() {
                 >
                   <div className="flex items-start gap-6">
                     <div className="flex-shrink-0">
-                      <div className="bg-black-500 text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">
+                      <div className="bg-black text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">
                         {reason.number}
                       </div>
                     </div>
