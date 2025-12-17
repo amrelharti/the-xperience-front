@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Menu, X, PlayCircle, User, Eye, MessageSquare, GraduationCap } from "lucide-react"
+import { Menu, X, PlayCircle, User, Eye, MessageSquare, GraduationCap, FileCheck } from "lucide-react"
 
 interface Course {
   id: string
@@ -503,7 +503,7 @@ export default function AdminPage() {
               <p className="text-sm sm:text-base text-slate-600">Access your most important admin functions</p>
             </CardHeader>
             <CardContent className="px-4 sm:px-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
                 <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#005eb8] group">
                   <Link href="/admin/trainings">
                     <div className="p-2 sm:p-3 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-lg group-hover:scale-110 transition-transform duration-200">
@@ -542,6 +542,14 @@ export default function AdminPage() {
                       <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
                     <span className="font-semibold text-slate-700 text-xs sm:text-sm">Monitor Feed</span>
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-cyan-500 group">
+                  <Link href="/admin/cv-score-users">
+                    <div className="p-2 sm:p-3 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <FileCheck className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    </div>
+                    <span className="font-semibold text-slate-700 text-xs sm:text-sm">CV Score Users</span>
                   </Link>
                 </Button>
               </div>
