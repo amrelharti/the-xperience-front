@@ -1096,7 +1096,7 @@ export default function XperienceProLandingPage() {
                   ref={(el) => {
                     sectionRefs.current[`problem-${index}`] = el
                   }}
-                  className={`bg-white p-8 rounded-xl shadow-lg border-l-4 border-[#FFBC00]-500 transform transition-all duration-700 ${
+                  className={`bg-white p-8 rounded-xl shadow-lg border-l-4 border-black-500 transform transition-all duration-700 ${
                     visibleSections.has(`problem-${index}`)
                       ? "opacity-100 translate-x-0"
                       : "opacity-0 -translate-x-10"
@@ -1105,7 +1105,7 @@ export default function XperienceProLandingPage() {
                 >
                   <div className="flex items-start gap-6">
                     <div className="flex-shrink-0">
-                      <div className="bg-[#FFBC00]-500 text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">
+                      <div className="bg-black-500 text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">
                         {reason.number}
                       </div>
                     </div>
