@@ -916,44 +916,6 @@ export default function XperienceProLandingPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] text-white py-20 md:py-32 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)'
-          }}></div>
-        </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              {t.hero.headline}
-            </h1>
-            <p className="text-xl md:text-2xl mb-6 text-blue-100 leading-relaxed">
-              {t.hero.subheading}
-            </p>
-            <p className="text-lg mb-8 text-blue-200">
-              {t.hero.forWho}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button
-                onClick={() => scrollToSection("price")}
-                className="bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
-              >
-                {t.hero.ctaPrimary}
-                <ArrowRight className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => scrollToSection("program")}
-                className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-lg text-lg border-2 border-white/30 transition-all duration-200 flex items-center gap-2"
-              >
-                {t.hero.ctaSecondary}
-                <PlayCircle className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CV Scorer Section */}
       <section className="py-16 md:py-24 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1046,6 +1008,44 @@ export default function XperienceProLandingPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] text-white py-20 md:py-32 overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)'
+          }}></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              {t.hero.headline}
+            </h1>
+            <p className="text-xl md:text-2xl mb-6 text-blue-100 leading-relaxed">
+              {t.hero.subheading}
+            </p>
+            <p className="text-lg mb-8 text-blue-200">
+              {t.hero.forWho}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button
+                onClick={() => scrollToSection("price")}
+                className="bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
+              >
+                {t.hero.ctaPrimary}
+                <ArrowRight className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => scrollToSection("program")}
+                className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-lg text-lg border-2 border-white/30 transition-all duration-200 flex items-center gap-2"
+              >
+                {t.hero.ctaSecondary}
+                <PlayCircle className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
@@ -1405,22 +1405,22 @@ export default function XperienceProLandingPage() {
             <div className="overflow-hidden rounded-2xl">
               <div 
                 className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentTestimonialIndex * 100}%)` }}
+                style={{ transform: `translateX(-${currentTestimonialIndex * (100 / 3)}%)` }}
               >
                 {testimonialImages.map((image, index) => (
                   <div
                     key={index}
-                    className="min-w-full flex-shrink-0 flex items-center justify-center"
+                    className="min-w-[33.333%] flex-shrink-0 flex items-center justify-center px-2"
                   >
-                    <div className="mx-auto max-w-2xl w-full px-4">
-                      <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+                    <div className="w-full">
+                      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                         <Image
                           src={image}
                           alt={`Testimonial ${index + 1}`}
-                          width={600}
-                          height={400}
-                          className="w-full h-auto object-contain max-h-[500px]"
-                          priority={index === 0}
+                          width={400}
+                          height={300}
+                          className="w-full h-auto object-contain max-h-[400px]"
+                          priority={index < 3}
                         />
                       </div>
                     </div>
@@ -1432,7 +1432,7 @@ export default function XperienceProLandingPage() {
             {/* Navigation Buttons */}
             <button
               onClick={() => setCurrentTestimonialIndex((prev) => 
-                prev === 0 ? testimonialImages.length - 1 : prev - 1
+                prev === 0 ? Math.max(0, testimonialImages.length - 3) : Math.max(0, prev - 1)
               )}
               className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
               aria-label="Previous testimonial"
@@ -1441,7 +1441,7 @@ export default function XperienceProLandingPage() {
             </button>
             <button
               onClick={() => setCurrentTestimonialIndex((prev) => 
-                prev === testimonialImages.length - 1 ? 0 : prev + 1
+                prev >= testimonialImages.length - 3 ? 0 : prev + 1
               )}
               className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
               aria-label="Next testimonial"
@@ -1451,7 +1451,7 @@ export default function XperienceProLandingPage() {
             
             {/* Dots Indicator */}
             <div className="flex justify-center gap-2 mt-6">
-              {testimonialImages.map((_, index) => (
+              {Array.from({ length: Math.max(1, testimonialImages.length - 2) }).map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentTestimonialIndex(index)}
@@ -1460,7 +1460,7 @@ export default function XperienceProLandingPage() {
                       ? "bg-[#005eb8] w-8"
                       : "bg-gray-300 hover:bg-gray-400"
                   }`}
-                  aria-label={`Go to testimonial ${index + 1}`}
+                  aria-label={`Go to testimonial group ${index + 1}`}
                 />
               ))}
             </div>
@@ -1472,7 +1472,7 @@ export default function XperienceProLandingPage() {
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
-            {language === "en" ? "They trusted us" : "Ils nous ont fait C*confiance"}
+            {language === "en" ? "They trusted us" : "Ils nous ont fait confiance"}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 md:gap-8">
             {[
