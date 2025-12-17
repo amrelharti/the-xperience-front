@@ -1410,16 +1410,16 @@ export default function XperienceProLandingPage() {
                 {testimonialImages.map((image, index) => (
                   <div
                     key={index}
-                    className="min-w-full flex-shrink-0"
+                    className="min-w-full flex-shrink-0 flex items-center justify-center"
                   >
-                    <div className="mx-auto max-w-4xl">
+                    <div className="mx-auto max-w-2xl w-full px-4">
                       <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                         <Image
                           src={image}
                           alt={`Testimonial ${index + 1}`}
-                          width={800}
-                          height={600}
-                          className="w-full h-auto object-contain"
+                          width={600}
+                          height={400}
+                          className="w-full h-auto object-contain max-h-[500px]"
                           priority={index === 0}
                         />
                       </div>
