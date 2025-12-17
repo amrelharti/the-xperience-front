@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
-import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp, FileCheck, Languages, Briefcase, FileSearch } from "lucide-react"
+import { useUser } from "@/hooks/useUser"
+import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp, FileCheck, Languages, Briefcase, FileSearch, ArrowRight } from "lucide-react"
 import Navbar from "@/app/components/Navbar"
 import CVScorerChat from "@/components/CVScorerChat"
 
@@ -98,6 +100,8 @@ export default function CvScorerPage() {
   const [result, setResult] = useState<CvScoreResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
+  const { user, isLoading: userLoading } = useUser()
+  const router = useRouter()
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
     try {
@@ -946,6 +950,32 @@ export default function CvScorerPage() {
                 </CardContent>
               </Card>
             </div>
+          )}
+
+          {/* Button for non-authenticated users */}
+          {result && !userLoading && !user && (
+            <Card className="mt-8 border-2 border-primary/30 shadow-lg bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5">
+              <CardContent className="pt-8 pb-8 text-center">
+                <div className="max-w-2xl mx-auto space-y-6">
+                  <h3 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">
+                    Want to improve your CV score?
+                  </h3>
+                  <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
+                    Get personalized coaching and learn how to create a winning CV that gets you interviews. Join Xperience Pro and transform your job search.
+                  </p>
+                  <Button
+                    onClick={() => {
+                      router.push("/landing#price")
+                    }}
+                    size="lg"
+                    className="w-full sm:w-auto px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] rounded-xl bg-gradient-to-r from-[#0476D7] to-[#0068A7] hover:from-[#0068A7] hover:to-[#005A8F]"
+                  >
+                    Learn More About Xperience Pro
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           )}
       </div>
       <CVScorerChat />

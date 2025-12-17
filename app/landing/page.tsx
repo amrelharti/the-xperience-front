@@ -684,6 +684,32 @@ export default function XperienceProLandingPage() {
     }
   }, [])
 
+  // Handle hash navigation on page load
+  useEffect(() => {
+    const handleHashNavigation = () => {
+      const hash = window.location.hash
+      if (hash) {
+        const sectionId = hash.substring(1) // Remove the #
+        const element = document.getElementById(sectionId)
+        if (element) {
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: "smooth", block: "start" })
+          }, 100) // Small delay to ensure page is rendered
+        }
+      }
+    }
+
+    // Handle hash on initial load
+    handleHashNavigation()
+
+    // Handle hash changes (e.g., when navigating from another page)
+    window.addEventListener("hashchange", handleHashNavigation)
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashNavigation)
+    }
+  }, [])
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
     if (element) {
@@ -918,7 +944,7 @@ export default function XperienceProLandingPage() {
       </header>
 
       {/* CV Scorer Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <section id="cv-scorer" className="py-16 md:py-24 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
             <div
