@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
-import { useUser } from "@/hooks/useUser"
+import { useUser } from "../hooks/useUser"
 import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp, FileCheck, Languages, Briefcase, FileSearch, ArrowRight } from "lucide-react"
 import Navbar from "@/app/components/Navbar"
 import CVScorerChat from "@/components/CVScorerChat"
