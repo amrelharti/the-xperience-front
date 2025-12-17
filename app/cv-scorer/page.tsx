@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
 import { useUser } from "../hooks/useUser"
-import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp, FileCheck, Languages, Briefcase, FileSearch, ArrowRight } from "lucide-react"
+import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp, FileCheck, Languages, Briefcase, FileSearch, ArrowRight, X } from "lucide-react"
 import Navbar from "@/app/components/Navbar"
 import CVScorerChat from "@/components/CVScorerChat"
 
@@ -98,7 +98,11 @@ export default function CvScorerPage() {
   const [feedbackLanguage, setFeedbackLanguage] = useState<"FRENCH" | "ENGLISH" | "AUTO">("AUTO")
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<CvScoreResponse | null>(null)
+  const [pendingResult, setPendingResult] = useState<CvScoreResponse | null>(null) // Store result before showing form
   const [error, setError] = useState<string | null>(null)
+  const [showContactForm, setShowContactForm] = useState(false)
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "" })
+  const [submittingForm, setSubmittingForm] = useState(false)
   const { toast } = useToast()
   const { user, isLoading: userLoading } = useUser()
   const router = useRouter()
@@ -211,12 +215,20 @@ export default function CvScorerPage() {
         return
       }
 
-      setResult(data)
-      
-      toast({
-        title: "CV scored successfully",
-        description: `Your CV scored ${data.final_score}/100`,
-      })
+      // For non-authenticated users, show form first, then results
+      // For authenticated users, show results immediately
+      if (!user && !userLoading) {
+        // Store result temporarily and show form
+        setPendingResult(data)
+        setShowContactForm(true)
+      } else {
+        // Authenticated user - show results immediately
+        setResult(data)
+        toast({
+          title: "CV scored successfully",
+          description: `Your CV scored ${data.final_score}/100`,
+        })
+      }
     } catch (error) {
       console.error("Error scoring CV:", error)
       const errorMessage = error instanceof Error ? error.message : "Failed to score CV"
@@ -241,6 +253,66 @@ export default function CvScorerPage() {
     if (score >= 80) return "bg-green-100 dark:bg-green-900/20"
     if (score >= 60) return "bg-yellow-100 dark:bg-yellow-900/20"
     return "bg-red-100 dark:bg-red-900/20"
+  }
+
+  const handleContactFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setSubmittingForm(true)
+
+    try {
+      const response = await fetch("/api/cv-scorer/submit-contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          finalScore: pendingResult?.final_score || null,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: "Failed to submit contact information" }))
+        throw new Error(error.error || "Failed to submit contact information")
+      }
+
+      toast({
+        title: "Thank you!",
+        description: "Your information has been submitted successfully.",
+      })
+
+      // Hide form and show results
+      setShowContactForm(false)
+      if (pendingResult) {
+        setResult(pendingResult)
+        setPendingResult(null)
+        toast({
+          title: "CV scored successfully",
+          description: `Your CV scored ${pendingResult.final_score}/100`,
+        })
+      }
+    } catch (error) {
+      console.error("Error submitting contact form:", error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to submit contact information",
+        variant: "destructive",
+      })
+    } finally {
+      setSubmittingForm(false)
+    }
   }
 
   return (
@@ -979,6 +1051,98 @@ export default function CvScorerPage() {
           )}
       </div>
       <CVScorerChat />
+
+      {/* Contact Form Modal for Non-Authenticated Users */}
+      {showContactForm && pendingResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <Card className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto border-2">
+            <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent sticky top-0 bg-white z-10">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-2xl font-heading">Get Your CV Score</CardTitle>
+                <button
+                  onClick={() => setShowContactForm(false)}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <CardDescription className="mt-2">
+                Please provide your contact information to view your CV score results
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <form onSubmit={handleContactFormSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="contact-name" className="block text-sm font-medium text-foreground mb-2">
+                    Full Name *
+                  </label>
+                  <Input
+                    id="contact-name"
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="h-11 border-2 focus:border-primary/50 rounded-xl"
+                    placeholder="Enter your full name"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="contact-email" className="block text-sm font-medium text-foreground mb-2">
+                    Email *
+                  </label>
+                  <Input
+                    id="contact-email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="h-11 border-2 focus:border-primary/50 rounded-xl"
+                    placeholder="Enter your email"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="contact-phone" className="block text-sm font-medium text-foreground mb-2">
+                    Phone Number *
+                  </label>
+                  <Input
+                    id="contact-phone"
+                    type="tel"
+                    required
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="h-11 border-2 focus:border-primary/50 rounded-xl"
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+
+                <div className="pt-4">
+                  <Button
+                    type="submit"
+                    disabled={submittingForm}
+                    className="w-full h-12 text-base shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl bg-gradient-to-r from-[#0476D7] to-[#0068A7] hover:from-[#0068A7] hover:to-[#005A8F]"
+                    size="lg"
+                  >
+                    {submittingForm ? (
+                      <>
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        View My CV Score
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
