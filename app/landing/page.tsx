@@ -632,6 +632,7 @@ export default function XperienceProLandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0)
+  const [currentPartnerIndex, setCurrentPartnerIndex] = useState(0)
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -980,28 +981,28 @@ export default function XperienceProLandingPage() {
                   </div>
                   <div className="relative z-10 text-center text-white w-full">
                     <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                      <FileCheck className="w-20 h-20 mx-auto mb-6 text-[#FFBC00]" />
+                      <FileCheck className="w-20 h-20 mx-auto mb-6 text-white" />
                       <div className="space-y-4">
                         <div className="bg-white/20 rounded-lg p-4">
                           <div className="text-sm text-blue-200 mb-2">{language === "en" ? "Structure & Readability" : "Structure & Lisibilité"}</div>
                           <div className="w-full bg-white/20 rounded-full h-2">
-                            <div className="bg-[#FFBC00] h-2 rounded-full" style={{ width: "85%" }}></div>
+                            <div className="bg-white h-2 rounded-full" style={{ width: "85%" }}></div>
                           </div>
                         </div>
                         <div className="bg-white/20 rounded-lg p-4">
                           <div className="text-sm text-blue-200 mb-2">{language === "en" ? "Content Quality" : "Qualité du Contenu"}</div>
                           <div className="w-full bg-white/20 rounded-full h-2">
-                            <div className="bg-[#FFBC00] h-2 rounded-full" style={{ width: "78%" }}></div>
+                            <div className="bg-white h-2 rounded-full" style={{ width: "78%" }}></div>
                           </div>
                         </div>
                         <div className="bg-white/20 rounded-lg p-4">
                           <div className="text-sm text-blue-200 mb-2">{language === "en" ? "ATS Compatibility" : "Compatibilité ATS"}</div>
                           <div className="w-full bg-white/20 rounded-full h-2">
-                            <div className="bg-[#FFBC00] h-2 rounded-full" style={{ width: "92%" }}></div>
+                            <div className="bg-white h-2 rounded-full" style={{ width: "92%" }}></div>
                           </div>
                         </div>
                       </div>
-                      <div className="mt-6 text-3xl font-bold text-[#FFBC00]">
+                      <div className="mt-6 text-3xl font-bold text-white">
                         {language === "en" ? "Score: 85/100" : "Score : 85/100"}
                       </div>
                     </div>
@@ -1095,7 +1096,7 @@ export default function XperienceProLandingPage() {
                   ref={(el) => {
                     sectionRefs.current[`problem-${index}`] = el
                   }}
-                  className={`bg-white p-8 rounded-xl shadow-lg border-l-4 border-red-500 transform transition-all duration-700 ${
+                  className={`bg-white p-8 rounded-xl shadow-lg border-l-4 border-[#FFBC00]-500 transform transition-all duration-700 ${
                     visibleSections.has(`problem-${index}`)
                       ? "opacity-100 translate-x-0"
                       : "opacity-0 -translate-x-10"
@@ -1104,7 +1105,7 @@ export default function XperienceProLandingPage() {
                 >
                   <div className="flex items-start gap-6">
                     <div className="flex-shrink-0">
-                      <div className="bg-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">
+                      <div className="bg-[#FFBC00]-500 text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold">
                         {reason.number}
                       </div>
                     </div>
@@ -1468,47 +1469,77 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
-      {/* Partners Section */}
+      {/* Partners Section - Slideshow */}
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
             {language === "en" ? "They trusted us" : "Ils nous ont fait confiance"}
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 md:gap-8">
-            {[
-              "/partenaires/AIESEC.png",
-              "/partenaires/Al_Aoula_Tv_Logo.png",
-              "/partenaires/EMSI.png",
-              "/partenaires/ENCG Casa.png",
-              "/partenaires/ENCG Kenitra.png",
-              "/partenaires/ENCG Oujda.png",
-              "/partenaires/ENCG Tanger.png",
-              "/partenaires/ENCG-S.png",
-              "/partenaires/ENSA Kenitra.png",
-              "/partenaires/ENSA Tetouan.png",
-              "/partenaires/Le-Matinma.png",
-              "/partenaires/logo_alowla.png",
-              "/partenaires/logo_alowla1.png",
-              "/partenaires/Logo_groupe_ISCAE.jpg",
-              "/partenaires/Logo_iav.png",
-              "/partenaires/Logo_inpt.PNG",
-              "/partenaires/Logo_Université_Euromed_de_Fès.png",
-              "/partenaires/M24_tv_logo.jpg",
-              "/partenaires/Universite_Cadi_Ayyad.png",
-            ].map((logo, index) => (
-              <div
-                key={index}
-                className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center h-24 md:h-32 group hover:scale-105"
+          <div className="relative">
+            {/* Carousel Container */}
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentPartnerIndex * (100 / 6)}%)` }}
               >
-                <Image
-                  src={logo}
-                  alt={`Partner ${index + 1}`}
-                  width={120}
-                  height={80}
-                  className="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-                />
+                {[
+                  "/partenaires/AIESEC.png",
+                  "/partenaires/Al_Aoula_Tv_Logo.png",
+                  "/partenaires/EMSI.png",
+                  "/partenaires/ENCG Casa.png",
+                  "/partenaires/ENCG Kenitra.png",
+                  "/partenaires/ENCG Oujda.png",
+                  "/partenaires/ENCG Tanger.png",
+                  "/partenaires/ENCG-S.png",
+                  "/partenaires/ENSA Kenitra.png",
+                  "/partenaires/ENSA Tetouan.png",
+                  "/partenaires/Le-Matinma.png",
+                  "/partenaires/logo_alowla.png",
+                  "/partenaires/logo_alowla1.png",
+                  "/partenaires/Logo_groupe_ISCAE.jpg",
+                  "/partenaires/Logo_iav.png",
+                  "/partenaires/Logo_inpt.PNG",
+                  "/partenaires/Logo_Université_Euromed_de_Fès.png",
+                  "/partenaires/M24_tv_logo.jpg",
+                  "/partenaires/Universite_Cadi_Ayyad.png",
+                ].map((logo, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[16.666%] md:min-w-[16.666%] flex-shrink-0 px-2"
+                  >
+                    <div className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center h-24 md:h-32 group hover:scale-105">
+                      <Image
+                        src={logo}
+                        alt={`Partner ${index + 1}`}
+                        width={120}
+                        height={80}
+                        className="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            
+            {/* Navigation Buttons */}
+            <button
+              onClick={() => setCurrentPartnerIndex((prev) => 
+                prev === 0 ? Math.max(0, 19 - 6) : Math.max(0, prev - 1)
+              )}
+              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              aria-label="Previous partners"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setCurrentPartnerIndex((prev) => 
+                prev >= 19 - 6 ? 0 : prev + 1
+              )}
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              aria-label="Next partners"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </section>
