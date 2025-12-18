@@ -552,6 +552,14 @@ export default function AdminPage() {
                     <span className="font-semibold text-slate-700 text-xs sm:text-sm">CV Score Users</span>
                   </Link>
                 </Button>
+                <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-rose-500 group">
+                  <Link href="/admin/leads">
+                    <div className="p-2 sm:p-3 bg-gradient-to-br from-rose-500 to-rose-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    </div>
+                    <span className="font-semibold text-slate-700 text-xs sm:text-sm">Landing Page Leads</span>
+                  </Link>
+                </Button>
               </div>
             </CardContent>
           </Card>

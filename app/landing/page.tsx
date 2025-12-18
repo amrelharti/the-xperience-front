@@ -743,7 +743,7 @@ export default function XperienceProLandingPage() {
     return "212" + cleaned
   }
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     const t = content[language]
@@ -758,6 +758,30 @@ export default function XperienceProLandingPage() {
     const message = language === "en"
       ? `Hi, my name is ${formData.fullName} and I'm looking for ${lookingForText}. I chose this offer: ${formData.offer}. My phone number is ${formData.phone}.`
       : `Bonjour, je m'appelle ${formData.fullName} et je recherche ${lookingForText}. J'ai choisi cette offre : ${formData.offer}. Mon numéro de téléphone est ${formData.phone}.`
+
+    // Save to database first
+    try {
+      const response = await fetch("/api/landing-page/leads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          phone: formData.phone,
+          lookingFor: formData.lookingFor,
+          offer: formData.offer,
+        }),
+      })
+
+      if (!response.ok) {
+        console.error("Failed to save lead to database")
+        // Continue anyway - still send WhatsApp message
+      }
+    } catch (error) {
+      console.error("Error saving lead to database:", error)
+      // Continue anyway - still send WhatsApp message
+    }
 
     // Clean and format the WhatsApp number - ensure only digits
     let cleanedNumber = cleanPhoneNumber(ADMIN_WHATSAPP_NUMBER)
