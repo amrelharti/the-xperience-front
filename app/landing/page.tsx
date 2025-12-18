@@ -761,6 +761,13 @@ export default function XperienceProLandingPage() {
 
     // Save to database first
     try {
+      console.log("💾 Saving lead to database:", {
+        fullName: formData.fullName,
+        phone: formData.phone,
+        lookingFor: formData.lookingFor,
+        offer: formData.offer,
+      })
+      
       const response = await fetch("/api/landing-page/leads", {
         method: "POST",
         headers: {
@@ -774,12 +781,16 @@ export default function XperienceProLandingPage() {
         }),
       })
 
+      const responseData = await response.json()
+      
       if (!response.ok) {
-        console.error("Failed to save lead to database")
+        console.error("❌ Failed to save lead to database:", response.status, responseData)
         // Continue anyway - still send WhatsApp message
+      } else {
+        console.log("✅ Lead saved successfully:", responseData)
       }
     } catch (error) {
-      console.error("Error saving lead to database:", error)
+      console.error("❌ Error saving lead to database:", error)
       // Continue anyway - still send WhatsApp message
     }
 
