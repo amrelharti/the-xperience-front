@@ -668,6 +668,7 @@ export default function XperienceProLandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0)
+  const [testimonialsPerView, setTestimonialsPerView] = useState(3)
   const [currentPartnerIndex, setCurrentPartnerIndex] = useState(0)
   const [formData, setFormData] = useState({
     fullName: "",
@@ -711,6 +712,24 @@ export default function XperienceProLandingPage() {
       }
     }
     fetchRemainingSpots()
+    
+    // Set testimonials per view based on screen size
+    const updateTestimonialsPerView = () => {
+      if (window.innerWidth < 640) {
+        setTestimonialsPerView(1)
+      } else if (window.innerWidth < 1024) {
+        setTestimonialsPerView(2)
+      } else {
+        setTestimonialsPerView(3)
+      }
+    }
+    
+    updateTestimonialsPerView()
+    window.addEventListener('resize', updateTestimonialsPerView)
+    
+    return () => {
+      window.removeEventListener('resize', updateTestimonialsPerView)
+    }
   }, [])
   
   // Testimonial images from clients_reviews folder
@@ -1541,10 +1560,10 @@ export default function XperienceProLandingPage() {
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <span className="text-lg text-gray-500 line-through">{t.price.plans.basic.originalPrice}</span>
                 </div>
-                <div className="text-5xl md:text-6xl font-bold text-gray-900 mb-2">
+                <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-2">
                   {t.price.plans.basic.currentPrice}
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mt-4">{t.price.plans.basic.name}</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mt-4">{t.price.plans.basic.name}</h3>
               </div>
               <ul className="space-y-3 mb-8">
                 {t.price.plans.basic.features.map((feature, index) => (
@@ -1585,10 +1604,11 @@ export default function XperienceProLandingPage() {
                 </span>
               </div>
               {/* Limited Spots Badge */}
-              <div className="absolute -top-4 right-4 z-10">
-                <div className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse flex items-center gap-1">
+              <div className="absolute -top-3 sm:-top-4 right-2 sm:right-4 z-10">
+                <div className="bg-red-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  {remainingSpots} {language === "en" ? "left" : "restantes"}
+                  <span className="hidden sm:inline">{remainingSpots} {language === "en" ? "left" : "restantes"}</span>
+                  <span className="sm:hidden">{remainingSpots}</span>
                 </div>
               </div>
               
@@ -1596,10 +1616,10 @@ export default function XperienceProLandingPage() {
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <span className="text-lg text-blue-200 line-through">{t.price.plans.premium.originalPrice}</span>
                 </div>
-                <div className="text-5xl md:text-6xl font-bold text-[#FFBC00] mb-2">
+                <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#FFBC00] mb-2">
                   {t.price.plans.premium.currentPrice}
                 </div>
-                <h3 className="text-2xl font-bold text-white mt-4">{t.price.plans.premium.name}</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mt-4">{t.price.plans.premium.name}</h3>
               </div>
               <ul className="space-y-3 mb-8 text-white">
                 {t.price.plans.premium.features.map((feature, index) => (
@@ -1657,6 +1677,7 @@ export default function XperienceProLandingPage() {
                 }}
                 onTouchStart={(e) => {
                   e.preventDefault()
+                  e.stopPropagation()
                   setIsHolding(true)
                   setHoldProgress(0)
                   
@@ -1681,7 +1702,9 @@ export default function XperienceProLandingPage() {
                     }
                   }, interval)
                 }}
-                onTouchEnd={() => {
+                onTouchEnd={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
                   if (holdTimerRef.current) {
                     clearInterval(holdTimerRef.current)
                     holdTimerRef.current = null
@@ -1691,7 +1714,26 @@ export default function XperienceProLandingPage() {
                     setHoldProgress(0)
                   }
                 }}
-                className="w-full bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold py-4 px-6 rounded-lg text-lg shadow-2xl transform hover:scale-105 transition-all duration-200 group relative overflow-hidden"
+                onTouchCancel={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  if (holdTimerRef.current) {
+                    clearInterval(holdTimerRef.current)
+                    holdTimerRef.current = null
+                  }
+                  setIsHolding(false)
+                  if (holdProgress < 100) {
+                    setHoldProgress(0)
+                  }
+                }}
+                className="w-full bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold py-4 px-6 rounded-lg text-lg shadow-2xl transform hover:scale-105 transition-all duration-200 group relative overflow-hidden select-none touch-none"
+                style={{
+                  WebkitUserSelect: 'none',
+                  userSelect: 'none',
+                  WebkitTouchCallout: 'none',
+                  touchAction: 'manipulation',
+                  WebkitTapHighlightColor: 'transparent',
+                }}
               >
                 {/* Lightning/Energy Animation Overlay */}
                 {isHolding && holdProgress < 100 && (
@@ -1840,12 +1882,18 @@ export default function XperienceProLandingPage() {
             <div className="overflow-hidden rounded-2xl">
               <div 
                 className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentTestimonialIndex * (100 / 3)}%)` }}
+                style={{ 
+                  transform: `translateX(-${currentTestimonialIndex * (100 / testimonialsPerView)}%)` 
+                }}
               >
                 {testimonialImages.map((image, index) => (
                   <div
                     key={index}
-                    className="min-w-[33.333%] flex-shrink-0 flex items-center justify-center px-2"
+                    className={`flex-shrink-0 flex items-center justify-center px-2 ${
+                      testimonialsPerView === 1 ? 'min-w-full' : 
+                      testimonialsPerView === 2 ? 'min-w-[50%]' : 
+                      'min-w-[33.333%]'
+                    }`}
                   >
                     <div className="w-full">
                       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -1854,7 +1902,7 @@ export default function XperienceProLandingPage() {
                           alt={`Testimonial ${index + 1}`}
                           width={400}
                           height={300}
-                          className="w-full h-auto object-contain max-h-[400px]"
+                          className="w-full h-auto object-contain max-h-[300px] sm:max-h-[400px]"
                           priority={index < 3}
                         />
                       </div>
@@ -1867,33 +1915,33 @@ export default function XperienceProLandingPage() {
             {/* Navigation Buttons */}
             <button
               onClick={() => setCurrentTestimonialIndex((prev) => 
-                prev === 0 ? Math.max(0, testimonialImages.length - 3) : Math.max(0, prev - 1)
+                prev === 0 ? Math.max(0, testimonialImages.length - testimonialsPerView) : Math.max(0, prev - 1)
               )}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 sm:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
               aria-label="Previous testimonial"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
             <button
               onClick={() => setCurrentTestimonialIndex((prev) => 
-                prev >= testimonialImages.length - 3 ? 0 : prev + 1
+                prev >= testimonialImages.length - testimonialsPerView ? 0 : prev + 1
               )}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 sm:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
               aria-label="Next testimonial"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
             
             {/* Dots Indicator */}
             <div className="flex justify-center gap-2 mt-6">
-              {Array.from({ length: Math.max(1, testimonialImages.length - 2) }).map((_, index) => (
+              {Array.from({ length: Math.max(1, testimonialImages.length - testimonialsPerView + 1) }).map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentTestimonialIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                  className={`h-2 rounded-full transition-all duration-200 ${
                     index === currentTestimonialIndex
                       ? "bg-[#005eb8] w-8"
-                      : "bg-gray-300 hover:bg-gray-400"
+                      : "bg-gray-300 hover:bg-gray-400 w-2"
                   }`}
                   aria-label={`Go to testimonial group ${index + 1}`}
                 />
