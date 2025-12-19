@@ -689,12 +689,21 @@ export default function XperienceProLandingPage() {
   useEffect(() => {
     const fetchRemainingSpots = async () => {
       try {
-        const response = await fetch("/api/landing-page/remaining-spots", {
+        // Add timestamp to prevent caching
+        const timestamp = new Date().getTime()
+        const response = await fetch(`/api/landing-page/remaining-spots?t=${timestamp}`, {
           method: "GET",
+          cache: "no-store", // Prevent browser caching
+          headers: {
+            "Cache-Control": "no-cache",
+          },
         })
         if (response.ok) {
           const data = await response.json()
+          console.log("Fetched remaining spots:", data.remainingSpots)
           setRemainingSpots(data.remainingSpots || 12)
+        } else {
+          console.error("Failed to fetch remaining spots:", response.status)
         }
       } catch (error) {
         console.error("Error fetching remaining spots:", error)
