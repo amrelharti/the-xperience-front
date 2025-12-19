@@ -32,11 +32,19 @@ interface Content {
   }
   problem: {
     title: string
+    subtitle?: string
+    emotional?: string
+    positioning?: string
     reasons: {
       number: string
       title: string
       description: string
     }[]
+  }
+  solution: {
+    title: string
+    subtitle: string
+    points: string[]
   }
   cvScorer: {
     title: string
@@ -74,6 +82,7 @@ interface Content {
   }
   platform: {
     title: string
+    subtitle?: string
     points: string[]
   }
   whoItsFor: {
@@ -150,9 +159,9 @@ const content: Record<Language, Content> = {
       },
     },
     hero: {
-      headline: "Xperience Pro: Stop applying in the dark. Start getting real interviews.",
-      subheading: "A step-by-step program to build a winning CV, adapt it to each job, master LinkedIn, and feel confident in interviews.",
-      forWho: "For students, employees, and job seekers who are tired of sending CVs and getting no answers.",
+      headline: "Ignored by recruiters? Put an end to applications without response.",
+      subheading: "You send applications. You make efforts. But responses don't come. And you don't know why.",
+      forWho: "For candidates who want to understand what's blocking them and how to fix it.",
       ctaPrimary: "Fix My Job Search Now",
       ctaSecondary: "See How It Works",
     },
@@ -182,6 +191,15 @@ const content: Record<Language, Content> = {
           title: "You don't prepare in advance to seize opportunities",
           description: "Great opportunities pass by and you end up accepting a job you don't really want.",
         },
+      ],
+    },
+    solution: {
+      title: "Xperience Pro: The Complete Solution",
+      subtitle: "Xperience Pro is a structured 1-month program, designed for candidates who want to:",
+      points: [
+        "Identify why their applications don't lead to results",
+        "Fix what's really blocking them from the recruiter's perspective",
+        "Stop applying blindly",
       ],
     },
     cvScorer: {
@@ -256,10 +274,13 @@ const content: Record<Language, Content> = {
       ],
     },
     platform: {
-      title: "Learn on a simple, 24/7 online platform",
+      title: "Xperience Pro: A Unique Experience",
+      subtitle: "Understanding alone isn't enough. Applying alone is difficult.",
       points: [
-        "All lessons are available on an online platform.",
-        "Short videos, practical exercises, and progress tracking.",
+        "Clear video capsules, accessible at any time, to understand the real rules of recruitment and what recruiters really expect.",
+        "A 1-month structure with live sessions, concrete exercises, and guided practice.",
+        "With Xperience: you get real feedback, you know exactly what to fix, you move forward with a clear framework.",
+        "Important: Videos remain accessible even after the program ends.",
       ],
     },
     whoItsFor: {
@@ -392,22 +413,25 @@ const content: Record<Language, Content> = {
       },
     },
     hero: {
-      headline: "Xperience Pro : Arrête de postuler dans le vide. Commence à décrocher de vrais entretiens.",
-      subheading: "Un programme étape par étape pour créer un CV qui donne envie de te rencontrer, l'adapter à chaque offre, maîtriser LinkedIn et arriver préparé(e) en entretien.",
-      forWho: "Pour les étudiants, salariés et personnes en recherche d'emploi qui en ont marre d'envoyer des CV sans aucune réponse.",
+      headline: "Ignoré par les recruteurs ? Mettez fin aux candidatures sans réponse.",
+      subheading: "Vous envoyez des candidatures. Vous faites des efforts. Mais les réponses n'arrivent pas. Et vous ne savez pas pourquoi.",
+      forWho: "Pour les candidats qui veulent comprendre ce qui les bloque et comment le corriger.",
       ctaPrimary: "Corriger ce qui bloque",
       ctaSecondary: "Voir comment ça marche",
     },
     socialProof: {
-      title: "Méthode éprouvée",
+      title: "Xperience Pro: Un programme testé et approuvé",
       stats: [
-        { number: "+5000", label: "candidats accompagnés" },
+        { number: "+6000", label: "candidats accompagnés" },
         { number: "92%", label: "ont atteint leurs objectifs professionnels" },
         { number: "80%", label: "l'ont fait en moins de 3 mois" },
       ],
     },
     problem: {
-      title: "3 raisons pour lesquelles tu n'atteins pas tes objectifs professionnels",
+      title: "Vous postulez sans réponse. Vous passez parfois des entretiens, sans suite. Vous améliorez votre CV, sans impact réel.",
+      subtitle: "Le plus dur n'est pas le refus. C'est de ne pas savoir quoi corriger.",
+      emotional: "Vous voyez d'autres avancer. Parfois avec moins d'expérience. Parfois avec un parcours similaire. Et vous vous demandez : \"Pourquoi pas moi ?\"",
+      positioning: "Ce n'est pas une question de compétence. C'est une question de positionnement.",
       reasons: [
         {
           number: "01",
@@ -424,6 +448,15 @@ const content: Record<Language, Content> = {
           title: "Tu ne te prépares pas à l'avance pour saisir les opportunités",
           description: "Les bonnes opportunités te passent sous le nez et tu te contentes d'un job qui ne t'intéresse pas.",
         },
+      ],
+    },
+    solution: {
+      title: "Xperience Pro: La solution complète",
+      subtitle: "Xperience Pro est un programme structuré sur 1 mois, pensé pour les candidats qui veulent :",
+      points: [
+        "Identifier pourquoi leurs candidatures n'aboutissent pas",
+        "Corriger ce qui bloque réellement côté recruteur",
+        "Arrêter de postuler à l'aveugle",
       ],
     },
     cvScorer: {
@@ -498,10 +531,13 @@ const content: Record<Language, Content> = {
       ],
     },
     platform: {
-      title: "Une plateforme simple, accessible 24h/24",
+      title: "Xperience Pro: Une expérience unique",
+      subtitle: "Comprendre seul ne suffit pas. Appliquer seul est difficile.",
       points: [
-        "Tous les modules sont disponibles sur une plateforme en ligne.",
-        "Vidéos courtes, exercices pratiques et suivi de progression.",
+        "Des capsules vidéo claires, accessibles à tout moment, pour comprendre les règles réelles du recrutement et ce que les recruteurs attendent vraiment.",
+        "Une structure sur 1 mois avec des lives, des exercices concrets et des mises en pratique guidées.",
+        "Avec Xperience : vous avez du feedback réel, vous savez précisément quoi corriger, vous avancez avec un cadre clair.",
+        "Important: Les vidéos restent accessibles même après la fin du programme.",
       ],
     },
     whoItsFor: {
@@ -645,6 +681,12 @@ export default function XperienceProLandingPage() {
   const [holdProgress, setHoldProgress] = useState(0)
   const [isHolding, setIsHolding] = useState(false)
   const holdTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const [checklistItems, setChecklistItems] = useState<{ [key: string]: boolean }>({
+    postuleSansReponse: false,
+    corrigerBlocage: false,
+    pretAppliquer: false,
+  })
+  const [showMicroReward, setShowMicroReward] = useState(false)
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
   
   // Testimonial images from clients_reviews folder
@@ -910,6 +952,12 @@ export default function XperienceProLandingPage() {
       window.open(whatsappUrl2, "_blank", "noopener,noreferrer")
     }
     
+    // Show micro-reward
+    setShowMicroReward(true)
+    setTimeout(() => {
+      setShowMicroReward(false)
+    }, 3000)
+
     // Reset form
     setFormData({
       fullName: "",
@@ -1159,10 +1207,25 @@ export default function XperienceProLandingPage() {
       <section className="py-16 md:py-24 bg-gradient-to-br from-gray-50 via-red-50/30 to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-16">
+            <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-gray-900 leading-tight">
                 {t.problem.title}
               </h2>
+              {t.problem.subtitle && (
+                <p className="text-xl md:text-2xl font-semibold text-gray-800 mb-4 italic">
+                  {t.problem.subtitle}
+                </p>
+              )}
+              {t.problem.emotional && (
+                <p className="text-lg md:text-xl text-gray-700 mb-6 leading-relaxed">
+                  {t.problem.emotional}
+                </p>
+              )}
+              {t.problem.positioning && (
+                <p className="text-xl md:text-2xl font-bold text-[#005eb8] mb-6">
+                  {t.problem.positioning}
+                </p>
+              )}
               <div className="w-24 h-1 bg-gradient-to-r from-[#005eb8] to-[#FFBC00] mx-auto rounded-full"></div>
             </div>
             <div className="space-y-8">
@@ -1198,6 +1261,40 @@ export default function XperienceProLandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Solution Section */}
+      {t.solution && (
+        <section className="py-16 md:py-24 bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+                {t.solution.title}
+              </h2>
+              <p className="text-xl md:text-2xl mb-8 text-blue-100">
+                {t.solution.subtitle}
+              </p>
+              <div className="grid md:grid-cols-3 gap-6 mt-12">
+                {t.solution.points.map((point, index) => (
+                  <div
+                    key={index}
+                    className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 transform hover:scale-105 transition-all duration-300"
+                  >
+                    <div className="text-4xl font-bold text-[#FFBC00] mb-3">{index + 1}</div>
+                    <p className="text-lg leading-relaxed">{point}</p>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => scrollToSection("price")}
+                className="mt-12 bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto"
+              >
+                {language === "en" ? "Fix What's Blocking My Applications" : "Corriger ce qui bloque mes candidatures"}
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Trainer Section */}
       <section className="py-16 md:py-24 bg-white">
@@ -1338,19 +1435,26 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
-      {/* Platform Section */}
+      {/* Platform Section - Enhanced */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-gray-900">
-              {t.platform.title}
-            </h2>
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl shadow-lg">
-              <div className="space-y-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
+                {t.platform.title}
+              </h2>
+              {t.platform.subtitle && (
+                <p className="text-xl md:text-2xl font-semibold text-gray-700 mb-8 italic">
+                  {t.platform.subtitle}
+                </p>
+              )}
+            </div>
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 md:p-12 rounded-2xl shadow-lg">
+              <div className="space-y-6">
                 {t.platform.points.map((point, index) => (
-                  <div key={index} className="flex items-center gap-3 text-left">
-                    <CheckCircle2 className="w-6 h-6 text-[#005eb8] flex-shrink-0" />
-                    <p className="text-lg text-gray-700">{point}</p>
+                  <div key={index} className="flex items-start gap-4 text-left">
+                    <CheckCircle2 className="w-6 h-6 text-[#005eb8] flex-shrink-0 mt-1" />
+                    <p className="text-lg text-gray-700 leading-relaxed">{point}</p>
                   </div>
                 ))}
               </div>
@@ -1376,6 +1480,74 @@ export default function XperienceProLandingPage() {
                   <p className="text-lg text-gray-700 flex-1">{point}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Checklist CTA Section - Phase 3 */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+            <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900">
+              {language === "en" 
+                ? "Before you choose your plan, confirm this applies to you:"
+                : "Avant de choisir votre formule, confirmez que cela vous concerne :"
+              }
+            </h3>
+            <div className="space-y-4 mb-8">
+              <label className="flex items-center gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-[#005eb8] transition-all duration-200 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={checklistItems.postuleSansReponse}
+                  onChange={(e) => setChecklistItems({ ...checklistItems, postuleSansReponse: e.target.checked })}
+                  className="w-6 h-6 text-[#005eb8] rounded border-gray-300 focus:ring-[#005eb8] cursor-pointer"
+                />
+                <span className="text-lg text-gray-700 group-hover:text-gray-900 transition-colors">
+                  {language === "en" ? "I apply without getting responses" : "Je postule sans obtenir de réponses"}
+                </span>
+              </label>
+              <label className="flex items-center gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-[#005eb8] transition-all duration-200 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={checklistItems.corrigerBlocage}
+                  onChange={(e) => setChecklistItems({ ...checklistItems, corrigerBlocage: e.target.checked })}
+                  className="w-6 h-6 text-[#005eb8] rounded border-gray-300 focus:ring-[#005eb8] cursor-pointer"
+                />
+                <span className="text-lg text-gray-700 group-hover:text-gray-900 transition-colors">
+                  {language === "en" ? "I want to fix what's blocking me" : "Je veux corriger ce qui me bloque"}
+                </span>
+              </label>
+              <label className="flex items-center gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-[#005eb8] transition-all duration-200 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={checklistItems.pretAppliquer}
+                  onChange={(e) => setChecklistItems({ ...checklistItems, pretAppliquer: e.target.checked })}
+                  className="w-6 h-6 text-[#005eb8] rounded border-gray-300 focus:ring-[#005eb8] cursor-pointer"
+                />
+                <span className="text-lg text-gray-700 group-hover:text-gray-900 transition-colors">
+                  {language === "en" ? "I'm ready to apply what I learn" : "Je suis prêt(e) à appliquer ce que j'apprends"}
+                </span>
+              </label>
+            </div>
+            <div className="text-center">
+              <button
+                onClick={() => {
+                  const allChecked = Object.values(checklistItems).every(v => v)
+                  if (allChecked) {
+                    scrollToSection("price")
+                  }
+                }}
+                disabled={!Object.values(checklistItems).every(v => v)}
+                className={`px-8 py-4 rounded-lg text-lg font-bold transition-all duration-200 ${
+                  Object.values(checklistItems).every(v => v)
+                    ? "bg-[#005eb8] hover:bg-[#0476D7] text-white shadow-lg transform hover:scale-105 cursor-pointer"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+              >
+                {language === "en" ? "See Plans" : "Voir les formules"}
+                <ArrowRight className="w-5 h-5 inline-block ml-2" />
+              </button>
             </div>
           </div>
         </div>
@@ -1789,6 +1961,21 @@ export default function XperienceProLandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Micro-Reward Modal - Phase 3 */}
+      {showMicroReward && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className="bg-white rounded-full p-8 shadow-2xl transform animate-scale-in">
+            <div className="text-center">
+              <div className="text-6xl mb-4 animate-bounce">🎉</div>
+              <div className="text-2xl font-bold text-[#005eb8] mb-2">
+                {language === "en" ? "Great Decision!" : "Bonne décision !"}
+              </div>
+              <CheckCircle2 className="w-16 h-16 text-[#FFBC00] mx-auto" />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Exit Intent Modal */}
       {showExitIntent && (
