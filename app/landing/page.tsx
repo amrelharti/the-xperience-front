@@ -1614,7 +1614,7 @@ export default function XperienceProLandingPage() {
                   setIsHolding(true)
                   setHoldProgress(0)
                   
-                  const duration = 2000 // 2 seconds
+                  const duration = 1500 // 1.5 seconds (adjustable: 1000-2000ms)
                   const interval = 20 // Update every 20ms
                   const increment = 100 / (duration / interval)
                   
@@ -1660,7 +1660,7 @@ export default function XperienceProLandingPage() {
                   setIsHolding(true)
                   setHoldProgress(0)
                   
-                  const duration = 2000
+                  const duration = 1500 // 1.5 seconds
                   const interval = 20
                   const increment = 100 / (duration / interval)
                   
@@ -1693,18 +1693,136 @@ export default function XperienceProLandingPage() {
                 }}
                 className="w-full bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold py-4 px-6 rounded-lg text-lg shadow-2xl transform hover:scale-105 transition-all duration-200 group relative overflow-hidden"
               >
-                <span className="relative z-10 transition-all duration-200">
+                {/* Lightning/Energy Animation Overlay */}
+                {isHolding && holdProgress < 100 && (
+                  <>
+                    {/* Animated Lightning Bolts */}
+                    <div className="absolute inset-0 pointer-events-none z-20">
+                      {/* Lightning bolt 1 */}
+                      <svg
+                        className="absolute top-0 left-[20%] w-8 h-full opacity-70 animate-lightning-strike"
+                        style={{ animationDuration: '0.3s' }}
+                        viewBox="0 0 24 100"
+                        fill="none"
+                      >
+                        <path
+                          d="M12 0 L8 20 L16 25 L10 40 L18 45 L6 60 L14 65 L4 80 L20 85 L8 100"
+                          stroke="white"
+                          strokeWidth="2.5"
+                          fill="none"
+                          className="drop-shadow-[0_0_10px_rgba(255,255,255,1)]"
+                          style={{ filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.9))' }}
+                        />
+                      </svg>
+                      {/* Lightning bolt 2 */}
+                      <svg
+                        className="absolute top-0 right-[25%] w-8 h-full opacity-60 animate-lightning-strike"
+                        style={{ animationDuration: '0.4s', animationDelay: '0.15s' }}
+                        viewBox="0 0 24 100"
+                        fill="none"
+                      >
+                        <path
+                          d="M12 0 L10 15 L14 20 L8 35 L16 40 L6 55 L18 60 L4 75 L20 80 L10 100"
+                          stroke="white"
+                          strokeWidth="2.5"
+                          fill="none"
+                          className="drop-shadow-[0_0_10px_rgba(255,255,255,1)]"
+                          style={{ filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.9))' }}
+                        />
+                      </svg>
+                      {/* Lightning bolt 3 */}
+                      <svg
+                        className="absolute top-0 left-[50%] w-8 h-full opacity-50 animate-lightning-strike"
+                        style={{ animationDuration: '0.35s', animationDelay: '0.25s' }}
+                        viewBox="0 0 24 100"
+                        fill="none"
+                      >
+                        <path
+                          d="M12 0 L6 18 L18 23 L8 38 L16 43 L10 58 L14 63 L6 78 L20 83 L8 100"
+                          stroke="white"
+                          strokeWidth="2.5"
+                          fill="none"
+                          className="drop-shadow-[0_0_10px_rgba(255,255,255,1)]"
+                          style={{ filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.9))' }}
+                        />
+                      </svg>
+                      {/* Lightning bolt 4 (center) */}
+                      <svg
+                        className="absolute top-0 left-[45%] w-6 h-full opacity-80 animate-lightning-flash"
+                        style={{ animationDuration: '0.25s', animationDelay: '0.1s' }}
+                        viewBox="0 0 20 100"
+                        fill="none"
+                      >
+                        <path
+                          d="M10 0 L6 18 L14 22 L8 38 L12 42 L4 58 L16 62 L2 78 L18 82 L8 100"
+                          stroke="white"
+                          strokeWidth="3"
+                          fill="none"
+                          style={{ filter: 'drop-shadow(0 0 12px rgba(255,255,255,1))' }}
+                        />
+                      </svg>
+                    </div>
+                    
+                    {/* Electric Spark Particles */}
+                    <div className="absolute inset-0 pointer-events-none z-20">
+                      {[...Array(15)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="absolute w-2 h-2 bg-white rounded-full animate-electric-spark"
+                          style={{
+                            left: `${10 + Math.random() * 80}%`,
+                            top: `${10 + Math.random() * 80}%`,
+                            animationDelay: `${Math.random() * 0.6}s`,
+                            animationDuration: `${0.4 + Math.random() * 0.4}s`,
+                            boxShadow: '0 0 8px 3px rgba(255, 255, 255, 1), 0 0 12px 4px rgba(255, 255, 255, 0.6)',
+                          }}
+                        />
+                      ))}
+                    </div>
+                    
+                    {/* Glowing Pulse Effect */}
+                    <div 
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-lightning-flash z-10"
+                      style={{ 
+                        animationDuration: '0.4s',
+                        background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)`,
+                      }}
+                    />
+                    
+                    {/* Energy Wave Effect */}
+                    <div 
+                      className="absolute inset-0 z-10 animate-energy-pulse"
+                      style={{
+                        background: `radial-gradient(circle at ${holdProgress}% 50%, rgba(255,255,255,0.4) 0%, transparent 60%)`,
+                      }}
+                    />
+                    
+                    {/* Shimmer Effect */}
+                    <div 
+                      className="absolute inset-0 z-10"
+                      style={{
+                        background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) ${holdProgress}%, transparent 100%)`,
+                        animation: 'shimmer 1s ease-in-out infinite',
+                      }}
+                    />
+                  </>
+                )}
+                
+                {/* Progress Bar Background */}
+                {isHolding && (
+                  <div 
+                    className="absolute inset-0 bg-[#e6a800] transition-all duration-20 ease-linear z-0"
+                    style={{ width: `${holdProgress}%` }}
+                  />
+                )}
+                
+                {/* Button Text */}
+                <span className="relative z-30 transition-all duration-200 font-bold">
                   {isHolding && holdProgress < 100
                     ? (language === "en" ? `Hold to confirm... ${Math.round(holdProgress)}%` : `Maintenez pour confirmer... ${Math.round(holdProgress)}%`)
                     : (language === "en" ? "Choose Premium" : "Choisir Premium")
                   }
                 </span>
-                {isHolding && (
-                  <div 
-                    className="absolute inset-0 bg-[#e6a800] transition-all duration-20 ease-linear"
-                    style={{ width: `${holdProgress}%` }}
-                  />
-                )}
               </button>
             </div>
           </div>
