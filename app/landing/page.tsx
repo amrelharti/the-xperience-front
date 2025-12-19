@@ -682,8 +682,27 @@ export default function XperienceProLandingPage() {
   const [isHolding, setIsHolding] = useState(false)
   const holdTimerRef = useRef<NodeJS.Timeout | null>(null)
   const [showMicroReward, setShowMicroReward] = useState(false)
-  const [remainingSpots] = useState(12) // Limited spots counter
+  const [remainingSpots, setRemainingSpots] = useState(12) // Limited spots counter - fetched from backend
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
+  
+  // Fetch remaining spots from backend
+  useEffect(() => {
+    const fetchRemainingSpots = async () => {
+      try {
+        const response = await fetch("/api/landing-page/remaining-spots", {
+          method: "GET",
+        })
+        if (response.ok) {
+          const data = await response.json()
+          setRemainingSpots(data.remainingSpots || 12)
+        }
+      } catch (error) {
+        console.error("Error fetching remaining spots:", error)
+        // Keep default value of 12
+      }
+    }
+    fetchRemainingSpots()
+  }, [])
   
   // Testimonial images from clients_reviews folder
   const testimonialImages = [
@@ -1150,18 +1169,9 @@ export default function XperienceProLandingPage() {
       {/* Social Proof Section */}
       <section className="py-12 md:py-16 bg-white border-y border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 text-gray-900">
-              {t.socialProof.title}
-            </h2>
-            {/* Limited Spots Indicator */}
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-full text-sm font-semibold">
-              🔥 {language === "en" 
-                ? `${remainingSpots} spots remaining this month` 
-                : `${remainingSpots} places restantes ce mois-ci`
-              }
-            </div>
-          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900">
+            {t.socialProof.title}
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {t.socialProof.stats.map((stat, index) => {
               const isVisible = visibleSections.has(`stat-${index}`)
