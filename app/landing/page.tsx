@@ -153,8 +153,8 @@ const content: Record<Language, Content> = {
       headline: "Xperience Pro: Stop applying in the dark. Start getting real interviews.",
       subheading: "A step-by-step program to build a winning CV, adapt it to each job, master LinkedIn, and feel confident in interviews.",
       forWho: "For students, employees, and job seekers who are tired of sending CVs and getting no answers.",
-      ctaPrimary: "Join Xperience Pro",
-      ctaSecondary: "See what's inside",
+      ctaPrimary: "Fix My Job Search Now",
+      ctaSecondary: "See How It Works",
     },
     socialProof: {
       title: "Proven Method",
@@ -395,8 +395,8 @@ const content: Record<Language, Content> = {
       headline: "Xperience Pro : Arrête de postuler dans le vide. Commence à décrocher de vrais entretiens.",
       subheading: "Un programme étape par étape pour créer un CV qui donne envie de te rencontrer, l'adapter à chaque offre, maîtriser LinkedIn et arriver préparé(e) en entretien.",
       forWho: "Pour les étudiants, salariés et personnes en recherche d'emploi qui en ont marre d'envoyer des CV sans aucune réponse.",
-      ctaPrimary: "Rejoindre Xperience Pro ",
-      ctaSecondary: "Découvrir le programme",
+      ctaPrimary: "Corriger ce qui bloque",
+      ctaSecondary: "Voir comment ça marche",
     },
     socialProof: {
       title: "Méthode éprouvée",
@@ -639,6 +639,9 @@ export default function XperienceProLandingPage() {
     lookingFor: "",
     offer: "",
   })
+  const [showExitIntent, setShowExitIntent] = useState(false)
+  const [animatedStats, setAnimatedStats] = useState<{ [key: number]: number }>({})
+  const [ctaHoverState, setCtaHoverState] = useState<{ [key: string]: boolean }>({})
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
   
   // Testimonial images from clients_reviews folder
@@ -657,6 +660,64 @@ export default function XperienceProLandingPage() {
   const ADMIN_WHATSAPP_NUMBER = "212773213060"
 
   const t = content[language]
+
+  // Animate stats when they become visible
+  useEffect(() => {
+    const animateStat = (index: number, targetValue: number, isPercentage: boolean) => {
+      const duration = 2000 // 2 seconds
+      const steps = 60
+      const increment = targetValue / steps
+      let current = 0
+      let step = 0
+
+      const timer = setInterval(() => {
+        step++
+        current = Math.min(current + increment, targetValue)
+        
+        if (isPercentage) {
+          setAnimatedStats((prev) => ({ ...prev, [index]: Math.round(current) }))
+        } else {
+          setAnimatedStats((prev) => ({ ...prev, [index]: Math.round(current) }))
+        }
+
+        if (step >= steps) {
+          clearInterval(timer)
+          setAnimatedStats((prev) => ({ ...prev, [index]: targetValue }))
+        }
+      }, duration / steps)
+    }
+
+    // Parse and animate stats when they become visible
+    t.socialProof.stats.forEach((stat, index) => {
+      const statKey = `stat-${index}`
+      if (visibleSections.has(statKey) && !animatedStats[index]) {
+        const numberStr = stat.number.replace(/[^0-9.]/g, '')
+        const numValue = parseFloat(numberStr)
+        
+        if (stat.number.includes('%')) {
+          animateStat(index, numValue, true)
+        } else if (stat.number.includes('+')) {
+          // For numbers like +5000, animate to 5000
+          animateStat(index, numValue, false)
+        }
+      }
+    })
+  }, [visibleSections, t.socialProof.stats, animatedStats])
+
+  // Exit intent detection
+  useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      // Only trigger if mouse is moving towards top of screen (trying to close tab)
+      if (e.clientY <= 0 && !showExitIntent) {
+        setShowExitIntent(true)
+      }
+    }
+
+    document.addEventListener('mouseleave', handleMouseLeave)
+    return () => {
+      document.removeEventListener('mouseleave', handleMouseLeave)
+    }
+  }, [showExitIntent])
 
   useEffect(() => {
     const observers: IntersectionObserver[] = []
@@ -1096,17 +1157,31 @@ export default function XperienceProLandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
                 onClick={() => scrollToSection("price")}
-                className="bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
+                onMouseEnter={() => setCtaHoverState({ ...ctaHoverState, heroPrimary: true })}
+                onMouseLeave={() => setCtaHoverState({ ...ctaHoverState, heroPrimary: false })}
+                className="bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2 group"
               >
-                {t.hero.ctaPrimary}
-                <ArrowRight className="w-5 h-5" />
+                <span className="transition-all duration-200">
+                  {ctaHoverState.heroPrimary 
+                    ? (language === "en" ? "Fix My Job Search Now" : "Corriger ce qui bloque")
+                    : t.hero.ctaPrimary
+                  }
+                </span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
               </button>
               <button
                 onClick={() => scrollToSection("program")}
-                className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-lg text-lg border-2 border-white/30 transition-all duration-200 flex items-center gap-2"
+                onMouseEnter={() => setCtaHoverState({ ...ctaHoverState, heroSecondary: true })}
+                onMouseLeave={() => setCtaHoverState({ ...ctaHoverState, heroSecondary: false })}
+                className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-lg text-lg border-2 border-white/30 transition-all duration-200 flex items-center gap-2 group"
               >
-                {t.hero.ctaSecondary}
-                <PlayCircle className="w-5 h-5" />
+                <span className="transition-all duration-200">
+                  {ctaHoverState.heroSecondary
+                    ? (language === "en" ? "See How It Works" : "Voir comment ça marche")
+                    : t.hero.ctaSecondary
+                  }
+                </span>
+                <PlayCircle className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
               </button>
             </div>
           </div>
@@ -1120,25 +1195,56 @@ export default function XperienceProLandingPage() {
             {t.socialProof.title}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {t.socialProof.stats.map((stat, index) => (
-              <div
-                key={index}
-                ref={(el) => {
-                  sectionRefs.current[`stat-${index}`] = el
-                }}
-                className={`bg-gradient-to-br from-[#005eb8] to-[#0476D7] p-8 rounded-2xl shadow-xl text-white text-center transform transition-all duration-700 ${
-                  visibleSections.has(`stat-${index}`)
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-10"
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
-              >
-                <div className="text-5xl md:text-6xl font-bold mb-2 text-[#FFBC00]">
-                  {stat.number}
+            {t.socialProof.stats.map((stat, index) => {
+              const isVisible = visibleSections.has(`stat-${index}`)
+              const animatedValue = animatedStats[index] ?? 0
+              const isPercentage = stat.number.includes('%')
+              const hasPlus = stat.number.includes('+')
+              
+              // Format the displayed number
+              let displayNumber = stat.number
+              if (isVisible && animatedValue > 0) {
+                if (isPercentage) {
+                  displayNumber = `${animatedValue}%`
+                } else if (hasPlus) {
+                  displayNumber = `+${animatedValue.toLocaleString()}`
+                } else {
+                  displayNumber = animatedValue.toString()
+                }
+              }
+
+              // Calculate progress bar percentage
+              const numberStr = stat.number.replace(/[^0-9.]/g, '')
+              const maxValue = parseFloat(numberStr)
+              const progressPercentage = isVisible && maxValue > 0 ? (animatedValue / maxValue) * 100 : 0
+
+              return (
+                <div
+                  key={index}
+                  ref={(el) => {
+                    sectionRefs.current[`stat-${index}`] = el
+                  }}
+                  className={`bg-gradient-to-br from-[#005eb8] to-[#0476D7] p-8 rounded-2xl shadow-xl text-white text-center transform transition-all duration-700 ${
+                    isVisible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-10"
+                  }`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
+                >
+                  <div className="text-5xl md:text-6xl font-bold mb-2 text-[#FFBC00]">
+                    {displayNumber}
+                  </div>
+                  <div className="text-lg md:text-xl font-medium mb-4">{stat.label}</div>
+                  {/* Animated Progress Bar */}
+                  <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-[#FFBC00] h-2 rounded-full transition-all duration-1000 ease-out"
+                      style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="text-lg md:text-xl font-medium">{stat.label}</div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -1406,9 +1512,16 @@ export default function XperienceProLandingPage() {
                   setFormData({ ...formData, offer: t.form.offerOptions.xperience })
                   setShowForm(true)
                 }}
-                className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 px-6 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200"
+                onMouseEnter={() => setCtaHoverState({ ...ctaHoverState, basicPlan: true })}
+                onMouseLeave={() => setCtaHoverState({ ...ctaHoverState, basicPlan: false })}
+                className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 px-6 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 group"
               >
-                {language === "en" ? "Choose Basic" : "Choisir Basic"}
+                <span className="transition-all duration-200">
+                  {ctaHoverState.basicPlan
+                    ? (language === "en" ? "Start Fixing My CV" : "Commencer à corriger")
+                    : (language === "en" ? "Choose Basic" : "Choisir Basic")
+                  }
+                </span>
               </button>
             </div>
 
@@ -1447,9 +1560,16 @@ export default function XperienceProLandingPage() {
                   setFormData({ ...formData, offer: t.form.offerOptions.xperiencePro })
                   setShowForm(true)
                 }}
-                className="w-full bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold py-4 px-6 rounded-lg text-lg shadow-2xl transform hover:scale-105 transition-all duration-200"
+                onMouseEnter={() => setCtaHoverState({ ...ctaHoverState, premiumPlan: true })}
+                onMouseLeave={() => setCtaHoverState({ ...ctaHoverState, premiumPlan: false })}
+                className="w-full bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold py-4 px-6 rounded-lg text-lg shadow-2xl transform hover:scale-105 transition-all duration-200 group"
               >
-                {language === "en" ? "Choose Premium" : "Choisir Premium"}
+                <span className="transition-all duration-200">
+                  {ctaHoverState.premiumPlan
+                    ? (language === "en" ? "Fix My Job Search Now" : "Corriger ce qui bloque")
+                    : (language === "en" ? "Choose Premium" : "Choisir Premium")
+                  }
+                </span>
               </button>
             </div>
           </div>
@@ -1678,6 +1798,61 @@ export default function XperienceProLandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Exit Intent Modal */}
+      {showExitIntent && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in"
+          onClick={() => setShowExitIntent(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-scale-in relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowExitIntent(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="text-center">
+              <div className="mb-4">
+                <MessageSquare className="w-16 h-16 text-[#005eb8] mx-auto" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                {language === "en" 
+                  ? "You're one click away from fixing what's blocking you"
+                  : "Vous êtes à un clic de corriger ce qui vous bloque"
+                }
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {language === "en"
+                  ? "Don't let another opportunity pass by. See how we help candidates get real results."
+                  : "Ne laissez pas passer une autre opportunité. Découvrez comment nous aidons les candidats à obtenir de vrais résultats."
+                }
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => {
+                    setShowExitIntent(false)
+                    scrollToSection("price")
+                  }}
+                  className="flex-1 bg-[#005eb8] hover:bg-[#0476D7] text-white font-bold px-6 py-3 rounded-lg transition-all duration-200"
+                >
+                  {language === "en" ? "See Offers" : "Voir les offres"}
+                </button>
+                <button
+                  onClick={() => setShowExitIntent(false)}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-6 py-3 rounded-lg transition-all duration-200"
+                >
+                  {language === "en" ? "Maybe Later" : "Peut-être plus tard"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Form Modal */}
       {showForm && (
