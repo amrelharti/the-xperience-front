@@ -681,12 +681,8 @@ export default function XperienceProLandingPage() {
   const [holdProgress, setHoldProgress] = useState(0)
   const [isHolding, setIsHolding] = useState(false)
   const holdTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const [checklistItems, setChecklistItems] = useState<{ [key: string]: boolean }>({
-    postuleSansReponse: false,
-    corrigerBlocage: false,
-    pretAppliquer: false,
-  })
   const [showMicroReward, setShowMicroReward] = useState(false)
+  const [remainingSpots] = useState(12) // Limited spots counter
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
   
   // Testimonial images from clients_reviews folder
@@ -1105,9 +1101,18 @@ export default function XperienceProLandingPage() {
             <p className="text-xl md:text-2xl mb-6 text-blue-100 leading-relaxed">
               {t.hero.subheading}
             </p>
-            <p className="text-lg mb-8 text-blue-200">
+            <p className="text-lg mb-6 text-blue-200">
               {t.hero.forWho}
             </p>
+            {/* Limited Spots Badge */}
+            <div className="mb-8 flex justify-center">
+              <div className="bg-[#FFBC00] text-gray-900 px-6 py-2 rounded-full text-sm md:text-base font-bold shadow-lg animate-pulse">
+                ⚡ {language === "en" 
+                  ? `Only ${remainingSpots} spots left this month!` 
+                  : `Il ne reste que ${remainingSpots} places ce mois-ci !`
+                }
+              </div>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
                 onClick={() => scrollToSection("price")}
@@ -1145,9 +1150,18 @@ export default function XperienceProLandingPage() {
       {/* Social Proof Section */}
       <section className="py-12 md:py-16 bg-white border-y border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900">
-            {t.socialProof.title}
-          </h2>
+          <div className="flex flex-col items-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 text-gray-900">
+              {t.socialProof.title}
+            </h2>
+            {/* Limited Spots Indicator */}
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-full text-sm font-semibold">
+              🔥 {language === "en" 
+                ? `${remainingSpots} spots remaining this month` 
+                : `${remainingSpots} places restantes ce mois-ci`
+              }
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {t.socialProof.stats.map((stat, index) => {
               const isVisible = visibleSections.has(`stat-${index}`)
@@ -1485,74 +1499,6 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
-      {/* Checklist CTA Section - Phase 3 */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-            <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900">
-              {language === "en" 
-                ? "Before you choose your plan, confirm this applies to you:"
-                : "Avant de choisir votre formule, confirmez que cela vous concerne :"
-              }
-            </h3>
-            <div className="space-y-4 mb-8">
-              <label className="flex items-center gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-[#005eb8] transition-all duration-200 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={checklistItems.postuleSansReponse}
-                  onChange={(e) => setChecklistItems({ ...checklistItems, postuleSansReponse: e.target.checked })}
-                  className="w-6 h-6 text-[#005eb8] rounded border-gray-300 focus:ring-[#005eb8] cursor-pointer"
-                />
-                <span className="text-lg text-gray-700 group-hover:text-gray-900 transition-colors">
-                  {language === "en" ? "I apply without getting responses" : "Je postule sans obtenir de réponses"}
-                </span>
-              </label>
-              <label className="flex items-center gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-[#005eb8] transition-all duration-200 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={checklistItems.corrigerBlocage}
-                  onChange={(e) => setChecklistItems({ ...checklistItems, corrigerBlocage: e.target.checked })}
-                  className="w-6 h-6 text-[#005eb8] rounded border-gray-300 focus:ring-[#005eb8] cursor-pointer"
-                />
-                <span className="text-lg text-gray-700 group-hover:text-gray-900 transition-colors">
-                  {language === "en" ? "I want to fix what's blocking me" : "Je veux corriger ce qui me bloque"}
-                </span>
-              </label>
-              <label className="flex items-center gap-4 p-4 rounded-lg border-2 border-gray-200 hover:border-[#005eb8] transition-all duration-200 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={checklistItems.pretAppliquer}
-                  onChange={(e) => setChecklistItems({ ...checklistItems, pretAppliquer: e.target.checked })}
-                  className="w-6 h-6 text-[#005eb8] rounded border-gray-300 focus:ring-[#005eb8] cursor-pointer"
-                />
-                <span className="text-lg text-gray-700 group-hover:text-gray-900 transition-colors">
-                  {language === "en" ? "I'm ready to apply what I learn" : "Je suis prêt(e) à appliquer ce que j'apprends"}
-                </span>
-              </label>
-            </div>
-            <div className="text-center">
-              <button
-                onClick={() => {
-                  const allChecked = Object.values(checklistItems).every(v => v)
-                  if (allChecked) {
-                    scrollToSection("price")
-                  }
-                }}
-                disabled={!Object.values(checklistItems).every(v => v)}
-                className={`px-8 py-4 rounded-lg text-lg font-bold transition-all duration-200 ${
-                  Object.values(checklistItems).every(v => v)
-                    ? "bg-[#005eb8] hover:bg-[#0476D7] text-white shadow-lg transform hover:scale-105 cursor-pointer"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-              >
-                {language === "en" ? "See Plans" : "Voir les formules"}
-                <ArrowRight className="w-5 h-5 inline-block ml-2" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Price Section */}
       <section
         id="price"
@@ -1614,10 +1560,17 @@ export default function XperienceProLandingPage() {
               style={{ transitionDelay: "100ms" }}
             >
               {/* Special Offer Badge */}
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
                 <span className="bg-[#FFBC00] text-gray-900 font-bold px-4 py-1 rounded-full text-sm shadow-lg">
                   {t.price.plans.premium.specialOffer}
                 </span>
+              </div>
+              {/* Limited Spots Badge */}
+              <div className="absolute -top-4 right-4 z-10">
+                <div className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {remainingSpots} {language === "en" ? "left" : "restantes"}
+                </div>
               </div>
               
               <div className="text-center mb-6 text-white">
