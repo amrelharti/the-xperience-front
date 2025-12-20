@@ -311,7 +311,7 @@ const content: Record<Language, Content> = {
         premium: {
           name: "COACHING PREMIUM",
           originalPrice: "1800 DH",
-          currentPrice: "1200 DH",
+          currentPrice: "1199 DH",
           specialOffer: "RECOMMENDED",
           description: "Will help you correct all the key points that influence the recruiter's decision.",
           features: [
@@ -406,7 +406,7 @@ const content: Record<Language, Content> = {
         reconversion: "Reconversion Professionnelle",
       },
       offerOptions: {
-        xperiencePro: "COACHING PREMIUM - 1200 DH",
+        xperiencePro: "COACHING PREMIUM - 1199 DH",
         xperience: "COACHING BASIC - 800 DH",
       },
     },
@@ -571,7 +571,7 @@ const content: Record<Language, Content> = {
         premium: {
           name: "COACHING PREMIUM",
           originalPrice: "1800 DH",
-          currentPrice: "1200 DH",
+          currentPrice: "1199 DH",
           specialOffer: "RECOMMANDÉ",
           description: "Va vous aider à corriger l'ensemble des points clés qui influencent la décision du recruteur.",
           features: [
@@ -666,7 +666,7 @@ const content: Record<Language, Content> = {
         reconversion: "Reconversion Professionnelle",
       },
       offerOptions: {
-        xperiencePro: "COACHING PREMIUM - 1200 DH",
+        xperiencePro: "COACHING PREMIUM - 1199 DH",
         xperience: "COACHING BASIC - 800 DH",
       },
     },
@@ -1374,8 +1374,9 @@ export default function XperienceProLandingPage() {
               </div>
               <button
                 onClick={() => scrollToSection("price")}
-                className="mt-12 bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto"
+                className="mt-12 bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto relative"
               >
+                <span className="absolute -left-10 text-2xl animate-emoji-pulse">👆</span>
                 {language === "en" ? "Fix What's Blocking My Applications" : "Corriger ce qui bloque mes candidatures"}
                 <ArrowRight className="w-5 h-5" />
               </button>
@@ -1596,7 +1597,7 @@ export default function XperienceProLandingPage() {
               <ul className="space-y-3 mb-8">
                 {t.price.plans.basic.features.map((feature, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-gray-600 text-sm leading-relaxed">- {feature}</span>
+                    <span className="text-gray-600 text-sm leading-relaxed">o {feature}</span>
                   </li>
                 ))}
               </ul>
@@ -1611,8 +1612,8 @@ export default function XperienceProLandingPage() {
               >
                 <span className="transition-all duration-200">
                   {ctaHoverState.basicPlan
-                    ? (language === "en" ? "Start Fixing My CV" : "Commencer à corriger")
-                    : (language === "en" ? "Choose Basic" : "Choisir Basic")
+                    ? (language === "en" ? "Click to choose Basic offer" : "Cliquer pour choisir l'offre Basic")
+                    : (language === "en" ? "Click to choose Basic offer" : "Cliquer pour choisir l'offre Basic")
                   }
                 </span>
               </button>
@@ -1912,7 +1913,7 @@ export default function XperienceProLandingPage() {
                 <span className="relative z-30 transition-all duration-200 font-bold">
                   {isHolding && holdProgress < 100
                     ? (language === "en" ? `Hold to confirm... ${Math.round(holdProgress)}%` : `Maintenez pour confirmer... ${Math.round(holdProgress)}%`)
-                    : (language === "en" ? "Maintain to choose premium" : "Maintenir pour choisir premium")
+                    : (language === "en" ? "Click to choose premi" : "Cliquer pour choisir l'offre premium")
                   }
                 </span>
               </button>
