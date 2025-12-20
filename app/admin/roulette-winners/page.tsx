@@ -8,7 +8,7 @@ import { useUser } from "../../hooks/useUser"
 import UserDropdown from "../../components/UserDropdown"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Menu, X, Trophy, ArrowLeft, Calendar, Gift, Key } from "lucide-react"
+import { Menu, X, Trophy, ArrowLeft, Calendar, Gift, Key, User, Trash2 } from "lucide-react"
 
 interface RouletteWinner {
   id: string

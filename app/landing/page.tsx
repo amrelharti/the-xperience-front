@@ -96,6 +96,7 @@ interface Content {
         name: string
         originalPrice: string
         currentPrice: string
+        description?: string
         features: string[]
       }
       premium: {
@@ -103,6 +104,7 @@ interface Content {
         originalPrice: string
         currentPrice: string
         specialOffer: string
+        description?: string
         features: string[]
       }
     }
@@ -297,27 +299,34 @@ const content: Record<Language, Content> = {
         basic: {
           name: "COACHING BASIC",
           originalPrice: "1000 DH",
-          currentPrice: "700 DH",
+          currentPrice: "800 DH",
+          description: "A first step to test our program",
           features: [
-            "Access to a single module of the program. You choose between:",
-            "Mastered interview techniques",
-            "Professional CV",
-            "Personal branding and analysis of offers on LinkedIn",
+            "The Basic Coaching gives access to one module of the program, your choice:",
+            "• Professional CV",
+            "• Interview techniques",
+            "• Personal branding and LinkedIn",
           ],
         },
         premium: {
           name: "COACHING PREMIUM",
           originalPrice: "1500 DH",
-          currentPrice: "999 DH",
-          specialOffer: "SPECIAL OFFER",
+          currentPrice: "1199 DH",
+          specialOffer: "RECOMMENDED",
+          description: "Will help you correct all the key points that influence the recruiter's decision.",
           features: [
-            "Access to all modules of the program:",
-            "Professional CV",
-            "Mastered interview techniques",
-            "Personal branding and analysis of offers on LinkedIn",
-            "Free ebooks and resources",
-            "Regular WhatsApp follow-up",
-            "1 month of training: 4 live sessions and 18 recorded capsules",
+            "CV",
+            "  o Clear, readable and quickly understandable CV",
+            "  o Capable of passing the first screening",
+            "Interviews",
+            "  o Structured and relevant answers",
+            "  o Better understanding of what the recruiter really expects",
+            "LinkedIn",
+            "  o Profile optimization",
+            "  o Content creation strategy",
+            "Support & follow-up",
+            "  o Personalized live feedback and on WhatsApp",
+            "  o Resources and application exercises",
           ],
         },
       },
@@ -397,8 +406,8 @@ const content: Record<Language, Content> = {
         reconversion: "Reconversion Professionnelle",
       },
       offerOptions: {
-        xperiencePro: "COACHING PREMIUM - 999 DH",
-        xperience: "COACHING BASIC - 700 DH",
+        xperiencePro: "COACHING PREMIUM - 1199 DH",
+        xperience: "COACHING BASIC - 800 DH",
       },
     },
   },
@@ -551,27 +560,34 @@ const content: Record<Language, Content> = {
         basic: {
           name: "COACHING BASIC",
           originalPrice: "1000 DH",
-          currentPrice: "700 DH",
+          currentPrice: "800 DH",
+          description: "Une première étape pour tester notre programme",
           features: [
-            "Accès à un seul module du programme. Tu choisis entre:",
-            "Techniques d'entretien maîtrisées",
-            "CV professionnel",
-            "Personal branding et analyse des offres sur LinkedIn",
+            "Le Coaching Basic donne accès à un seul module du programme, au choix :",
+            "• CV professionnel",
+            "• Techniques d'entretien",
+            "• Personal branding et LinkedIn",
           ],
         },
         premium: {
           name: "COACHING PREMIUM",
           originalPrice: "1500 DH",
-          currentPrice: "999 DH",
-          specialOffer: "OFFRE SPÉCIALE",
+          currentPrice: "1199 DH",
+          specialOffer: "RECOMMANDÉ",
+          description: "Va vous aider à corriger l'ensemble des points clés qui influencent la décision du recruteur.",
           features: [
-            "Accès à l'ensemble des modules du programme:",
-            "CV professionnel",
-            "Techniques d'entretien maîtrisées",
-            "Personal branding et analyse des offres sur LinkedIn",
-            "Ebooks et ressources gratuites",
-            "Suivi régulier sur Whatsapp",
-            "1 mois de formation: 4 séances live et 18 capsules enregistrées",
+            "CV",
+            "  o CV clair, lisible et compréhensible rapidement",
+            "  o Capable de passer le premier tri",
+            "Entretiens",
+            "  o Réponses structurées et pertinentes",
+            "  o Meilleure compréhension de ce que le recruteur attend vraiment",
+            "LinkedIn",
+            "  o Optimisation du profil",
+            "  o Stratégie de création de contenu",
+            "Accompagnement & suivi",
+            "  o Feedback personnalisé live et sur WhatsApp",
+            "  o Ressources et exercices d'application",
           ],
         },
       },
@@ -651,8 +667,8 @@ const content: Record<Language, Content> = {
         reconversion: "Reconversion Professionnelle",
       },
       offerOptions: {
-        xperiencePro: "COACHING PREMIUM - 999 DH",
-        xperience: "COACHING BASIC - 700 DH",
+        xperiencePro: "COACHING PREMIUM - 1199 DH",
+        xperience: "COACHING BASIC - 800 DH",
       },
     },
   },
@@ -1562,6 +1578,9 @@ export default function XperienceProLandingPage() {
                   {t.price.plans.basic.currentPrice}
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mt-4">{t.price.plans.basic.name}</h3>
+                {t.price.plans.basic.description && (
+                  <p className="text-gray-600 text-sm mt-2 italic">{t.price.plans.basic.description}</p>
+                )}
               </div>
               <ul className="space-y-3 mb-8">
                 {t.price.plans.basic.features.map((feature, index) => (
@@ -1618,6 +1637,9 @@ export default function XperienceProLandingPage() {
                   {t.price.plans.premium.currentPrice}
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-white mt-4">{t.price.plans.premium.name}</h3>
+                {t.price.plans.premium.description && (
+                  <p className="text-blue-100 text-sm mt-2 italic">{t.price.plans.premium.description}</p>
+                )}
               </div>
               <ul className="space-y-3 mb-8 text-white">
                 {t.price.plans.premium.features.map((feature, index) => (
@@ -1860,7 +1882,7 @@ export default function XperienceProLandingPage() {
                 <span className="relative z-30 transition-all duration-200 font-bold">
                   {isHolding && holdProgress < 100
                     ? (language === "en" ? `Hold to confirm... ${Math.round(holdProgress)}%` : `Maintenez pour confirmer... ${Math.round(holdProgress)}%`)
-                    : (language === "en" ? "Maintain to choose premium" : "Maintenir pour Choisir premium")
+                    : (language === "en" ? "Maintain to choose premium" : "Maintenir pour choisir premium")
                   }
                 </span>
               </button>
@@ -2099,7 +2121,7 @@ export default function XperienceProLandingPage() {
             <div className="flex-shrink-0 order-2 lg:order-1">
               <div className="relative">
                 <div className="absolute -inset-4 bg-gradient-to-br from-[#FFD700]/30 via-[#008000]/30 to-[#FF0000]/30 rounded-3xl blur-2xl transform rotate-6 animate-pulse"></div>
-                <div className="relative bg-gradient-to-br from-red-600 to-red-700 rounded-2xl p-6 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+                <div className="relative  transform hover:scale-105 transition-transform duration-300">
                   <Image
                     src="/Assad.png"
                     alt="Assad Mascot"
