@@ -161,7 +161,7 @@ const content: Record<Language, Content> = {
       },
     },
     hero: {
-      headline: "Ignored by recruiters? Put an end to applications without response.",
+      headline: "Ignored by recruiters?\n Put an end to applications without response.",
       subheading: "You send applications. You make efforts. But responses don't come. And you don't know why.",
       forWho: "For candidates who want to understand what's blocking them and how to fix it.",
       ctaPrimary: "Fix My Job Search Now",
@@ -422,7 +422,7 @@ const content: Record<Language, Content> = {
       },
     },
     hero: {
-      headline: "Ignoré par les recruteurs ? Mettez fin aux candidatures sans réponse.",
+      headline: "Ignoré par les recruteurs ?\n Mettez fin aux candidatures sans réponse.",
       subheading: "Vous envoyez des candidatures. Vous faites des efforts. Mais les réponses n'arrivent pas.\n Et vous ne savez pas pourquoi.",
       forWho: "Pour les candidats qui veulent comprendre ce qui les bloque et comment le corriger.",
       ctaPrimary: "Corriger ce qui bloque",
@@ -519,19 +519,19 @@ const content: Record<Language, Content> = {
       items: [
         {
           title: "Module 1 : CV clair, lisible et compris par les recruteurs",
-          description: "Optimiser votre CV pour qu'il soit :\n• Compréhensible rapidement\n• Aligné avec les attentes des recruteurs\n<span class='font-bold'>Objectif : passer le premier tri et éviter l'élimination automatique.",
+          description: "Optimiser votre CV pour qu'il soit :\n• Compréhensible rapidement\n• Aligné avec les attentes des recruteurs\nObjectif : passer le premier tri et éviter l'élimination automatique.",
         },
         {
           title: "Module 2 : Maitrise des techniques d'entretien",
-          description: "Comprendre :\n• Ce que le recruteur cherche vraiment à évaluer\n• Comment éviter les réponses floues ou hors sujet\n<span class='font-bold'>Objectif : mieux performer en entretien, sans improviser.",
+          description: "Comprendre :\n• Ce que le recruteur cherche vraiment à évaluer\n• Comment éviter les réponses floues ou hors sujet\nObjectif : mieux performer en entretien, sans improviser.",
         },
         {
           title: "Module 3 : Gérer le stress et convaincre à l'entretien",
-          description: "Apprendre à :\n• Gérer le stress avant et pendant l'entretien\n• Bien se renseigner sur l'entreprise et se distinguer\n <span class='font-bold'>Objectif : gagner en confiance et en impact face au recruteur.</span>",
+          description: "Apprendre à :\n• Gérer le stress avant et pendant l'entretien\n• Bien se renseigner sur l'entreprise et se distinguer\nObjectif : gagner en confiance et en impact face au recruteur.",
         },
         {
           title: "Module 4 : LinkedIn et positionnement professionnel",
-          description: "Optimiser votre présence sur LinkedIn pour :\n• Renforcer votre crédibilité face aux recruteurs\n• Se positionner comme un leader d'opinion dans votre domaine.\n<span class='font-bold'>Objectif : Améliorer votre visibilité et votre positionnement sur le marché.",
+          description: "Optimiser votre présence sur LinkedIn pour :\n• Renforcer votre crédibilité face aux recruteurs\n• Se positionner comme un leader d'opinion dans votre domaine.\nObjectif : Améliorer votre visibilité et votre positionnement sur le marché.",
         },
       ],
     },
@@ -1562,7 +1562,25 @@ export default function XperienceProLandingPage() {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900">{module.title}</h3>
                 </div>
-                <p className="text-gray-600 leading-relaxed whitespace-pre-line">{module.description}</p>
+                <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                  {module.description.split('\n').map((line, lineIndex, lines) => {
+                    if (line.startsWith('Objectif :')) {
+                      return (
+                        <span key={lineIndex}>
+                          <span className="font-semibold">Objectif :</span>
+                          {line.replace('Objectif :', '')}
+                          {lineIndex < lines.length - 1 && '\n'}
+                        </span>
+                      )
+                    }
+                    return (
+                      <span key={lineIndex}>
+                        {line}
+                        {lineIndex < lines.length - 1 && '\n'}
+                      </span>
+                    )
+                  })}
+                </p>
               </div>
             ))}
           </div>
