@@ -310,8 +310,8 @@ const content: Record<Language, Content> = {
         },
         premium: {
           name: "COACHING PREMIUM",
-          originalPrice: "1500 DH",
-          currentPrice: "1199 DH",
+          originalPrice: "1800 DH",
+          currentPrice: "1200 DH",
           specialOffer: "RECOMMENDED",
           description: "Will help you correct all the key points that influence the recruiter's decision.",
           features: [
@@ -465,7 +465,7 @@ const content: Record<Language, Content> = {
       points: [
         "Identifier pourquoi leurs candidatures n'aboutissent pas",
         "Corriger ce qui bloque réellement côté recruteur",
-        "Arrêter de postuler à l'aveugle",
+        "Utiliser l'IA pour "
       ],
     },
     cvScorer: {
@@ -1270,65 +1270,7 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
-      {/* Problem Section - Enhanced */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-gray-50 via-red-50/30 to-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-gray-900 leading-tight">
-                {t.problem.title}
-              </h2>
-              {t.problem.subtitle && (
-                <p className="text-xl md:text-2xl font-semibold text-gray-800 mb-4 italic">
-                  {t.problem.subtitle}
-                </p>
-              )}
-              {t.problem.emotional && (
-                <p className="text-lg md:text-xl text-gray-700 mb-6 leading-relaxed">
-                  {t.problem.emotional}
-                </p>
-              )}
-              {t.problem.positioning && (
-                <p className="text-xl md:text-2xl font-bold text-[#005eb8] mb-6">
-                  {t.problem.positioning}
-                </p>
-              )}
-              <div className="w-24 h-1 bg-gradient-to-r from-[#005eb8] to-[#FFBC00] mx-auto rounded-full"></div>
-            </div>
-            <div className="space-y-8">
-              {t.problem.reasons.map((reason, index) => (
-                <div
-                  key={index}
-                  ref={(el) => {
-                    sectionRefs.current[`problem-${index}`] = el
-                  }}
-                  className={`bg-white p-8 md:p-10 rounded-2xl shadow-xl border-l-4 border-black transform transition-all duration-700 hover:shadow-2xl hover:scale-[1.02] ${
-                    visibleSections.has(`problem-${index}`)
-                      ? "opacity-100 translate-x-0"
-                      : "opacity-0 -translate-x-10"
-                  }`}
-                  style={{ transitionDelay: `${index * 150}ms` }}
-                >
-                  <div className="flex items-start gap-6 md:gap-8">
-                    <div className="flex-shrink-0">
-                      <div className="bg-black text-white rounded-full w-20 h-20 md:w-24 md:h-24 flex items-center justify-center text-2xl md:text-3xl font-bold shadow-lg transform hover:scale-110 transition-transform duration-200">
-                        {reason.number}
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-tight">
-                        {reason.title}
-                      </h3>
-                      <p className="text-lg md:text-xl text-gray-600 leading-relaxed">{reason.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
+     
       {/* Solution Section */}
       {t.solution && (
         <section className="py-16 md:py-24 bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] text-white">
@@ -1439,35 +1381,7 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
-      {/* Transformation Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
-              {t.transformation.title}
-            </h2>
-            <div className="space-y-4">
-              {t.transformation.points.map((point, index) => (
-                <div
-                  key={index}
-                  ref={(el) => {
-                    sectionRefs.current[`transformation-${index}`] = el
-                  }}
-                  className={`bg-gradient-to-r from-[#005eb8] to-[#0476D7] p-6 rounded-lg shadow-lg text-white flex items-start gap-4 transform transition-all duration-700 ${
-                    visibleSections.has(`transformation-${index}`)
-                      ? "opacity-100 translate-x-0"
-                      : "opacity-0 translate-x-10"
-                  }`}
-                  style={{ transitionDelay: `${index * 100}ms` }}
-                >
-                  <CheckCircle2 className="w-6 h-6 mt-1 flex-shrink-0 text-[#FFBC00]" />
-                  <p className="text-lg flex-1">{point}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* Modules Section */}
       <section id="program" className="py-16 md:py-24 bg-gray-50">
@@ -2101,7 +2015,7 @@ export default function XperienceProLandingPage() {
       </section>
 
       {/* AFCON 2025 Roulette Section - Before Footer */}
-      <section className="py-20 md:py-28 bg-gradient-to-br from-red-600 via-red-700 to-red-800 relative overflow-hidden">
+      <section className="py-12 md:py-16 bg-gradient-to-br from-red-600 via-red-700 to-red-800 relative overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
           <div className="absolute top-20 left-10 w-72 h-72 bg-[#FFD700]/30 rounded-full blur-3xl"></div>
@@ -2109,18 +2023,18 @@ export default function XperienceProLandingPage() {
         </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-12">
-            <div className="inline-block mb-6">
-              <span className="text-white text-2xl md:text-3xl font-black drop-shadow-lg">
+          <div className="text-center mb-8">
+            <div className="inline-block mb-4">
+              <span className="text-white text-xl md:text-2xl font-black drop-shadow-lg">
                 🎉 AFCON 2025 🎉
               </span>
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 drop-shadow-lg">
               {language === "en" 
                 ? "Only 2 winners per day! Spin now and win amazing prizes!" 
                 : "Seulement 2 gagnants par jour ! Tournez maintenant et gagnez des prix incroyables !"}
             </h2>
-            <div className="flex flex-wrap items-center justify-center gap-6 text-base md:text-lg mb-8">
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm md:text-base mb-6">
               <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#FFD700]">
                 <span className="w-5 h-5 rounded-full bg-[#FFD700] shadow-lg"></span>
                 <span className="font-bold text-gray-900">20% OFF Xperience Pro</span>
@@ -2136,21 +2050,21 @@ export default function XperienceProLandingPage() {
             </div>
           </div>
           
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-16">
-            {/* Assad Mascot with better styling */}
+          <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
+            {/* Assad Mascot - Smaller */}
             <div className="flex-shrink-0 order-2 lg:order-1">
               <div className="relative">
-                <div className="absolute -inset-4 bg-gradient-to-br from-[#FFD700]/30 via-[#008000]/30 to-[#FF0000]/30 rounded-3xl blur-2xl transform rotate-6 animate-pulse"></div>
-                <div className="relative  transform hover:scale-105 transition-transform duration-300">
+                <div className="absolute -inset-3 bg-gradient-to-br from-[#FFD700]/30 via-[#008000]/30 to-[#FF0000]/30 rounded-2xl blur-xl transform rotate-6 animate-pulse"></div>
+                <div className="relative transform hover:scale-105 transition-transform duration-300">
                   <Image
                     src="/Assad.png"
                     alt="Assad Mascot"
-                    width={250}
-                    height={400}
-                    className="w-56 md:w-72 h-auto drop-shadow-2xl"
+                    width={200}
+                    height={320}
+                    className="w-40 md:w-48 h-auto drop-shadow-2xl"
                     priority
                   />
-                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#008000] to-[#00AA00] text-white px-6 py-3 rounded-full text-base font-bold shadow-xl whitespace-nowrap border-2 border-white">
+                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#008000] to-[#00AA00] text-white px-4 py-2 rounded-full text-sm font-bold shadow-xl whitespace-nowrap border-2 border-white">
                     {language === "en" ? "Good Luck! 🍀" : "Bonne Chance ! 🍀"}
                   </div>
                 </div>
@@ -2516,8 +2430,9 @@ function RouletteWheel({ language }: { language: Language }) {
         setWinnersToday(data.winnersToday || winnersToday + 1)
         setCanSpin(data.canSpin !== false)
         
-        // Only send WhatsApp for actual prizes (not "Try Again")
-        if (data.verificationCode && (selectedPrize.id === 1 || selectedPrize.id === 4 || selectedPrize.id === 7 || selectedPrize.id === 10 || 
+        // Only process actual prizes (Free CV Correction and 20% OFF) - not "Try Again"
+        if (data.verificationCode && data.prize !== "Try Again" && 
+            (selectedPrize.id === 1 || selectedPrize.id === 4 || selectedPrize.id === 7 || selectedPrize.id === 10 || 
             selectedPrize.id === 2 || selectedPrize.id === 5 || selectedPrize.id === 8 || selectedPrize.id === 11)) {
           
           // Prompt for name first
@@ -2595,22 +2510,22 @@ function RouletteWheel({ language }: { language: Language }) {
     <div className="flex flex-col items-center gap-10">
       {/* Modern Roulette Wheel Container */}
       <div className="relative">
-        {/* Premium Pointer Design */}
-        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-30">
+        {/* Premium Pointer Design - Smaller */}
+        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
           <div className="relative">
             {/* Glow effect */}
-            <div className="absolute inset-0 bg-[#FFD700] blur-xl opacity-60 animate-pulse"></div>
+            <div className="absolute inset-0 bg-[#FFD700] blur-lg opacity-60 animate-pulse"></div>
             {/* Pointer triangle */}
             <div className="relative">
-              <div className="w-0 h-0 border-l-[32px] border-r-[32px] border-t-[50px] border-l-transparent border-r-transparent border-t-[#FFD700] drop-shadow-[0_4px_20px_rgba(255,215,0,0.6)]"></div>
+              <div className="w-0 h-0 border-l-[24px] border-r-[24px] border-t-[36px] border-l-transparent border-r-transparent border-t-[#FFD700] drop-shadow-[0_3px_15px_rgba(255,215,0,0.6)]"></div>
               {/* Inner highlight */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[16px] border-r-[16px] border-t-[25px] border-l-transparent border-r-transparent border-t-white/40"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-r-[12px] border-t-[18px] border-l-transparent border-r-transparent border-t-white/40"></div>
             </div>
           </div>
         </div>
 
-        {/* Clean Modern Wheel Container */}
-        <div className="relative w-[450px] h-[450px] md:w-[550px] md:h-[550px]">
+        {/* Clean Modern Wheel Container - Smaller */}
+        <div className="relative w-[320px] h-[320px] md:w-[380px] md:h-[380px]">
           {/* Subtle outer glow */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFD700]/15 via-[#008000]/15 to-[#FF0000]/15 blur-2xl"></div>
           
@@ -2618,7 +2533,7 @@ function RouletteWheel({ language }: { language: Language }) {
           <div className="relative w-full h-full">
             <div
               ref={wheelRef}
-              className="w-full h-full rounded-full relative overflow-hidden border-[14px] border-white shadow-[0_25px_70px_rgba(0,0,0,0.6)]"
+              className="w-full h-full rounded-full relative overflow-hidden border-[10px] border-white shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
               style={{
                 background: "conic-gradient(" +
                   prizes.map((prize, index) => {
@@ -2659,11 +2574,11 @@ function RouletteWheel({ language }: { language: Language }) {
                   >
                     <div className="text-center">
                       <div 
-                        className="font-black text-xs md:text-sm text-white leading-tight whitespace-nowrap"
+                        className="font-black text-[10px] md:text-xs text-white leading-tight whitespace-nowrap"
                         style={{
-                          textShadow: "3px 3px 6px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.8), -1px -1px 3px rgba(0,0,0,0.6), 1px 1px 3px rgba(0,0,0,0.6)",
-                          WebkitTextStroke: "0.8px rgba(0,0,0,0.9)",
-                          filter: "drop-shadow(0 0 4px rgba(0,0,0,0.9))",
+                          textShadow: "2px 2px 4px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.6), 1px 1px 2px rgba(0,0,0,0.6)",
+                          WebkitTextStroke: "0.6px rgba(0,0,0,0.9)",
+                          filter: "drop-shadow(0 0 3px rgba(0,0,0,0.9))",
                         }}
                       >
                         {labelText}
@@ -2673,15 +2588,15 @@ function RouletteWheel({ language }: { language: Language }) {
                 )
               })}
 
-              {/* Premium Center Button with 3D effect */}
+              {/* Premium Center Button - Smaller */}
               <button
                 onClick={spinWheel}
                 disabled={isSpinning || !canSpin}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 md:w-32 md:h-32 bg-[#FF8C00] rounded-full border-[8px] border-white shadow-[0_10px_40px_rgba(255,140,0,0.6)] flex items-center justify-center z-10 hover:bg-[#FF7A00] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110 active:scale-95"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24 bg-[#FF8C00] rounded-full border-[6px] border-white shadow-[0_8px_30px_rgba(255,140,0,0.6)] flex items-center justify-center z-10 hover:bg-[#FF7A00] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110 active:scale-95"
               >
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl mb-1">🎯</div>
-                  <div className="text-xs md:text-sm font-black text-white tracking-wider">SPIN</div>
+                  <div className="text-2xl md:text-3xl mb-0.5">🎯</div>
+                  <div className="text-[10px] md:text-xs font-black text-white tracking-wider">SPIN</div>
                 </div>
               </button>
             </div>
@@ -2689,16 +2604,16 @@ function RouletteWheel({ language }: { language: Language }) {
         </div>
       </div>
 
-      {/* Premium Spin Button */}
+      {/* Premium Spin Button - Smaller */}
       <button
         onClick={spinWheel}
         disabled={isSpinning || !canSpin}
         className={`
-          relative px-14 py-6 rounded-2xl font-black text-xl md:text-2xl shadow-[0_10px_40px_rgba(0,0,0,0.3)]
+          relative px-8 py-4 rounded-xl font-black text-lg md:text-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)]
           transform transition-all duration-300 overflow-hidden
           ${isSpinning || !canSpin
             ? "bg-gray-400 cursor-not-allowed text-gray-600"
-            : "bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] hover:from-[#FFA500] hover:via-[#FFD700] hover:to-[#FFA500] hover:scale-110 active:scale-95 text-gray-900 shadow-[0_10px_40px_rgba(255,215,0,0.4)]"
+            : "bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] hover:from-[#FFA500] hover:via-[#FFD700] hover:to-[#FFA500] hover:scale-110 active:scale-95 text-gray-900 shadow-[0_8px_30px_rgba(255,215,0,0.4)]"
           }
         `}
       >
@@ -2710,11 +2625,11 @@ function RouletteWheel({ language }: { language: Language }) {
         {!isSpinning && canSpin && (
           <div className="absolute inset-0 bg-[#FFD700] blur-xl opacity-50 animate-pulse"></div>
         )}
-        <span className="relative z-10 flex items-center gap-3">
+        <span className="relative z-10 flex items-center gap-2">
           {isSpinning 
             ? (
               <>
-                <div className="w-7 h-7 border-3 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
                 <span>{language === "en" ? "Spinning..." : "En cours..."}</span>
               </>
             )
@@ -2722,7 +2637,7 @@ function RouletteWheel({ language }: { language: Language }) {
             ? (language === "en" ? "🎉 2 Winners Today!" : "🎉 2 Gagnants Aujourd'hui !")
             : (
               <>
-                <span className="text-3xl">🎰</span>
+                <span className="text-2xl">🎰</span>
                 <span>{language === "en" ? "Spin Now!" : "Tournez Maintenant !"}</span>
               </>
             )
@@ -2730,23 +2645,23 @@ function RouletteWheel({ language }: { language: Language }) {
         </span>
       </button>
 
-      {/* Premium Status Info */}
-      <div className="text-center space-y-4 w-full max-w-lg">
-        {result && (
-          <div className="bg-gradient-to-r from-[#008000] via-[#00AA00] to-[#008000] text-white px-10 py-5 rounded-2xl font-black text-xl md:text-2xl shadow-[0_10px_40px_rgba(0,128,0,0.5)] animate-pulse border-2 border-white/30">
+      {/* Premium Status Info - Smaller */}
+      <div className="text-center space-y-3 w-full max-w-md">
+        {result && result !== "Try Again" && (
+          <div className="bg-gradient-to-r from-[#008000] via-[#00AA00] to-[#008000] text-white px-6 py-3 rounded-xl font-black text-base md:text-lg shadow-[0_8px_30px_rgba(0,128,0,0.5)] animate-pulse border-2 border-white/30">
             {language === "en" ? `🎉 You won: ${result}!` : `🎉 Vous avez gagné : ${result} !`}
           </div>
         )}
-        <div className="flex items-center justify-center gap-6 text-base md:text-lg text-white font-bold drop-shadow-lg">
-          <div className="bg-white/25 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border-2 border-white/40">
+        <div className="flex items-center justify-center gap-4 text-sm md:text-base text-white font-bold drop-shadow-lg">
+          <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border-2 border-white/40">
             {language === "en" 
               ? `Winners: ${winnersToday}/2` 
               : `Gagnants : ${winnersToday}/2`}
           </div>
           {timeUntilReset && (
             <>
-              <div className="w-2 h-2 rounded-full bg-white/70"></div>
-              <div className="bg-white/25 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border-2 border-white/40">
+              <div className="w-1.5 h-1.5 rounded-full bg-white/70"></div>
+              <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border-2 border-white/40">
                 {language === "en" 
                   ? `Reset: ${timeUntilReset}` 
                   : `Reset : ${timeUntilReset}`}
