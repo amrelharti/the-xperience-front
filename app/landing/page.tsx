@@ -170,7 +170,7 @@ const content: Record<Language, Content> = {
     socialProof: {
       title: "Proven Method",
       stats: [
-        { number: "+5000", label: "candidates accompanied" },
+        { number: "+6000", label: "candidates accompanied" },
         { number: "92%", label: "reached their professional goals" },
         { number: "80%", label: "did it in less than 3 months" },
       ],
@@ -226,14 +226,14 @@ const content: Record<Language, Content> = {
       bio: [
         "Certified trainer with 7+ years of experience helping young people prepare for the job market.",
         "Specializes in job and internship search techniques.",
-        "More than 5000 people have benefited from his career coaching.",
+        "More than 6000 people have benefited from his career coaching.",
         "Has spoken in over 100 conferences in Morocco and internationally.",
         "Works as an Employability Manager and collaborates with several well-known universities in Morocco, focusing on company relations and industrial partnerships.",
         "Has been invited by major media such as Al Aoula, Le Matin, and M24.",
       ],
       stats: [
         { label: "Years of Experience", value: "7+" },
-        { label: "People Coached", value: "5000+" },
+        { label: "People Coached", value: "6000+" },
         { label: "Conferences", value: "100+" },
       ],
       social: {
@@ -460,7 +460,7 @@ const content: Record<Language, Content> = {
       ],
     },
     solution: {
-      title: "Xperience Pro: La solution complète",
+      title: "Xperience Pro:\n La solution complète",
       subtitle: "Xperience Pro est un programme structuré sur 1 mois, pensé pour les candidats qui veulent :",
       points: [
         "Identifier pourquoi leurs candidatures n'aboutissent pas",
@@ -490,14 +490,14 @@ const content: Record<Language, Content> = {
       bio: [
         "Formateur certifié avec plus de 7 ans d'expérience dans l'accompagnement des jeunes vers le marché de l'emploi.",
         "Spécialisé dans les techniques de recherche d'emploi et de stage.",
-        "Plus de 5000 personnes ont bénéficié de son coaching de carrière.",
+        "Plus de 6000 personnes ont bénéficié de son coaching de carrière.",
         "A animé plus de 100 conférences au Maroc et à l'international.",
         "Travaille en tant que Responsable Employabilité et collabore avec plusieurs universités reconnues au Maroc, axé sur les relations entreprises et partenariats industriels.",
         "A été invité par les grands médias tels qu'Al Aoula, Le Matin et M24.",
       ],
       stats: [
         { label: "Années d'expérience", value: "7+" },
-        { label: "Personnes coachées", value: "5000+" },
+        { label: "Personnes coachées", value: "6000+" },
         { label: "Conférences", value: "100+" },
       ],
       social: {
@@ -617,7 +617,7 @@ const content: Record<Language, Content> = {
       ],
     },
     testimonials: {
-      title: "Ce que disent nos étudiants",
+      title: "Ce que disent nos bénéficiaires",
       items: [
         {
           name: "Sarah M.",
@@ -1268,6 +1268,160 @@ export default function XperienceProLandingPage() {
           </div>
         </div>
       </section>
+ {/* Testimonials Section - Carousel */}
+ <section id="testimonials" className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+            {t.testimonials.title}
+          </h2>
+          <div className="relative">
+            {/* Carousel Container */}
+            <div className="overflow-hidden rounded-2xl">
+              <div 
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ 
+                  transform: `translateX(-${currentTestimonialIndex * (100 / testimonialsPerView)}%)` 
+                }}
+              >
+                {testimonialImages.map((image, index) => (
+                  <div
+                    key={index}
+                    className={`flex-shrink-0 flex items-center justify-center px-2 ${
+                      testimonialsPerView === 1 ? 'min-w-full' : 
+                      testimonialsPerView === 2 ? 'min-w-[50%]' : 
+                      'min-w-[33.333%]'
+                    }`}
+                  >
+                    <div className="w-full">
+                      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <Image
+                          src={image}
+                          alt={`Testimonial ${index + 1}`}
+                          width={400}
+                          height={300}
+                          className="w-full h-auto object-contain max-h-[300px] sm:max-h-[400px]"
+                          priority={index < 3}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Navigation Buttons */}
+            <button
+              onClick={() => setCurrentTestimonialIndex((prev) => 
+                prev === 0 ? Math.max(0, testimonialImages.length - testimonialsPerView) : Math.max(0, prev - 1)
+              )}
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 sm:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              aria-label="Previous testimonial"
+            >
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+            <button
+              onClick={() => setCurrentTestimonialIndex((prev) => 
+                prev >= testimonialImages.length - testimonialsPerView ? 0 : prev + 1
+              )}
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 sm:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              aria-label="Next testimonial"
+            >
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+            
+            {/* Dots Indicator */}
+            <div className="flex justify-center gap-2 mt-6">
+              {Array.from({ length: Math.max(1, testimonialImages.length - testimonialsPerView + 1) }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentTestimonialIndex(index)}
+                  className={`h-2 rounded-full transition-all duration-200 ${
+                    index === currentTestimonialIndex
+                      ? "bg-[#005eb8] w-8"
+                      : "bg-gray-300 hover:bg-gray-400 w-2"
+                  }`}
+                  aria-label={`Go to testimonial group ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Partners Section - Slideshow */}
+      <section className="py-16 md:py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+            {language === "en" ? "They trusted us" : "Ils nous ont fait confiance"}
+          </h2>
+          <div className="relative">
+            {/* Carousel Container */}
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentPartnerIndex * (100 / 6)}%)` }}
+              >
+                {[
+                  "/partenaires/AIESEC.png",
+                  "/partenaires/Al_Aoula_Tv_Logo.png",
+                  "/partenaires/EMSI.png",
+                  "/partenaires/ENCG Casa.png",
+                  "/partenaires/ENCG Kenitra.png",
+                  "/partenaires/ENCG Oujda.png",
+                  "/partenaires/ENCG Tanger.png",
+                  "/partenaires/ENCG-S.png",
+                  "/partenaires/ENSA Kenitra.png",
+                  "/partenaires/ENSA Tetouan.png",
+                  "/partenaires/Le-Matinma.png",
+                  "/partenaires/logo_alowla.png",
+                  "/partenaires/logo_alowla1.png",
+                  "/partenaires/Logo_groupe_ISCAE.jpg",
+                  "/partenaires/Logo_iav.png",
+                  "/partenaires/Logo_inpt.PNG",
+                  "/partenaires/Logo_Université_Euromed_de_Fès.png",
+                  "/partenaires/M24_tv_logo.jpg",
+                  "/partenaires/Universite_Cadi_Ayyad.png",
+                ].map((logo, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[16.666%] md:min-w-[16.666%] flex-shrink-0 px-2"
+                  >
+                    <div className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center h-24 md:h-32 group hover:scale-105">
+                      <Image
+                        src={logo}
+                        alt={`Partner ${index + 1}`}
+                        width={120}
+                        height={80}
+                        className="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Navigation Buttons */}
+            <button
+              onClick={() => setCurrentPartnerIndex((prev) => 
+                prev === 0 ? Math.max(0, 19 - 6) : Math.max(0, prev - 1)
+              )}
+              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              aria-label="Previous partners"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setCurrentPartnerIndex((prev) => 
+                prev >= 19 - 6 ? 0 : prev + 1
+              )}
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              aria-label="Next partners"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </section>
 
      
       {/* Solution Section */}
@@ -1820,161 +1974,6 @@ export default function XperienceProLandingPage() {
                 </span>
               </button>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section - Carousel */}
-      <section id="testimonials" className="py-16 md:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
-            {t.testimonials.title}
-          </h2>
-          <div className="relative">
-            {/* Carousel Container */}
-            <div className="overflow-hidden rounded-2xl">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ 
-                  transform: `translateX(-${currentTestimonialIndex * (100 / testimonialsPerView)}%)` 
-                }}
-              >
-                {testimonialImages.map((image, index) => (
-                  <div
-                    key={index}
-                    className={`flex-shrink-0 flex items-center justify-center px-2 ${
-                      testimonialsPerView === 1 ? 'min-w-full' : 
-                      testimonialsPerView === 2 ? 'min-w-[50%]' : 
-                      'min-w-[33.333%]'
-                    }`}
-                  >
-                    <div className="w-full">
-                      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <Image
-                          src={image}
-                          alt={`Testimonial ${index + 1}`}
-                          width={400}
-                          height={300}
-                          className="w-full h-auto object-contain max-h-[300px] sm:max-h-[400px]"
-                          priority={index < 3}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Navigation Buttons */}
-            <button
-              onClick={() => setCurrentTestimonialIndex((prev) => 
-                prev === 0 ? Math.max(0, testimonialImages.length - testimonialsPerView) : Math.max(0, prev - 1)
-              )}
-              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 sm:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
-              aria-label="Previous testimonial"
-            >
-              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
-            <button
-              onClick={() => setCurrentTestimonialIndex((prev) => 
-                prev >= testimonialImages.length - testimonialsPerView ? 0 : prev + 1
-              )}
-              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 sm:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
-              aria-label="Next testimonial"
-            >
-              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
-            
-            {/* Dots Indicator */}
-            <div className="flex justify-center gap-2 mt-6">
-              {Array.from({ length: Math.max(1, testimonialImages.length - testimonialsPerView + 1) }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentTestimonialIndex(index)}
-                  className={`h-2 rounded-full transition-all duration-200 ${
-                    index === currentTestimonialIndex
-                      ? "bg-[#005eb8] w-8"
-                      : "bg-gray-300 hover:bg-gray-400 w-2"
-                  }`}
-                  aria-label={`Go to testimonial group ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Partners Section - Slideshow */}
-      <section className="py-16 md:py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
-            {language === "en" ? "They trusted us" : "Ils nous ont fait confiance"}
-          </h2>
-          <div className="relative">
-            {/* Carousel Container */}
-            <div className="overflow-hidden">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentPartnerIndex * (100 / 6)}%)` }}
-              >
-                {[
-                  "/partenaires/AIESEC.png",
-                  "/partenaires/Al_Aoula_Tv_Logo.png",
-                  "/partenaires/EMSI.png",
-                  "/partenaires/ENCG Casa.png",
-                  "/partenaires/ENCG Kenitra.png",
-                  "/partenaires/ENCG Oujda.png",
-                  "/partenaires/ENCG Tanger.png",
-                  "/partenaires/ENCG-S.png",
-                  "/partenaires/ENSA Kenitra.png",
-                  "/partenaires/ENSA Tetouan.png",
-                  "/partenaires/Le-Matinma.png",
-                  "/partenaires/logo_alowla.png",
-                  "/partenaires/logo_alowla1.png",
-                  "/partenaires/Logo_groupe_ISCAE.jpg",
-                  "/partenaires/Logo_iav.png",
-                  "/partenaires/Logo_inpt.PNG",
-                  "/partenaires/Logo_Université_Euromed_de_Fès.png",
-                  "/partenaires/M24_tv_logo.jpg",
-                  "/partenaires/Universite_Cadi_Ayyad.png",
-                ].map((logo, index) => (
-                  <div
-                    key={index}
-                    className="min-w-[16.666%] md:min-w-[16.666%] flex-shrink-0 px-2"
-                  >
-                    <div className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center h-24 md:h-32 group hover:scale-105">
-                      <Image
-                        src={logo}
-                        alt={`Partner ${index + 1}`}
-                        width={120}
-                        height={80}
-                        className="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Navigation Buttons */}
-            <button
-              onClick={() => setCurrentPartnerIndex((prev) => 
-                prev === 0 ? Math.max(0, 19 - 6) : Math.max(0, prev - 1)
-              )}
-              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
-              aria-label="Previous partners"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setCurrentPartnerIndex((prev) => 
-                prev >= 19 - 6 ? 0 : prev + 1
-              )}
-              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
-              aria-label="Next partners"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
           </div>
         </div>
       </section>
