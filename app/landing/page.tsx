@@ -2062,44 +2062,58 @@ export default function XperienceProLandingPage() {
       </section>
 
       {/* AFCON 2025 Roulette Section - Before Footer */}
-      <section className="py-16 md:py-24 bg-white relative overflow-hidden">
+      <section className="py-20 md:py-28 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-[#FFD700]/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#008000]/10 rounded-full blur-3xl"></div>
+        </div>
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-8">
-            <p className="text-gray-700 text-lg md:text-xl font-semibold mb-6">
+          <div className="text-center mb-12">
+            <div className="inline-block mb-6">
+              <span className="bg-gradient-to-r from-[#FFD700] via-[#008000] to-[#FF0000] text-transparent bg-clip-text text-2xl md:text-3xl font-black">
+                🎉 AFCON 2025 🎉
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
               {language === "en" 
                 ? "Only 2 winners per day! Spin now and win amazing prizes!" 
                 : "Seulement 2 gagnants par jour ! Tournez maintenant et gagnez des prix incroyables !"}
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 text-sm md:text-base text-gray-600 mb-8">
-              <span className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#FFD700]"></span>
-                20% OFF Xperience Pro
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#008000]"></span>
-                {language === "en" ? "Free CV Correction" : "Correction CV Gratuite"}
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#FF0000]"></span>
-                {language === "en" ? "Try Again" : "Réessayer"}
-              </span>
+            </h2>
+            <div className="flex flex-wrap items-center justify-center gap-6 text-base md:text-lg text-gray-700 mb-8">
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
+                <span className="w-4 h-4 rounded-full bg-[#FFD700] shadow-sm"></span>
+                <span className="font-semibold">20% OFF Xperience Pro</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
+                <span className="w-4 h-4 rounded-full bg-[#008000] shadow-sm"></span>
+                <span className="font-semibold">{language === "en" ? "Free CV Correction" : "Correction CV Gratuite"}</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
+                <span className="w-4 h-4 rounded-full bg-[#FF0000] shadow-sm"></span>
+                <span className="font-semibold">{language === "en" ? "Try Again" : "Réessayer"}</span>
+              </div>
             </div>
           </div>
           
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
-            {/* Assad Mascot */}
+          <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-16">
+            {/* Assad Mascot with better styling */}
             <div className="flex-shrink-0 order-2 lg:order-1">
               <div className="relative">
-                <Image
-                  src="/Assad.png"
-                  alt="Assad Mascot"
-                  width={200}
-                  height={300}
-                  className="w-48 md:w-64 h-auto"
-                  priority
-                />
-                <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-[#008000] text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg whitespace-nowrap">
-                  {language === "en" ? "Good Luck! 🍀" : "Bonne Chance ! 🍀"}
+                <div className="absolute -inset-4 bg-gradient-to-br from-[#FFD700]/30 via-[#008000]/30 to-[#FF0000]/30 rounded-3xl blur-2xl transform rotate-6 animate-pulse"></div>
+                <div className="relative bg-gradient-to-br from-red-600 to-red-700 rounded-2xl p-6 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+                  <Image
+                    src="/Assad.png"
+                    alt="Assad Mascot"
+                    width={250}
+                    height={400}
+                    className="w-56 md:w-72 h-auto drop-shadow-2xl"
+                    priority
+                  />
+                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#008000] to-[#00AA00] text-white px-6 py-3 rounded-full text-base font-bold shadow-xl whitespace-nowrap border-2 border-white">
+                    {language === "en" ? "Good Luck! 🍀" : "Bonne Chance ! 🍀"}
+                  </div>
                 </div>
               </div>
             </div>
@@ -2442,129 +2456,150 @@ function RouletteWheel({ language }: { language: Language }) {
   const prizeAngle = 360 / prizes.length
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex flex-col items-center gap-8">
       <div className="relative">
-        {/* Simple Pointer */}
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
-          <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[30px] border-l-transparent border-r-transparent border-t-[#FFD700]"></div>
+        {/* Enhanced Pointer with shadow */}
+        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
+          <div className="relative">
+            <div className="absolute inset-0 bg-[#FFD700] blur-lg opacity-40"></div>
+            <div className="relative w-0 h-0 border-l-[28px] border-r-[28px] border-t-[45px] border-l-transparent border-r-transparent border-t-[#FFD700] drop-shadow-2xl filter"></div>
+          </div>
         </div>
 
-        {/* Simple Wheel Container */}
-        <div className="relative w-80 h-80 md:w-96 md:h-96">
-          <div
-            ref={wheelRef}
-            className="w-full h-full rounded-full relative overflow-hidden border-4 border-gray-200 shadow-lg"
-            style={{
-              background: "conic-gradient(" +
-                prizes.map((prize, index) => {
-                  const startAngle = index * prizeAngle
-                  const endAngle = (index + 1) * prizeAngle
-                  return `${prize.color} ${startAngle}deg ${endAngle}deg`
-                }).join(", ") +
-              ")",
-            }}
-          >
-            {/* Simple divider lines */}
-            {prizes.map((_, index) => {
-              const angle = index * prizeAngle
-              return (
-                <div
-                  key={`divider-${index}`}
-                  className="absolute top-1/2 left-1/2 w-0.5 h-full origin-top bg-white/60"
-                  style={{
-                    transform: `translate(-50%, -50%) rotate(${angle}deg)`,
-                  }}
-                />
-              )
-            })}
+        {/* Enhanced Wheel Container */}
+        <div className="relative w-[400px] h-[400px] md:w-[500px] md:h-[500px]">
+          {/* Outer glow effect */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFD700]/20 via-[#008000]/20 to-[#FF0000]/20 blur-2xl animate-pulse"></div>
+          
+          {/* Main wheel */}
+          <div className="relative w-full h-full">
+            <div
+              ref={wheelRef}
+              className="w-full h-full rounded-full relative overflow-hidden border-8 border-white shadow-2xl"
+              style={{
+                background: "conic-gradient(" +
+                  prizes.map((prize, index) => {
+                    const startAngle = index * prizeAngle
+                    const endAngle = (index + 1) * prizeAngle
+                    return `${prize.color} ${startAngle}deg ${endAngle}deg`
+                  }).join(", ") +
+                ")",
+                boxShadow: "0 0 60px rgba(0,0,0,0.2), inset 0 0 40px rgba(0,0,0,0.1)",
+              }}
+            >
+              {/* Enhanced divider lines */}
+              {prizes.map((_, index) => {
+                const angle = index * prizeAngle
+                return (
+                  <div
+                    key={`divider-${index}`}
+                    className="absolute top-1/2 left-1/2 w-1 h-full origin-top bg-white/80"
+                    style={{
+                      transform: `translate(-50%, -50%) rotate(${angle}deg)`,
+                      boxShadow: "0 0 4px rgba(0,0,0,0.3)",
+                    }}
+                  />
+                )
+              })}
 
-            {/* Simple Prize Labels */}
-            {prizes.map((prize, index) => {
-              const angle = (index * prizeAngle) + (prizeAngle / 2) - 90
-              const radius = 50
-              const x = 50 + radius * Math.cos((angle * Math.PI) / 180)
-              const y = 50 + radius * Math.sin((angle * Math.PI) / 180)
+              {/* Enhanced Prize Labels - Much more visible */}
+              {prizes.map((prize, index) => {
+                const angle = (index * prizeAngle) + (prizeAngle / 2) - 90
+                const radius = 48
+                const x = 50 + radius * Math.cos((angle * Math.PI) / 180)
+                const y = 50 + radius * Math.sin((angle * Math.PI) / 180)
 
-              return (
-                <div
-                  key={prize.id}
-                  className="absolute text-center"
-                  style={{
-                    left: `${x}%`,
-                    top: `${y}%`,
-                    transform: `translate(-50%, -50%) rotate(${angle + 90}deg)`,
-                    transformOrigin: "center",
-                    width: "30%",
-                  }}
-                >
-                  <div className="bg-white px-2 py-1 rounded">
-                    <div className="font-bold text-[9px] md:text-[10px] text-gray-900 leading-tight whitespace-nowrap">
-                      {prize.label}
+                return (
+                  <div
+                    key={prize.id}
+                    className="absolute text-center pointer-events-none"
+                    style={{
+                      left: `${x}%`,
+                      top: `${y}%`,
+                      transform: `translate(-50%, -50%) rotate(${angle + 90}deg)`,
+                      transformOrigin: "center",
+                      width: "32%",
+                    }}
+                  >
+                    <div className="bg-white px-3 py-2 rounded-lg shadow-xl border-2 border-gray-200">
+                      <div className="font-extrabold text-xs md:text-sm text-gray-900 leading-tight whitespace-nowrap">
+                        {prize.label}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
 
-            {/* Simple Center Circle - Clickable */}
-            <button
-              onClick={spinWheel}
-              disabled={isSpinning || !canSpin}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24 bg-[#FF8C00] rounded-full border-4 border-white shadow-xl flex items-center justify-center z-10 hover:bg-[#FF7A00] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <div className="text-center">
-                <div className="text-xl md:text-2xl mb-0.5">🎯</div>
-                <div className="text-[9px] md:text-[10px] font-black text-white">SPIN</div>
-              </div>
-            </button>
+              {/* Enhanced Center Circle - Clickable */}
+              <button
+                onClick={spinWheel}
+                disabled={isSpinning || !canSpin}
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 md:w-28 md:h-28 bg-gradient-to-br from-[#FF8C00] to-[#FF6B00] rounded-full border-6 border-white shadow-2xl flex items-center justify-center z-10 hover:from-[#FF7A00] hover:to-[#FF5A00] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110"
+              >
+                <div className="text-center">
+                  <div className="text-2xl md:text-3xl mb-1">🎯</div>
+                  <div className="text-[10px] md:text-xs font-black text-white drop-shadow-lg">SPIN</div>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Simple Spin Button */}
+      {/* Enhanced Spin Button */}
       <button
         onClick={spinWheel}
         disabled={isSpinning || !canSpin}
-        className={`px-8 py-4 rounded-xl font-bold text-lg md:text-xl shadow-lg transform transition-all duration-200 ${
+        className={`relative px-12 py-5 rounded-2xl font-bold text-xl md:text-2xl shadow-2xl transform transition-all duration-300 overflow-hidden ${
           isSpinning || !canSpin
             ? "bg-gray-400 cursor-not-allowed text-gray-600"
-            : "bg-[#FFD700] hover:bg-[#FFA500] hover:scale-105 text-gray-900"
+            : "bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] hover:from-[#FFA500] hover:via-[#FFD700] hover:to-[#FFA500] hover:scale-110 text-gray-900"
         }`}
       >
-        {isSpinning 
-          ? (language === "en" ? "Spinning..." : "En cours...")
-          : !canSpin
-          ? (language === "en" ? "2 Winners Today!" : "2 Gagnants Aujourd'hui !")
-          : (
-            <>
-              <span className="text-xl mr-2">🎰</span>
-              {language === "en" ? "Spin Now!" : "Tournez Maintenant !"}
-            </>
-          )
-        }
+        {!isSpinning && !canSpin && (
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+        )}
+        <span className="relative z-10 flex items-center gap-3">
+          {isSpinning 
+            ? (
+              <>
+                <div className="w-6 h-6 border-3 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
+                <span>{language === "en" ? "Spinning..." : "En cours..."}</span>
+              </>
+            )
+            : !canSpin
+            ? (language === "en" ? "🎉 2 Winners Today!" : "🎉 2 Gagnants Aujourd'hui !")
+            : (
+              <>
+                <span className="text-2xl">🎰</span>
+                <span>{language === "en" ? "Spin Now!" : "Tournez Maintenant !"}</span>
+              </>
+            )
+          }
+        </span>
       </button>
 
-      {/* Simple Status Info */}
-      <div className="text-center space-y-2">
+      {/* Enhanced Status Info */}
+      <div className="text-center space-y-3 w-full max-w-md">
         {result && (
-          <div className="bg-[#008000] text-white px-6 py-3 rounded-xl font-bold text-lg shadow-lg">
+          <div className="bg-gradient-to-r from-[#008000] to-[#00AA00] text-white px-8 py-4 rounded-2xl font-bold text-xl shadow-2xl animate-pulse">
             {language === "en" ? `🎉 You won: ${result}!` : `🎉 Vous avez gagné : ${result} !`}
           </div>
         )}
-        <div className="flex items-center justify-center gap-4 text-sm md:text-base text-gray-600">
-          <span>
+        <div className="flex items-center justify-center gap-6 text-base md:text-lg text-gray-700 font-semibold">
+          <div className="bg-white px-5 py-2 rounded-full shadow-md">
             {language === "en" 
               ? `Winners: ${winnersToday}/2` 
               : `Gagnants : ${winnersToday}/2`}
-          </span>
+          </div>
           {timeUntilReset && (
             <>
-              <span>•</span>
-              <span>
+              <div className="w-1 h-1 rounded-full bg-gray-400"></div>
+              <div className="bg-white px-5 py-2 rounded-full shadow-md">
                 {language === "en" 
                   ? `Reset: ${timeUntilReset}` 
                   : `Reset : ${timeUntilReset}`}
-              </span>
+              </div>
             </>
           )}
         </div>
