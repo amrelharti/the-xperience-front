@@ -2473,44 +2473,39 @@ function RouletteWheel({ language }: { language: Language }) {
           </div>
         </div>
 
-        {/* Premium Wheel Container with 3D effect */}
+        {/* Clean Modern Wheel Container */}
         <div className="relative w-[450px] h-[450px] md:w-[550px] md:h-[550px]">
-          {/* Outer ring glow */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFD700]/30 via-[#008000]/30 to-[#FF0000]/30 blur-3xl animate-pulse"></div>
+          {/* Subtle outer glow */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFD700]/15 via-[#008000]/15 to-[#FF0000]/15 blur-2xl"></div>
           
-          {/* Outer decorative ring */}
-          <div className="absolute inset-0 rounded-full border-[6px] border-white/50 shadow-[0_0_40px_rgba(255,255,255,0.3)]"></div>
-          
-          {/* Main wheel with 3D depth */}
+          {/* Main wheel - Clean and simple */}
           <div className="relative w-full h-full">
             <div
               ref={wheelRef}
-              className="w-full h-full rounded-full relative overflow-hidden border-[10px] border-white shadow-[0_20px_60px_rgba(0,0,0,0.4),inset_0_0_50px_rgba(0,0,0,0.15)]"
+              className="w-full h-full rounded-full relative overflow-hidden border-[14px] border-white shadow-[0_25px_70px_rgba(0,0,0,0.6)]"
               style={{
                 background: "conic-gradient(" +
                   prizes.map((prize, index) => {
                     const startAngle = index * prizeAngle
                     const endAngle = (index + 1) * prizeAngle
-                    // Add slight color variation for depth
-                    const darkerColor = prize.color === "#FFD700" ? "#E6C200"
-                      : prize.color === "#008000" ? "#006600"
-                      : "#CC0000"
-                    return `${prize.color} ${startAngle}deg ${startAngle + prizeAngle * 0.5}deg, ${darkerColor} ${startAngle + prizeAngle * 0.5}deg ${endAngle}deg`
+                    return `${prize.color} ${startAngle}deg ${endAngle}deg`
                   }).join(", ") +
                 ")",
               }}
             >
-              {/* Premium divider lines with 3D effect */}
+              {/* Clean divider lines - subtle, only between segments */}
               {prizes.map((_, index) => {
                 const angle = index * prizeAngle
                 return (
                   <div
                     key={`divider-${index}`}
-                    className="absolute top-1/2 left-1/2 w-[2px] h-full origin-top"
+                    className="absolute top-1/2 left-1/2 origin-top"
                     style={{
                       transform: `translate(-50%, -50%) rotate(${angle}deg)`,
-                      background: "linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.3) 100%)",
-                      boxShadow: "0 0 8px rgba(255,255,255,0.5), inset 0 0 4px rgba(0,0,0,0.2)",
+                      width: "1.5px",
+                      height: "40%", // Only goes partway from center, not to edge
+                      background: "rgba(255,255,255,0.3)",
+                      top: "50%",
                     }}
                   />
                 )
@@ -2563,14 +2558,11 @@ function RouletteWheel({ language }: { language: Language }) {
               <button
                 onClick={spinWheel}
                 disabled={isSpinning || !canSpin}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 md:w-32 md:h-32 bg-gradient-to-br from-[#FF8C00] via-[#FF7A00] to-[#FF6B00] rounded-full border-[8px] border-white shadow-[0_10px_40px_rgba(255,140,0,0.5),inset_0_4px_20px_rgba(255,255,255,0.3)] flex items-center justify-center z-10 hover:from-[#FF7A00] hover:via-[#FF6B00] hover:to-[#FF5A00] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110 active:scale-95"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 md:w-32 md:h-32 bg-[#FF8C00] rounded-full border-[8px] border-white shadow-[0_10px_40px_rgba(255,140,0,0.6)] flex items-center justify-center z-10 hover:bg-[#FF7A00] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110 active:scale-95"
               >
-                {/* Inner glow */}
-                <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/30 to-transparent"></div>
-                {/* Content */}
-                <div className="relative text-center z-10">
-                  <div className="text-3xl md:text-4xl mb-1 drop-shadow-lg">🎯</div>
-                  <div className="text-xs md:text-sm font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] tracking-wider">SPIN</div>
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl mb-1">🎯</div>
+                  <div className="text-xs md:text-sm font-black text-white tracking-wider">SPIN</div>
                 </div>
               </button>
             </div>
