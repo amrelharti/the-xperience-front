@@ -2520,12 +2520,21 @@ function RouletteWheel({ language }: { language: Language }) {
         if (data.verificationCode && (selectedPrize.id === 1 || selectedPrize.id === 4 || selectedPrize.id === 7 || selectedPrize.id === 10 || 
             selectedPrize.id === 2 || selectedPrize.id === 5 || selectedPrize.id === 8 || selectedPrize.id === 11)) {
           
-          // Prompt for name
-          const winnerName = prompt(
+          // Prompt for name first
+          let winnerName = prompt(
             language === "en" 
               ? "🎉 Congratulations! Please enter your name to claim your prize:" 
               : "🎉 Félicitations ! Veuillez entrer votre nom pour réclamer votre prix :"
           )
+          
+          // If user cancels or doesn't enter name, ask again
+          if (!winnerName || !winnerName.trim()) {
+            winnerName = prompt(
+              language === "en" 
+                ? "⚠️ Name is required. Please enter your name:" 
+                : "⚠️ Le nom est requis. Veuillez entrer votre nom :"
+            )
+          }
           
           // Update winner with name if provided
           if (winnerName && winnerName.trim()) {
@@ -2538,23 +2547,37 @@ function RouletteWheel({ language }: { language: Language }) {
                   winnerName: winnerName.trim()
                 })
               })
+              
+              // Send WhatsApp message to ADMIN with winner info
+              const adminMessage = language === "en"
+                ? `🎰 *Roulette Winner*\n\n*Name:* ${winnerName.trim()}\n*Prize:* ${data.prize}\n*Verification Code:* ${data.verificationCode}\n\nPlease verify and process this winner.`
+                : `🎰 *Gagnant de la Roulette*\n\n*Nom:* ${winnerName.trim()}\n*Prix:* ${data.prize}\n*Code de vérification:* ${data.verificationCode}\n\nVeuillez vérifier et traiter ce gagnant.`
+              
+              // Send message to admin
+              sendWhatsAppMessage(adminMessage)
+              
+              // Show success message to winner
+              alert(
+                language === "en" 
+                  ? `🎉 Congratulations ${winnerName.trim()}! You won: ${data.prize}!\n\nYour verification code: ${data.verificationCode}\n\nWe've sent your information to our team. They will contact you soon!` 
+                  : `🎉 Félicitations ${winnerName.trim()} ! Vous avez gagné : ${data.prize} !\n\nVotre code de vérification : ${data.verificationCode}\n\nNous avons envoyé vos informations à notre équipe. Ils vous contacteront bientôt !`
+              )
             } catch (error) {
               console.error("Error updating winner name:", error)
+              alert(
+                language === "en" 
+                  ? "An error occurred. Please contact us with your verification code: " + data.verificationCode
+                  : "Une erreur s'est produite. Veuillez nous contacter avec votre code de vérification : " + data.verificationCode
+              )
             }
+          } else {
+            // If still no name, show error
+            alert(
+              language === "en" 
+                ? "Name is required to claim your prize. Please contact us with your verification code: " + data.verificationCode
+                : "Le nom est requis pour réclamer votre prix. Veuillez nous contacter avec votre code de vérification : " + data.verificationCode
+            )
           }
-          
-          const prizeText = language === "en" 
-            ? `🎉 Congratulations! You won: ${data.prize}!` 
-            : `🎉 Félicitations ! Vous avez gagné : ${data.prize} !`
-          
-          const codeText = language === "en"
-            ? `Your verification code is: ${data.verificationCode}\n\nPlease save this code to claim your prize.`
-            : `Votre code de vérification est : ${data.verificationCode}\n\nVeuillez conserver ce code pour réclamer votre prix.`
-          
-          const whatsappMessage = `${prizeText}\n\n${codeText}`
-          
-          // Send WhatsApp message with prize and code
-          sendWhatsAppMessage(whatsappMessage)
         }
         
         // Try Again doesn't show alert
