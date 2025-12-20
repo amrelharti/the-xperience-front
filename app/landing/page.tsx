@@ -2456,63 +2456,84 @@ function RouletteWheel({ language }: { language: Language }) {
   const prizeAngle = 360 / prizes.length
 
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-10">
+      {/* Modern Roulette Wheel Container */}
       <div className="relative">
-        {/* Enhanced Pointer with shadow */}
-        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
+        {/* Premium Pointer Design */}
+        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-30">
           <div className="relative">
-            <div className="absolute inset-0 bg-[#FFD700] blur-lg opacity-40"></div>
-            <div className="relative w-0 h-0 border-l-[28px] border-r-[28px] border-t-[45px] border-l-transparent border-r-transparent border-t-[#FFD700] drop-shadow-2xl filter"></div>
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-[#FFD700] blur-xl opacity-60 animate-pulse"></div>
+            {/* Pointer triangle */}
+            <div className="relative">
+              <div className="w-0 h-0 border-l-[32px] border-r-[32px] border-t-[50px] border-l-transparent border-r-transparent border-t-[#FFD700] drop-shadow-[0_4px_20px_rgba(255,215,0,0.6)]"></div>
+              {/* Inner highlight */}
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[16px] border-r-[16px] border-t-[25px] border-l-transparent border-r-transparent border-t-white/40"></div>
+            </div>
           </div>
         </div>
 
-        {/* Enhanced Wheel Container */}
-        <div className="relative w-[400px] h-[400px] md:w-[500px] md:h-[500px]">
-          {/* Outer glow effect */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFD700]/20 via-[#008000]/20 to-[#FF0000]/20 blur-2xl animate-pulse"></div>
+        {/* Premium Wheel Container with 3D effect */}
+        <div className="relative w-[450px] h-[450px] md:w-[550px] md:h-[550px]">
+          {/* Outer ring glow */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFD700]/30 via-[#008000]/30 to-[#FF0000]/30 blur-3xl animate-pulse"></div>
           
-          {/* Main wheel */}
+          {/* Outer decorative ring */}
+          <div className="absolute inset-0 rounded-full border-[6px] border-white/50 shadow-[0_0_40px_rgba(255,255,255,0.3)]"></div>
+          
+          {/* Main wheel with 3D depth */}
           <div className="relative w-full h-full">
             <div
               ref={wheelRef}
-              className="w-full h-full rounded-full relative overflow-hidden border-8 border-white shadow-2xl"
+              className="w-full h-full rounded-full relative overflow-hidden border-[10px] border-white shadow-[0_20px_60px_rgba(0,0,0,0.4),inset_0_0_50px_rgba(0,0,0,0.15)]"
               style={{
                 background: "conic-gradient(" +
                   prizes.map((prize, index) => {
                     const startAngle = index * prizeAngle
                     const endAngle = (index + 1) * prizeAngle
-                    return `${prize.color} ${startAngle}deg ${endAngle}deg`
+                    // Add slight color variation for depth
+                    const darkerColor = prize.color === "#FFD700" ? "#E6C200"
+                      : prize.color === "#008000" ? "#006600"
+                      : "#CC0000"
+                    return `${prize.color} ${startAngle}deg ${startAngle + prizeAngle * 0.5}deg, ${darkerColor} ${startAngle + prizeAngle * 0.5}deg ${endAngle}deg`
                   }).join(", ") +
                 ")",
-                boxShadow: "0 0 60px rgba(0,0,0,0.2), inset 0 0 40px rgba(0,0,0,0.1)",
               }}
             >
-              {/* Enhanced divider lines */}
+              {/* Premium divider lines with 3D effect */}
               {prizes.map((_, index) => {
                 const angle = index * prizeAngle
                 return (
                   <div
                     key={`divider-${index}`}
-                    className="absolute top-1/2 left-1/2 w-1 h-full origin-top bg-white/80"
+                    className="absolute top-1/2 left-1/2 w-[2px] h-full origin-top"
                     style={{
                       transform: `translate(-50%, -50%) rotate(${angle}deg)`,
-                      boxShadow: "0 0 4px rgba(0,0,0,0.3)",
+                      background: "linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.3) 100%)",
+                      boxShadow: "0 0 8px rgba(255,255,255,0.5), inset 0 0 4px rgba(0,0,0,0.2)",
                     }}
                   />
                 )
               })}
 
-              {/* Enhanced Prize Labels - Much more visible with better styling */}
+              {/* Premium Prize Labels with better visibility */}
               {prizes.map((prize, index) => {
                 const angle = (index * prizeAngle) + (prizeAngle / 2) - 90
-                const radius = 48
+                const radius = 50
                 const x = 50 + radius * Math.cos((angle * Math.PI) / 180)
                 const y = 50 + radius * Math.sin((angle * Math.PI) / 180)
 
-                // Determine border color based on prize type
-                const borderColor = prize.color === "#FFD700" ? "border-[#FFD700]" 
-                  : prize.color === "#008000" ? "border-[#008000]" 
-                  : "border-[#FF0000]"
+                // Get full label text
+                const fullLabel = prize.label === "OFF Xperience Pro" 
+                  ? (language === "en" ? "20% OFF Xperience Pro" : "20% OFF Xperience Pro")
+                  : prize.label === "Free CV Correction"
+                  ? (language === "en" ? "Free CV Correction" : "Correction CV Gratuite")
+                  : (language === "en" ? "Try Again" : "Réessayer")
+
+                // Determine styling based on prize type
+                const isGold = prize.color === "#FFD700"
+                const isGreen = prize.color === "#008000"
+                const isRed = prize.color === "#FF0000"
 
                 return (
                   <div
@@ -2523,32 +2544,41 @@ function RouletteWheel({ language }: { language: Language }) {
                       top: `${y}%`,
                       transform: `translate(-50%, -50%) rotate(${angle + 90}deg)`,
                       transformOrigin: "center",
-                      width: "35%",
+                      width: "38%",
                     }}
                   >
-                    <div className={`bg-white px-4 py-3 rounded-xl shadow-2xl border-3 ${borderColor} backdrop-blur-sm`}>
-                      <div className="font-black text-sm md:text-base text-gray-900 leading-tight whitespace-nowrap drop-shadow-sm">
-                        {prize.label === "OFF Xperience Pro" 
-                          ? (language === "en" ? "20% OFF Xperience Pro" : "20% OFF Xperience Pro")
-                          : prize.label === "Free CV Correction"
-                          ? (language === "en" ? "Free CV Correction" : "Correction CV Gratuite")
-                          : (language === "en" ? "Try Again" : "Réessayer")
-                        }
+                    <div className={`
+                      px-4 py-3 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-md
+                      ${isGold ? "bg-gradient-to-br from-white to-yellow-50 border-[3px] border-[#FFD700]" : ""}
+                      ${isGreen ? "bg-gradient-to-br from-white to-green-50 border-[3px] border-[#008000]" : ""}
+                      ${isRed ? "bg-gradient-to-br from-white to-red-50 border-[3px] border-[#FF0000]" : ""}
+                    `}>
+                      <div className={`
+                        font-black text-sm md:text-base leading-tight whitespace-nowrap
+                        ${isGold ? "text-[#B8860B]" : ""}
+                        ${isGreen ? "text-[#006400]" : ""}
+                        ${isRed ? "text-[#CC0000]" : ""}
+                        drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]
+                      `}>
+                        {fullLabel}
                       </div>
                     </div>
                   </div>
                 )
               })}
 
-              {/* Enhanced Center Circle - Clickable */}
+              {/* Premium Center Button with 3D effect */}
               <button
                 onClick={spinWheel}
                 disabled={isSpinning || !canSpin}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 md:w-28 md:h-28 bg-gradient-to-br from-[#FF8C00] to-[#FF6B00] rounded-full border-6 border-white shadow-2xl flex items-center justify-center z-10 hover:from-[#FF7A00] hover:to-[#FF5A00] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 md:w-32 md:h-32 bg-gradient-to-br from-[#FF8C00] via-[#FF7A00] to-[#FF6B00] rounded-full border-[8px] border-white shadow-[0_10px_40px_rgba(255,140,0,0.5),inset_0_4px_20px_rgba(255,255,255,0.3)] flex items-center justify-center z-10 hover:from-[#FF7A00] hover:via-[#FF6B00] hover:to-[#FF5A00] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110 active:scale-95"
               >
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl mb-1">🎯</div>
-                  <div className="text-[10px] md:text-xs font-black text-white drop-shadow-lg">SPIN</div>
+                {/* Inner glow */}
+                <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/30 to-transparent"></div>
+                {/* Content */}
+                <div className="relative text-center z-10">
+                  <div className="text-3xl md:text-4xl mb-1 drop-shadow-lg">🎯</div>
+                  <div className="text-xs md:text-sm font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] tracking-wider">SPIN</div>
                 </div>
               </button>
             </div>
@@ -2556,24 +2586,32 @@ function RouletteWheel({ language }: { language: Language }) {
         </div>
       </div>
 
-      {/* Enhanced Spin Button */}
+      {/* Premium Spin Button */}
       <button
         onClick={spinWheel}
         disabled={isSpinning || !canSpin}
-        className={`relative px-12 py-5 rounded-2xl font-bold text-xl md:text-2xl shadow-2xl transform transition-all duration-300 overflow-hidden ${
-          isSpinning || !canSpin
+        className={`
+          relative px-14 py-6 rounded-2xl font-black text-xl md:text-2xl shadow-[0_10px_40px_rgba(0,0,0,0.3)]
+          transform transition-all duration-300 overflow-hidden
+          ${isSpinning || !canSpin
             ? "bg-gray-400 cursor-not-allowed text-gray-600"
-            : "bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] hover:from-[#FFA500] hover:via-[#FFD700] hover:to-[#FFA500] hover:scale-110 text-gray-900"
-        }`}
+            : "bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] hover:from-[#FFA500] hover:via-[#FFD700] hover:to-[#FFA500] hover:scale-110 active:scale-95 text-gray-900 shadow-[0_10px_40px_rgba(255,215,0,0.4)]"
+          }
+        `}
       >
+        {/* Shimmer effect */}
         {!isSpinning && !canSpin && (
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
+        )}
+        {/* Button glow */}
+        {!isSpinning && canSpin && (
+          <div className="absolute inset-0 bg-[#FFD700] blur-xl opacity-50 animate-pulse"></div>
         )}
         <span className="relative z-10 flex items-center gap-3">
           {isSpinning 
             ? (
               <>
-                <div className="w-6 h-6 border-3 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-7 h-7 border-3 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
                 <span>{language === "en" ? "Spinning..." : "En cours..."}</span>
               </>
             )
@@ -2581,7 +2619,7 @@ function RouletteWheel({ language }: { language: Language }) {
             ? (language === "en" ? "🎉 2 Winners Today!" : "🎉 2 Gagnants Aujourd'hui !")
             : (
               <>
-                <span className="text-2xl">🎰</span>
+                <span className="text-3xl">🎰</span>
                 <span>{language === "en" ? "Spin Now!" : "Tournez Maintenant !"}</span>
               </>
             )
@@ -2589,23 +2627,23 @@ function RouletteWheel({ language }: { language: Language }) {
         </span>
       </button>
 
-      {/* Enhanced Status Info */}
-      <div className="text-center space-y-3 w-full max-w-md">
+      {/* Premium Status Info */}
+      <div className="text-center space-y-4 w-full max-w-lg">
         {result && (
-          <div className="bg-gradient-to-r from-[#008000] to-[#00AA00] text-white px-8 py-4 rounded-2xl font-bold text-xl shadow-2xl animate-pulse">
+          <div className="bg-gradient-to-r from-[#008000] via-[#00AA00] to-[#008000] text-white px-10 py-5 rounded-2xl font-black text-xl md:text-2xl shadow-[0_10px_40px_rgba(0,128,0,0.5)] animate-pulse border-2 border-white/30">
             {language === "en" ? `🎉 You won: ${result}!` : `🎉 Vous avez gagné : ${result} !`}
           </div>
         )}
-        <div className="flex items-center justify-center gap-6 text-base md:text-lg text-white font-semibold drop-shadow-lg">
-          <div className="bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full shadow-md border border-white/30">
+        <div className="flex items-center justify-center gap-6 text-base md:text-lg text-white font-bold drop-shadow-lg">
+          <div className="bg-white/25 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border-2 border-white/40">
             {language === "en" 
               ? `Winners: ${winnersToday}/2` 
               : `Gagnants : ${winnersToday}/2`}
           </div>
           {timeUntilReset && (
             <>
-              <div className="w-1 h-1 rounded-full bg-white/60"></div>
-              <div className="bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full shadow-md border border-white/30">
+              <div className="w-2 h-2 rounded-full bg-white/70"></div>
+              <div className="bg-white/25 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border-2 border-white/40">
                 {language === "en" 
                   ? `Reset: ${timeUntilReset}` 
                   : `Reset : ${timeUntilReset}`}
