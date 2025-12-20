@@ -519,19 +519,19 @@ const content: Record<Language, Content> = {
       items: [
         {
           title: "Module 1 : CV clair, lisible et compris par les recruteurs",
-          description: "Optimiser votre CV pour qu'il soit :\n\n• Compréhensible rapidement\n• Aligné avec les attentes des recruteurs\n\nObjectif : passer le premier tri et éviter l'élimination automatique.",
+          description: "Optimiser votre CV pour qu'il soit :\n• Compréhensible rapidement\n• Aligné avec les attentes des recruteurs\n<span class='font-bold'>Objectif : passer le premier tri et éviter l'élimination automatique.",
         },
         {
           title: "Module 2 : Maitrise des techniques d'entretien",
-          description: "Comprendre :\n\n• Ce que le recruteur cherche vraiment à évaluer\n• Comment éviter les réponses floues ou hors sujet\n\nObjectif : mieux performer en entretien, sans improviser.",
+          description: "Comprendre :\n• Ce que le recruteur cherche vraiment à évaluer\n• Comment éviter les réponses floues ou hors sujet\n<span class='font-bold'>Objectif : mieux performer en entretien, sans improviser.",
         },
         {
           title: "Module 3 : Gérer le stress et convaincre à l'entretien",
-          description: "Apprendre à :\n\n• Gérer le stress avant et pendant l'entretien\n• Bien se renseigner sur l'entreprise et se distinguer\n\nObjectif : gagner en confiance et en impact face au recruteur.",
+          description: "Apprendre à :\n• Gérer le stress avant et pendant l'entretien\n• Bien se renseigner sur l'entreprise et se distinguer\n <span class='font-bold'>Objectif : gagner en confiance et en impact face au recruteur.</span>",
         },
         {
           title: "Module 4 : LinkedIn et positionnement professionnel",
-          description: "Optimiser votre présence sur LinkedIn pour :\n\n• Renforcer votre crédibilité face aux recruteurs\n• Se positionner comme un leader d'opinion dans votre domaine.\n\nObjectif : Améliorer votre visibilité et votre positionnement sur le marché.",
+          description: "Optimiser votre présence sur LinkedIn pour :\n• Renforcer votre crédibilité face aux recruteurs\n• Se positionner comme un leader d'opinion dans votre domaine.\n<span class='font-bold'>Objectif : Améliorer votre visibilité et votre positionnement sur le marché.",
         },
       ],
     },
@@ -1162,14 +1162,14 @@ export default function XperienceProLandingPage() {
               {t.hero.forWho}
             </p>
             
-            {/* YouTube Video Embed - No title, no logo */}
+            {/* YouTube Video Embed - Minimal branding */}
             <div className="mb-8 max-w-4xl mx-auto">
               <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                 <iframe
                   className="absolute top-0 left-0 w-full h-full rounded-lg shadow-2xl"
-                  src="https://www.youtube.com/embed/5Jf283OoTM4?modestbranding=1&showinfo=0&rel=0&controls=1&iv_load_policy=3&fs=1"
+                  src="https://www.youtube-nocookie.com/embed/5Jf283OoTM4?modestbranding=1&rel=0&controls=1&iv_load_policy=3&fs=1&playsinline=1"
                   title="Xperience Pro Video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                 />
               </div>
@@ -2349,19 +2349,24 @@ function RouletteWheel({ language }: { language: Language }) {
     }
   }
 
+  // Prize wheel configuration - 12 segments
+  // Color mapping (must match backend indices):
+  // - Gold (#FFD700) = "20% OFF Xperience Pro" (indices 0, 3, 6, 9)
+  // - Green (#008000) = "Free CV Correction" (indices 1, 4, 7, 10)
+  // - Red (#FF0000) = "Try Again" (indices 2, 5, 8, 11)
   const prizes = [
-    { id: 1, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 },
-    { id: 2, label: "Free CV Correction", color: "#008000", weight: 2 },
-    { id: 3, label: "Try Again", color: "#FF0000", weight: 3 },
-    { id: 4, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 },
-    { id: 5, label: "Free CV Correction", color: "#008000", weight: 2 },
-    { id: 6, label: "Try Again", color: "#FF0000", weight: 3 },
-    { id: 7, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 },
-    { id: 8, label: "Free CV Correction", color: "#008000", weight: 2 },
-    { id: 9, label: "Try Again", color: "#FF0000", weight: 3 },
-    { id: 10, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 },
-    { id: 11, label: "Free CV Correction", color: "#008000", weight: 2 },
-    { id: 12, label: "Try Again", color: "#FF0000", weight: 3 },
+    { id: 1, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 }, // Index 0 - 20% OFF
+    { id: 2, label: "Free CV Correction", color: "#008000", weight: 2 }, // Index 1 - Free CV
+    { id: 3, label: "Try Again", color: "#FF0000", weight: 3 }, // Index 2 - Try Again
+    { id: 4, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 }, // Index 3 - 20% OFF
+    { id: 5, label: "Free CV Correction", color: "#008000", weight: 2 }, // Index 4 - Free CV
+    { id: 6, label: "Try Again", color: "#FF0000", weight: 3 }, // Index 5 - Try Again
+    { id: 7, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 }, // Index 6 - 20% OFF
+    { id: 8, label: "Free CV Correction", color: "#008000", weight: 2 }, // Index 7 - Free CV
+    { id: 9, label: "Try Again", color: "#FF0000", weight: 3 }, // Index 8 - Try Again
+    { id: 10, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 }, // Index 9 - 20% OFF
+    { id: 11, label: "Free CV Correction", color: "#008000", weight: 2 }, // Index 10 - Free CV
+    { id: 12, label: "Try Again", color: "#FF0000", weight: 3 }, // Index 11 - Try Again
   ]
 
   // Check daily winners and time until reset
@@ -2429,15 +2434,32 @@ function RouletteWheel({ language }: { language: Language }) {
 
       // Show result after animation
       setTimeout(async () => {
-        setResult(selectedPrize.label)
+        // Check if this is actually a win (not "Try Again")
+        const isActualWin = data.prize && data.prize !== "Try Again" && data.verificationCode
+        const displayResult = isActualWin ? data.prize : selectedPrize.label
+        
+        setResult(displayResult)
         setIsSpinning(false)
-        setWinnersToday(data.winnersToday || winnersToday + 1)
+        
+        // Only increment winners count if it's an actual win
+        if (isActualWin) {
+          setWinnersToday(data.winnersToday || winnersToday + 1)
+        }
         setCanSpin(data.canSpin !== false)
         
         // Only process actual prizes (Free CV Correction and 20% OFF) - not "Try Again"
-        console.log("Roulette result:", { prize: data.prize, verificationCode: data.verificationCode, selectedPrize: selectedPrize.label })
+        console.log("Roulette result:", { 
+          backendPrize: data.prize, 
+          verificationCode: data.verificationCode, 
+          selectedPrizeLabel: selectedPrize.label,
+          isActualWin: isActualWin
+        })
         
-        if (data.verificationCode && data.prize && data.prize !== "Try Again") {
+        // Double check: must have verification code AND prize must not be "Try Again" AND selected prize must not be "Try Again"
+        // Also check the color - red (#FF0000) means "Try Again" and should never be processed as a win
+        const isRedSegment = selectedPrize.color === "#FF0000"
+        
+        if (data.verificationCode && data.prize && data.prize !== "Try Again" && selectedPrize.label !== "Try Again" && !isRedSegment) {
           console.log("Processing winner with prize:", data.prize)
           
           // Prompt for name first
@@ -2505,7 +2527,13 @@ function RouletteWheel({ language }: { language: Language }) {
             )
           }
         } else {
-          console.log("No prize won or Try Again result")
+          // This is "Try Again" - no win, no action needed
+          console.log("No prize won - Try Again result", { 
+            backendPrize: data.prize, 
+            selectedPrizeLabel: selectedPrize.label,
+            isRedSegment: selectedPrize.color === "#FF0000"
+          })
+          // Don't show any alert for "Try Again" - just let the wheel show the result
         }
         
         // Try Again doesn't show alert
