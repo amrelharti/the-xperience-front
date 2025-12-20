@@ -461,7 +461,7 @@ const content: Record<Language, Content> = {
     },
     solution: {
       title: "Xperience Pro:\n La solution complète",
-      subtitle: "Xperience Pro est un programme structuré sur 1 mois, pensé pour les candidats qui veulent :",
+      subtitle: "Un accompagnement intensif, structuré et guidé pour les candidats qui sont déterminés à:",
       points: [
         "Identifier pourquoi leurs candidatures n'aboutissent pas",
         "Corriger ce qui bloque réellement côté recruteur",
@@ -573,7 +573,7 @@ const content: Record<Language, Content> = {
           originalPrice: "1800 DH",
           currentPrice: "1199 DH",
           specialOffer: "RECOMMANDÉ",
-          description: "Va vous aider à corriger l'ensemble des points clés qui influencent la décision du recruteur.",
+          description: "Conçu pour corriger l’ensemble des points clés qui influencent la décision du recruteur.(Programme sur 4 semaines)",
           features: [
             "CV",
             "CV clair, lisible et compréhensible rapidement",
@@ -696,6 +696,9 @@ export default function XperienceProLandingPage() {
   const holdTimerRef = useRef<NodeJS.Timeout | null>(null)
   const [showMicroReward, setShowMicroReward] = useState(false)
   const [remainingSpots, setRemainingSpots] = useState(12) // Limited spots counter - fetched from backend
+  const [showPremiumMessage, setShowPremiumMessage] = useState(false)
+  const premiumCardRef = useRef<HTMLDivElement | null>(null)
+  const premiumTimerRef = useRef<NodeJS.Timeout | null>(null)
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
   
   // Fetch remaining spots from backend
@@ -743,6 +746,46 @@ export default function XperienceProLandingPage() {
       window.removeEventListener('resize', updateTestimonialsPerView)
     }
   }, [])
+
+  // Intersection Observer for Premium Card - Show message after 5 seconds
+  useEffect(() => {
+    if (!premiumCardRef.current) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Premium card is visible - start 5 second timer
+            if (!premiumTimerRef.current && !showPremiumMessage) {
+              premiumTimerRef.current = setTimeout(() => {
+                setShowPremiumMessage(true)
+              }, 5000) // 5 seconds
+            }
+          } else {
+            // Premium card is not visible - clear timer if it exists
+            if (premiumTimerRef.current) {
+              clearTimeout(premiumTimerRef.current)
+              premiumTimerRef.current = null
+            }
+          }
+        })
+      },
+      {
+        threshold: 0.5, // Card must be at least 50% visible
+        rootMargin: '0px',
+      }
+    )
+
+    observer.observe(premiumCardRef.current)
+
+    return () => {
+      observer.disconnect()
+      if (premiumTimerRef.current) {
+        clearTimeout(premiumTimerRef.current)
+        premiumTimerRef.current = null
+      }
+    }
+  }, [showPremiumMessage])
   
   // Testimonial images from clients_reviews folder
   const testimonialImages = [
@@ -1614,7 +1657,7 @@ export default function XperienceProLandingPage() {
                 }}
                 onMouseEnter={() => setCtaHoverState({ ...ctaHoverState, basicPlan: true })}
                 onMouseLeave={() => setCtaHoverState({ ...ctaHoverState, basicPlan: false })}
-                className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 px-6 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 group"
+                className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 px-6 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 group animate-button-bounce"
               >
                 <span className="transition-all duration-200">
                   {ctaHoverState.basicPlan
@@ -1627,6 +1670,9 @@ export default function XperienceProLandingPage() {
 
             {/* Premium Plan Card */}
             <div
+              ref={(el) => {
+                premiumCardRef.current = el
+              }}
               className={`bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] rounded-2xl shadow-xl border-2 border-[#FFBC00] p-8 transform transition-all duration-700 relative ${
                 visibleSections.has("price") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
@@ -1686,243 +1732,32 @@ export default function XperienceProLandingPage() {
                 })}
               </ul>
               <button
-                onMouseDown={(e) => {
-                  e.preventDefault()
-                  setIsHolding(true)
-                  setHoldProgress(0)
-                  
-                  const duration = 1500 // 1.5 seconds (adjustable: 1000-2000ms)
-                  const interval = 20 // Update every 20ms
-                  const increment = 100 / (duration / interval)
-                  
-                  let progress = 0
-                  holdTimerRef.current = setInterval(() => {
-                    progress += increment
-                    setHoldProgress(Math.min(progress, 100))
-                    
-                    if (progress >= 100) {
-                      if (holdTimerRef.current) {
-                        clearInterval(holdTimerRef.current)
-                        holdTimerRef.current = null
-                      }
-                      setIsHolding(false)
-                      setFormData({ ...formData, offer: t.form.offerOptions.xperiencePro })
-                      setShowForm(true)
-                      setHoldProgress(0)
-                    }
-                  }, interval)
+                onClick={() => {
+                  setFormData({ ...formData, offer: t.form.offerOptions.xperiencePro })
+                  setShowForm(true)
                 }}
-                onMouseUp={() => {
-                  if (holdTimerRef.current) {
-                    clearInterval(holdTimerRef.current)
-                    holdTimerRef.current = null
-                  }
-                  setIsHolding(false)
-                  if (holdProgress < 100) {
-                    setHoldProgress(0)
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (holdTimerRef.current) {
-                    clearInterval(holdTimerRef.current)
-                    holdTimerRef.current = null
-                  }
-                  setIsHolding(false)
-                  if (holdProgress < 100) {
-                    setHoldProgress(0)
-                  }
-                }}
-                onTouchStart={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  setIsHolding(true)
-                  setHoldProgress(0)
-                  
-                  const duration = 1500 // 1.5 seconds
-                  const interval = 20
-                  const increment = 100 / (duration / interval)
-                  
-                  let progress = 0
-                  holdTimerRef.current = setInterval(() => {
-                    progress += increment
-                    setHoldProgress(Math.min(progress, 100))
-                    
-                    if (progress >= 100) {
-                      if (holdTimerRef.current) {
-                        clearInterval(holdTimerRef.current)
-                        holdTimerRef.current = null
-                      }
-                      setIsHolding(false)
-                      setFormData({ ...formData, offer: t.form.offerOptions.xperiencePro })
-                      setShowForm(true)
-                      setHoldProgress(0)
-                    }
-                  }, interval)
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  if (holdTimerRef.current) {
-                    clearInterval(holdTimerRef.current)
-                    holdTimerRef.current = null
-                  }
-                  setIsHolding(false)
-                  if (holdProgress < 100) {
-                    setHoldProgress(0)
-                  }
-                }}
-                onTouchCancel={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  if (holdTimerRef.current) {
-                    clearInterval(holdTimerRef.current)
-                    holdTimerRef.current = null
-                  }
-                  setIsHolding(false)
-                  if (holdProgress < 100) {
-                    setHoldProgress(0)
-                  }
-                }}
-                className="w-full bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold py-4 px-6 rounded-lg text-lg shadow-2xl transform hover:scale-105 transition-all duration-200 group relative overflow-hidden select-none touch-none"
-                style={{
-                  WebkitUserSelect: 'none',
-                  userSelect: 'none',
-                  WebkitTouchCallout: 'none',
-                  touchAction: 'manipulation',
-                  WebkitTapHighlightColor: 'transparent',
-                }}
+                className="w-full bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold py-4 px-6 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 group animate-button-bounce"
               >
-                {/* Lightning/Energy Animation Overlay */}
-                {isHolding && holdProgress < 100 && (
-                  <>
-                    {/* Animated Lightning Bolts */}
-                    <div className="absolute inset-0 pointer-events-none z-20">
-                      {/* Lightning bolt 1 */}
-                      <svg
-                        className="absolute top-0 left-[20%] w-8 h-full opacity-70 animate-lightning-strike"
-                        style={{ animationDuration: '0.3s' }}
-                        viewBox="0 0 24 100"
-                        fill="none"
-                      >
-                        <path
-                          d="M12 0 L8 20 L16 25 L10 40 L18 45 L6 60 L14 65 L4 80 L20 85 L8 100"
-                          stroke="white"
-                          strokeWidth="2.5"
-                          fill="none"
-                          className="drop-shadow-[0_0_10px_rgba(255,255,255,1)]"
-                          style={{ filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.9))' }}
-                        />
-                      </svg>
-                      {/* Lightning bolt 2 */}
-                      <svg
-                        className="absolute top-0 right-[25%] w-8 h-full opacity-60 animate-lightning-strike"
-                        style={{ animationDuration: '0.4s', animationDelay: '0.15s' }}
-                        viewBox="0 0 24 100"
-                        fill="none"
-                      >
-                        <path
-                          d="M12 0 L10 15 L14 20 L8 35 L16 40 L6 55 L18 60 L4 75 L20 80 L10 100"
-                          stroke="white"
-                          strokeWidth="2.5"
-                          fill="none"
-                          className="drop-shadow-[0_0_10px_rgba(255,255,255,1)]"
-                          style={{ filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.9))' }}
-                        />
-                      </svg>
-                      {/* Lightning bolt 3 */}
-                      <svg
-                        className="absolute top-0 left-[50%] w-8 h-full opacity-50 animate-lightning-strike"
-                        style={{ animationDuration: '0.35s', animationDelay: '0.25s' }}
-                        viewBox="0 0 24 100"
-                        fill="none"
-                      >
-                        <path
-                          d="M12 0 L6 18 L18 23 L8 38 L16 43 L10 58 L14 63 L6 78 L20 83 L8 100"
-                          stroke="white"
-                          strokeWidth="2.5"
-                          fill="none"
-                          className="drop-shadow-[0_0_10px_rgba(255,255,255,1)]"
-                          style={{ filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.9))' }}
-                        />
-                      </svg>
-                      {/* Lightning bolt 4 (center) */}
-                      <svg
-                        className="absolute top-0 left-[45%] w-6 h-full opacity-80 animate-lightning-flash"
-                        style={{ animationDuration: '0.25s', animationDelay: '0.1s' }}
-                        viewBox="0 0 20 100"
-                        fill="none"
-                      >
-                        <path
-                          d="M10 0 L6 18 L14 22 L8 38 L12 42 L4 58 L16 62 L2 78 L18 82 L8 100"
-                          stroke="white"
-                          strokeWidth="3"
-                          fill="none"
-                          style={{ filter: 'drop-shadow(0 0 12px rgba(255,255,255,1))' }}
-                        />
-                      </svg>
-                    </div>
-                    
-                    {/* Electric Spark Particles */}
-                    <div className="absolute inset-0 pointer-events-none z-20">
-                      {[...Array(15)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="absolute w-2 h-2 bg-white rounded-full animate-electric-spark"
-                          style={{
-                            left: `${10 + Math.random() * 80}%`,
-                            top: `${10 + Math.random() * 80}%`,
-                            animationDelay: `${Math.random() * 0.6}s`,
-                            animationDuration: `${0.4 + Math.random() * 0.4}s`,
-                            boxShadow: '0 0 8px 3px rgba(255, 255, 255, 1), 0 0 12px 4px rgba(255, 255, 255, 0.6)',
-                          }}
-                        />
-                      ))}
-                    </div>
-                    
-                    {/* Glowing Pulse Effect */}
-                    <div 
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-lightning-flash z-10"
-                      style={{ 
-                        animationDuration: '0.4s',
-                        background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)`,
-                      }}
-                    />
-                    
-                    {/* Energy Wave Effect */}
-                    <div 
-                      className="absolute inset-0 z-10 animate-energy-pulse"
-                      style={{
-                        background: `radial-gradient(circle at ${holdProgress}% 50%, rgba(255,255,255,0.4) 0%, transparent 60%)`,
-                      }}
-                    />
-                    
-                    {/* Shimmer Effect */}
-                    <div 
-                      className="absolute inset-0 z-10"
-                      style={{
-                        background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) ${holdProgress}%, transparent 100%)`,
-                        animation: 'shimmer 1s ease-in-out infinite',
-                      }}
-                    />
-                  </>
-                )}
-                
-                {/* Progress Bar Background */}
-                {isHolding && (
-                  <div 
-                    className="absolute inset-0 bg-[#e6a800] transition-all duration-20 ease-linear z-0"
-                    style={{ width: `${holdProgress}%` }}
-                  />
-                )}
-                
-                {/* Button Text */}
-                <span className="relative z-30 transition-all duration-200 font-bold">
-                  {isHolding && holdProgress < 100
-                    ? (language === "en" ? `Hold to confirm... ${Math.round(holdProgress)}%` : `Maintenez pour confirmer... ${Math.round(holdProgress)}%`)
-                    : (language === "en" ? "Click to choose premi" : "Cliquer pour choisir l'offre premium")
-                  }
+                <span className="transition-all duration-200">
+                  {language === "en" ? "Click to choose premium offer" : "Cliquer pour choisir l'offre premium"}
                 </span>
               </button>
+              
+              {/* Delayed Message - Shows after 5 seconds of viewing */}
+              <div
+                className={`mt-4 transition-all duration-500 ${
+                  showPremiumMessage
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-2 pointer-events-none"
+                }`}
+              >
+                <p className="text-center text-white/90 text-sm md:text-base italic font-medium">
+                  {language === "en" 
+                    ? "One salary received can largely exceed the price of the program."
+                    : "Un seul salaire encaissé peut largement dépasser le prix du programme."
+                  }
+                </p>
+              </div>
             </div>
           </div>
         </div>
