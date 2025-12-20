@@ -2493,23 +2493,6 @@ function RouletteWheel({ language }: { language: Language }) {
                 ")",
               }}
             >
-              {/* Clean divider lines - subtle, only between segments */}
-              {prizes.map((_, index) => {
-                const angle = index * prizeAngle
-                return (
-                  <div
-                    key={`divider-${index}`}
-                    className="absolute top-1/2 left-1/2 origin-top"
-                    style={{
-                      transform: `translate(-50%, -50%) rotate(${angle}deg)`,
-                      width: "1.5px",
-                      height: "40%", // Only goes partway from center, not to edge
-                      background: "rgba(255,255,255,0.3)",
-                      top: "50%",
-                    }}
-                  />
-                )
-              })}
 
               {/* Prize Labels - Directly on wheel segments at outer rim */}
               {prizes.map((prize, index) => {
