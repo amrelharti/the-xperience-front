@@ -16,6 +16,7 @@ interface RouletteWinner {
   prizeIndex: number
   verificationCode: string
   userIdentifier: string
+  winnerName: string | null
   winDate: string
   createdAt: string
 }
@@ -74,6 +75,36 @@ export default function RouletteWinnersPage() {
       return "from-green-500 to-green-600"
     } else {
       return "from-red-500 to-red-600"
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this winner?")) {
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/admin/roulette/winners/${id}`, {
+        method: "DELETE",
+        credentials: "include"
+      })
+      
+      if (res.ok) {
+        toast({
+          title: "Success",
+          description: "Winner deleted successfully",
+        })
+        loadWinners()
+      } else {
+        throw new Error("Failed to delete winner")
+      }
+    } catch (error) {
+      console.error("Error deleting winner:", error)
+      toast({
+        title: "Error",
+        description: "Failed to delete winner",
+        variant: "destructive",
+      })
     }
   }
 
@@ -196,7 +227,18 @@ export default function RouletteWinnersPage() {
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <CardContent className="pt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                      {/* Winner Name */}
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Name</p>
+                          <p className="text-base font-semibold text-slate-900 mt-1">{winner.winnerName || "N/A"}</p>
+                        </div>
+                      </div>
+
                       {/* Prize */}
                       <div className="flex items-start gap-3">
                         <div className={`p-2 bg-gradient-to-br ${getPrizeColor(winner.prize)} rounded-lg`}>
@@ -219,17 +261,6 @@ export default function RouletteWinnersPage() {
                         </div>
                       </div>
 
-                      {/* User Identifier */}
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
-                          <Key className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">User ID</p>
-                          <p className="text-xs font-mono text-slate-700 mt-1 break-all">{winner.userIdentifier.substring(0, 30)}...</p>
-                        </div>
-                      </div>
-
                       {/* Win Date */}
                       <div className="flex items-start gap-3">
                         <div className="p-2 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg">
@@ -239,6 +270,19 @@ export default function RouletteWinnersPage() {
                           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Win Date</p>
                           <p className="text-base font-semibold text-slate-900 mt-1">{formatDate(winner.createdAt)}</p>
                         </div>
+                      </div>
+
+                      {/* Delete Button */}
+                      <div className="flex items-center justify-end">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(winner.id)}
+                          className="hover:bg-red-600"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </Button>
                       </div>
                     </div>
                   </CardContent>

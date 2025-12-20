@@ -274,7 +274,7 @@ const content: Record<Language, Content> = {
       ],
     },
     platform: {
-      title: "Xperience Pro: A Unique Experience",
+      title: "Xperience Pro: A Unique solution",
       subtitle: "Understanding alone isn't enough. Applying alone is difficult.",
       points: [
         "Clear video capsules, accessible at any time, to understand the real rules of recruitment and what recruiters really expect.",
@@ -524,14 +524,11 @@ const content: Record<Language, Content> = {
           title: "Module 4 – Préparation aux entretiens",
           description: "Comment te présenter, répondre aux questions classiques et poser des questions intelligentes en fin d'entretien.",
         },
-        {
-          title: "Module 5 – Plan d'action",
-          description: "Un plan d'action sur 30 jours pour postuler, relancer et suivre tes candidatures sans te perdre.",
-        },
+        
       ],
     },
     platform: {
-      title: "Xperience Pro: Une expérience unique",
+      title: "Xperience Pro: Une solution unique",
       subtitle: "Comprendre seul ne suffit pas. Appliquer seul est difficile.",
       points: [
         "Des capsules vidéo claires, accessibles à tout moment, pour comprendre les règles réelles du recrutement et ce que les recruteurs attendent vraiment.",
@@ -662,7 +659,7 @@ const content: Record<Language, Content> = {
 }
 
 export default function XperienceProLandingPage() {
-  const [language, setLanguage] = useState<Language>("en")
+  const [language, setLanguage] = useState<Language>("fr")
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null)
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set())
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -1493,14 +1490,14 @@ export default function XperienceProLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
-                {t.platform.title}
-              </h2>
-              {t.platform.subtitle && (
-                <p className="text-xl md:text-2xl font-semibold text-gray-700 mb-8 italic">
+            {t.platform.subtitle && (
+                <p className="text-xl md:text-2xl font-bold text-gray-700 mb-8 italic">
                   {t.platform.subtitle}
                 </p>
               )}
+              <h2 className="text-3xl md:text-4xl font-semibold mb-6 text-gray-900">
+                {t.platform.title}
+              </h2>
             </div>
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 md:p-12 rounded-2xl shadow-lg">
               <div className="space-y-6">
@@ -2205,7 +2202,7 @@ export default function XperienceProLandingPage() {
               <h3 className="text-2xl font-bold text-gray-900 mb-3">
                 {language === "en" 
                   ? "You're one click away from fixing what's blocking you"
-                  : "Vous êtes à un clic de corriger ce qui vous bloque"
+                  : "Vous êtes à un clic de corriger ce qui me bloque"
                 }
               </h3>
               <p className="text-gray-600 mb-6">
@@ -2471,7 +2468,7 @@ function RouletteWheel({ language }: { language: Language }) {
       }
 
       // Show result after animation
-      setTimeout(() => {
+      setTimeout(async () => {
         setResult(selectedPrize.label)
         setIsSpinning(false)
         setWinnersToday(data.winnersToday || winnersToday + 1)
@@ -2480,6 +2477,29 @@ function RouletteWheel({ language }: { language: Language }) {
         // Only send WhatsApp for actual prizes (not "Try Again")
         if (data.verificationCode && (selectedPrize.id === 1 || selectedPrize.id === 4 || selectedPrize.id === 7 || selectedPrize.id === 10 || 
             selectedPrize.id === 2 || selectedPrize.id === 5 || selectedPrize.id === 8 || selectedPrize.id === 11)) {
+          
+          // Prompt for name
+          const winnerName = prompt(
+            language === "en" 
+              ? "🎉 Congratulations! Please enter your name to claim your prize:" 
+              : "🎉 Félicitations ! Veuillez entrer votre nom pour réclamer votre prix :"
+          )
+          
+          // Update winner with name if provided
+          if (winnerName && winnerName.trim()) {
+            try {
+              await fetch("/api/roulette/update-winner", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  verificationCode: data.verificationCode,
+                  winnerName: winnerName.trim()
+                })
+              })
+            } catch (error) {
+              console.error("Error updating winner name:", error)
+            }
+          }
           
           const prizeText = language === "en" 
             ? `🎉 Congratulations! You won: ${data.prize}!` 
@@ -2495,18 +2515,6 @@ function RouletteWheel({ language }: { language: Language }) {
           sendWhatsAppMessage(whatsappMessage)
         }
         
-        // Show alert
-        if (selectedPrize.id === 1 || selectedPrize.id === 4 || selectedPrize.id === 7 || selectedPrize.id === 10) {
-          // 20% OFF
-          alert(language === "en" 
-            ? `🎉 Congratulations! You won: ${data.prize}! Check WhatsApp for your verification code.` 
-            : `🎉 Félicitations ! Vous avez gagné : ${data.prize} ! Vérifiez WhatsApp pour votre code de vérification.`)
-        } else if (selectedPrize.id === 2 || selectedPrize.id === 5 || selectedPrize.id === 8 || selectedPrize.id === 11) {
-          // Free CV Correction
-          alert(language === "en" 
-            ? `🎉 Congratulations! You won: ${data.prize}! Check WhatsApp for your verification code.` 
-            : `🎉 Félicitations ! Vous avez gagné : ${data.prize} ! Vérifiez WhatsApp pour votre code de vérification.`)
-        }
         // Try Again doesn't show alert
       }, 4000)
     } catch (error) {
