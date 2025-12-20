@@ -316,7 +316,7 @@ const content: Record<Language, Content> = {
           description: "Will help you correct all the key points that influence the recruiter's decision.",
           features: [
             "CV",
-            " Clear, readable and quickly understandable CV",
+            "Clear, readable and quickly understandable CV",
             "Capable of passing the first screening",
             "Interviews",
             "Structured and relevant answers",
@@ -1642,11 +1642,30 @@ export default function XperienceProLandingPage() {
                 )}
               </div>
               <ul className="space-y-3 mb-8 text-white">
-                {t.price.plans.premium.features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-white/90 text-sm leading-relaxed">- {feature}</span>
-                  </li>
-                ))}
+                {t.price.plans.premium.features.map((feature, index) => {
+                  // Check if this is a section title (CV, LinkedIn, Entretiens, Accompagnement & suivi)
+                  const isSectionTitle = feature === "CV" || 
+                                         feature === "LinkedIn" || 
+                                         feature === "Entretiens" || 
+                                         feature === "Accompagnement & suivi" ||
+                                         feature === "Interviews" ||
+                                         feature === "Support & follow-up"
+                  
+                  if (isSectionTitle) {
+                    return (
+                      <li key={index} className="mt-4 first:mt-0">
+                        <h4 className="text-white font-bold text-base mb-2">{feature}</h4>
+                      </li>
+                    )
+                  }
+                  
+                  // Regular feature item
+                  return (
+                    <li key={index} className="flex items-start gap-2 ml-4">
+                      <span className="text-white/90 text-sm leading-relaxed">o {feature}</span>
+                    </li>
+                  )
+                })}
               </ul>
               <button
                 onMouseDown={(e) => {
