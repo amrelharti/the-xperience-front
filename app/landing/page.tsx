@@ -2516,51 +2516,43 @@ function RouletteWheel({ language }: { language: Language }) {
                 )
               })}
 
-              {/* Premium Prize Labels with better visibility */}
+              {/* Prize Labels - Directly on wheel segments at outer rim */}
               {prizes.map((prize, index) => {
                 const angle = (index * prizeAngle) + (prizeAngle / 2) - 90
-                const radius = 50
+                // Position text on outer rim (around 85% from center, near the white border)
+                const radius = 85
                 const x = 50 + radius * Math.cos((angle * Math.PI) / 180)
                 const y = 50 + radius * Math.sin((angle * Math.PI) / 180)
 
-                // Get full label text
-                const fullLabel = prize.label === "OFF Xperience Pro" 
+                // Get label text
+                const labelText = prize.label === "OFF Xperience Pro" 
                   ? (language === "en" ? "20% OFF Xperience Pro" : "20% OFF Xperience Pro")
                   : prize.label === "Free CV Correction"
                   ? (language === "en" ? "Free CV Correction" : "Correction CV Gratuite")
                   : (language === "en" ? "Try Again" : "Réessayer")
 
-                // Determine styling based on prize type
-                const isGold = prize.color === "#FFD700"
-                const isGreen = prize.color === "#008000"
-                const isRed = prize.color === "#FF0000"
-
                 return (
                   <div
                     key={prize.id}
-                    className="absolute text-center pointer-events-none"
+                    className="absolute pointer-events-none z-20"
                     style={{
                       left: `${x}%`,
                       top: `${y}%`,
                       transform: `translate(-50%, -50%) rotate(${angle + 90}deg)`,
                       transformOrigin: "center",
-                      width: "38%",
+                      width: "18%",
                     }}
                   >
-                    <div className={`
-                      px-4 py-3 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-md
-                      ${isGold ? "bg-gradient-to-br from-white to-yellow-50 border-[3px] border-[#FFD700]" : ""}
-                      ${isGreen ? "bg-gradient-to-br from-white to-green-50 border-[3px] border-[#008000]" : ""}
-                      ${isRed ? "bg-gradient-to-br from-white to-red-50 border-[3px] border-[#FF0000]" : ""}
-                    `}>
-                      <div className={`
-                        font-black text-sm md:text-base leading-tight whitespace-nowrap
-                        ${isGold ? "text-[#B8860B]" : ""}
-                        ${isGreen ? "text-[#006400]" : ""}
-                        ${isRed ? "text-[#CC0000]" : ""}
-                        drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]
-                      `}>
-                        {fullLabel}
+                    <div className="text-center">
+                      <div 
+                        className="font-black text-xs md:text-sm text-white leading-tight whitespace-nowrap"
+                        style={{
+                          textShadow: "3px 3px 6px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.8), -1px -1px 3px rgba(0,0,0,0.6), 1px 1px 3px rgba(0,0,0,0.6)",
+                          WebkitTextStroke: "0.8px rgba(0,0,0,0.9)",
+                          filter: "drop-shadow(0 0 4px rgba(0,0,0,0.9))",
+                        }}
+                      >
+                        {labelText}
                       </div>
                     </div>
                   </div>
