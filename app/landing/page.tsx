@@ -423,7 +423,7 @@ const content: Record<Language, Content> = {
     },
     hero: {
       headline: "Ignoré par les recruteurs ? Mettez fin aux candidatures sans réponse.",
-      subheading: "Vous envoyez des candidatures. Vous faites des efforts. Mais les réponses n'arrivent pas. Et vous ne savez pas pourquoi.",
+      subheading: "Vous envoyez des candidatures. Vous faites des efforts. Mais les réponses n'arrivent pas.\n Et vous ne savez pas pourquoi.",
       forWho: "Pour les candidats qui veulent comprendre ce qui les bloque et comment le corriger.",
       ctaPrimary: "Corriger ce qui bloque",
       ctaSecondary: "Voir comment ça marche",
@@ -465,7 +465,7 @@ const content: Record<Language, Content> = {
       points: [
         "Identifier pourquoi leurs candidatures n'aboutissent pas",
         "Corriger ce qui bloque réellement côté recruteur",
-        "Utiliser l'IA pour "
+        "Booster leur recherche d’emploi / Stage grâce à l’IA "
       ],
     },
     cvScorer: {
@@ -518,22 +518,21 @@ const content: Record<Language, Content> = {
       title: "Le contenu du programme Xperience Pro",
       items: [
         {
-          title: "Module 1 – Les fondamentaux du CV",
-          description: "Construire un CV professionnel qui met en valeur ton profil, même si tu n'as pas beaucoup d'expérience.",
+          title: "Module 1 : CV clair, lisible et compris par les recruteurs",
+          description: "Optimiser votre CV pour qu'il soit :\n\n• Compréhensible rapidement\n• Aligné avec les attentes des recruteurs\n\nObjectif : passer le premier tri et éviter l'élimination automatique.",
         },
         {
-          title: "Module 2 – Adapter ton CV à chaque offre",
-          description: "Comment lire une offre, choisir les bons mots-clés et adapter ton CV rapidement.",
+          title: "Module 2 : Maitrise des techniques d'entretien",
+          description: "Comprendre :\n\n• Ce que le recruteur cherche vraiment à évaluer\n• Comment éviter les réponses floues ou hors sujet\n\nObjectif : mieux performer en entretien, sans improviser.",
         },
         {
-          title: "Module 3 – Maîtriser LinkedIn",
-          description: "Optimiser ta photo, ton titre, ton 'À propos' et devenir visible pour les recruteurs.",
+          title: "Module 3 : Gérer le stress et convaincre à l'entretien",
+          description: "Apprendre à :\n\n• Gérer le stress avant et pendant l'entretien\n• Bien se renseigner sur l'entreprise et se distinguer\n\nObjectif : gagner en confiance et en impact face au recruteur.",
         },
         {
-          title: "Module 4 – Préparation aux entretiens",
-          description: "Comment te présenter, répondre aux questions classiques et poser des questions intelligentes en fin d'entretien.",
+          title: "Module 4 : LinkedIn et positionnement professionnel",
+          description: "Optimiser votre présence sur LinkedIn pour :\n\n• Renforcer votre crédibilité face aux recruteurs\n• Se positionner comme un leader d'opinion dans votre domaine.\n\nObjectif : Améliorer votre visibilité et votre positionnement sur le marché.",
         },
-        
       ],
     },
     platform: {
@@ -1409,7 +1408,7 @@ export default function XperienceProLandingPage() {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900">{module.title}</h3>
                 </div>
-                <p className="text-gray-600 leading-relaxed">{module.description}</p>
+                <p className="text-gray-600 leading-relaxed whitespace-pre-line">{module.description}</p>
               </div>
             ))}
           </div>
