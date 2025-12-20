@@ -406,7 +406,7 @@ const content: Record<Language, Content> = {
         reconversion: "Reconversion Professionnelle",
       },
       offerOptions: {
-        xperiencePro: "COACHING PREMIUM - 1199 DH",
+        xperiencePro: "COACHING PREMIUM - 1200 DH",
         xperience: "COACHING BASIC - 800 DH",
       },
     },
@@ -423,7 +423,7 @@ const content: Record<Language, Content> = {
     },
     hero: {
       headline: "Ignoré par les recruteurs ?\n Mettez fin aux candidatures sans réponse.",
-      subheading: "Vous envoyez des candidatures. Vous faites des efforts. Mais les réponses n'arrivent pas.\n Et vous ne savez pas pourquoi.",
+      subheading: "Vous envoyez des candidatures. Vous faites des efforts. Mais les réponses n'arrivent pas.",
       forWho: "Pour les candidats qui veulent comprendre ce qui les bloque et comment le corriger.",
       ctaPrimary: "Corriger ce qui bloque",
       ctaSecondary: "Voir comment ça marche",
@@ -570,8 +570,8 @@ const content: Record<Language, Content> = {
         },
         premium: {
           name: "COACHING PREMIUM",
-          originalPrice: "1500 DH",
-          currentPrice: "1199 DH",
+          originalPrice: "1800 DH",
+          currentPrice: "1200 DH",
           specialOffer: "RECOMMANDÉ",
           description: "Va vous aider à corriger l'ensemble des points clés qui influencent la décision du recruteur.",
           features: [
@@ -666,7 +666,7 @@ const content: Record<Language, Content> = {
         reconversion: "Reconversion Professionnelle",
       },
       offerOptions: {
-        xperiencePro: "COACHING PREMIUM - 1199 DH",
+        xperiencePro: "COACHING PREMIUM - 1200 DH",
         xperience: "COACHING BASIC - 800 DH",
       },
     },
@@ -1210,6 +1210,8 @@ export default function XperienceProLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <p className="text-xl md:text-2xl mb-6 font-bold text-black-900 leading-relaxed text-center">
               {t.hero.subheading}
+              <br />
+              <span className="block mt-2">Et vous ne savez pas pourquoi.</span>
             </p>
           <h2 className="text-2xl md:text-3xl text-center mb-8 text-gray-900">
             {t.socialProof.title}
@@ -1348,82 +1350,6 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
-      {/* Partners Section - Slideshow */}
-      <section className="py-16 md:py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
-            {language === "en" ? "They trusted us" : "Ils nous ont fait confiance"}
-          </h2>
-          <div className="relative">
-            {/* Carousel Container */}
-            <div className="overflow-hidden">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentPartnerIndex * (100 / 6)}%)` }}
-              >
-                {[
-                  "/partenaires/AIESEC.png",
-                  "/partenaires/Al_Aoula_Tv_Logo.png",
-                  "/partenaires/EMSI.png",
-                  "/partenaires/ENCG Casa.png",
-                  "/partenaires/ENCG Kenitra.png",
-                  "/partenaires/ENCG Oujda.png",
-                  "/partenaires/ENCG Tanger.png",
-                  "/partenaires/ENCG-S.png",
-                  "/partenaires/ENSA Kenitra.png",
-                  "/partenaires/ENSA Tetouan.png",
-                  "/partenaires/Le-Matinma.png",
-                  "/partenaires/logo_alowla.png",
-                  "/partenaires/logo_alowla1.png",
-                  "/partenaires/Logo_groupe_ISCAE.jpg",
-                  "/partenaires/Logo_iav.png",
-                  "/partenaires/Logo_inpt.PNG",
-                  "/partenaires/Logo_Université_Euromed_de_Fès.png",
-                  "/partenaires/M24_tv_logo.jpg",
-                  "/partenaires/Universite_Cadi_Ayyad.png",
-                ].map((logo, index) => (
-                  <div
-                    key={index}
-                    className="min-w-[16.666%] md:min-w-[16.666%] flex-shrink-0 px-2"
-                  >
-                    <div className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center h-24 md:h-32 group hover:scale-105">
-                      <Image
-                        src={logo}
-                        alt={`Partner ${index + 1}`}
-                        width={120}
-                        height={80}
-                        className="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Navigation Buttons */}
-            <button
-              onClick={() => setCurrentPartnerIndex((prev) => 
-                prev === 0 ? Math.max(0, 19 - 6) : Math.max(0, prev - 1)
-              )}
-              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
-              aria-label="Previous partners"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setCurrentPartnerIndex((prev) => 
-                prev >= 19 - 6 ? 0 : prev + 1
-              )}
-              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
-              aria-label="Next partners"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </section>
-
-     
       {/* Solution Section */}
       {t.solution && (
         <section className="py-16 md:py-24 bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] text-white">
@@ -1542,7 +1468,7 @@ export default function XperienceProLandingPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
             {t.modules.title}
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             {t.modules.items.map((module, index) => (
               <div
                 key={index}
@@ -1566,9 +1492,8 @@ export default function XperienceProLandingPage() {
                   {module.description.split('\n').map((line, lineIndex, lines) => {
                     if (line.startsWith('Objectif :')) {
                       return (
-                        <span key={lineIndex}>
-                          <span className="font-semibold">Objectif :</span>
-                          {line.replace('Objectif :', '')}
+                        <span key={lineIndex} className="font-semibold">
+                          {line}
                           {lineIndex < lines.length - 1 && '\n'}
                         </span>
                       )
@@ -1992,6 +1917,81 @@ export default function XperienceProLandingPage() {
                 </span>
               </button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Partners Section - Slideshow */}
+      <section className="py-16 md:py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+            {language === "en" ? "They trusted us" : "Ils nous ont fait confiance"}
+          </h2>
+          <div className="relative">
+            {/* Carousel Container */}
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentPartnerIndex * (100 / 6)}%)` }}
+              >
+                {[
+                  "/partenaires/AIESEC.png",
+                  "/partenaires/Al_Aoula_Tv_Logo.png",
+                  "/partenaires/EMSI.png",
+                  "/partenaires/ENCG Casa.png",
+                  "/partenaires/ENCG Kenitra.png",
+                  "/partenaires/ENCG Oujda.png",
+                  "/partenaires/ENCG Tanger.png",
+                  "/partenaires/ENCG-S.png",
+                  "/partenaires/ENSA Kenitra.png",
+                  "/partenaires/ENSA Tetouan.png",
+                  "/partenaires/Le-Matinma.png",
+                  "/partenaires/logo_alowla.png",
+                  "/partenaires/logo_alowla1.png",
+                  "/partenaires/Logo_groupe_ISCAE.jpg",
+                  "/partenaires/Logo_iav.png",
+                  "/partenaires/Logo_inpt.PNG",
+                  "/partenaires/Logo_Université_Euromed_de_Fès.png",
+                  "/partenaires/M24_tv_logo.jpg",
+                  "/partenaires/Universite_Cadi_Ayyad.png",
+                ].map((logo, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[16.666%] md:min-w-[16.666%] flex-shrink-0 px-2"
+                  >
+                    <div className="bg-white p-4 md:p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center h-24 md:h-32 group hover:scale-105">
+                      <Image
+                        src={logo}
+                        alt={`Partner ${index + 1}`}
+                        width={120}
+                        height={80}
+                        className="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Navigation Buttons */}
+            <button
+              onClick={() => setCurrentPartnerIndex((prev) => 
+                prev === 0 ? Math.max(0, 19 - 6) : Math.max(0, prev - 1)
+              )}
+              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              aria-label="Previous partners"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setCurrentPartnerIndex((prev) => 
+                prev >= 19 - 6 ? 0 : prev + 1
+              )}
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              aria-label="Next partners"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </section>
