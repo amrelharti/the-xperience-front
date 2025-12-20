@@ -2347,6 +2347,50 @@ function RouletteWheel({ language }: { language: Language }) {
   const [timeUntilReset, setTimeUntilReset] = useState("")
   const wheelRef = useRef<HTMLDivElement>(null)
   const [rotation, setRotation] = useState(0)
+  
+  const ADMIN_WHATSAPP_NUMBER = "212773213060"
+  
+  // Clean phone number - remove all non-digit characters
+  const cleanPhoneNumber = (phone: string): string => {
+    return phone.replace(/\D/g, "")
+  }
+  
+  // Send WhatsApp message
+  const sendWhatsAppMessage = (message: string) => {
+    let cleanedNumber = cleanPhoneNumber(ADMIN_WHATSAPP_NUMBER)
+    
+    // For WhatsApp Business, ensure proper format
+    if (cleanedNumber.startsWith("00212")) {
+      cleanedNumber = cleanedNumber.replace("00212", "212")
+    }
+    if (cleanedNumber.startsWith("+212")) {
+      cleanedNumber = cleanedNumber.replace("+212", "212")
+    }
+    if (cleanedNumber.startsWith("0") && !cleanedNumber.startsWith("212")) {
+      cleanedNumber = "212" + cleanedNumber.substring(1)
+    }
+    if (!cleanedNumber.startsWith("212")) {
+      cleanedNumber = "212" + cleanedNumber
+    }
+    
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(message)
+    
+    // Try multiple WhatsApp URL formats
+    const whatsappUrl1 = `https://wa.me/${cleanedNumber}?text=${encodedMessage}`
+    const whatsappUrl2 = `https://api.whatsapp.com/send?phone=${cleanedNumber}&text=${encodedMessage}`
+    
+    try {
+      const win = window.open(whatsappUrl1, "_blank", "noopener,noreferrer")
+      if (!win || win.closed || typeof win.closed === "undefined") {
+        setTimeout(() => {
+          window.open(whatsappUrl2, "_blank", "noopener,noreferrer")
+        }, 100)
+      }
+    } catch (error) {
+      window.open(whatsappUrl2, "_blank", "noopener,noreferrer")
+    }
+  }
 
   const prizes = [
     { id: 1, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 },
@@ -2433,16 +2477,35 @@ function RouletteWheel({ language }: { language: Language }) {
         setWinnersToday(data.winnersToday || winnersToday + 1)
         setCanSpin(data.canSpin !== false)
         
-        if (selectedPrize.id === 1 || selectedPrize.id === 4 || selectedPrize.id === 7) {
-          // 20% OFF - show success message
+        // Only send WhatsApp for actual prizes (not "Try Again")
+        if (data.verificationCode && (selectedPrize.id === 1 || selectedPrize.id === 4 || selectedPrize.id === 7 || selectedPrize.id === 10 || 
+            selectedPrize.id === 2 || selectedPrize.id === 5 || selectedPrize.id === 8 || selectedPrize.id === 11)) {
+          
+          const prizeText = language === "en" 
+            ? `🎉 Congratulations! You won: ${data.prize}!` 
+            : `🎉 Félicitations ! Vous avez gagné : ${data.prize} !`
+          
+          const codeText = language === "en"
+            ? `Your verification code is: ${data.verificationCode}\n\nPlease save this code to claim your prize.`
+            : `Votre code de vérification est : ${data.verificationCode}\n\nVeuillez conserver ce code pour réclamer votre prix.`
+          
+          const whatsappMessage = `${prizeText}\n\n${codeText}`
+          
+          // Send WhatsApp message with prize and code
+          sendWhatsAppMessage(whatsappMessage)
+        }
+        
+        // Show alert
+        if (selectedPrize.id === 1 || selectedPrize.id === 4 || selectedPrize.id === 7 || selectedPrize.id === 10) {
+          // 20% OFF
           alert(language === "en" 
-            ? `🎉 Congratulations! You won: ${selectedPrize.label}! Contact us to claim your prize.` 
-            : `🎉 Félicitations ! Vous avez gagné : ${selectedPrize.label} ! Contactez-nous pour réclamer votre prix.`)
-        } else if (selectedPrize.id === 2 || selectedPrize.id === 5 || selectedPrize.id === 8) {
+            ? `🎉 Congratulations! You won: ${data.prize}! Check WhatsApp for your verification code.` 
+            : `🎉 Félicitations ! Vous avez gagné : ${data.prize} ! Vérifiez WhatsApp pour votre code de vérification.`)
+        } else if (selectedPrize.id === 2 || selectedPrize.id === 5 || selectedPrize.id === 8 || selectedPrize.id === 11) {
           // Free CV Correction
           alert(language === "en" 
-            ? `🎉 Congratulations! You won: ${selectedPrize.label}! Contact us to claim your prize.` 
-            : `🎉 Félicitations ! Vous avez gagné : ${selectedPrize.label} ! Contactez-nous pour réclamer votre prix.`)
+            ? `🎉 Congratulations! You won: ${data.prize}! Check WhatsApp for your verification code.` 
+            : `🎉 Félicitations ! Vous avez gagné : ${data.prize} ! Vérifiez WhatsApp pour votre code de vérification.`)
         }
         // Try Again doesn't show alert
       }, 4000)

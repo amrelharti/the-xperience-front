@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Menu, X, PlayCircle, User, Eye, MessageSquare, GraduationCap, FileCheck, Settings } from "lucide-react"
+import { Menu, X, PlayCircle, User, Eye, MessageSquare, GraduationCap, FileCheck, Settings, Trophy } from "lucide-react"
 
 interface Course {
   id: string
@@ -550,6 +550,14 @@ export default function AdminPage() {
                       <FileCheck className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
                     <span className="font-semibold text-slate-700 text-xs sm:text-sm">CV Score Users</span>
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-yellow-500 group">
+                  <Link href="/admin/roulette-winners">
+                    <div className="p-2 sm:p-3 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                      <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    </div>
+                    <span className="font-semibold text-slate-700 text-xs sm:text-sm">Roulette Winners</span>
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="h-20 sm:h-24 flex-col gap-2 sm:gap-3 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-rose-500 group">
