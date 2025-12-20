@@ -4,19 +4,35 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:80
 
 export async function GET(request: NextRequest) {
   try {
-    // Get JWT token from cookies
-    const token = request.cookies.get('token')?.value
-
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const cookieHeader = request.headers.get('cookie') || ''
+    
+    // Extract JWT token from SESSION cookie
+    let jwtToken = null
+    if (cookieHeader) {
+      const cookies = cookieHeader.split(';')
+      for (const cookie of cookies) {
+        const [name, value] = cookie.trim().split('=')
+        if (name === 'SESSION' && value) {
+          jwtToken = value
+          break
+        }
+      }
     }
-
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+    
+    if (jwtToken) {
+      headers['Authorization'] = `Bearer ${jwtToken}`
+    } else {
+      headers['Cookie'] = cookieHeader
+    }
+    
     const response = await fetch(`${BACKEND_URL}/api/admin/roulette/winners`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
+      headers,
+      credentials: 'include',
       cache: 'no-store',
     })
     

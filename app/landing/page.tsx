@@ -1863,7 +1863,7 @@ export default function XperienceProLandingPage() {
                 <span className="relative z-30 transition-all duration-200 font-bold">
                   {isHolding && holdProgress < 100
                     ? (language === "en" ? `Hold to confirm... ${Math.round(holdProgress)}%` : `Maintenez pour confirmer... ${Math.round(holdProgress)}%`)
-                    : (language === "en" ? "Choose Premium" : "Choisir Premium")
+                    : (language === "en" ? "Maintain to choose premium" : "Maintenir pour Choisir premium")
                   }
                 </span>
               </button>
