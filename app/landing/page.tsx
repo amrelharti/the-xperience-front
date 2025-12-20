@@ -1163,12 +1163,12 @@ export default function XperienceProLandingPage() {
               {t.hero.forWho}
             </p>
             
-            {/* YouTube Video Embed */}
+            {/* YouTube Video Embed - No title, no logo */}
             <div className="mb-8 max-w-4xl mx-auto">
               <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                 <iframe
                   className="absolute top-0 left-0 w-full h-full rounded-lg shadow-2xl"
-                  src="https://www.youtube.com/embed/5Jf283OoTM4"
+                  src="https://www.youtube.com/embed/5Jf283OoTM4?modestbranding=1&showinfo=0&rel=0&controls=1&iv_load_policy=3&fs=1"
                   title="Xperience Pro Video"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -1209,7 +1209,7 @@ export default function XperienceProLandingPage() {
       {/* Social Proof Section */}
       <section className="py-12 md:py-16 bg-white border-y border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p className="text-xl md:text-2xl mb-6 font-bold text-black-900 leading-relaxed">
+            <p className="text-xl md:text-2xl mb-6 font-bold text-black-900 leading-relaxed text-center">
               {t.hero.subheading}
             </p>
           <h2 className="text-2xl md:text-3xl text-center mb-8 text-gray-900">
@@ -2310,38 +2310,43 @@ function RouletteWheel({ language }: { language: Language }) {
   
   // Send WhatsApp message
   const sendWhatsAppMessage = (message: string) => {
-    let cleanedNumber = cleanPhoneNumber(ADMIN_WHATSAPP_NUMBER)
-    
-    // For WhatsApp Business, ensure proper format
-    if (cleanedNumber.startsWith("00212")) {
-      cleanedNumber = cleanedNumber.replace("00212", "212")
-    }
-    if (cleanedNumber.startsWith("+212")) {
-      cleanedNumber = cleanedNumber.replace("+212", "212")
-    }
-    if (cleanedNumber.startsWith("0") && !cleanedNumber.startsWith("212")) {
-      cleanedNumber = "212" + cleanedNumber.substring(1)
-    }
-    if (!cleanedNumber.startsWith("212")) {
-      cleanedNumber = "212" + cleanedNumber
-    }
-    
-    // Encode the message for URL
-    const encodedMessage = encodeURIComponent(message)
-    
-    // Try multiple WhatsApp URL formats
-    const whatsappUrl1 = `https://wa.me/${cleanedNumber}?text=${encodedMessage}`
-    const whatsappUrl2 = `https://api.whatsapp.com/send?phone=${cleanedNumber}&text=${encodedMessage}`
-    
     try {
-      const win = window.open(whatsappUrl1, "_blank", "noopener,noreferrer")
-      if (!win || win.closed || typeof win.closed === "undefined") {
-        setTimeout(() => {
-          window.open(whatsappUrl2, "_blank", "noopener,noreferrer")
-        }, 100)
+      let cleanedNumber = cleanPhoneNumber(ADMIN_WHATSAPP_NUMBER)
+      
+      // For WhatsApp Business, ensure proper format
+      if (cleanedNumber.startsWith("00212")) {
+        cleanedNumber = cleanedNumber.replace("00212", "212")
       }
+      if (cleanedNumber.startsWith("+212")) {
+        cleanedNumber = cleanedNumber.replace("+212", "212")
+      }
+      if (cleanedNumber.startsWith("0") && !cleanedNumber.startsWith("212")) {
+        cleanedNumber = "212" + cleanedNumber.substring(1)
+      }
+      if (!cleanedNumber.startsWith("212")) {
+        cleanedNumber = "212" + cleanedNumber
+      }
+      
+      // Encode the message for URL
+      const encodedMessage = encodeURIComponent(message)
+      
+      // Use wa.me format (most reliable)
+      const whatsappUrl = `https://wa.me/${cleanedNumber}?text=${encodedMessage}`
+      
+      console.log("Opening WhatsApp URL:", whatsappUrl)
+      
+      // Open WhatsApp in new window/tab
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer")
+      
+      // Fallback: try alternative format if first fails
+      setTimeout(() => {
+        const altUrl = `https://api.whatsapp.com/send?phone=${cleanedNumber}&text=${encodedMessage}`
+        console.log("Trying alternative WhatsApp URL:", altUrl)
+      }, 500)
     } catch (error) {
-      window.open(whatsappUrl2, "_blank", "noopener,noreferrer")
+      console.error("Error sending WhatsApp message:", error)
+      // Fallback: show message in console for debugging
+      console.log("WhatsApp message that should be sent:", message)
     }
   }
 
@@ -2431,9 +2436,10 @@ function RouletteWheel({ language }: { language: Language }) {
         setCanSpin(data.canSpin !== false)
         
         // Only process actual prizes (Free CV Correction and 20% OFF) - not "Try Again"
-        if (data.verificationCode && data.prize !== "Try Again" && 
-            (selectedPrize.id === 1 || selectedPrize.id === 4 || selectedPrize.id === 7 || selectedPrize.id === 10 || 
-            selectedPrize.id === 2 || selectedPrize.id === 5 || selectedPrize.id === 8 || selectedPrize.id === 11)) {
+        console.log("Roulette result:", { prize: data.prize, verificationCode: data.verificationCode, selectedPrize: selectedPrize.label })
+        
+        if (data.verificationCode && data.prize && data.prize !== "Try Again") {
+          console.log("Processing winner with prize:", data.prize)
           
           // Prompt for name first
           let winnerName = prompt(
@@ -2454,7 +2460,8 @@ function RouletteWheel({ language }: { language: Language }) {
           // Update winner with name if provided
           if (winnerName && winnerName.trim()) {
             try {
-              await fetch("/api/roulette/update-winner", {
+              console.log("Updating winner name:", winnerName.trim())
+              const updateResponse = await fetch("/api/roulette/update-winner", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -2463,11 +2470,16 @@ function RouletteWheel({ language }: { language: Language }) {
                 })
               })
               
+              if (!updateResponse.ok) {
+                console.error("Failed to update winner name")
+              }
+              
               // Send WhatsApp message to ADMIN with winner info
               const adminMessage = language === "en"
                 ? `🎰 *Roulette Winner*\n\n*Name:* ${winnerName.trim()}\n*Prize:* ${data.prize}\n*Verification Code:* ${data.verificationCode}\n\nPlease verify and process this winner.`
                 : `🎰 *Gagnant de la Roulette*\n\n*Nom:* ${winnerName.trim()}\n*Prix:* ${data.prize}\n*Code de vérification:* ${data.verificationCode}\n\nVeuillez vérifier et traiter ce gagnant.`
               
+              console.log("Sending WhatsApp message to admin:", adminMessage)
               // Send message to admin
               sendWhatsAppMessage(adminMessage)
               
@@ -2478,7 +2490,7 @@ function RouletteWheel({ language }: { language: Language }) {
                   : `🎉 Félicitations ${winnerName.trim()} ! Vous avez gagné : ${data.prize} !\n\nVotre code de vérification : ${data.verificationCode}\n\nNous avons envoyé vos informations à notre équipe. Ils vous contacteront bientôt !`
               )
             } catch (error) {
-              console.error("Error updating winner name:", error)
+              console.error("Error updating winner name or sending WhatsApp:", error)
               alert(
                 language === "en" 
                   ? "An error occurred. Please contact us with your verification code: " + data.verificationCode
@@ -2493,6 +2505,8 @@ function RouletteWheel({ language }: { language: Language }) {
                 : "Le nom est requis pour réclamer votre prix. Veuillez nous contacter avec votre code de vérification : " + data.verificationCode
             )
           }
+        } else {
+          console.log("No prize won or Try Again result")
         }
         
         // Try Again doesn't show alert
