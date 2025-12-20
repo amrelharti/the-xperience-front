@@ -1374,9 +1374,8 @@ export default function XperienceProLandingPage() {
               </div>
               <button
                 onClick={() => scrollToSection("price")}
-                className="mt-12 bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto relative"
+                className="mt-12 bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto animate-button-bounce"
               >
-                <span className="absolute -left-10 text-2xl animate-emoji-pulse">👆</span>
                 {language === "en" ? "Fix What's Blocking My Applications" : "Corriger ce qui bloque mes candidatures"}
                 <ArrowRight className="w-5 h-5" />
               </button>
@@ -1595,11 +1594,18 @@ export default function XperienceProLandingPage() {
                 )}
               </div>
               <ul className="space-y-3 mb-8">
-                {t.price.plans.basic.features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-gray-600 text-sm leading-relaxed">o {feature}</span>
-                  </li>
-                ))}
+                {t.price.plans.basic.features.map((feature, index) => {
+                  const isFirstLine = index === 0
+                  return (
+                    <li key={index} className="flex items-start gap-2">
+                      {isFirstLine ? (
+                        <span className="text-gray-600 text-sm leading-relaxed font-semibold">{feature}</span>
+                      ) : (
+                        <span className="text-gray-600 text-sm leading-relaxed">o {feature}</span>
+                      )}
+                    </li>
+                  )
+                })}
               </ul>
               <button
                 onClick={() => {
