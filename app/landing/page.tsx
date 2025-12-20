@@ -1145,9 +1145,7 @@ export default function XperienceProLandingPage() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
               {t.hero.headline}
             </h1>
-            <p className="text-xl md:text-2xl mb-6 text-blue-100 leading-relaxed">
-              {t.hero.subheading}
-            </p>
+            
             <p className="text-lg mb-6 text-blue-200">
               {t.hero.forWho}
             </p>
@@ -1197,7 +1195,10 @@ export default function XperienceProLandingPage() {
       {/* Social Proof Section */}
       <section className="py-12 md:py-16 bg-white border-y border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900">
+            <p className="text-xl md:text-2xl mb-6 font-bold text-black-900 leading-relaxed">
+              {t.hero.subheading}
+            </p>
+          <h2 className="text-2xl md:text-3xl text-center mb-8 text-gray-900">
             {t.socialProof.title}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
