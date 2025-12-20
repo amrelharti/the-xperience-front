@@ -2062,37 +2062,37 @@ export default function XperienceProLandingPage() {
       </section>
 
       {/* AFCON 2025 Roulette Section - Before Footer */}
-      <section className="py-20 md:py-28 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <section className="py-20 md:py-28 bg-gradient-to-br from-red-600 via-red-700 to-red-800 relative overflow-hidden">
         {/* Decorative background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-[#FFD700]/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#008000]/10 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-[#FFD700]/30 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#008000]/30 rounded-full blur-3xl"></div>
         </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12">
             <div className="inline-block mb-6">
-              <span className="bg-gradient-to-r from-[#FFD700] via-[#008000] to-[#FF0000] text-transparent bg-clip-text text-2xl md:text-3xl font-black">
+              <span className="text-white text-2xl md:text-3xl font-black drop-shadow-lg">
                 🎉 AFCON 2025 🎉
               </span>
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-lg">
               {language === "en" 
                 ? "Only 2 winners per day! Spin now and win amazing prizes!" 
                 : "Seulement 2 gagnants par jour ! Tournez maintenant et gagnez des prix incroyables !"}
             </h2>
-            <div className="flex flex-wrap items-center justify-center gap-6 text-base md:text-lg text-gray-700 mb-8">
-              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
-                <span className="w-4 h-4 rounded-full bg-[#FFD700] shadow-sm"></span>
-                <span className="font-semibold">20% OFF Xperience Pro</span>
+            <div className="flex flex-wrap items-center justify-center gap-6 text-base md:text-lg mb-8">
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#FFD700]">
+                <span className="w-5 h-5 rounded-full bg-[#FFD700] shadow-lg"></span>
+                <span className="font-bold text-gray-900">20% OFF Xperience Pro</span>
               </div>
-              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
-                <span className="w-4 h-4 rounded-full bg-[#008000] shadow-sm"></span>
-                <span className="font-semibold">{language === "en" ? "Free CV Correction" : "Correction CV Gratuite"}</span>
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#008000]">
+                <span className="w-5 h-5 rounded-full bg-[#008000] shadow-lg"></span>
+                <span className="font-bold text-gray-900">{language === "en" ? "Free CV Correction" : "Correction CV Gratuite"}</span>
               </div>
-              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
-                <span className="w-4 h-4 rounded-full bg-[#FF0000] shadow-sm"></span>
-                <span className="font-semibold">{language === "en" ? "Try Again" : "Réessayer"}</span>
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#FF0000]">
+                <span className="w-5 h-5 rounded-full bg-[#FF0000] shadow-lg"></span>
+                <span className="font-bold text-gray-900">{language === "en" ? "Try Again" : "Réessayer"}</span>
               </div>
             </div>
           </div>
@@ -2349,18 +2349,18 @@ function RouletteWheel({ language }: { language: Language }) {
   const [rotation, setRotation] = useState(0)
 
   const prizes = [
-    { id: 1, label: language === "en" ? "OFF Xperience Pro" : "OFF Xperience Pro", color: "#FFD700", weight: 1 },
-    { id: 2, label: language === "en" ? "Free CV Correction" : "Correction CV Gratuite", color: "#008000", weight: 2 },
-    { id: 3, label: language === "en" ? "Try Again" : "Réessayer", color: "#FF0000", weight: 3 },
-    { id: 4, label: language === "en" ? "OFF Xperience Pro" : "OFF Xperience Pro", color: "#FFD700", weight: 1 },
-    { id: 5, label: language === "en" ? "Free CV Correction" : "Correction CV Gratuite", color: "#008000", weight: 2 },
-    { id: 6, label: language === "en" ? "Try Again" : "Réessayer", color: "#FF0000", weight: 3 },
-    { id: 7, label: language === "en" ? "OFF Xperience Pro" : "OFF Xperience Pro", color: "#FFD700", weight: 1 },
-    { id: 8, label: language === "en" ? "Free CV Correction" : "Correction CV Gratuite", color: "#008000", weight: 2 },
-    { id: 9, label: language === "en" ? "Try Again" : "Réessayer", color: "#FF0000", weight: 3 },
-    { id: 10, label: language === "en" ? "OFF Xperience Pro" : "OFF Xperience Pro", color: "#FFD700", weight: 1 },
-    { id: 11, label: language === "en" ? "Free CV Correction" : "Correction CV Gratuite", color: "#008000", weight: 2 },
-    { id: 12, label: language === "en" ? "Try Again" : "Réessayer", color: "#FF0000", weight: 3 },
+    { id: 1, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 },
+    { id: 2, label: "Free CV Correction", color: "#008000", weight: 2 },
+    { id: 3, label: "Try Again", color: "#FF0000", weight: 3 },
+    { id: 4, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 },
+    { id: 5, label: "Free CV Correction", color: "#008000", weight: 2 },
+    { id: 6, label: "Try Again", color: "#FF0000", weight: 3 },
+    { id: 7, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 },
+    { id: 8, label: "Free CV Correction", color: "#008000", weight: 2 },
+    { id: 9, label: "Try Again", color: "#FF0000", weight: 3 },
+    { id: 10, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 },
+    { id: 11, label: "Free CV Correction", color: "#008000", weight: 2 },
+    { id: 12, label: "Try Again", color: "#FF0000", weight: 3 },
   ]
 
   // Check daily winners and time until reset
@@ -2502,12 +2502,17 @@ function RouletteWheel({ language }: { language: Language }) {
                 )
               })}
 
-              {/* Enhanced Prize Labels - Much more visible */}
+              {/* Enhanced Prize Labels - Much more visible with better styling */}
               {prizes.map((prize, index) => {
                 const angle = (index * prizeAngle) + (prizeAngle / 2) - 90
                 const radius = 48
                 const x = 50 + radius * Math.cos((angle * Math.PI) / 180)
                 const y = 50 + radius * Math.sin((angle * Math.PI) / 180)
+
+                // Determine border color based on prize type
+                const borderColor = prize.color === "#FFD700" ? "border-[#FFD700]" 
+                  : prize.color === "#008000" ? "border-[#008000]" 
+                  : "border-[#FF0000]"
 
                 return (
                   <div
@@ -2518,12 +2523,17 @@ function RouletteWheel({ language }: { language: Language }) {
                       top: `${y}%`,
                       transform: `translate(-50%, -50%) rotate(${angle + 90}deg)`,
                       transformOrigin: "center",
-                      width: "32%",
+                      width: "35%",
                     }}
                   >
-                    <div className="bg-white px-3 py-2 rounded-lg shadow-xl border-2 border-gray-200">
-                      <div className="font-extrabold text-xs md:text-sm text-gray-900 leading-tight whitespace-nowrap">
-                        {prize.label}
+                    <div className={`bg-white px-4 py-3 rounded-xl shadow-2xl border-3 ${borderColor} backdrop-blur-sm`}>
+                      <div className="font-black text-sm md:text-base text-gray-900 leading-tight whitespace-nowrap drop-shadow-sm">
+                        {prize.label === "OFF Xperience Pro" 
+                          ? (language === "en" ? "20% OFF Xperience Pro" : "20% OFF Xperience Pro")
+                          : prize.label === "Free CV Correction"
+                          ? (language === "en" ? "Free CV Correction" : "Correction CV Gratuite")
+                          : (language === "en" ? "Try Again" : "Réessayer")
+                        }
                       </div>
                     </div>
                   </div>
@@ -2586,16 +2596,16 @@ function RouletteWheel({ language }: { language: Language }) {
             {language === "en" ? `🎉 You won: ${result}!` : `🎉 Vous avez gagné : ${result} !`}
           </div>
         )}
-        <div className="flex items-center justify-center gap-6 text-base md:text-lg text-gray-700 font-semibold">
-          <div className="bg-white px-5 py-2 rounded-full shadow-md">
+        <div className="flex items-center justify-center gap-6 text-base md:text-lg text-white font-semibold drop-shadow-lg">
+          <div className="bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full shadow-md border border-white/30">
             {language === "en" 
               ? `Winners: ${winnersToday}/2` 
               : `Gagnants : ${winnersToday}/2`}
           </div>
           {timeUntilReset && (
             <>
-              <div className="w-1 h-1 rounded-full bg-gray-400"></div>
-              <div className="bg-white px-5 py-2 rounded-full shadow-md">
+              <div className="w-1 h-1 rounded-full bg-white/60"></div>
+              <div className="bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full shadow-md border border-white/30">
                 {language === "en" 
                   ? `Reset: ${timeUntilReset}` 
                   : `Reset : ${timeUntilReset}`}
