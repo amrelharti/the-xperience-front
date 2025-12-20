@@ -2268,6 +2268,273 @@ export default function XperienceProLandingPage() {
           </div>
         </div>
       )}
+
+      {/* AFCON 2025 Roulette Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-[#0000FF] via-[#008000] to-[#FFD700] relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.1) 20px, rgba(255,255,255,0.1) 40px)'
+          }}></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 drop-shadow-lg">
+              {language === "en" ? "🎉 Spin & Win AFCON 2025 Edition! 🎉" : "🎉 Tournez & Gagnez Édition AFCON 2025 ! 🎉"}
+            </h2>
+            <p className="text-white/90 text-lg md:text-xl mb-2">
+              {language === "en" 
+                ? "Only 2 winners per day! Spin now and win amazing prizes!" 
+                : "Seulement 2 gagnants par jour ! Tournez maintenant et gagnez des prix incroyables !"}
+            </p>
+            <p className="text-white/80 text-sm md:text-base">
+              {language === "en" 
+                ? "🎁 Prizes: 20% OFF Xperience Pro | Free CV Correction | Try Again" 
+                : "🎁 Prix : 20% OFF Xperience Pro | Correction CV Gratuite | Réessayer"}
+            </p>
+          </div>
+          
+          <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
+            {/* Assad Mascot */}
+            <div className="flex-shrink-0 order-2 lg:order-1">
+              <div className="relative">
+                <Image
+                  src="/Assad.png"
+                  alt="Assad Mascot"
+                  width={200}
+                  height={300}
+                  className="w-48 md:w-64 h-auto drop-shadow-2xl animate-bounce"
+                  style={{ animationDuration: '2s' }}
+                  priority
+                />
+                <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 text-[#0000FF] px-4 py-2 rounded-full text-sm font-bold shadow-lg whitespace-nowrap">
+                  {language === "en" ? "Good Luck! 🍀" : "Bonne Chance ! 🍀"}
+                </div>
+              </div>
+            </div>
+
+            {/* Roulette Wheel */}
+            <div className="flex-shrink-0 order-1 lg:order-2">
+              <RouletteWheel language={language} />
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+// Roulette Wheel Component
+function RouletteWheel({ language }: { language: Language }) {
+  const [isSpinning, setIsSpinning] = useState(false)
+  const [result, setResult] = useState<string | null>(null)
+  const [canSpin, setCanSpin] = useState(true)
+  const [winnersToday, setWinnersToday] = useState(0)
+  const [timeUntilReset, setTimeUntilReset] = useState("")
+  const wheelRef = useRef<HTMLDivElement>(null)
+  const [rotation, setRotation] = useState(0)
+
+  const prizes = [
+    { id: 1, label: language === "en" ? "20% OFF Xperience Pro" : "20% OFF Xperience Pro", color: "#FFD700", weight: 1 },
+    { id: 2, label: language === "en" ? "Free CV Correction" : "Correction CV Gratuite", color: "#008000", weight: 2 },
+    { id: 3, label: language === "en" ? "Try Again" : "Réessayer", color: "#FF0000", weight: 3 },
+    { id: 4, label: language === "en" ? "20% OFF Xperience Pro" : "20% OFF Xperience Pro", color: "#FFD700", weight: 1 },
+    { id: 5, label: language === "en" ? "Free CV Correction" : "Correction CV Gratuite", color: "#008000", weight: 2 },
+    { id: 6, label: language === "en" ? "Try Again" : "Réessayer", color: "#FF0000", weight: 3 },
+    { id: 7, label: language === "en" ? "20% OFF Xperience Pro" : "20% OFF Xperience Pro", color: "#FFD700", weight: 1 },
+    { id: 8, label: language === "en" ? "Free CV Correction" : "Correction CV Gratuite", color: "#008000", weight: 2 },
+  ]
+
+  // Check daily winners and time until reset
+  useEffect(() => {
+    const checkDailyStatus = async () => {
+      try {
+        const response = await fetch("/api/roulette/daily-status")
+        if (response.ok) {
+          const data = await response.json()
+          setWinnersToday(data.winnersToday || 0)
+          setCanSpin(data.canSpin !== false)
+          if (data.timeUntilReset) {
+            setTimeUntilReset(data.timeUntilReset)
+          }
+        }
+      } catch (error) {
+        console.error("Error checking daily status:", error)
+      }
+    }
+    checkDailyStatus()
+    
+    // Update time until reset every minute
+    const interval = setInterval(() => {
+      checkDailyStatus()
+    }, 60000)
+    
+    return () => clearInterval(interval)
+  }, [])
+
+  const spinWheel = async () => {
+    if (isSpinning || !canSpin) return
+
+    setIsSpinning(true)
+    setResult(null)
+
+    try {
+      const response = await fetch("/api/roulette/spin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        alert(error.message || (language === "en" ? "Unable to spin. Try again later." : "Impossible de tourner. Réessayez plus tard."))
+        setIsSpinning(false)
+        return
+      }
+
+      const data = await response.json()
+      const prizeIndex = data.prizeIndex
+      const selectedPrize = prizes[prizeIndex]
+
+      // Calculate rotation (multiple full spins + prize position)
+      const fullSpins = 5 // Number of full rotations
+      const prizeAngle = (360 / prizes.length) * prizeIndex
+      const finalRotation = rotation + (fullSpins * 360) + (360 - prizeAngle) + (360 / prizes.length / 2)
+
+      setRotation(finalRotation)
+
+      // Animate wheel
+      if (wheelRef.current) {
+        wheelRef.current.style.transition = "transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)"
+        wheelRef.current.style.transform = `rotate(${finalRotation}deg)`
+      }
+
+      // Show result after animation
+      setTimeout(() => {
+        setResult(selectedPrize.label)
+        setIsSpinning(false)
+        setWinnersToday(data.winnersToday || winnersToday + 1)
+        setCanSpin(data.canSpin !== false)
+        
+        if (selectedPrize.id === 1 || selectedPrize.id === 4 || selectedPrize.id === 7) {
+          // 20% OFF - show success message
+          alert(language === "en" 
+            ? `🎉 Congratulations! You won: ${selectedPrize.label}! Contact us to claim your prize.` 
+            : `🎉 Félicitations ! Vous avez gagné : ${selectedPrize.label} ! Contactez-nous pour réclamer votre prix.`)
+        } else if (selectedPrize.id === 2 || selectedPrize.id === 5 || selectedPrize.id === 8) {
+          // Free CV Correction
+          alert(language === "en" 
+            ? `🎉 Congratulations! You won: ${selectedPrize.label}! Contact us to claim your prize.` 
+            : `🎉 Félicitations ! Vous avez gagné : ${selectedPrize.label} ! Contactez-nous pour réclamer votre prix.`)
+        }
+        // Try Again doesn't show alert
+      }, 4000)
+    } catch (error) {
+      console.error("Error spinning wheel:", error)
+      setIsSpinning(false)
+      alert(language === "en" ? "An error occurred. Please try again." : "Une erreur s'est produite. Veuillez réessayer.")
+    }
+  }
+
+  const prizeAngle = 360 / prizes.length
+
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <div className="relative">
+        {/* Pointer */}
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
+          <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[30px] border-l-transparent border-r-transparent border-t-[#FFD700] drop-shadow-lg"></div>
+        </div>
+
+        {/* Wheel Container */}
+        <div className="relative w-80 h-80 md:w-96 md:h-96">
+          <div
+            ref={wheelRef}
+            className="w-full h-full rounded-full relative overflow-hidden border-8 border-[#FFD700] shadow-2xl"
+            style={{
+              background: "conic-gradient(" +
+                prizes.map((prize, index) => {
+                  const startAngle = index * prizeAngle
+                  const endAngle = (index + 1) * prizeAngle
+                  return `${prize.color} ${startAngle}deg ${endAngle}deg`
+                }).join(", ") +
+              ")",
+            }}
+          >
+            {/* Prize Labels */}
+            {prizes.map((prize, index) => {
+              const angle = (index * prizeAngle) + (prizeAngle / 2) - 90
+              const radius = 50
+              const x = 50 + radius * Math.cos((angle * Math.PI) / 180)
+              const y = 50 + radius * Math.sin((angle * Math.PI) / 180)
+
+              return (
+                <div
+                  key={prize.id}
+                  className="absolute text-white font-bold text-xs md:text-sm text-center"
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                    transform: `translate(-50%, -50%) rotate(${angle + 90}deg)`,
+                    transformOrigin: "center",
+                    width: "30%",
+                  }}
+                >
+                  <div className="bg-black/40 px-2 py-1 rounded backdrop-blur-sm">
+                    {prize.label}
+                  </div>
+                </div>
+              )
+            })}
+
+            {/* Center Circle */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-full border-4 border-white shadow-xl flex items-center justify-center z-10">
+              <div className="text-center">
+                <div className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">🎯</div>
+                <div className="text-xs md:text-sm font-bold text-white mt-1">AFCON</div>
+                <div className="text-xs md:text-sm font-bold text-white">2025</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Spin Button */}
+      <button
+        onClick={spinWheel}
+        disabled={isSpinning || !canSpin}
+        className={`px-8 py-4 rounded-full font-bold text-lg md:text-xl shadow-2xl transform transition-all duration-200 ${
+          isSpinning || !canSpin
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-[#FFD700] hover:bg-[#FFA500] hover:scale-110 text-[#0000FF]"
+        }`}
+      >
+        {isSpinning 
+          ? (language === "en" ? "Spinning..." : "En cours...")
+          : !canSpin
+          ? (language === "en" ? "2 Winners Today!" : "2 Gagnants Aujourd'hui !")
+          : (language === "en" ? "🎰 Spin Now!" : "🎰 Tournez Maintenant !")
+        }
+      </button>
+
+      {/* Status Info */}
+      <div className="text-center space-y-2">
+        {result && (
+          <div className="bg-white/90 text-[#0000FF] px-6 py-3 rounded-full font-bold text-lg shadow-lg">
+            {language === "en" ? `🎉 You won: ${result}!` : `🎉 Vous avez gagné : ${result} !`}
+          </div>
+        )}
+        <div className="text-white/90 text-sm md:text-base">
+          {language === "en" 
+            ? `Winners today: ${winnersToday}/2` 
+            : `Gagnants aujourd'hui : ${winnersToday}/2`}
+        </div>
+        {timeUntilReset && (
+          <div className="text-white/80 text-xs md:text-sm">
+            {language === "en" 
+              ? `Next reset in: ${timeUntilReset}` 
+              : `Prochain reset dans : ${timeUntilReset}`}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
