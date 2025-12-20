@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'
 
 export async function GET(request: NextRequest) {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/roulette/daily-status`, {
+    const response = await fetch(`${BACKEND_URL}/api/roulette/daily-status?t=${Date.now()}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
       cache: 'no-store',
     })
