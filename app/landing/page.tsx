@@ -1162,6 +1162,20 @@ export default function XperienceProLandingPage() {
             <p className="text-lg mb-6 text-blue-200">
               {t.hero.forWho}
             </p>
+            
+            {/* YouTube Video Embed */}
+            <div className="mb-8 max-w-4xl mx-auto">
+              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full rounded-lg shadow-2xl"
+                  src="https://www.youtube.com/embed/5Jf283OoTM4"
+                  title="Xperience Pro Video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+            
             {/* Limited Spots Badge */}
             <div className="mb-8 flex justify-center">
               <div className="bg-[#FFBC00] text-gray-900 px-6 py-2 rounded-full text-sm md:text-base font-bold shadow-lg animate-pulse">
@@ -1186,20 +1200,7 @@ export default function XperienceProLandingPage() {
                 </span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
               </button>
-              <button
-                onClick={() => scrollToSection("program")}
-                onMouseEnter={() => setCtaHoverState({ ...ctaHoverState, heroSecondary: true })}
-                onMouseLeave={() => setCtaHoverState({ ...ctaHoverState, heroSecondary: false })}
-                className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-lg text-lg border-2 border-white/30 transition-all duration-200 flex items-center gap-2 group"
-              >
-                <span className="transition-all duration-200">
-                  {ctaHoverState.heroSecondary
-                    ? (language === "en" ? "See How It Works" : "Voir comment ça marche")
-                    : t.hero.ctaSecondary
-                  }
-                </span>
-                <PlayCircle className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
-              </button>
+             
             </div>
           </div>
         </div>
