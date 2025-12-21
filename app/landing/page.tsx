@@ -2160,13 +2160,16 @@ function RouletteWheel({ language }: { language: Language }) {
   const [result, setResult] = useState<string | null>(null)
   const [canSpin, setCanSpin] = useState(true)
   const [winnersToday, setWinnersToday] = useState(0)
+  const [maxWinners, setMaxWinners] = useState(2)
   const [timeUntilReset, setTimeUntilReset] = useState("")
   const wheelRef = useRef<HTMLDivElement>(null)
   const [rotation, setRotation] = useState(0)
   const [showWinnerModal, setShowWinnerModal] = useState(false)
   const [winnerData, setWinnerData] = useState<{name: string, prize: string, verificationCode: string} | null>(null)
+  const [remainingTries, setRemainingTries] = useState(3)
   
   const ADMIN_WHATSAPP_NUMBER = "212773213060"
+  const MAX_TRIES_PER_DAY = 3
   
   // Clean phone number - remove all non-digit characters
   const cleanPhoneNumber = (phone: string): string => {
@@ -2274,15 +2277,60 @@ function RouletteWheel({ language }: { language: Language }) {
     { id: 12, label: "Try Again", color: "#FF0000", weight: 3 }, // Index 11 - Try Again
   ]
 
+  // Initialize and track user tries from localStorage
+  useEffect(() => {
+    const initializeTries = () => {
+      const storageKey = "roulette_tries"
+      const lastResetKey = "roulette_last_reset"
+      const today = new Date().toDateString()
+      
+      const lastReset = localStorage.getItem(lastResetKey)
+      if (lastReset !== today) {
+        // Reset tries for new day
+        localStorage.setItem(storageKey, "0")
+        localStorage.setItem(lastResetKey, today)
+        setRemainingTries(MAX_TRIES_PER_DAY)
+      } else {
+        // Get remaining tries for today
+        const triesUsed = parseInt(localStorage.getItem(storageKey) || "0")
+        setRemainingTries(Math.max(0, MAX_TRIES_PER_DAY - triesUsed))
+      }
+    }
+    
+    initializeTries()
+  }, [])
+
   // Check daily winners and time until reset
   useEffect(() => {
     const checkDailyStatus = async () => {
+      // Check if it's a new day and reset tries if needed
+      const storageKey = "roulette_tries"
+      const lastResetKey = "roulette_last_reset"
+      const today = new Date().toDateString()
+      const lastReset = localStorage.getItem(lastResetKey)
+      
+      if (lastReset !== today) {
+        // New day - reset tries
+        localStorage.setItem(storageKey, "0")
+        localStorage.setItem(lastResetKey, today)
+        setRemainingTries(MAX_TRIES_PER_DAY)
+      }
+      
       try {
         const response = await fetch("/api/roulette/daily-status")
         if (response.ok) {
           const data = await response.json()
           setWinnersToday(data.winnersToday || 0)
-          setCanSpin(data.canSpin !== false)
+          setMaxWinners(data.maxWinners || 2)
+          
+          // Get current tries (may have been reset above)
+          const currentTriesUsed = parseInt(localStorage.getItem(storageKey) || "0")
+          const currentRemainingTries = Math.max(0, MAX_TRIES_PER_DAY - currentTriesUsed)
+          
+          // User can spin if: daily winners limit not reached AND user has remaining tries
+          const hasDailyWinnersAvailable = (data.winnersToday || 0) < (data.maxWinners || 2)
+          const hasTriesLeft = currentRemainingTries > 0
+          setCanSpin(hasDailyWinnersAvailable && hasTriesLeft && (data.canSpin !== false))
           if (data.timeUntilReset) {
             setTimeUntilReset(data.timeUntilReset)
           }
@@ -2299,13 +2347,21 @@ function RouletteWheel({ language }: { language: Language }) {
     }, 60000)
     
     return () => clearInterval(interval)
-  }, [])
+  }, [remainingTries])
 
   const spinWheel = async () => {
-    if (isSpinning || !canSpin) return
+    if (isSpinning || !canSpin || remainingTries <= 0) return
 
     setIsSpinning(true)
     setResult(null)
+    
+    // Decrement tries (will be restored if API call fails due to daily limit)
+    const storageKey = "roulette_tries"
+    const triesUsed = parseInt(localStorage.getItem(storageKey) || "0")
+    const newTriesUsed = triesUsed + 1
+    localStorage.setItem(storageKey, newTriesUsed.toString())
+    const previousRemainingTries = remainingTries
+    setRemainingTries(Math.max(0, MAX_TRIES_PER_DAY - newTriesUsed))
 
     try {
       const response = await fetch("/api/roulette/spin", {
@@ -2315,6 +2371,11 @@ function RouletteWheel({ language }: { language: Language }) {
 
       if (!response.ok) {
         const error = await response.json()
+        // If error is due to daily limit or already won, restore the try
+        if (response.status === 429 || response.status === 403 || error.error === "Daily limit reached" || error.error === "Already won today") {
+          localStorage.setItem(storageKey, triesUsed.toString())
+          setRemainingTries(previousRemainingTries)
+        }
         alert(error.message || (language === "en" ? "Unable to spin. Try again later." : "Impossible de tourner. Réessayez plus tard."))
         setIsSpinning(false)
         return
@@ -2374,7 +2435,11 @@ function RouletteWheel({ language }: { language: Language }) {
         if (isActualWin) {
           setWinnersToday(data.winnersToday || winnersToday + 1)
         }
-        setCanSpin(data.canSpin !== false)
+        // Update canSpin: check daily winners limit AND remaining tries
+        const hasDailyWinnersAvailable = (data.winnersToday || 0) < maxWinners
+        const currentTries = MAX_TRIES_PER_DAY - remainingTries + 1 // +1 because we just used one
+        const hasTriesLeft = currentTries < MAX_TRIES_PER_DAY
+        setCanSpin(hasDailyWinnersAvailable && hasTriesLeft && (data.canSpin !== false))
         
         // Only process actual prizes (Free CV Correction and 20% OFF) - not "Try Again"
         console.log("Roulette result:", { 
@@ -2607,7 +2672,11 @@ function RouletteWheel({ language }: { language: Language }) {
               </>
             )
             : !canSpin
-            ? (language === "en" ? "🎉 2 Winners Today!" : "🎉 2 Gagnants Aujourd'hui !")
+            ? (winnersToday >= maxWinners 
+                ? (language === "en" ? "🎊 Max Winners Reached!" : "🎊 Max Gagnants Atteint !")
+                : remainingTries <= 0
+                ? (language === "en" ? "⏰ No More Tries!" : "⏰ Plus de Tentatives !")
+                : (language === "en" ? "Can't Spin" : "Impossible de Tourner"))
             : (
               <>
                 <span className="text-2xl">🎰</span>
@@ -2625,11 +2694,35 @@ function RouletteWheel({ language }: { language: Language }) {
             {language === "en" ? `🎉 You won: ${result}!` : `🎉 Vous avez gagné : ${result} !`}
           </div>
         )}
-        <div className="flex items-center justify-center gap-4 text-sm md:text-base text-white font-bold drop-shadow-lg">
+        
+        {/* Daily Winners Limit Reached Message */}
+        {winnersToday >= maxWinners && (
+          <div className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white px-6 py-4 rounded-xl font-bold text-base md:text-lg shadow-[0_8px_30px_rgba(220,38,38,0.5)] border-2 border-white/30 animate-pulse">
+            {language === "en" 
+              ? `🎊 Congratulations! We've reached ${maxWinners} winners for today! Come back tomorrow for another chance! 🎊`
+              : `🎊 Félicitations ! Nous avons atteint ${maxWinners} gagnants aujourd'hui ! Revenez demain pour une autre chance ! 🎊`}
+          </div>
+        )}
+        
+        {/* Out of Tries Message */}
+        {remainingTries <= 0 && winnersToday < maxWinners && (
+          <div className="bg-gradient-to-r from-orange-600 via-orange-500 to-orange-600 text-white px-6 py-4 rounded-xl font-bold text-base md:text-lg shadow-[0_8px_30px_rgba(234,88,12,0.5)] border-2 border-white/30">
+            {language === "en" 
+              ? `⏰ You've used all ${MAX_TRIES_PER_DAY} tries for today! Come back tomorrow for more chances! ⏰`
+              : `⏰ Vous avez utilisé toutes vos ${MAX_TRIES_PER_DAY} tentatives aujourd'hui ! Revenez demain pour plus de chances ! ⏰`}
+          </div>
+        )}
+        
+        <div className="flex flex-wrap items-center justify-center gap-3 text-sm md:text-base text-white font-bold drop-shadow-lg">
           <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border-2 border-white/40">
             {language === "en" 
-              ? `Winners: ${winnersToday}/2` 
-              : `Gagnants : ${winnersToday}/2`}
+              ? `Winners: ${winnersToday}/${maxWinners}` 
+              : `Gagnants : ${winnersToday}/${maxWinners}`}
+          </div>
+          <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border-2 border-white/40">
+            {language === "en" 
+              ? `Your Tries: ${remainingTries}/${MAX_TRIES_PER_DAY}` 
+              : `Vos Tentatives : ${remainingTries}/${MAX_TRIES_PER_DAY}`}
           </div>
           {timeUntilReset && (
             <>
