@@ -2543,33 +2543,33 @@ function RouletteWheel({ language }: { language: Language }) {
   const prizeAngle = 360 / prizes.length
 
   return (
-    <div className="flex flex-col items-center gap-10">
+    <div className="flex flex-col items-center gap-8">
       {/* Modern Roulette Wheel Container */}
       <div className="relative">
-        {/* Premium Pointer Design - Smaller */}
-        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
+        {/* Premium Pointer Design - Modern & Clean */}
+        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-30">
           <div className="relative">
-            {/* Glow effect */}
-            <div className="absolute inset-0 bg-[#FFD700] blur-lg opacity-60 animate-pulse"></div>
-            {/* Pointer triangle */}
+            {/* Subtle glow */}
+            <div className="absolute inset-0 bg-[#FFD700] blur-md opacity-40 animate-pulse"></div>
+            {/* Clean pointer triangle */}
             <div className="relative">
-              <div className="w-0 h-0 border-l-[24px] border-r-[24px] border-t-[36px] border-l-transparent border-r-transparent border-t-[#FFD700] drop-shadow-[0_3px_15px_rgba(255,215,0,0.6)]"></div>
-              {/* Inner highlight */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-r-[12px] border-t-[18px] border-l-transparent border-r-transparent border-t-white/40"></div>
+              <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[32px] border-l-transparent border-r-transparent border-t-[#FFD700] drop-shadow-lg"></div>
+              {/* Inner highlight for depth */}
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-r-[10px] border-t-[16px] border-l-transparent border-r-transparent border-t-white/30"></div>
             </div>
           </div>
         </div>
 
-        {/* Clean Modern Wheel Container - Smaller */}
-        <div className="relative w-[320px] h-[320px] md:w-[380px] md:h-[380px]">
-          {/* Subtle outer glow */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFD700]/15 via-[#008000]/15 to-[#FF0000]/15 blur-2xl"></div>
+        {/* Modern Wheel Container */}
+        <div className="relative w-[300px] h-[300px] md:w-[360px] md:h-[360px]">
+          {/* Subtle outer glow - more refined */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFD700]/10 via-[#008000]/10 to-[#FF0000]/10 blur-xl"></div>
           
-          {/* Main wheel - Clean and simple */}
+          {/* Main wheel - Clean modern design */}
           <div className="relative w-full h-full">
             <div
               ref={wheelRef}
-              className="w-full h-full rounded-full relative overflow-hidden border-[10px] border-white shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
+              className="w-full h-full rounded-full relative overflow-hidden border-8 border-white/95 shadow-2xl"
               style={{
                 background: "conic-gradient(" +
                   prizes.map((prize, index) => {
@@ -2626,15 +2626,15 @@ function RouletteWheel({ language }: { language: Language }) {
                 )
               })}
 
-              {/* Premium Center Button - Smaller */}
+              {/* Modern Center Button */}
               <button
                 onClick={spinWheel}
                 disabled={isSpinning || !canSpin}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24 bg-[#FF8C00] rounded-full border-[6px] border-white shadow-[0_8px_30px_rgba(255,140,0,0.6)] flex items-center justify-center z-10 hover:bg-[#FF7A00] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-110 active:scale-95"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#FF8C00] to-[#FF6B00] rounded-full border-4 border-white shadow-xl flex items-center justify-center z-10 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl mb-0.5">🎯</div>
-                  <div className="text-[10px] md:text-xs font-black text-white tracking-wider">SPIN</div>
+                  <div className="text-xl md:text-2xl">🎯</div>
+                  <div className="text-[9px] md:text-[10px] font-black text-white tracking-wider">SPIN</div>
                 </div>
               </button>
             </div>
@@ -2642,97 +2642,101 @@ function RouletteWheel({ language }: { language: Language }) {
         </div>
       </div>
 
-      {/* Premium Spin Button - Smaller */}
+      {/* Modern Spin Button */}
       <button
         onClick={spinWheel}
         disabled={isSpinning || !canSpin}
         className={`
-          relative px-8 py-4 rounded-xl font-black text-lg md:text-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)]
-          transform transition-all duration-300 overflow-hidden
+          relative px-10 py-4 rounded-2xl font-bold text-base md:text-lg shadow-lg
+          transform transition-all duration-200 overflow-hidden min-w-[200px]
           ${isSpinning || !canSpin
-            ? "bg-gray-400 cursor-not-allowed text-gray-600"
-            : "bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] hover:from-[#FFA500] hover:via-[#FFD700] hover:to-[#FFA500] hover:scale-110 active:scale-95 text-gray-900 shadow-[0_8px_30px_rgba(255,215,0,0.4)]"
+            ? "bg-gray-500/80 cursor-not-allowed text-white/70"
+            : "bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFA500] hover:to-[#FFD700] hover:scale-105 active:scale-95 text-gray-900 shadow-[0_4px_20px_rgba(255,215,0,0.3)]"
           }
         `}
       >
-        {/* Shimmer effect */}
-        {!isSpinning && !canSpin && (
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
-        )}
-        {/* Button glow */}
+        {/* Button glow for enabled state */}
         {!isSpinning && canSpin && (
-          <div className="absolute inset-0 bg-[#FFD700] blur-xl opacity-50 animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
         )}
-        <span className="relative z-10 flex items-center gap-2">
+        <span className="relative z-10 flex items-center justify-center gap-2">
           {isSpinning 
             ? (
               <>
-                <div className="w-5 h-5 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-white/50 border-t-transparent rounded-full animate-spin"></div>
                 <span>{language === "en" ? "Spinning..." : "En cours..."}</span>
               </>
             )
             : !canSpin
             ? (winnersToday >= maxWinners 
-                ? (language === "en" ? "🎊 Max Winners Reached!" : "🎊 Max Gagnants Atteint !")
+                ? (language === "en" ? "Max Winners Reached" : "Max Gagnants Atteint")
                 : remainingTries <= 0
-                ? (language === "en" ? "⏰ No More Tries!" : "⏰ Plus de Tentatives !")
+                ? (language === "en" ? "No More Tries" : "Plus de Tentatives")
                 : (language === "en" ? "Can't Spin" : "Impossible de Tourner"))
             : (
               <>
-                <span className="text-2xl">🎰</span>
-                <span>{language === "en" ? "Spin Now!" : "Tournez Maintenant !"}</span>
+                <span className="text-xl">🎰</span>
+                <span>{language === "en" ? "Spin Now" : "Tournez Maintenant"}</span>
               </>
             )
           }
         </span>
       </button>
 
-      {/* Premium Status Info - Smaller */}
-      <div className="text-center space-y-3 w-full max-w-md">
+      {/* Modern Status Info - Clean & Minimal */}
+      <div className="text-center space-y-4 w-full max-w-2xl">
+        {/* Win Result Banner */}
         {result && result !== "Try Again" && (
-          <div className="bg-gradient-to-r from-[#008000] via-[#00AA00] to-[#008000] text-white px-6 py-3 rounded-xl font-black text-base md:text-lg shadow-[0_8px_30px_rgba(0,128,0,0.5)] animate-pulse border-2 border-white/30">
+          <div className="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-2xl font-bold text-base md:text-lg shadow-lg animate-pulse">
             {language === "en" ? `🎉 You won: ${result}!` : `🎉 Vous avez gagné : ${result} !`}
           </div>
         )}
         
-        {/* Daily Winners Limit Reached Message */}
+        {/* Daily Winners Limit Message */}
         {winnersToday >= maxWinners && (
-          <div className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white px-6 py-4 rounded-xl font-bold text-base md:text-lg shadow-[0_8px_30px_rgba(220,38,38,0.5)] border-2 border-white/30 animate-pulse">
+          <div className="bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-4 rounded-2xl font-semibold text-sm md:text-base shadow-lg">
             {language === "en" 
-              ? `🎊 Congratulations! We've reached ${maxWinners} winners for today! Come back tomorrow for another chance! 🎊`
-              : `🎊 Félicitations ! Nous avons atteint ${maxWinners} gagnants aujourd'hui ! Revenez demain pour une autre chance ! 🎊`}
+              ? `🎊 We've reached ${maxWinners} winners today! Come back tomorrow for another chance! 🎊`
+              : `🎊 Nous avons atteint ${maxWinners} gagnants aujourd'hui ! Revenez demain pour une autre chance ! 🎊`}
           </div>
         )}
         
         {/* Out of Tries Message */}
         {remainingTries <= 0 && winnersToday < maxWinners && (
-          <div className="bg-gradient-to-r from-orange-600 via-orange-500 to-orange-600 text-white px-6 py-4 rounded-xl font-bold text-base md:text-lg shadow-[0_8px_30px_rgba(234,88,12,0.5)] border-2 border-white/30">
+          <div className="bg-gradient-to-r from-orange-600 to-orange-500 text-white px-6 py-4 rounded-2xl font-semibold text-sm md:text-base shadow-lg">
             {language === "en" 
-              ? `⏰ You've used all ${MAX_TRIES_PER_DAY} tries for today! Come back tomorrow for more chances! ⏰`
-              : `⏰ Vous avez utilisé toutes vos ${MAX_TRIES_PER_DAY} tentatives aujourd'hui ! Revenez demain pour plus de chances ! ⏰`}
+              ? `⏰ You've used all ${MAX_TRIES_PER_DAY} tries for today! Come back tomorrow! ⏰`
+              : `⏰ Vous avez utilisé toutes vos ${MAX_TRIES_PER_DAY} tentatives aujourd'hui ! Revenez demain ! ⏰`}
           </div>
         )}
         
-        <div className="flex flex-wrap items-center justify-center gap-3 text-sm md:text-base text-white font-bold drop-shadow-lg">
-          <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border-2 border-white/40">
-            {language === "en" 
-              ? `Winners: ${winnersToday}/${maxWinners}` 
-              : `Gagnants : ${winnersToday}/${maxWinners}`}
+        {/* Status Cards - Modern Grid Layout */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          <div className="bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl shadow-md border border-white/20">
+            <div className="text-xs md:text-sm text-white/80 mb-1">
+              {language === "en" ? "Winners Today" : "Gagnants Aujourd'hui"}
+            </div>
+            <div className="text-lg md:text-xl font-bold text-white">
+              {winnersToday}/{maxWinners}
+            </div>
           </div>
-          <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border-2 border-white/40">
-            {language === "en" 
-              ? `Your Tries: ${remainingTries}/${MAX_TRIES_PER_DAY}` 
-              : `Vos Tentatives : ${remainingTries}/${MAX_TRIES_PER_DAY}`}
+          <div className="bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl shadow-md border border-white/20">
+            <div className="text-xs md:text-sm text-white/80 mb-1">
+              {language === "en" ? "Your Tries" : "Vos Tentatives"}
+            </div>
+            <div className="text-lg md:text-xl font-bold text-white">
+              {remainingTries}/{MAX_TRIES_PER_DAY}
+            </div>
           </div>
           {timeUntilReset && (
-            <>
-              <div className="w-1.5 h-1.5 rounded-full bg-white/70"></div>
-              <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border-2 border-white/40">
-                {language === "en" 
-                  ? `Reset: ${timeUntilReset}` 
-                  : `Reset : ${timeUntilReset}`}
+            <div className="bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl shadow-md border border-white/20 col-span-2 md:col-span-1">
+              <div className="text-xs md:text-sm text-white/80 mb-1">
+                {language === "en" ? "Reset In" : "Réinitialisation"}
               </div>
-            </>
+              <div className="text-lg md:text-xl font-bold text-white font-mono">
+                {timeUntilReset}
+              </div>
+            </div>
           )}
         </div>
       </div>
