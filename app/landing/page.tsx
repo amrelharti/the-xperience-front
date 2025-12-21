@@ -2175,6 +2175,23 @@ function RouletteWheel({ language }: { language: Language }) {
   const cleanPhoneNumber = (phone: string): string => {
     return phone.replace(/\D/g, "")
   }
+
+  // Format time from "HH:MM" to "Xh Ymin"
+  const formatTimeUntilReset = (timeStr: string): string => {
+    if (!timeStr) return ""
+    const parts = timeStr.split(":")
+    if (parts.length !== 2) return timeStr
+    const hours = parseInt(parts[0], 10)
+    const minutes = parseInt(parts[1], 10)
+    if (hours > 0 && minutes > 0) {
+      return `${hours}h ${minutes}min`
+    } else if (hours > 0) {
+      return `${hours}h`
+    } else if (minutes > 0) {
+      return `${minutes}min`
+    }
+    return timeStr
+  }
   
   // Send WhatsApp message (for admin)
   const sendWhatsAppMessage = (message: string) => {
@@ -2612,7 +2629,7 @@ function RouletteWheel({ language }: { language: Language }) {
                   >
                     <div className="text-center">
                       <div 
-                        className="font-black text-[10px] md:text-xs text-white leading-tight whitespace-nowrap"
+                        className="text-[10px] md:text-xs text-white leading-tight whitespace-nowrap"
                         style={{
                           textShadow: "2px 2px 4px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.6), 1px 1px 2px rgba(0,0,0,0.6)",
                           WebkitTextStroke: "0.6px rgba(0,0,0,0.9)",
@@ -2634,7 +2651,7 @@ function RouletteWheel({ language }: { language: Language }) {
               >
                 <div className="text-center">
                   <div className="text-xl md:text-2xl">🎯</div>
-                  <div className="text-[9px] md:text-[10px] font-black text-white tracking-wider">SPIN</div>
+                  <div className="text-[9px] md:text-[10px] text-white tracking-wider">SPIN</div>
                 </div>
               </button>
             </div>
@@ -2687,14 +2704,14 @@ function RouletteWheel({ language }: { language: Language }) {
       <div className="text-center space-y-4 w-full max-w-2xl">
         {/* Win Result Banner */}
         {result && result !== "Try Again" && (
-          <div className="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-2xl font-bold text-base md:text-lg shadow-lg animate-pulse">
+          <div className="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-2xl text-base md:text-lg shadow-lg animate-pulse">
             {language === "en" ? `🎉 You won: ${result}!` : `🎉 Vous avez gagné : ${result} !`}
           </div>
         )}
         
         {/* Daily Winners Limit Message */}
         {winnersToday >= maxWinners && (
-          <div className="bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-4 rounded-2xl font-semibold text-sm md:text-base shadow-lg">
+          <div className="bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-4 rounded-2xl text-sm md:text-base shadow-lg">
             {language === "en" 
               ? `🎊 We've reached ${maxWinners} winners today! Come back tomorrow for another chance! 🎊`
               : `🎊 Nous avons atteint ${maxWinners} gagnants aujourd'hui ! Revenez demain pour une autre chance ! 🎊`}
@@ -2703,7 +2720,7 @@ function RouletteWheel({ language }: { language: Language }) {
         
         {/* Out of Tries Message */}
         {remainingTries <= 0 && winnersToday < maxWinners && (
-          <div className="bg-gradient-to-r from-orange-600 to-orange-500 text-white px-6 py-4 rounded-2xl font-semibold text-sm md:text-base shadow-lg">
+          <div className="bg-gradient-to-r from-orange-600 to-orange-500 text-white px-6 py-4 rounded-2xl text-sm md:text-base shadow-lg">
             {language === "en" 
               ? `⏰ You've used all ${MAX_TRIES_PER_DAY} tries for today! Come back tomorrow! ⏰`
               : `⏰ Vous avez utilisé toutes vos ${MAX_TRIES_PER_DAY} tentatives aujourd'hui ! Revenez demain ! ⏰`}
@@ -2716,7 +2733,7 @@ function RouletteWheel({ language }: { language: Language }) {
             <div className="text-xs md:text-sm text-white/80 mb-1">
               {language === "en" ? "Winners Today" : "Gagnants Aujourd'hui"}
             </div>
-            <div className="text-lg md:text-xl font-bold text-white">
+            <div className="text-lg md:text-xl text-white">
               {winnersToday}/{maxWinners}
             </div>
           </div>
@@ -2724,7 +2741,7 @@ function RouletteWheel({ language }: { language: Language }) {
             <div className="text-xs md:text-sm text-white/80 mb-1">
               {language === "en" ? "Your Tries" : "Vos Tentatives"}
             </div>
-            <div className="text-lg md:text-xl font-bold text-white">
+            <div className="text-lg md:text-xl text-white">
               {remainingTries}/{MAX_TRIES_PER_DAY}
             </div>
           </div>
@@ -2733,8 +2750,8 @@ function RouletteWheel({ language }: { language: Language }) {
               <div className="text-xs md:text-sm text-white/80 mb-1">
                 {language === "en" ? "You can spin in" : "Vous pouvez tourner dans: "}
               </div>
-              <div className="text-lg md:text-xl font-bold text-white font-mono">
-                {timeUntilReset}
+              <div className="text-lg md:text-xl text-white">
+                {formatTimeUntilReset(timeUntilReset)}
               </div>
             </div>
           )}
