@@ -2163,6 +2163,8 @@ function RouletteWheel({ language }: { language: Language }) {
   const [timeUntilReset, setTimeUntilReset] = useState("")
   const wheelRef = useRef<HTMLDivElement>(null)
   const [rotation, setRotation] = useState(0)
+  const [showWinnerModal, setShowWinnerModal] = useState(false)
+  const [winnerData, setWinnerData] = useState<{name: string, prize: string, verificationCode: string} | null>(null)
   
   const ADMIN_WHATSAPP_NUMBER = "212773213060"
   
@@ -2171,7 +2173,7 @@ function RouletteWheel({ language }: { language: Language }) {
     return phone.replace(/\D/g, "")
   }
   
-  // Send WhatsApp message
+  // Send WhatsApp message (for admin)
   const sendWhatsAppMessage = (message: string) => {
     try {
       let cleanedNumber = cleanPhoneNumber(ADMIN_WHATSAPP_NUMBER)
@@ -2210,6 +2212,45 @@ function RouletteWheel({ language }: { language: Language }) {
       console.error("Error sending WhatsApp message:", error)
       // Fallback: show message in console for debugging
       console.log("WhatsApp message that should be sent:", message)
+    }
+  }
+
+  // Send WhatsApp message from winner to admin (with preset message)
+  const sendWinnerWhatsAppMessage = (winnerName: string, prize: string, verificationCode: string) => {
+    try {
+      let cleanedNumber = cleanPhoneNumber(ADMIN_WHATSAPP_NUMBER)
+      
+      // Format the number properly
+      if (cleanedNumber.startsWith("00212")) {
+        cleanedNumber = cleanedNumber.replace("00212", "212")
+      }
+      if (cleanedNumber.startsWith("+212")) {
+        cleanedNumber = cleanedNumber.replace("+212", "212")
+      }
+      if (cleanedNumber.startsWith("0") && !cleanedNumber.startsWith("212")) {
+        cleanedNumber = "212" + cleanedNumber.substring(1)
+      }
+      if (!cleanedNumber.startsWith("212")) {
+        cleanedNumber = "212" + cleanedNumber
+      }
+      
+      // Create preset message for winner
+      const winnerMessage = language === "en"
+        ? `🎉 Hello! I just won "${prize}" on the roulette!\n\nMy name: ${winnerName}\nVerification Code: ${verificationCode}\n\nI would like to claim my prize.`
+        : `🎉 Bonjour ! Je viens de gagner "${prize}" à la roulette !\n\nMon nom : ${winnerName}\nCode de vérification : ${verificationCode}\n\nJe souhaite réclamer mon prix.`
+      
+      // Encode the message for URL
+      const encodedMessage = encodeURIComponent(winnerMessage)
+      
+      // Use wa.me format
+      const whatsappUrl = `https://wa.me/${cleanedNumber}?text=${encodedMessage}`
+      
+      console.log("Opening WhatsApp for winner:", whatsappUrl)
+      
+      // Open WhatsApp in new window/tab
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer")
+    } catch (error) {
+      console.error("Error opening WhatsApp for winner:", error)
     }
   }
 
@@ -2389,15 +2430,16 @@ function RouletteWheel({ language }: { language: Language }) {
                 : `🎰 *Gagnant de la Roulette*\n\n*Nom:* ${winnerName.trim()}\n*Prix:* ${data.prize}\n*Code de vérification:* ${data.verificationCode}\n\nVeuillez vérifier et traiter ce gagnant.`
               
               console.log("Sending WhatsApp message to admin:", adminMessage)
-              // Send message to admin
+              // Send message to admin (this opens WhatsApp for admin to receive the message)
               sendWhatsAppMessage(adminMessage)
               
-              // Show success message to winner
-              alert(
-                language === "en" 
-                  ? `🎉 Congratulations ${winnerName.trim()}! You won: ${data.prize}!\n\nYour verification code: ${data.verificationCode}\n\nWe've sent your information to our team. They will contact you soon!` 
-                  : `🎉 Félicitations ${winnerName.trim()} ! Vous avez gagné : ${data.prize} !\n\nVotre code de vérification : ${data.verificationCode}\n\nNous avons envoyé vos informations à notre équipe. Ils vous contacteront bientôt !`
-              )
+              // Store winner data and show beautiful congratulations modal
+              setWinnerData({
+                name: winnerName.trim(),
+                prize: data.prize,
+                verificationCode: data.verificationCode
+              })
+              setShowWinnerModal(true)
             } catch (error) {
               console.error("Error updating winner name or sending WhatsApp:", error)
               alert(
@@ -2409,7 +2451,7 @@ function RouletteWheel({ language }: { language: Language }) {
           } else {
             // If still no name, show error
             alert(
-              language === "en" 
+              language === "en"
                 ? "Name is required to claim your prize. Please contact us with your verification code: " + data.verificationCode
                 : "Le nom est requis pour réclamer votre prix. Veuillez nous contacter avec votre code de vérification : " + data.verificationCode
             )
@@ -2601,6 +2643,97 @@ function RouletteWheel({ language }: { language: Language }) {
           )}
         </div>
       </div>
+
+      {/* Winner Congratulations Modal */}
+      {showWinnerModal && winnerData && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fade-in"
+          onClick={() => setShowWinnerModal(false)}
+        >
+          <div 
+            className="bg-gradient-to-br from-[#FFD700] via-[#FFBC00] to-[#FF8C00] rounded-3xl shadow-2xl max-w-md w-full p-8 relative animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowWinnerModal(false)}
+              className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Confetti/Sparkles effect */}
+            <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+              <div className="absolute top-0 left-1/4 w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0s', animationDuration: '2s' }}></div>
+              <div className="absolute top-0 right-1/4 w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '2s' }}></div>
+              <div className="absolute bottom-0 left-1/3 w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '1s', animationDuration: '2s' }}></div>
+              <div className="absolute bottom-0 right-1/3 w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '1.5s', animationDuration: '2s' }}></div>
+            </div>
+
+            {/* Content */}
+            <div className="text-center relative z-10">
+              {/* Trophy/Confetti Icon */}
+              <div className="text-7xl mb-4 animate-bounce">
+                🎉
+              </div>
+              
+              {/* Title */}
+              <h2 className="text-3xl md:text-4xl font-black text-white mb-3 drop-shadow-lg">
+                {language === "en" ? "Congratulations!" : "Félicitations !"}
+              </h2>
+              
+              {/* Winner Name */}
+              <p className="text-xl md:text-2xl font-bold text-white mb-4 drop-shadow-md">
+                {winnerData.name} 🎊
+              </p>
+              
+              {/* Prize */}
+              <div className="bg-white/95 rounded-2xl p-4 mb-4 shadow-xl">
+                <p className="text-sm font-semibold text-gray-600 mb-1">
+                  {language === "en" ? "You won:" : "Vous avez gagné :"}
+                </p>
+                <p className="text-xl md:text-2xl font-black text-[#FF8C00]">
+                  {winnerData.prize}
+                </p>
+              </div>
+              
+              {/* Verification Code */}
+              <div className="bg-white/95 rounded-xl p-3 mb-6 shadow-lg">
+                <p className="text-xs font-semibold text-gray-600 mb-1">
+                  {language === "en" ? "Verification Code:" : "Code de vérification :"}
+                </p>
+                <p className="text-2xl font-black text-gray-900 font-mono tracking-wider">
+                  {winnerData.verificationCode}
+                </p>
+              </div>
+
+              {/* WhatsApp Button */}
+              <button
+                onClick={() => {
+                  sendWinnerWhatsAppMessage(winnerData.name, winnerData.prize, winnerData.verificationCode)
+                  setShowWinnerModal(false)
+                }}
+                className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white font-black py-4 px-6 rounded-xl shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3 mb-3"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                <span className="text-lg">
+                  {language === "en" ? "Contact us on WhatsApp" : "Contactez-nous sur WhatsApp"}
+                </span>
+              </button>
+
+              {/* Info text */}
+              <p className="text-sm text-white/90 font-medium">
+                {language === "en" 
+                  ? "Click the button above to send us a message with your verification code"
+                  : "Cliquez sur le bouton ci-dessus pour nous envoyer un message avec votre code de vérification"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
