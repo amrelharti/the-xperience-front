@@ -2284,9 +2284,19 @@ function RouletteWheel({ language }: { language: Language }) {
       const selectedPrize = prizes[prizeIndex]
 
       // Calculate rotation (multiple full spins + prize position)
-      const fullSpins = 5 // Number of full rotations
-      const prizeAngle = (360 / prizes.length) * prizeIndex
-      const finalRotation = rotation + (fullSpins * 360) + (360 - prizeAngle) + (360 / prizes.length / 2)
+      // The pointer is at the top (0 degrees), pointing down
+      // Each segment spans 30 degrees (360 / 12 = 30)
+      // Segment center is at: index * 30 + 15 degrees
+      // To position segment center at top pointer (0°), rotate clockwise by: 360 - (index * 30 + 15)
+      const fullSpins = 5 // Number of full rotations for visual effect
+      const segmentAngle = 360 / prizes.length // 30 degrees per segment
+      const segmentCenterAngle = prizeIndex * segmentAngle + segmentAngle / 2
+      // Calculate rotation needed to align segment center with top pointer
+      const rotationToPrize = 360 - segmentCenterAngle
+      // Add full spins and ensure we continue from current rotation smoothly
+      // Start from current normalized rotation to avoid large number accumulation
+      const currentNormalized = rotation % 360
+      const finalRotation = currentNormalized + (fullSpins * 360) + rotationToPrize
 
       setRotation(finalRotation)
 
