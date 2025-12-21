@@ -2628,7 +2628,7 @@ function RouletteWheel({ language }: { language: Language }) {
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-full border-4 border-white shadow-xl flex items-center justify-center z-10 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 <div className="text-center">
-                  <div className="text-xl md:text-2xl">🎯</div>
+                  <div className="text-xl md:text-2xl">🦁</div>
                   <div className="text-[9px] md:text-[10px] text-white tracking-wider">SPIN</div>
                 </div>
               </button>
