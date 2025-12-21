@@ -2283,28 +2283,42 @@ function RouletteWheel({ language }: { language: Language }) {
       const prizeIndex = data.prizeIndex
       const selectedPrize = prizes[prizeIndex]
 
-      // Calculate rotation (multiple full spins + prize position)
-      // The pointer is at the top (0 degrees), pointing down
-      // Each segment spans 30 degrees (360 / 12 = 30)
-      // Segment center is at: index * 30 + 15 degrees
-      // To position segment center at top pointer (0°), rotate clockwise by: 360 - (index * 30 + 15)
-      const fullSpins = 5 // Number of full rotations for visual effect
-      const segmentAngle = 360 / prizes.length // 30 degrees per segment
+      console.log("Spinning to prize index:", prizeIndex, "Prize:", selectedPrize.label, "Backend prize:", data.prize)
+
+      // Calculate rotation to align segment center with top pointer
+      // Each segment spans 30 degrees (360 / 12)
+      // Segment center for index 'prizeIndex' is at: prizeIndex * 30 + 15 degrees
+      // To align center with top (0deg), rotate wheel by: 360 - (prizeIndex * 30 + 15)
+      const fullSpins = 5
+      const segmentAngle = 360 / prizes.length
       const segmentCenterAngle = prizeIndex * segmentAngle + segmentAngle / 2
-      // Calculate rotation needed to align segment center with top pointer
-      const rotationToPrize = 360 - segmentCenterAngle
-      // Add full spins and ensure we continue from current rotation smoothly
-      // Start from current normalized rotation to avoid large number accumulation
+      
+      // Target rotation (normalized): position where segment center aligns with top
+      const targetRotationNormalized = (360 - segmentCenterAngle) % 360
+      
+      // Current rotation (normalized)
       const currentNormalized = rotation % 360
-      const finalRotation = currentNormalized + (fullSpins * 360) + rotationToPrize
+      
+      // Calculate rotation needed to reach target from current position
+      let rotationDelta = targetRotationNormalized - currentNormalized
+      if (rotationDelta <= 0) {
+        rotationDelta += 360 // Always rotate forward (clockwise)
+      }
+      
+      // Final rotation: current + full spins + delta to target
+      const finalRotation = rotation + (fullSpins * 360) + rotationDelta
+
+      console.log("Rotation calculation:", {
+        prizeIndex,
+        segmentCenterAngle: segmentCenterAngle.toFixed(1),
+        targetRotationNormalized: targetRotationNormalized.toFixed(1),
+        currentNormalized: currentNormalized.toFixed(1),
+        rotationDelta: rotationDelta.toFixed(1),
+        finalRotation: finalRotation.toFixed(1),
+        finalNormalized: (finalRotation % 360).toFixed(1)
+      })
 
       setRotation(finalRotation)
-
-      // Animate wheel
-      if (wheelRef.current) {
-        wheelRef.current.style.transition = "transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)"
-        wheelRef.current.style.transform = `rotate(${finalRotation}deg)`
-      }
 
       // Show result after animation
       setTimeout(async () => {
@@ -2457,6 +2471,8 @@ function RouletteWheel({ language }: { language: Language }) {
                     return `${prize.color} ${startAngle}deg ${endAngle}deg`
                   }).join(", ") +
                 ")",
+                transform: `rotate(${rotation}deg)`,
+                transition: isSpinning ? "transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)" : "none",
               }}
             >
 
