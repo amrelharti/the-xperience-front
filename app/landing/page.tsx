@@ -2731,7 +2731,7 @@ function RouletteWheel({ language }: { language: Language }) {
           {timeUntilReset && (
             <div className="bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl shadow-md border border-white/20 col-span-2 md:col-span-1">
               <div className="text-xs md:text-sm text-white/80 mb-1">
-                {language === "en" ? "Reset In" : "Réinitialisation"}
+                {language === "en" ? "You can spin in" : "Vous pouvez tourner dans: "}
               </div>
               <div className="text-lg md:text-xl font-bold text-white font-mono">
                 {timeUntilReset}
