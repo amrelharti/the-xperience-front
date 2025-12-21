@@ -1892,7 +1892,7 @@ export default function XperienceProLandingPage() {
                 🎉 AFCON 2025 🎉
               </span>
             </div>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl text-white mb-3 drop-shadow-lg">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl text-white mb-3 drop-shadow-lg font-normal">
               {language === "en" 
                 ? "Only 2 winners per day! Spin now and win amazing prizes!" 
                 : "Seulement 2 gagnants par jour ! Tournez maintenant et gagnez des prix incroyables !"}
@@ -2570,7 +2570,7 @@ function RouletteWheel({ language }: { language: Language }) {
             <div className="absolute inset-0 bg-[#FFD700] blur-md opacity-40 animate-pulse"></div>
             {/* Clean pointer triangle */}
             <div className="relative">
-              <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[32px] border-l-transparent border-r-transparent border-t-[#FFD700] drop-shadow-lg"></div>
+              <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[32px] border-l-transparent border-r-transparent border-t-[#FFD700] drop-shadow-lg padding-top-5"></div>
               {/* Inner highlight for depth */}
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-r-[10px] border-t-[16px] border-l-transparent border-r-transparent border-t-white/30"></div>
             </div>
