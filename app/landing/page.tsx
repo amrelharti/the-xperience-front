@@ -1913,31 +1913,9 @@ export default function XperienceProLandingPage() {
             </div>
           </div>
           
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
-            {/* Assad Mascot - Smaller */}
-            <div className="flex-shrink-0 order-2 lg:order-1">
-              <div className="relative">
-                <div className="absolute -inset-3 bg-gradient-to-br from-[#FFD700]/30 via-[#008000]/30 to-[#FF0000]/30 rounded-2xl blur-xl transform rotate-6 animate-pulse"></div>
-                <div className="relative transform hover:scale-105 transition-transform duration-300">
-                  <Image
-                    src="/Assad.png"
-                    alt="Assad Mascot"
-                    width={200}
-                    height={320}
-                    className="w-40 md:w-48 h-auto drop-shadow-2xl"
-                    priority
-                  />
-                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#008000] to-[#00AA00] text-white px-4 py-2 rounded-full text-sm shadow-xl whitespace-nowrap border-2 border-white">
-                    {language === "en" ? "Good Luck! 🍀" : "Bonne Chance ! 🍀"}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Roulette Wheel */}
-            <div className="flex-shrink-0 order-1 lg:order-2">
-              <RouletteWheel language={language} />
-            </div>
+          {/* Roulette Wheel - Centered */}
+          <div className="flex justify-center">
+            <RouletteWheel language={language} />
           </div>
         </div>
       </section>
@@ -2647,7 +2625,7 @@ function RouletteWheel({ language }: { language: Language }) {
               <button
                 onClick={spinWheel}
                 disabled={isSpinning || !canSpin}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#FF8C00] to-[#FF6B00] rounded-full border-4 border-white shadow-xl flex items-center justify-center z-10 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-full border-4 border-white shadow-xl flex items-center justify-center z-10 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 <div className="text-center">
                   <div className="text-xl md:text-2xl">🎯</div>
@@ -2668,7 +2646,7 @@ function RouletteWheel({ language }: { language: Language }) {
           transform transition-all duration-200 overflow-hidden min-w-[200px]
           ${isSpinning || !canSpin
             ? "bg-gray-500/80 cursor-not-allowed text-white/70"
-            : "bg-gradient-to-r from-[#FFD700] to-[#FFA500] hover:from-[#FFA500] hover:to-[#FFD700] hover:scale-105 active:scale-95 text-gray-900 shadow-[0_4px_20px_rgba(255,215,0,0.3)]"
+            : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-500 hover:scale-105 active:scale-95 text-white shadow-[0_4px_20px_rgba(220,38,38,0.3)]"
           }
         `}
       >
@@ -2720,7 +2698,7 @@ function RouletteWheel({ language }: { language: Language }) {
         
         {/* Out of Tries Message */}
         {remainingTries <= 0 && winnersToday < maxWinners && (
-          <div className="bg-gradient-to-r from-orange-600 to-orange-500 text-white px-6 py-4 rounded-2xl text-sm md:text-base shadow-lg">
+          <div className="bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-4 rounded-2xl text-sm md:text-base shadow-lg">
             {language === "en" 
               ? `⏰ You've used all ${MAX_TRIES_PER_DAY} tries for today! Come back tomorrow! ⏰`
               : `⏰ Vous avez utilisé toutes vos ${MAX_TRIES_PER_DAY} tentatives aujourd'hui ! Revenez demain ! ⏰`}
@@ -2807,7 +2785,7 @@ function RouletteWheel({ language }: { language: Language }) {
                 <p className="text-sm font-semibold text-gray-600 mb-1">
                   {language === "en" ? "You won:" : "Vous avez gagné :"}
                 </p>
-                <p className="text-xl md:text-2xl font-black text-[#FF8C00]">
+                <p className="text-xl md:text-2xl text-red-600">
                   {winnerData.prize}
                 </p>
               </div>
