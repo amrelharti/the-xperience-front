@@ -1888,11 +1888,11 @@ export default function XperienceProLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-8">
             <div className="inline-block mb-4">
-              <span className="text-white text-xl md:text-2xl font-black drop-shadow-lg">
+              <span className="text-white text-xl md:text-2xl drop-shadow-lg">
                 🎉 AFCON 2025 🎉
               </span>
             </div>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 drop-shadow-lg">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl text-white mb-3 drop-shadow-lg">
               {language === "en" 
                 ? "Only 2 winners per day! Spin now and win amazing prizes!" 
                 : "Seulement 2 gagnants par jour ! Tournez maintenant et gagnez des prix incroyables !"}
@@ -1900,15 +1900,15 @@ export default function XperienceProLandingPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm md:text-base mb-6">
               <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#FFD700]">
                 <span className="w-5 h-5 rounded-full bg-[#FFD700] shadow-lg"></span>
-                <span className="font-bold text-gray-900">20% OFF Xperience Pro</span>
+                <span className="text-gray-900">20% OFF Xperience Pro</span>
               </div>
               <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#008000]">
                 <span className="w-5 h-5 rounded-full bg-[#008000] shadow-lg"></span>
-                <span className="font-bold text-gray-900">{language === "en" ? "Free CV Correction" : "Correction CV Gratuite"}</span>
+                <span className="text-gray-900">{language === "en" ? "Free CV Correction" : "Correction CV Gratuite"}</span>
               </div>
               <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#FF0000]">
                 <span className="w-5 h-5 rounded-full bg-[#FF0000] shadow-lg"></span>
-                <span className="font-bold text-gray-900">{language === "en" ? "Try Again" : "Réessayer"}</span>
+                <span className="text-gray-900">{language === "en" ? "Try Again" : "Réessayer"}</span>
               </div>
             </div>
           </div>
@@ -1927,7 +1927,7 @@ export default function XperienceProLandingPage() {
                     className="w-40 md:w-48 h-auto drop-shadow-2xl"
                     priority
                   />
-                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#008000] to-[#00AA00] text-white px-4 py-2 rounded-full text-sm font-bold shadow-xl whitespace-nowrap border-2 border-white">
+                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#008000] to-[#00AA00] text-white px-4 py-2 rounded-full text-sm shadow-xl whitespace-nowrap border-2 border-white">
                     {language === "en" ? "Good Luck! 🍀" : "Bonne Chance ! 🍀"}
                   </div>
                 </div>
