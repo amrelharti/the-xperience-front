@@ -1751,12 +1751,17 @@ export default function XperienceProLandingPage() {
                     : "opacity-0 translate-y-2 pointer-events-none"
                 }`}
               >
-                <p className="text-center text-white/90 text-sm md:text-base italic font-medium">
-                  {language === "en" 
-                    ? "One salary received can largely exceed the price of the program."
-                    : "Un seul salaire encaissé peut largement dépasser le prix du programme."
-                  }
-                </p>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                  <p className="text-center text-white text-sm md:text-base italic font-medium flex items-center justify-center gap-2">
+                    <span className="text-lg">💡</span>
+                    <span>
+                      {language === "en" 
+                        ? "One salary received can largely exceed the price of the program."
+                        : "Un seul salaire encaissé peut largement dépasser le prix du programme."
+                      }
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
