@@ -1964,6 +1964,19 @@ export default function XperienceProLandingPage() {
               <Linkedin className="w-6 h-6" />
             </a>
           </div>
+          <div className="mt-8 pt-6 border-t border-gray-800">
+            <p className="text-gray-500 text-sm">
+              © {new Date().getFullYear()} XPERIENCE. {language === "en" ? "Developed by" : "Développé par"}{" "}
+              <a
+                href="https://www.linkedin.com/in/amr-el-harti/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors underline"
+              >
+                Amr El Harti
+              </a>
+            </p>
+          </div>
         </div>
       </footer>
 
