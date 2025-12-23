@@ -128,11 +128,12 @@ export default function AdminPage() {
         setLandingPageViews(data.totalViews || 0)
         console.log("📊 Loaded landing page views:", data.totalViews || 0)
       } else {
-        console.warn("Failed to load landing page views, using default 0")
+        const errorData = await res.json().catch(() => ({ error: 'Unknown error' }))
+        console.error("❌ Failed to load landing page views:", res.status, errorData)
         setLandingPageViews(0)
       }
     } catch (error) {
-      console.error("Error loading landing page views:", error)
+      console.error("❌ Error loading landing page views:", error)
       setLandingPageViews(0)
     }
   }

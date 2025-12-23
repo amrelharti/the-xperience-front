@@ -771,15 +771,22 @@ export default function XperienceProLandingPage() {
   useEffect(() => {
     const trackPageView = async () => {
       try {
-        await fetch('/api/landing-page/track-view', {
+        const response = await fetch('/api/landing-page/track-view', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
         })
-        console.log('✅ Landing page view tracked')
+        
+        if (response.ok) {
+          const data = await response.json()
+          console.log('✅ Landing page view tracked:', data)
+        } else {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+          console.error('❌ Failed to track page view:', response.status, errorData)
+        }
       } catch (error) {
-        console.error('Error tracking page view:', error)
+        console.error('❌ Error tracking page view:', error)
         // Silently fail - don't break user experience
       }
     }
