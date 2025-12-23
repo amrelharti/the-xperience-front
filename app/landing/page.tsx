@@ -1369,14 +1369,16 @@ export default function XperienceProLandingPage() {
                   >
                     <div className="w-full">
                       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <Image
-                          src={image}
-                          alt={`Testimonial ${index + 1}`}
-                          width={400}
-                          height={300}
-                          className="w-full h-auto object-contain max-h-[250px] sm:max-h-[350px] md:max-h-[400px]"
-                          priority={index < 3}
-                        />
+                        <div className="w-full flex items-center justify-center p-2">
+                          <Image
+                            src={image}
+                            alt={`Testimonial ${index + 1}`}
+                            width={400}
+                            height={800}
+                            className="w-full h-auto object-contain max-h-[500px] sm:max-h-[600px] md:max-h-[700px] lg:max-h-[800px]"
+                            priority={index < 3}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1386,18 +1388,20 @@ export default function XperienceProLandingPage() {
             
             {/* Navigation Buttons */}
             <button
-              onClick={() => setCurrentTestimonialIndex((prev) => 
-                prev === 0 ? Math.max(0, testimonialImages.length - testimonialsPerView) : Math.max(0, prev - 1)
-              )}
+              onClick={() => {
+                const maxIndex = Math.ceil(testimonialImages.length / testimonialsPerView) - 1
+                setCurrentTestimonialIndex((prev) => prev === 0 ? maxIndex : prev - 1)
+              }}
               className="absolute left-1 sm:left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-1.5 sm:p-2 md:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
               aria-label="Previous testimonial"
             >
               <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </button>
             <button
-              onClick={() => setCurrentTestimonialIndex((prev) => 
-                prev >= testimonialImages.length - testimonialsPerView ? 0 : prev + 1
-              )}
+              onClick={() => {
+                const maxIndex = Math.ceil(testimonialImages.length / testimonialsPerView) - 1
+                setCurrentTestimonialIndex((prev) => prev >= maxIndex ? 0 : prev + 1)
+              }}
               className="absolute right-1 sm:right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-1.5 sm:p-2 md:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
               aria-label="Next testimonial"
             >
@@ -1406,7 +1410,7 @@ export default function XperienceProLandingPage() {
             
             {/* Dots Indicator */}
             <div className="flex justify-center gap-2 mt-6">
-              {Array.from({ length: Math.max(1, testimonialImages.length - testimonialsPerView + 1) }).map((_, index) => (
+              {Array.from({ length: Math.max(1, Math.ceil(testimonialImages.length / testimonialsPerView)) }).map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentTestimonialIndex(index)}
@@ -2056,7 +2060,7 @@ export default function XperienceProLandingPage() {
                 href="https://www.linkedin.com/in/amr-el-harti/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors underline"
+                className="text-gray-400 hover:text-white transition-colors"
               >
                 Amr El Harti
               </a>
