@@ -752,7 +752,7 @@ export default function XperienceProLandingPage() {
     const updateTestimonialsPerView = () => {
       if (window.innerWidth < 640) {
         setTestimonialsPerView(1)
-      } else if (window.innerWidth < 1024) {
+      } else if (window.innerWidth < 1280) {
         setTestimonialsPerView(2)
       } else {
         setTestimonialsPerView(3)
@@ -820,7 +820,6 @@ export default function XperienceProLandingPage() {
     "/clients_reviews/screen6.jpg",
     "/clients_reviews/screen7.jpg",
     "/clients_reviews/screen8.jpg",
-    
   ]
   
   // WhatsApp number - Clean format: only digits, country code + number (e.g., 212773213060)
@@ -1428,76 +1427,75 @@ export default function XperienceProLandingPage() {
 
       {/* Struggle/Positioning Section */}
       <section className="py-16 md:py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Main Content Grid */}
-          <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-8">
-            {/* Left Column - Struggles */}
-            <div className="space-y-4">
-              <div className="flex items-start gap-4 bg-gradient-to-br from-red-50 to-orange-50 p-5 rounded-xl border-l-4 border-red-400 hover:shadow-lg transition-all duration-300">
-                <div className="bg-red-100 rounded-full p-2 flex-shrink-0 mt-1">
-                  <FileText className="w-5 h-5 text-red-600" />
-                </div>
-                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
-                  {t.struggle.paragraphs[0]}
-                </p>
-              </div>
-              
-              <div className="flex items-start gap-4 bg-gradient-to-br from-orange-50 to-yellow-50 p-5 rounded-xl border-l-4 border-orange-400 hover:shadow-lg transition-all duration-300">
-                <div className="bg-orange-100 rounded-full p-2 flex-shrink-0 mt-1">
-                  <MessageSquare className="w-5 h-5 text-orange-600" />
-                </div>
-                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
-                  {t.struggle.paragraphs[1]}
-                </p>
-              </div>
-              
-              <div className="flex items-start gap-4 bg-gradient-to-br from-yellow-50 to-amber-50 p-5 rounded-xl border-l-4 border-yellow-400 hover:shadow-lg transition-all duration-300">
-                <div className="bg-yellow-100 rounded-full p-2 flex-shrink-0 mt-1">
-                  <TrendingUp className="w-5 h-5 text-yellow-600" />
-                </div>
-                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
-                  {t.struggle.paragraphs[2]}
-                </p>
-              </div>
-            </div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Title */}
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+            {language === "en" ? "Does This Sound Familiar?" : "Ça vous parle ?"}
+          </h2>
 
-            {/* Right Column - Observations */}
-            <div className="space-y-4">
-              <div className="flex items-start gap-4 bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border-l-4 border-blue-400 hover:shadow-lg transition-all duration-300">
-                <div className="bg-blue-100 rounded-full p-2 flex-shrink-0 mt-1">
-                  <Users className="w-5 h-5 text-blue-600" />
-                </div>
-                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
-                  {t.struggle.paragraphs[5]}
-                </p>
+          {/* Bullet Points */}
+          <div className="space-y-4 mb-10">
+            <div className="flex items-start gap-4 group">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
               </div>
-              
-              <div className="flex items-start gap-4 bg-gradient-to-br from-indigo-50 to-purple-50 p-5 rounded-xl border-l-4 border-indigo-400 hover:shadow-lg transition-all duration-300">
-                <div className="bg-indigo-100 rounded-full p-2 flex-shrink-0 mt-1">
-                  <Target className="w-5 h-5 text-indigo-600" />
-                </div>
-                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
-                  {t.struggle.paragraphs[6]}
-                </p>
+              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+                {t.struggle.paragraphs[0]}
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-4 group">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
               </div>
-              
-              <div className="flex items-start gap-4 bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl border-l-4 border-purple-400 hover:shadow-lg transition-all duration-300">
-                <div className="bg-purple-100 rounded-full p-2 flex-shrink-0 mt-1">
-                  <Award className="w-5 h-5 text-purple-600" />
-                </div>
-                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
-                  {t.struggle.paragraphs[7]}
-                </p>
+              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+                {t.struggle.paragraphs[1]}
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-4 group">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
               </div>
-              
-              <div className="flex items-start gap-4 bg-gradient-to-br from-pink-50 to-rose-50 p-5 rounded-xl border-l-4 border-pink-400 hover:shadow-lg transition-all duration-300">
-                <div className="bg-pink-100 rounded-full p-2 flex-shrink-0 mt-1">
-                  <Sparkles className="w-5 h-5 text-pink-600" />
-                </div>
-                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
-                  {t.struggle.paragraphs[8]}
-                </p>
+              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+                {t.struggle.paragraphs[2]}
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-4 group">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
               </div>
+              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+                {t.struggle.paragraphs[5]}
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-4 group">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+              </div>
+              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+                {t.struggle.paragraphs[6]}
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-4 group">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+              </div>
+              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+                {t.struggle.paragraphs[7]}
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-4 group">
+              <div className="flex-shrink-0 mt-1">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+              </div>
+              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+                {t.struggle.paragraphs[8]}
+              </p>
             </div>
           </div>
 
@@ -1508,10 +1506,7 @@ export default function XperienceProLandingPage() {
                 backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)'
               }}></div>
             </div>
-            <div className="relative z-10 flex items-center gap-4">
-              <div className="bg-white/20 rounded-full p-3 flex-shrink-0">
-                <Target className="w-6 h-6 md:w-8 md:h-8" />
-              </div>
+            <div className="relative z-10 text-center">
               <p className="text-lg md:text-xl leading-relaxed font-semibold">
                 {t.struggle.paragraphs[3]}
               </p>
@@ -1520,13 +1515,9 @@ export default function XperienceProLandingPage() {
 
           {/* Conclusion - Call to Action */}
           <div className="bg-gradient-to-br from-[#FFBC00] via-[#FFD700] to-[#FFBC00] p-6 md:p-8 rounded-2xl shadow-2xl transform hover:scale-[1.01] transition-all duration-300 text-center">
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-gray-900" />
-              <p className="text-xl md:text-2xl text-gray-900 font-bold leading-relaxed">
-                {t.struggle.conclusion}
-              </p>
-              <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-gray-900" />
-            </div>
+            <p className="text-xl md:text-2xl text-gray-900 font-bold leading-relaxed">
+              {t.struggle.conclusion}
+            </p>
           </div>
         </div>
       </section>
