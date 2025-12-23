@@ -201,7 +201,7 @@ const content: Record<Language, Content> = {
     },
     solution: {
       title: "Xperience Pro: The Complete Solution",
-      subtitle: "Xperience Pro is a structured 1-month program, designed for candidates who want to:",
+      subtitle: "Xperience Pro is a structured 4 weeks program, designed for candidates who want to:",
       points: [
         "Identify why their applications don't lead to results",
         "Fix what's really blocking them from the recruiter's perspective",
@@ -230,15 +230,15 @@ const content: Record<Language, Content> = {
       bio: [
         "Certified trainer with 7+ years of experience helping young people prepare for the job market.",
         "Specializes in job and internship search techniques.",
-        "More than 6000 people have benefited from his career coaching.",
-        "Has spoken in over 100 conferences in Morocco and internationally.",
+        "More than 6000 people have benefited from his consultation.",
+        "Has spoken in over 100 conferences and workshops in Morocco and internationally.",
         "Works as an Employability Manager and collaborates with several well-known universities in Morocco, focusing on company relations and industrial partnerships.",
         "Has been invited by major media such as Al Aoula, Le Matin, and M24.",
       ],
       stats: [
         { label: "Years of Experience", value: "7+" },
         { label: "People Coached", value: "6000+" },
-        { label: "Conferences", value: "100+" },
+        { label: "Conferences & Workshops", value: "100+" },
       ],
       social: {
         instagram: "https://www.instagram.com/alielharti_ma/", // TODO: Update with actual Instagram URL
@@ -284,7 +284,7 @@ const content: Record<Language, Content> = {
       subtitle: "Understanding alone isn't enough. Applying alone is difficult.",
       points: [
         "Clear video capsules, accessible at any time, to understand the real rules of recruitment and what recruiters really expect.",
-        "A 1-month structure with live sessions, concrete exercises, and guided practice.",
+        "A 4 weeks structure with live sessions, concrete exercises, and guided practice boosted by AI.",
         "With Xperience: you get real feedback, you know exactly what to fix, you move forward with a clear framework.",
         "Important: Videos remain accessible even after the program ends.",
       ],
@@ -293,7 +293,7 @@ const content: Record<Language, Content> = {
       title: "Xperience Pro is for you if…",
       points: [
         "You're a student, employee, or job seeker.",
-        "You're tired of sending CVs and hearing nothing back.",
+        "You're tired of sending applications and hearing nothing back.",
         "You want a clear structure instead of random YouTube videos.",
       ],
     },
@@ -508,15 +508,15 @@ const content: Record<Language, Content> = {
       bio: [
         "Formateur certifié avec plus de 7 ans d'expérience dans l'accompagnement des jeunes vers le marché de l'emploi.",
         "Spécialisé dans les techniques de recherche d'emploi et de stage.",
-        "Plus de 6000 personnes ont bénéficié de son coaching de carrière.",
-        "A animé plus de 100 conférences au Maroc et à l'international.",
+        "Plus de 6000 personnes ont bénéficié de son accompagnement.",
+        "A animé plus de 100 conférences et ateliers au Maroc et à l'international.",
         "Travaille en tant que Responsable Employabilité et collabore avec plusieurs universités reconnues au Maroc, axé sur les relations entreprises et partenariats industriels.",
         "A été invité par les grands médias tels qu'Al Aoula, Le Matin et M24.",
       ],
       stats: [
         { label: "Années d'expérience", value: "7+" },
         { label: "Personnes coachées", value: "6000+" },
-        { label: "Conférences", value: "100+" },
+        { label: "Conférences et ateliers", value: "100+" },
       ],
       social: {
         instagram: "https://www.instagram.com/alielharti_ma/", // TODO: Update with actual Instagram URL
@@ -537,15 +537,15 @@ const content: Record<Language, Content> = {
       items: [
         {
           title: "Module 1 : CV clair, lisible et compris par les recruteurs",
-          description: "Optimiser votre CV pour qu'il soit :\n• Compréhensible rapidement\n• Aligné avec les attentes des recruteurs\nObjectif : passer le premier tri et éviter l'élimination automatique.",
+          description: "Optimiser votre CV pour qu'il soit :\n• Compréhensible rapidement\n• Aligné avec les attentes des recruteurs\nObjectif : Passer le premier tri et éviter l'élimination automatique.",
         },
         {
           title: "Module 2 : Maitrise des techniques d'entretien",
-          description: "Comprendre :\n• Ce que le recruteur cherche vraiment à évaluer\n• Comment éviter les réponses floues ou hors sujet\nObjectif : mieux performer en entretien, sans improviser.",
+          description: "Comprendre :\n• Ce que le recruteur cherche vraiment à évaluer\n• Comment éviter les réponses floues ou hors sujet\nObjectif : Mieux performer en entretien, sans improviser.",
         },
         {
           title: "Module 3 : Gérer le stress et convaincre à l'entretien",
-          description: "Apprendre à :\n• Gérer le stress avant et pendant l'entretien\n• Bien se renseigner sur l'entreprise et se distinguer\nObjectif : gagner en confiance et en impact face au recruteur.",
+          description: "Apprendre à :\n• Gérer le stress avant et pendant l'entretien\n• Bien se renseigner sur l'entreprise et se distinguer\nObjectif : Gagner en confiance et en impact face au recruteur.",
         },
         {
           title: "Module 4 : LinkedIn et positionnement professionnel",
@@ -558,7 +558,7 @@ const content: Record<Language, Content> = {
       subtitle: "Comprendre seul ne suffit pas. Appliquer seul est difficile.",
       points: [
         "Des capsules vidéo claires, accessibles à tout moment, pour comprendre les règles réelles du recrutement et ce que les recruteurs attendent vraiment.",
-        "Une structure sur 1 mois avec des lives, des exercices concrets et des mises en pratique guidées.",
+        "Une structure sur 4 semaines avec des lives, des exercices concrets et des mises en pratique guidées boostées par l'IA.",
         "Avec Xperience : vous avez du feedback réel, vous savez précisément quoi corriger, vous avancez avec un cadre clair.",
         "Important: Les vidéos restent accessibles même après la fin du programme.",
       ],
@@ -567,7 +567,7 @@ const content: Record<Language, Content> = {
       title: "Xperience Pro est fait pour toi si…",
       points: [
         "Tu es étudiant(e), salarié(e) ou en recherche d'emploi.",
-        "Tu en as marre d'envoyer des CV sans réponse.",
+        "Tu en as marre d'envoyer des candidatures sans réponse.",
         "Tu veux un cadre clair au lieu de vidéos YouTube au hasard.",
       ],
     },
@@ -1601,9 +1601,17 @@ export default function XperienceProLandingPage() {
       {/* Modules Section */}
       <section id="program" className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
-            {t.modules.title}
-          </h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              {t.modules.title}
+            </h2>
+            <div className="flex justify-center">
+              <div className="bg-red-500 text-white px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-lg flex items-center gap-2">
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>{language === "en" ? "Recorded capsules + live + follow-up" : "Capsules enregistrées + live + suivi"}</span>
+              </div>
+            </div>
+          </div>
           <div className="grid md:grid-cols-2 gap-6">
             {t.modules.items.map((module, index) => (
               <div
