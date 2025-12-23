@@ -700,7 +700,7 @@ export default function XperienceProLandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0)
-  const [testimonialsPerView, setTestimonialsPerView] = useState(3)
+  const [testimonialsPerView, setTestimonialsPerView] = useState(4)
   const [currentPartnerIndex, setCurrentPartnerIndex] = useState(0)
   const [formData, setFormData] = useState({
     fullName: "",
@@ -755,7 +755,7 @@ export default function XperienceProLandingPage() {
       } else if (window.innerWidth < 1280) {
         setTestimonialsPerView(2)
       } else {
-        setTestimonialsPerView(3)
+        setTestimonialsPerView(4)
       }
     }
     
@@ -1361,11 +1361,8 @@ export default function XperienceProLandingPage() {
                 {testimonialImages.map((image, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 flex items-center justify-center ${
-                      testimonialsPerView === 1 ? 'min-w-full px-3 sm:px-4' : 
-                      testimonialsPerView === 2 ? 'min-w-[50%] px-2 sm:px-3' : 
-                      'min-w-[33.333%] px-2'
-                    }`}
+                    style={{ width: `${100 / testimonialsPerView}%` }}
+                    className="flex-shrink-0 flex items-center justify-center px-2"
                   >
                     <div className="w-full">
                       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
