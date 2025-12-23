@@ -767,6 +767,26 @@ export default function XperienceProLandingPage() {
     }
   }, [])
 
+  // Track landing page view
+  useEffect(() => {
+    const trackPageView = async () => {
+      try {
+        await fetch('/api/landing-page/track-view', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        console.log('✅ Landing page view tracked')
+      } catch (error) {
+        console.error('Error tracking page view:', error)
+        // Silently fail - don't break user experience
+      }
+    }
+    
+    trackPageView()
+  }, [])
+
   // Intersection Observer for Premium Card - Show message after 5 seconds
   useEffect(() => {
     if (!premiumCardRef.current) return

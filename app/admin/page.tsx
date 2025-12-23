@@ -53,6 +53,7 @@ export default function AdminPage() {
   const [createCourseOpen, setCreateCourseOpen] = useState(false)
   const [editUserOpen, setEditUserOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [landingPageViews, setLandingPageViews] = useState<number>(0)
   
   // Form states
   const [newCourse, setNewCourse] = useState({
@@ -116,10 +117,30 @@ export default function AdminPage() {
     }
   }
 
+  // Load landing page views
+  const loadLandingPageViews = async () => {
+    try {
+      const res = await fetch(`/api/admin/landing-page/views`, {
+        credentials: "include"
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setLandingPageViews(data.totalViews || 0)
+        console.log("📊 Loaded landing page views:", data.totalViews || 0)
+      } else {
+        console.warn("Failed to load landing page views, using default 0")
+        setLandingPageViews(0)
+      }
+    } catch (error) {
+      console.error("Error loading landing page views:", error)
+      setLandingPageViews(0)
+    }
+  }
+
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true)
-      await Promise.all([loadCourses(), loadUsers()])
+      await Promise.all([loadCourses(), loadUsers(), loadLandingPageViews()])
       setIsLoading(false)
     }
     loadData()
@@ -440,7 +461,7 @@ export default function AdminPage() {
           </div>
 
           {/* Enhanced Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-slide-up">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 animate-slide-up">
             <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 bg-white/80 backdrop-blur-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                 <CardTitle className="text-sm font-semibold text-slate-600">Total Trainings</CardTitle>
@@ -491,6 +512,24 @@ export default function AdminPage() {
                 </p>
                 <div className="mt-3 h-1 bg-slate-100 rounded-full overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full w-2/3"></div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 bg-white/80 backdrop-blur-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-semibold text-slate-600">Landing Page Views</CardTitle>
+                <div className="p-2 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
+                  <Eye className="h-5 w-5 text-white" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-purple-600 mb-1">{landingPageViews.toLocaleString()}</div>
+                <p className="text-sm text-slate-500">
+                  Total page visits
+                </p>
+                <div className="mt-3 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full" style={{ width: `${Math.min((landingPageViews / 10000) * 100, 100)}%` }}></div>
                 </div>
               </CardContent>
             </Card>
