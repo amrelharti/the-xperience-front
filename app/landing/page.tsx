@@ -1426,96 +1426,96 @@ export default function XperienceProLandingPage() {
       </section>
 
       {/* Struggle/Positioning Section */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-10 md:py-14 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Title */}
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8 text-gray-900">
             {language === "en" ? "Does This Sound Familiar?" : "Ça vous parle ?"}
           </h2>
 
-          {/* Bullet Points */}
-          <div className="space-y-4 mb-10">
-            <div className="flex items-start gap-4 group">
-              <div className="flex-shrink-0 mt-1">
-                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+          {/* Bullet Points - Two Column Layout on Desktop */}
+          <div className="grid md:grid-cols-2 gap-x-6 gap-y-2.5 mb-6 md:mb-8">
+            <div className="flex items-start gap-3 group">
+              <div className="flex-shrink-0 mt-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
               </div>
-              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
                 {t.struggle.paragraphs[0]}
               </p>
             </div>
             
-            <div className="flex items-start gap-4 group">
-              <div className="flex-shrink-0 mt-1">
-                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+            <div className="flex items-start gap-3 group">
+              <div className="flex-shrink-0 mt-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
               </div>
-              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
-                {t.struggle.paragraphs[1]}
-              </p>
-            </div>
-            
-            <div className="flex items-start gap-4 group">
-              <div className="flex-shrink-0 mt-1">
-                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
-              </div>
-              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
-                {t.struggle.paragraphs[2]}
-              </p>
-            </div>
-            
-            <div className="flex items-start gap-4 group">
-              <div className="flex-shrink-0 mt-1">
-                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
-              </div>
-              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
                 {t.struggle.paragraphs[5]}
               </p>
             </div>
             
-            <div className="flex items-start gap-4 group">
-              <div className="flex-shrink-0 mt-1">
-                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+            <div className="flex items-start gap-3 group">
+              <div className="flex-shrink-0 mt-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
               </div>
-              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
+                {t.struggle.paragraphs[1]}
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-3 group">
+              <div className="flex-shrink-0 mt-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+              </div>
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
                 {t.struggle.paragraphs[6]}
               </p>
             </div>
             
-            <div className="flex items-start gap-4 group">
-              <div className="flex-shrink-0 mt-1">
-                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+            <div className="flex items-start gap-3 group">
+              <div className="flex-shrink-0 mt-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
               </div>
-              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
+                {t.struggle.paragraphs[2]}
+              </p>
+            </div>
+            
+            <div className="flex items-start gap-3 group">
+              <div className="flex-shrink-0 mt-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+              </div>
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
                 {t.struggle.paragraphs[7]}
               </p>
             </div>
             
-            <div className="flex items-start gap-4 group">
-              <div className="flex-shrink-0 mt-1">
-                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+            <div className="flex items-start gap-3 group md:col-span-2">
+              <div className="flex-shrink-0 mt-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
               </div>
-              <p className="text-lg md:text-xl text-gray-800 leading-relaxed flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
                 {t.struggle.paragraphs[8]}
               </p>
             </div>
           </div>
 
           {/* Key Insight - Highlighted */}
-          <div className="bg-gradient-to-r from-[#005eb8] via-[#0476D7] to-[#005eb8] p-6 md:p-8 rounded-2xl shadow-2xl text-white mb-6 transform hover:scale-[1.01] transition-all duration-300 relative overflow-hidden">
+          <div className="bg-gradient-to-r from-[#005eb8] via-[#0476D7] to-[#005eb8] p-5 md:p-6 rounded-xl shadow-xl text-white mb-4 transform hover:scale-[1.01] transition-all duration-300 relative overflow-hidden">
             <div className="absolute inset-0 opacity-10">
               <div className="absolute inset-0" style={{
                 backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)'
               }}></div>
             </div>
             <div className="relative z-10 text-center">
-              <p className="text-lg md:text-xl leading-relaxed font-semibold">
+              <p className="text-base md:text-lg leading-relaxed font-semibold">
                 {t.struggle.paragraphs[3]}
               </p>
             </div>
           </div>
 
           {/* Conclusion - Call to Action */}
-          <div className="bg-gradient-to-br from-[#FFBC00] via-[#FFD700] to-[#FFBC00] p-6 md:p-8 rounded-2xl shadow-2xl transform hover:scale-[1.01] transition-all duration-300 text-center">
-            <p className="text-xl md:text-2xl text-gray-900 font-bold leading-relaxed">
+          <div className="bg-gradient-to-br from-[#FFBC00] via-[#FFD700] to-[#FFBC00] p-5 md:p-6 rounded-xl shadow-xl transform hover:scale-[1.01] transition-all duration-300 text-center">
+            <p className="text-lg md:text-xl text-gray-900 font-bold leading-relaxed">
               {t.struggle.conclusion}
             </p>
           </div>
