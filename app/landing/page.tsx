@@ -470,7 +470,7 @@ const content: Record<Language, Content> = {
       ],
     },
     solution: {
-      title: "Xperience Pro:\n La solution complète",
+      title: "Xperience Pro :\n La solution complète",                  
       subtitle: "Un accompagnement intensif, structuré et guidé pour les candidats qui sont déterminés à:",
       points: [
         "Identifier pourquoi leurs candidatures n'aboutissent pas",
@@ -1352,32 +1352,46 @@ export default function XperienceProLandingPage() {
           <div className="relative">
             {/* Carousel Container */}
             <div className="overflow-hidden rounded-2xl">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ 
-                  transform: `translateX(-${currentTestimonialIndex * (100 / testimonialsPerView)}%)` 
-                }}
-              >
-                {testimonialImages.map((image, index) => (
-                  <div
-                    key={index}
-                    style={{ width: `${100 / testimonialsPerView}%` }}
-                    className="flex-shrink-0 flex items-center justify-center px-2"
-                  >
-                    <div className="w-full">
-                      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <Image
-                          src={image}
-                          alt={`Testimonial ${index + 1}`}
-                          width={400}
-                          height={300}
-                          className="w-full h-auto object-contain max-h-[250px] sm:max-h-[300px] md:max-h-[350px]"
-                          priority={index < 3}
-                        />
-                      </div>
+              <div className="relative w-full">
+                <div 
+                  className="flex transition-transform duration-500 ease-in-out"
+                  style={{ 
+                    transform: `translateX(-${currentTestimonialIndex * 100}%)` 
+                  }}
+                >
+                  {Array.from({ length: Math.ceil(testimonialImages.length / testimonialsPerView) }).map((_, groupIndex) => (
+                    <div
+                      key={groupIndex}
+                      className="flex-shrink-0 w-full flex"
+                    >
+                      {testimonialImages
+                        .slice(groupIndex * testimonialsPerView, (groupIndex + 1) * testimonialsPerView)
+                        .map((image, imageIndex) => {
+                          const actualIndex = groupIndex * testimonialsPerView + imageIndex
+                          return (
+                            <div
+                              key={actualIndex}
+                              className="flex-shrink-0 flex items-center justify-center"
+                              style={{ width: `${100 / testimonialsPerView}%` }}
+                            >
+                              <div className="w-full px-2">
+                                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                                  <Image
+                                    src={image}
+                                    alt={`Testimonial ${actualIndex + 1}`}
+                                    width={400}
+                                    height={300}
+                                    className="w-full h-auto object-contain max-h-[250px] sm:max-h-[300px] md:max-h-[350px]"
+                                    priority={actualIndex < 3}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
             
@@ -1423,86 +1437,97 @@ export default function XperienceProLandingPage() {
       </section>
 
       {/* Struggle/Positioning Section */}
-      <section className="py-10 md:py-14 bg-white">
+      <section className="py-10 md:py-14 bg-gradient-to-b from-white to-gray-50/30">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Title */}
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8 text-gray-900">
-            {language === "en" ? "Does This Sound Familiar?" : "Ça vous parle ?"}
-          </h2>
+          <div className="text-center mb-8 md:mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold mb-3 text-gray-900">
+              {language === "en" ? "Does This Sound Familiar?" : "Ça vous parle ?"}
+            </h2>
+            <div className="w-20 h-1 bg-gradient-to-r from-[#005eb8] to-[#0476D7] mx-auto rounded-full"></div>
+          </div>
 
           {/* Bullet Points - Two Column Layout on Desktop */}
-          <div className="grid md:grid-cols-2 gap-x-6 gap-y-2.5 mb-6 md:mb-8">
-            <div className="flex items-start gap-3 group">
-              <div className="flex-shrink-0 mt-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+          <div className="grid md:grid-cols-2 gap-x-6 gap-y-3 mb-8 md:mb-10">
+            <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
+              <div className="flex-shrink-0 mt-1.5 relative">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-[#005eb8] opacity-0 group-hover:opacity-30 group-hover:scale-150 transition-all duration-300"></div>
               </div>
-              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1 group-hover:text-gray-900 transition-colors duration-200">
                 {t.struggle.paragraphs[0]}
               </p>
             </div>
             
-            <div className="flex items-start gap-3 group">
-              <div className="flex-shrink-0 mt-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+            <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
+              <div className="flex-shrink-0 mt-1.5 relative">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-[#005eb8] opacity-0 group-hover:opacity-30 group-hover:scale-150 transition-all duration-300"></div>
               </div>
-              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1 group-hover:text-gray-900 transition-colors duration-200">
                 {t.struggle.paragraphs[5]}
               </p>
             </div>
             
-            <div className="flex items-start gap-3 group">
-              <div className="flex-shrink-0 mt-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+            <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
+              <div className="flex-shrink-0 mt-1.5 relative">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-[#005eb8] opacity-0 group-hover:opacity-30 group-hover:scale-150 transition-all duration-300"></div>
               </div>
-              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1 group-hover:text-gray-900 transition-colors duration-200">
                 {t.struggle.paragraphs[1]}
               </p>
             </div>
             
-            <div className="flex items-start gap-3 group">
-              <div className="flex-shrink-0 mt-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+            <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
+              <div className="flex-shrink-0 mt-1.5 relative">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-[#005eb8] opacity-0 group-hover:opacity-30 group-hover:scale-150 transition-all duration-300"></div>
               </div>
-              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1 group-hover:text-gray-900 transition-colors duration-200">
                 {t.struggle.paragraphs[6]}
               </p>
             </div>
             
-            <div className="flex items-start gap-3 group">
-              <div className="flex-shrink-0 mt-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+            <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
+              <div className="flex-shrink-0 mt-1.5 relative">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-[#005eb8] opacity-0 group-hover:opacity-30 group-hover:scale-150 transition-all duration-300"></div>
               </div>
-              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1 group-hover:text-gray-900 transition-colors duration-200">
                 {t.struggle.paragraphs[2]}
               </p>
             </div>
             
-            <div className="flex items-start gap-3 group">
-              <div className="flex-shrink-0 mt-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+            <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
+              <div className="flex-shrink-0 mt-1.5 relative">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-[#005eb8] opacity-0 group-hover:opacity-30 group-hover:scale-150 transition-all duration-300"></div>
               </div>
-              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1 group-hover:text-gray-900 transition-colors duration-200">
                 {t.struggle.paragraphs[7]}
               </p>
             </div>
             
-            <div className="flex items-start gap-3 group md:col-span-2">
-              <div className="flex-shrink-0 mt-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#005eb8] group-hover:scale-150 transition-transform duration-200"></div>
+            <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200 md:col-span-2">
+              <div className="flex-shrink-0 mt-1.5 relative">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-[#005eb8] opacity-0 group-hover:opacity-30 group-hover:scale-150 transition-all duration-300"></div>
               </div>
-              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1">
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1 group-hover:text-gray-900 transition-colors duration-200">
                 {t.struggle.paragraphs[8]}
               </p>
             </div>
           </div>
 
           {/* Key Insight - Highlighted */}
-          <div className="bg-gradient-to-r from-[#005eb8] via-[#0476D7] to-[#005eb8] p-5 md:p-6 rounded-xl shadow-xl text-white mb-4 transform hover:scale-[1.01] transition-all duration-300 relative overflow-hidden">
+          <div className="bg-gradient-to-r from-[#005eb8] via-[#0476D7] to-[#005eb8] p-6 md:p-7 rounded-2xl shadow-2xl text-white mb-5 transform hover:scale-[1.02] hover:shadow-3xl transition-all duration-300 relative overflow-hidden group">
             <div className="absolute inset-0 opacity-10">
               <div className="absolute inset-0" style={{
                 backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)'
               }}></div>
             </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             <div className="relative z-10 text-center">
               <p className="text-base md:text-lg leading-relaxed font-semibold">
                 {t.struggle.paragraphs[3]}
@@ -1511,8 +1536,9 @@ export default function XperienceProLandingPage() {
           </div>
 
           {/* Conclusion - Call to Action */}
-          <div className="bg-gradient-to-br from-[#FFBC00] via-[#FFD700] to-[#FFBC00] p-5 md:p-6 rounded-xl shadow-xl transform hover:scale-[1.01] transition-all duration-300 text-center">
-            <p className="text-lg md:text-xl text-gray-900 font-bold leading-relaxed">
+          <div className="bg-gradient-to-br from-[#FFBC00] via-[#FFD700] to-[#FFBC00] p-6 md:p-7 rounded-2xl shadow-2xl transform hover:scale-[1.02] hover:shadow-3xl transition-all duration-300 text-center relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            <p className="text-lg md:text-xl text-gray-900 font-bold leading-relaxed relative z-10">
               {t.struggle.conclusion}
             </p>
           </div>
@@ -1525,7 +1551,18 @@ export default function XperienceProLandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-                {t.solution.title}
+                {(() => {
+                  const parts = t.solution.title.split(/:\s*\n?\s*/);
+                  if (parts.length > 1) {
+                    return (
+                      <>
+                        {parts[0]}:<br className="md:hidden" />
+                        <span className="text-[#FFBC00] block md:inline md:ml-2">{parts[1]}</span>
+                      </>
+                    );
+                  }
+                  return t.solution.title;
+                })()}
               </h2>
               <p className="text-xl md:text-2xl mb-8 text-blue-100">
                 {t.solution.subtitle}
