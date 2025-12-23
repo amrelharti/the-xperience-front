@@ -8,7 +8,8 @@ import { useUser } from "../../hooks/useUser"
 import UserDropdown from "../../components/UserDropdown"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Menu, X, MessageSquare, ArrowLeft, Phone, User, Calendar, Briefcase, Tag } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Menu, X, MessageSquare, ArrowLeft, Phone, User, Calendar, Briefcase, Tag, Trash2 } from "lucide-react"
 
 interface LandingPageLead {
   id: string
@@ -23,6 +24,9 @@ export default function LandingPageLeadsPage() {
   const [leads, setLeads] = useState<LandingPageLead[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [leadToDelete, setLeadToDelete] = useState<LandingPageLead | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const { user } = useUser()
   const { toast } = useToast()
 
@@ -75,6 +79,50 @@ export default function LandingPageLeadsPage() {
       reconversion: "Reconversion Professionnelle",
     }
     return labels[value] || value
+  }
+
+  const handleDeleteClick = (lead: LandingPageLead) => {
+    setLeadToDelete(lead)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!leadToDelete) return
+
+    try {
+      setIsDeleting(true)
+      const res = await fetch(`/api/landing-page/leads/${leadToDelete.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      })
+
+      if (res.ok) {
+        toast({
+          title: "Success",
+          description: "Lead deleted successfully",
+        })
+        // Remove the lead from the list
+        setLeads(leads.filter((lead) => lead.id !== leadToDelete.id))
+      } else {
+        const error = await res.json().catch(() => ({ error: "Failed to delete lead" }))
+        toast({
+          title: "Error",
+          description: error.error || "Failed to delete lead",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error deleting lead:", error)
+      toast({
+        title: "Error",
+        description: "Failed to delete lead",
+        variant: "destructive",
+      })
+    } finally {
+      setIsDeleting(false)
+      setDeleteDialogOpen(false)
+      setLeadToDelete(null)
+    }
   }
 
   return (
@@ -249,16 +297,58 @@ export default function LandingPageLeadsPage() {
                       </div>
                     </div>
 
-                    {/* Date */}
-                    <div className="mt-4 pt-4 border-t border-slate-200 flex items-center gap-2 text-sm text-slate-600">
-                      <Calendar className="w-4 h-4" />
-                      <span>Submitted on {formatDate(lead.createdAt)}</span>
+                    {/* Date and Actions */}
+                    <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <Calendar className="w-4 h-4" />
+                        <span>Submitted on {formatDate(lead.createdAt)}</span>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteClick(lead)}
+                        className="hover:bg-red-600"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
           )}
+
+          {/* Delete Confirmation Dialog */}
+          <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to delete the lead for <strong>{leadToDelete?.fullName}</strong>? This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setDeleteDialogOpen(false)
+                    setLeadToDelete(null)
+                  }}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleDeleteConfirm}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </main>
       </div>
     </RequireAdmin>
