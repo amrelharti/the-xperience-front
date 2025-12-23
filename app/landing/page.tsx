@@ -1424,54 +1424,55 @@ export default function XperienceProLandingPage() {
       </section>
 
       {/* Struggle/Positioning Section */}
-      <section className="py-20 md:py-28 bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-10 md:space-y-14">
-            {/* First block */}
-            <div className="space-y-5 md:space-y-6">
-              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                {t.struggle.paragraphs[0]}
-              </p>
-              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                {t.struggle.paragraphs[1]}
-              </p>
-              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                {t.struggle.paragraphs[2]}
-              </p>
-              <div className="pt-4 md:pt-6">
-                <p className="text-lg md:text-xl text-gray-900 leading-relaxed">
-                  {t.struggle.paragraphs[3]}
+      <section className="py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-8">
+            {/* First Card */}
+            <div className="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="space-y-4">
+                <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                  {t.struggle.paragraphs[0]}
+                </p>
+                <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                  {t.struggle.paragraphs[1]}
+                </p>
+                <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                  {t.struggle.paragraphs[2]}
                 </p>
               </div>
             </div>
 
-            {/* Divider */}
-            <div className="flex items-center justify-center py-2">
-              <div className="w-16 h-px bg-gray-200"></div>
+            {/* Second Card */}
+            <div className="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="space-y-4">
+                <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                  {t.struggle.paragraphs[5]}
+                </p>
+                <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                  {t.struggle.paragraphs[6]}
+                </p>
+                <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                  {t.struggle.paragraphs[7]}
+                </p>
+                <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                  {t.struggle.paragraphs[8]}
+                </p>
+              </div>
             </div>
+          </div>
 
-            {/* Second block */}
-            <div className="space-y-5 md:space-y-6">
-              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                {t.struggle.paragraphs[5]}
-              </p>
-              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                {t.struggle.paragraphs[6]}
-              </p>
-              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                {t.struggle.paragraphs[7]}
-              </p>
-              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                {t.struggle.paragraphs[8]}
-              </p>
-            </div>
+          {/* Highlighted Message Card */}
+          <div className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] p-6 md:p-8 rounded-xl shadow-xl text-white mb-8 transform hover:scale-[1.02] transition-all duration-300">
+            <p className="text-lg md:text-xl lg:text-2xl leading-relaxed text-center">
+              {t.struggle.paragraphs[3]}
+            </p>
+          </div>
 
-            {/* Conclusion */}
-            <div className="pt-8 md:pt-10 border-t border-gray-100">
-              <p className="text-xl md:text-2xl text-gray-900 text-center leading-relaxed">
-                {t.struggle.conclusion}
-              </p>
-            </div>
+          {/* Conclusion Card */}
+          <div className="bg-gradient-to-br from-[#FFBC00] to-[#e6a800] p-6 md:p-8 rounded-xl shadow-xl transform hover:scale-[1.02] transition-all duration-300">
+            <p className="text-xl md:text-2xl lg:text-3xl text-gray-900 text-center leading-relaxed font-bold">
+              {t.struggle.conclusion}
+            </p>
           </div>
         </div>
       </section>
