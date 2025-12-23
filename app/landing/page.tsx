@@ -660,7 +660,7 @@ const content: Record<Language, Content> = {
         "Vous postulez sans réponse.",
         "Vous passez parfois des entretiens, sans suite.",
         "Vous améliorez votre CV, sans impact réel.",
-        "👉 Le plus dur n'est pas le refus. C'est de ne pas savoir quoi corriger.",
+        "Le plus dur n'est pas le refus. C'est de ne pas savoir quoi corriger.",
         "",
         "Vous voyez d'autres avancer.",
         "Parfois avec moins d'expérience.",
@@ -809,6 +809,9 @@ export default function XperienceProLandingPage() {
   
   // Testimonial images from clients_reviews folder
   const testimonialImages = [
+    "/clients_reviews/screen9.png",
+    "/clients_reviews/screen10.png",
+    "/clients_reviews/screen11.png",
     "/clients_reviews/screen1.jpg",
     "/clients_reviews/screen2.jpg",
     "/clients_reviews/screen3.jpg",
@@ -817,9 +820,7 @@ export default function XperienceProLandingPage() {
     "/clients_reviews/screen6.jpg",
     "/clients_reviews/screen7.jpg",
     "/clients_reviews/screen8.jpg",
-    "/clients_reviews/screen9.png",
-    "/clients_reviews/screen10.png",
-    "/clients_reviews/screen11.png",
+    
   ]
   
   // WhatsApp number - Clean format: only digits, country code + number (e.g., 212773213060)
@@ -1369,16 +1370,14 @@ export default function XperienceProLandingPage() {
                   >
                     <div className="w-full">
                       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <div className="w-full flex items-center justify-center p-2">
-                          <Image
-                            src={image}
-                            alt={`Testimonial ${index + 1}`}
-                            width={400}
-                            height={800}
-                            className="w-full h-auto object-contain max-h-[500px] sm:max-h-[600px] md:max-h-[700px] lg:max-h-[800px]"
-                            priority={index < 3}
-                          />
-                        </div>
+                        <Image
+                          src={image}
+                          alt={`Testimonial ${index + 1}`}
+                          width={400}
+                          height={300}
+                          className="w-full h-auto object-contain max-h-[250px] sm:max-h-[300px] md:max-h-[350px]"
+                          priority={index < 3}
+                        />
                       </div>
                     </div>
                   </div>
@@ -1428,55 +1427,106 @@ export default function XperienceProLandingPage() {
       </section>
 
       {/* Struggle/Positioning Section */}
-      <section className="py-12 md:py-16 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-6">
-            {/* First Card */}
-            <div className="bg-white p-4 md:p-5 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-              <div className="space-y-3">
-                <p className="text-sm md:text-base text-gray-700 leading-relaxed">
+      <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Main Content Grid */}
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-8">
+            {/* Left Column - Struggles */}
+            <div className="space-y-4">
+              <div className="flex items-start gap-4 bg-gradient-to-br from-red-50 to-orange-50 p-5 rounded-xl border-l-4 border-red-400 hover:shadow-lg transition-all duration-300">
+                <div className="bg-red-100 rounded-full p-2 flex-shrink-0 mt-1">
+                  <FileText className="w-5 h-5 text-red-600" />
+                </div>
+                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
                   {t.struggle.paragraphs[0]}
                 </p>
-                <p className="text-sm md:text-base text-gray-700 leading-relaxed">
+              </div>
+              
+              <div className="flex items-start gap-4 bg-gradient-to-br from-orange-50 to-yellow-50 p-5 rounded-xl border-l-4 border-orange-400 hover:shadow-lg transition-all duration-300">
+                <div className="bg-orange-100 rounded-full p-2 flex-shrink-0 mt-1">
+                  <MessageSquare className="w-5 h-5 text-orange-600" />
+                </div>
+                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
                   {t.struggle.paragraphs[1]}
                 </p>
-                <p className="text-sm md:text-base text-gray-700 leading-relaxed">
+              </div>
+              
+              <div className="flex items-start gap-4 bg-gradient-to-br from-yellow-50 to-amber-50 p-5 rounded-xl border-l-4 border-yellow-400 hover:shadow-lg transition-all duration-300">
+                <div className="bg-yellow-100 rounded-full p-2 flex-shrink-0 mt-1">
+                  <TrendingUp className="w-5 h-5 text-yellow-600" />
+                </div>
+                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
                   {t.struggle.paragraphs[2]}
                 </p>
               </div>
             </div>
 
-            {/* Second Card */}
-            <div className="bg-white p-4 md:p-5 rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-              <div className="space-y-3">
-                <p className="text-sm md:text-base text-gray-700 leading-relaxed">
+            {/* Right Column - Observations */}
+            <div className="space-y-4">
+              <div className="flex items-start gap-4 bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border-l-4 border-blue-400 hover:shadow-lg transition-all duration-300">
+                <div className="bg-blue-100 rounded-full p-2 flex-shrink-0 mt-1">
+                  <Users className="w-5 h-5 text-blue-600" />
+                </div>
+                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
                   {t.struggle.paragraphs[5]}
                 </p>
-                <p className="text-sm md:text-base text-gray-700 leading-relaxed">
+              </div>
+              
+              <div className="flex items-start gap-4 bg-gradient-to-br from-indigo-50 to-purple-50 p-5 rounded-xl border-l-4 border-indigo-400 hover:shadow-lg transition-all duration-300">
+                <div className="bg-indigo-100 rounded-full p-2 flex-shrink-0 mt-1">
+                  <Target className="w-5 h-5 text-indigo-600" />
+                </div>
+                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
                   {t.struggle.paragraphs[6]}
                 </p>
-                <p className="text-sm md:text-base text-gray-700 leading-relaxed">
+              </div>
+              
+              <div className="flex items-start gap-4 bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl border-l-4 border-purple-400 hover:shadow-lg transition-all duration-300">
+                <div className="bg-purple-100 rounded-full p-2 flex-shrink-0 mt-1">
+                  <Award className="w-5 h-5 text-purple-600" />
+                </div>
+                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
                   {t.struggle.paragraphs[7]}
                 </p>
-                <p className="text-sm md:text-base text-gray-700 leading-relaxed">
+              </div>
+              
+              <div className="flex items-start gap-4 bg-gradient-to-br from-pink-50 to-rose-50 p-5 rounded-xl border-l-4 border-pink-400 hover:shadow-lg transition-all duration-300">
+                <div className="bg-pink-100 rounded-full p-2 flex-shrink-0 mt-1">
+                  <Sparkles className="w-5 h-5 text-pink-600" />
+                </div>
+                <p className="text-base md:text-lg text-gray-800 leading-relaxed font-medium">
                   {t.struggle.paragraphs[8]}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Highlighted Message Card */}
-          <div className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] p-4 md:p-6 rounded-xl shadow-xl text-white mb-6 transform hover:scale-[1.02] transition-all duration-300">
-            <p className="text-base md:text-lg leading-relaxed text-center">
-              {t.struggle.paragraphs[3]}
-            </p>
+          {/* Key Insight - Highlighted */}
+          <div className="bg-gradient-to-r from-[#005eb8] via-[#0476D7] to-[#005eb8] p-6 md:p-8 rounded-2xl shadow-2xl text-white mb-6 transform hover:scale-[1.01] transition-all duration-300 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0" style={{
+                backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)'
+              }}></div>
+            </div>
+            <div className="relative z-10 flex items-center gap-4">
+              <div className="bg-white/20 rounded-full p-3 flex-shrink-0">
+                <Target className="w-6 h-6 md:w-8 md:h-8" />
+              </div>
+              <p className="text-lg md:text-xl leading-relaxed font-semibold">
+                {t.struggle.paragraphs[3]}
+              </p>
+            </div>
           </div>
 
-          {/* Conclusion Card */}
-          <div className="bg-gradient-to-br from-[#FFBC00] to-[#e6a800] p-4 md:p-6 rounded-xl shadow-xl transform hover:scale-[1.02] transition-all duration-300">
-            <p className="text-base md:text-lg text-gray-900 text-center leading-relaxed">
-              {t.struggle.conclusion}
-            </p>
+          {/* Conclusion - Call to Action */}
+          <div className="bg-gradient-to-br from-[#FFBC00] via-[#FFD700] to-[#FFBC00] p-6 md:p-8 rounded-2xl shadow-2xl transform hover:scale-[1.01] transition-all duration-300 text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-gray-900" />
+              <p className="text-xl md:text-2xl text-gray-900 font-bold leading-relaxed">
+                {t.struggle.conclusion}
+              </p>
+              <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-gray-900" />
+            </div>
           </div>
         </div>
       </section>
