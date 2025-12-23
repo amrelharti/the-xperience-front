@@ -126,6 +126,10 @@ interface Content {
       image: string
     }[]
   }
+  struggle: {
+    paragraphs: string[]
+    conclusion: string
+  }
   form: {
     title: string
     subtitle: string
@@ -389,6 +393,20 @@ const content: Record<Language, Content> = {
         },
       ],
     },
+    struggle: {
+      paragraphs: [
+        "You apply without responses.",
+        "You sometimes go to interviews, with no follow-up.",
+        "You improve your CV, with no real impact.",
+        "👉 The hardest part isn't the rejection. It's not knowing what to fix.",
+        "",
+        "You see others moving forward.",
+        "Sometimes with less experience.",
+        "Sometimes with a similar background.",
+        "And you wonder: \"Why not me?\"",
+      ],
+      conclusion: "It's not a question of competence. It's a question of positioning.",
+    },
     form: {
       title: "Join Xperience Pro",
       subtitle: "Fill out the form and we'll contact you via WhatsApp",
@@ -649,6 +667,20 @@ const content: Record<Language, Content> = {
         },
       ],
     },
+    struggle: {
+      paragraphs: [
+        "Vous postulez sans réponse.",
+        "Vous passez parfois des entretiens, sans suite.",
+        "Vous améliorez votre CV, sans impact réel.",
+        "👉 Le plus dur n'est pas le refus. C'est de ne pas savoir quoi corriger.",
+        "",
+        "Vous voyez d'autres avancer.",
+        "Parfois avec moins d'expérience.",
+        "Parfois avec un parcours similaire.",
+        "Et vous vous demandez : \"Pourquoi pas moi ?\"",
+      ],
+      conclusion: "Ce n'est pas une question de compétence. C'est une question de positionnement.",
+    },
     form: {
       title: "Rejoindre Xperience Pro",
       subtitle: "Remplissez le formulaire et nous vous contacterons via WhatsApp",
@@ -797,6 +829,9 @@ export default function XperienceProLandingPage() {
     "/clients_reviews/screen6.jpg",
     "/clients_reviews/screen7.jpg",
     "/clients_reviews/screen8.jpg",
+    "/clients_reviews/screen9.png",
+    "/clients_reviews/screen10.png",
+    "/clients_reviews/screen11.png",
   ]
   
   // WhatsApp number - Clean format: only digits, country code + number (e.g., 212773213060)
@@ -1400,6 +1435,57 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
+      {/* Struggle/Positioning Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="space-y-8 md:space-y-12">
+            {/* First block */}
+            <div className="space-y-4 md:space-y-6">
+              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+                {t.struggle.paragraphs[0]}
+              </p>
+              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+                {t.struggle.paragraphs[1]}
+              </p>
+              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+                {t.struggle.paragraphs[2]}
+              </p>
+              <p className="text-xl md:text-2xl text-gray-900 leading-relaxed font-medium mt-6 md:mt-8">
+                {t.struggle.paragraphs[3]}
+              </p>
+            </div>
+
+            {/* Divider */}
+            <div className="flex items-center justify-center py-4">
+              <div className="w-24 h-px bg-gray-300"></div>
+            </div>
+
+            {/* Second block */}
+            <div className="space-y-4 md:space-y-6">
+              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+                {t.struggle.paragraphs[5]}
+              </p>
+              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+                {t.struggle.paragraphs[6]}
+              </p>
+              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+                {t.struggle.paragraphs[7]}
+              </p>
+              <p className="text-lg md:text-xl text-gray-700 leading-relaxed italic">
+                {t.struggle.paragraphs[8]}
+              </p>
+            </div>
+
+            {/* Conclusion */}
+            <div className="pt-6 md:pt-8 border-t border-gray-200">
+              <p className="text-2xl md:text-3xl text-gray-900 text-center leading-relaxed font-medium">
+                {t.struggle.conclusion}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Solution Section */}
       {t.solution && (
         <section className="py-16 md:py-24 bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] text-white">
@@ -1928,44 +2014,44 @@ export default function XperienceProLandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-3">
             <Image
               src="/logo_white.png"
               alt="XPERIENCE Logo"
               width={200}
               height={60}
-              className="h-12 md:h-16 w-auto"
+              className="h-10 md:h-12 w-auto"
             />
           </div>
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-400 mb-3 text-sm">
             {language === "en"
               ? "Transform your job search. Get real results."
               : "Transforme ta recherche d'emploi. Obtiens de vrais résultats."}
           </p>
-          <div className="flex justify-center gap-4">
-            <a
-              href={t.trainer.social.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-white transition-colors"
-              aria-label="Instagram"
-            >
-              <Instagram className="w-6 h-6" />
-            </a>
-            <a
-              href={t.trainer.social.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-white transition-colors"
-              aria-label="LinkedIn"
-            >
-              <Linkedin className="w-6 h-6" />
-            </a>
-          </div>
-          <div className="mt-8 pt-6 border-t border-gray-800">
-            <p className="text-gray-500 text-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+            <div className="flex justify-center gap-4">
+              <a
+                href={t.trainer.social.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Instagram"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a
+                href={t.trainer.social.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="LinkedIn"
+              >
+                <Linkedin className="w-5 h-5" />
+              </a>
+            </div>
+            <p className="text-gray-500 text-xs">
               © {new Date().getFullYear()} XPERIENCE. {language === "en" ? "Developed by" : "Développé par"}{" "}
               <a
                 href="https://www.linkedin.com/in/amr-el-harti/"
