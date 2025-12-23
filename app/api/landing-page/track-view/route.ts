@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
     }
     
     console.log('📊 Frontend API: Tracking landing page view:', body)
+    console.log('📊 Backend URL:', `${BACKEND_URL}/api/landing-page/track-view`)
     
     // Forward to backend
     const response = await fetch(`${BACKEND_URL}/api/landing-page/track-view`, {
@@ -30,13 +31,22 @@ export async function POST(request: NextRequest) {
     })
     
     if (!response.ok) {
-      // If backend endpoint doesn't exist yet, we'll still return success
-      // so the frontend doesn't break. The backend can be implemented later.
-      console.warn('⚠️ Backend endpoint may not exist yet, but tracking attempted')
+      // Log the actual error for debugging
+      const errorText = await response.text().catch(() => 'Could not read error response')
+      console.error('❌ Backend error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+        url: `${BACKEND_URL}/api/landing-page/track-view`
+      })
+      
+      // Return the actual error so we can debug
       return NextResponse.json({ 
-        success: true, 
-        message: 'View tracked (backend endpoint may need implementation)' 
-      }, { status: 200 })
+        success: false, 
+        message: 'View tracking failed',
+        error: errorText,
+        status: response.status
+      }, { status: response.status })
     }
     
     const data = await response.json()
