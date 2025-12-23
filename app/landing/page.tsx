@@ -1424,10 +1424,10 @@ export default function XperienceProLandingPage() {
               </div>
               <button
                 onClick={() => scrollToSection("price")}
-                className="mt-12 bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto animate-button-bounce"
+                className="mt-12 bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-end gap-2 mx-auto animate-button-bounce"
               >
                 {language === "en" ? "Fix What's Blocking My Applications" : "Corriger ce qui bloque mes candidatures"}
-                <ArrowRight className="w-5 h-5" />
+                <ArrowDown className="w-5 h-5 group-hover:translate-y-1 transition-transform duration-200" />
               </button>
             </div>
           </div>
