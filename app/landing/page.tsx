@@ -258,24 +258,20 @@ const content: Record<Language, Content> = {
       title: "What's inside Xperience Pro",
       items: [
         {
-          title: "Module 1 – CV fundamentals",
-          description: "Build a CV that looks professional and clearly shows your value, even if you don't have a lot of experience.",
+          title: "Module 1 : Clear, readable CV understood by recruiters",
+          description: "Optimize your CV so that it is :\n• Quickly understandable\n• Aligned with recruiters' expectations\nObjective : Pass the first screening and avoid automatic elimination.",
         },
         {
-          title: "Module 2 – Adapting your CV to each job",
-          description: "How to read a job offer, pick the right keywords, and adapt your CV fast.",
+          title: "Module 2 : Mastering interview techniques",
+          description: "Understand :\n• What the recruiter is really looking to evaluate\n• How to avoid vague or off-topic answers\nObjective : Perform better in interviews, without improvising.",
         },
         {
-          title: "Module 3 – Mastering LinkedIn",
-          description: "Optimize your photo, headline, About section, and start being visible to recruiters.",
+          title: "Module 3 : Managing stress and convincing in interviews",
+          description: "Learn to :\n• Manage stress before and during the interview\n• Research the company well and stand out\nObjective : Gain confidence and impact with the recruiter.",
         },
         {
-          title: "Module 4 – Interview preparation",
-          description: "How to introduce yourself, answer classic questions, and ask smart questions at the end.",
-        },
-        {
-          title: "Module 5 – Action plan",
-          description: "A 30-day action plan to apply, follow up, and track your progress without feeling lost.",
+          title: "Module 4 : LinkedIn and professional positioning",
+          description: "Optimize your presence on LinkedIn to :\n• Strengthen your credibility with recruiters\n• Position yourself as a thought leader in your field.\nObjective : Improve your visibility and positioning in the market.",
         },
       ],
     },
@@ -340,19 +336,15 @@ const content: Record<Language, Content> = {
       items: [
         {
           question: "How do I access the program after payment?",
-          answer: "After payment, you'll receive an email with your login credentials and access to the online platform within 24 hours.",
+          answer: "Once the payment is made, you send us the bank receipt via WhatsApp. After completing the Onboarding form, we give you access to the Xperience platform with the video capsules and the WhatsApp group of the community",
         },
         {
           question: "Is it suitable for beginners?",
-          answer: "Yes! Xperience Pro is designed for everyone, whether you're just starting your career or looking to make a change. No prior experience needed.",
+          answer: "Our clients are students, fresh graduates and employees. Xperience is suitable for any competent candidate who wants to end applications without responses and boost their professional career.",
         },
         {
           question: "How long do I keep access?",
-          answer: "You get lifetime access to all the content. Once you join, you can revisit the lessons anytime, anywhere.",
-        },
-        {
-          question: "What if I'm not satisfied?",
-          answer: "We're confident you'll love the program. If you're not satisfied within the first 7 days, contact us for a full refund.",
+          answer: "You have lifetime access to all the video capsules. Once you join, you can review the lessons whenever you want, wherever you want.",
         },
         {
           question: "Can I access it on mobile?",
@@ -614,19 +606,15 @@ const content: Record<Language, Content> = {
       items: [
         {
           question: "Comment j'accède au programme après le paiement ?",
-          answer: "",
+          answer: "Une fois le paiement effectué, vous nous envoyez le reçu du virement via WhatsApp. Après le renseignement du formulaire Onboarding, nous vous donnons accès à la plate-forme Xperience avec les capsules vidéo et au groupe WhatsApp de la communauté",
         },
         {
           question: "Est-ce adapté aux débutants ?",
-          answer: "Oui ! Xperience Pro est conçu pour tout le monde, que tu commences ta carrière ou que tu veuilles changer. Aucune expérience préalable nécessaire.",
+          answer: "Nos clients sont des étudiants, des fraîchement diplômés et des salariés. Xperience est adapté à tout candidat compétent qui souhaite mettre fin aux candidatures sans réponses et booster son parcours professionnel.",
         },
         {
           question: "Combien de temps je garde l'accès ?",
-          answer: "Tu as un accès à vie à tout le contenu. Une fois inscrit(e), tu peux revoir les leçons quand tu veux, où tu veux.",
-        },
-        {
-          question: "Et si je ne suis pas satisfait(e) ?",
-          answer: "",
+          answer: "Tu as un accès à vie à toutes les capsules enregistrées. Une fois inscrit(e), tu peux revoir les leçons quand tu veux, où tu veux.",
         },
         {
           question: "Je peux y accéder sur mobile ?",
