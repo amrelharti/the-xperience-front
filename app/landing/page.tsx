@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { CheckCircle2, ArrowRight, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles, Menu, X, Star, Quote, FileCheck, ChevronLeft, ChevronRight } from "lucide-react"
+import { CheckCircle2, ArrowRight, ArrowDown, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles, Menu, X, Star, Quote, FileCheck, ChevronLeft, ChevronRight } from "lucide-react"
 
 type Language = "en" | "fr"
 
@@ -1198,7 +1198,14 @@ export default function XperienceProLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              {t.hero.headline}
+              {language === "fr" 
+                ? (
+                  <>
+                    Ignoré par les recruteurs ?<br className="md:hidden" /> Mettez fin aux candidatures sans réponse.
+                  </>
+                )
+                : t.hero.headline
+              }
             </h1>
             
             <p className="text-lg mb-6 text-blue-200">
@@ -1232,7 +1239,7 @@ export default function XperienceProLandingPage() {
                 onClick={() => scrollToSection("price")}
                 onMouseEnter={() => setCtaHoverState({ ...ctaHoverState, heroPrimary: true })}
                 onMouseLeave={() => setCtaHoverState({ ...ctaHoverState, heroPrimary: false })}
-                className="bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center gap-2 group"
+                className="bg-[#FFBC00] hover:bg-[#e6a800] text-gray-900 font-bold px-8 py-4 rounded-lg text-lg shadow-lg transform hover:scale-105 transition-all duration-200 flex items-end gap-2 group animate-button-bounce"
               >
                 <span className="transition-all duration-200">
                   {ctaHoverState.heroPrimary 
@@ -1240,7 +1247,7 @@ export default function XperienceProLandingPage() {
                     : t.hero.ctaPrimary
                   }
                 </span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                <ArrowDown className="w-5 h-5 group-hover:translate-y-1 transition-transform duration-200 flex-shrink-0" />
               </button>
              
             </div>
@@ -1881,8 +1888,8 @@ export default function XperienceProLandingPage() {
       <section className="py-12 md:py-16 bg-gradient-to-br from-red-600 via-red-700 to-red-800 relative overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-[#FFD700]/30 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#008000]/30 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-[#FFC72C]/30 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#007A33]/30 rounded-full blur-3xl"></div>
         </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -1898,16 +1905,16 @@ export default function XperienceProLandingPage() {
                 : "Seulement 2 gagnants par jour ! Tournez maintenant et gagnez des prix incroyables !"}
             </h2>
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm md:text-base mb-6">
-              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#FFD700]">
-                <span className="w-5 h-5 rounded-full bg-[#FFD700] shadow-lg"></span>
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#FFC72C]">
+                <span className="w-5 h-5 rounded-full bg-[#FFC72C] shadow-lg"></span>
                 <span className="text-gray-900">20% OFF Xperience Pro</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#008000]">
-                <span className="w-5 h-5 rounded-full bg-[#008000] shadow-lg"></span>
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#007A33]">
+                <span className="w-5 h-5 rounded-full bg-[#007A33] shadow-lg"></span>
                 <span className="text-gray-900">{language === "en" ? "Free CV Correction" : "Correction CV Gratuite"}</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#FF0000]">
-                <span className="w-5 h-5 rounded-full bg-[#FF0000] shadow-lg"></span>
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#C8102E]">
+                <span className="w-5 h-5 rounded-full bg-[#C8102E] shadow-lg"></span>
                 <span className="text-gray-900">{language === "en" ? "Try Again" : "Réessayer"}</span>
               </div>
             </div>
@@ -2253,23 +2260,23 @@ function RouletteWheel({ language }: { language: Language }) {
   }
 
   // Prize wheel configuration - 12 segments
-  // Color mapping (must match backend indices):
-  // - Gold (#FFD700) = "20% OFF Xperience Pro" (indices 0, 3, 6, 9)
-  // - Green (#008000) = "Free CV Correction" (indices 1, 4, 7, 10)
-  // - Red (#FF0000) = "Try Again" (indices 2, 5, 8, 11)
+  // Color mapping (must match backend indices) - AFCON Colors:
+  // - Yellow/Orange (#FFC72C) = "20% OFF Xperience Pro" (indices 0, 3, 6, 9)
+  // - Green (#007A33) = "Free CV Correction" (indices 1, 4, 7, 10)
+  // - Red (#C8102E) = "Try Again" (indices 2, 5, 8, 11)
   const prizes = [
-    { id: 1, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 }, // Index 0 - 20% OFF
-    { id: 2, label: "Free CV Correction", color: "#008000", weight: 2 }, // Index 1 - Free CV
-    { id: 3, label: "Try Again", color: "#FF0000", weight: 3 }, // Index 2 - Try Again
-    { id: 4, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 }, // Index 3 - 20% OFF
-    { id: 5, label: "Free CV Correction", color: "#008000", weight: 2 }, // Index 4 - Free CV
-    { id: 6, label: "Try Again", color: "#FF0000", weight: 3 }, // Index 5 - Try Again
-    { id: 7, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 }, // Index 6 - 20% OFF
-    { id: 8, label: "Free CV Correction", color: "#008000", weight: 2 }, // Index 7 - Free CV
-    { id: 9, label: "Try Again", color: "#FF0000", weight: 3 }, // Index 8 - Try Again
-    { id: 10, label: "OFF Xperience Pro", color: "#FFD700", weight: 1 }, // Index 9 - 20% OFF
-    { id: 11, label: "Free CV Correction", color: "#008000", weight: 2 }, // Index 10 - Free CV
-    { id: 12, label: "Try Again", color: "#FF0000", weight: 3 }, // Index 11 - Try Again
+    { id: 1, label: "OFF Xperience Pro", color: "#FFC72C", weight: 1 }, // Index 0 - 20% OFF
+    { id: 2, label: "Free CV Correction", color: "#007A33", weight: 2 }, // Index 1 - Free CV
+    { id: 3, label: "Try Again", color: "#C8102E", weight: 3 }, // Index 2 - Try Again
+    { id: 4, label: "OFF Xperience Pro", color: "#FFC72C", weight: 1 }, // Index 3 - 20% OFF
+    { id: 5, label: "Free CV Correction", color: "#007A33", weight: 2 }, // Index 4 - Free CV
+    { id: 6, label: "Try Again", color: "#C8102E", weight: 3 }, // Index 5 - Try Again
+    { id: 7, label: "OFF Xperience Pro", color: "#FFC72C", weight: 1 }, // Index 6 - 20% OFF
+    { id: 8, label: "Free CV Correction", color: "#007A33", weight: 2 }, // Index 7 - Free CV
+    { id: 9, label: "Try Again", color: "#C8102E", weight: 3 }, // Index 8 - Try Again
+    { id: 10, label: "OFF Xperience Pro", color: "#FFC72C", weight: 1 }, // Index 9 - 20% OFF
+    { id: 11, label: "Free CV Correction", color: "#007A33", weight: 2 }, // Index 10 - Free CV
+    { id: 12, label: "Try Again", color: "#C8102E", weight: 3 }, // Index 11 - Try Again
   ]
 
   // Initialize and track user tries from localStorage
@@ -2445,8 +2452,8 @@ function RouletteWheel({ language }: { language: Language }) {
         })
         
         // Double check: must have verification code AND prize must not be "Try Again" AND selected prize must not be "Try Again"
-        // Also check the color - red (#FF0000) means "Try Again" and should never be processed as a win
-        const isRedSegment = selectedPrize.color === "#FF0000"
+        // Also check the color - red (#C8102E) means "Try Again" and should never be processed as a win
+        const isRedSegment = selectedPrize.color === "#C8102E"
         
         if (data.verificationCode && data.prize && data.prize !== "Try Again" && selectedPrize.label !== "Try Again" && !isRedSegment) {
           console.log("Processing winner with prize:", data.prize)
@@ -2521,7 +2528,7 @@ function RouletteWheel({ language }: { language: Language }) {
           console.log("No prize won - Try Again result", { 
             backendPrize: data.prize, 
             selectedPrizeLabel: selectedPrize.label,
-            isRedSegment: selectedPrize.color === "#FF0000"
+            isRedSegment: selectedPrize.color === "#C8102E"
           })
           // Don't show any alert for "Try Again" - just let the wheel show the result
         }
@@ -2545,10 +2552,10 @@ function RouletteWheel({ language }: { language: Language }) {
         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-30">
           <div className="relative">
             {/* Subtle glow */}
-            <div className="absolute inset-0 bg-[#FFD700] blur-md opacity-40 animate-pulse"></div>
+            <div className="absolute inset-0 bg-[#FFC72C] blur-md opacity-40 animate-pulse"></div>
             {/* Clean pointer triangle */}
             <div className="relative">
-              <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[32px] border-l-transparent border-r-transparent border-t-[#FFD700] drop-shadow-lg padding-top-5"></div>
+              <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[32px] border-l-transparent border-r-transparent border-t-[#FFC72C] drop-shadow-lg padding-top-5"></div>
               {/* Inner highlight for depth */}
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-r-[10px] border-t-[16px] border-l-transparent border-r-transparent border-t-white/30"></div>
             </div>
@@ -2558,7 +2565,7 @@ function RouletteWheel({ language }: { language: Language }) {
         {/* Modern Wheel Container */}
         <div className="relative w-[300px] h-[300px] md:w-[360px] md:h-[360px]">
           {/* Subtle outer glow - more refined */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFD700]/10 via-[#008000]/10 to-[#FF0000]/10 blur-xl"></div>
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFC72C]/10 via-[#007A33]/10 to-[#C8102E]/10 blur-xl"></div>
           
           {/* Main wheel - Clean modern design */}
           <div className="relative w-full h-full">
@@ -2743,7 +2750,7 @@ function RouletteWheel({ language }: { language: Language }) {
           onClick={() => setShowWinnerModal(false)}
         >
           <div 
-            className="bg-gradient-to-br from-[#FFD700] via-[#FFBC00] to-[#FF8C00] rounded-3xl shadow-2xl max-w-md w-full p-8 relative animate-scale-in"
+            className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 rounded-3xl shadow-2xl max-w-md w-full p-8 relative animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
