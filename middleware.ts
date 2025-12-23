@@ -5,8 +5,15 @@ export function middleware(request: NextRequest) {
   // Check if maintenance mode is enabled
   const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true';
   
-  // Get the pathname
+  // Get the pathname and hostname
   const pathname = request.nextUrl.pathname;
+  const hostname = request.headers.get('host') || '';
+  
+  // Domain-based routing: If on app subdomain and root path, rewrite to LMS homepage
+  // This allows app.the-xperience.com/ to show LMS, while the-xperience.com/ shows landing page
+  if (hostname.includes('app.the-xperience.com') && pathname === '/') {
+    return NextResponse.rewrite(new URL('/lms-home', request.url));
+  }
   
   // Allow access to maintenance page and static assets
   const isMaintenancePage = pathname === '/maintenance';

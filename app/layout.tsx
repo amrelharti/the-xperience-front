@@ -21,9 +21,64 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: "The Xperience - Learn Through Video Courses",
-  description: "Premium learning platform with structured courses and progress tracking",
-  generator: "v0.app",
+  title: "Xperience Pro - Stop applying in the dark. Start getting real interviews.",
+  description: "A step-by-step program to build a winning CV, adapt it to each job, master LinkedIn, and feel confident in interviews. For students, employees, and job seekers in Morocco.",
+  keywords: [
+    "CV writing",
+    "job search",
+    "career coaching",
+    "LinkedIn optimization",
+    "interview preparation",
+    "Morocco",
+    "emploi Maroc",
+    "recherche d'emploi",
+    "coaching carrière",
+    "Xperience Pro",
+  ],
+  authors: [{ name: "Ali El Harti" }],
+  creator: "Ali El Harti",
+  publisher: "Xperience Pro",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    alternateLocale: ["fr_FR"],
+    url: "https://the-xperience.com",
+    siteName: "Xperience Pro",
+    title: "Xperience Pro - Stop applying in the dark. Start getting real interviews.",
+    description: "A step-by-step program to build a winning CV, adapt it to each job, master LinkedIn, and feel confident in interviews.",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Xperience Pro - Career Coaching Program",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Xperience Pro - Stop applying in the dark. Start getting real interviews.",
+    description: "A step-by-step program to build a winning CV, adapt it to each job, master LinkedIn, and feel confident in interviews.",
+    images: ["/og-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://the-xperience.com",
+    languages: {
+      "en": "https://the-xperience.com",
+      "fr": "https://the-xperience.com",
+    },
+  },
   icons: {
     icon: "/logos/favicon.png",
     apple: "/logos/apple-icon.png",
