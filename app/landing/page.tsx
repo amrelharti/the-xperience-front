@@ -1344,9 +1344,9 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
  {/* Testimonials Section - Carousel */}
- <section id="testimonials" className="py-16 md:py-24 bg-white">
+ <section id="testimonials" className="py-12 sm:py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-gray-900">
             {t.testimonials.title}
           </h2>
           <div className="relative">
@@ -1361,10 +1361,10 @@ export default function XperienceProLandingPage() {
                 {testimonialImages.map((image, index) => (
                   <div
                     key={index}
-                    className={`flex-shrink-0 flex items-center justify-center px-2 ${
-                      testimonialsPerView === 1 ? 'min-w-full' : 
-                      testimonialsPerView === 2 ? 'min-w-[50%]' : 
-                      'min-w-[33.333%]'
+                    className={`flex-shrink-0 flex items-center justify-center ${
+                      testimonialsPerView === 1 ? 'min-w-full px-3 sm:px-4' : 
+                      testimonialsPerView === 2 ? 'min-w-[50%] px-2 sm:px-3' : 
+                      'min-w-[33.333%] px-2'
                     }`}
                   >
                     <div className="w-full">
@@ -1374,7 +1374,7 @@ export default function XperienceProLandingPage() {
                           alt={`Testimonial ${index + 1}`}
                           width={400}
                           height={300}
-                          className="w-full h-auto object-contain max-h-[300px] sm:max-h-[400px]"
+                          className="w-full h-auto object-contain max-h-[250px] sm:max-h-[350px] md:max-h-[400px]"
                           priority={index < 3}
                         />
                       </div>
@@ -1389,19 +1389,19 @@ export default function XperienceProLandingPage() {
               onClick={() => setCurrentTestimonialIndex((prev) => 
                 prev === 0 ? Math.max(0, testimonialImages.length - testimonialsPerView) : Math.max(0, prev - 1)
               )}
-              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 sm:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              className="absolute left-1 sm:left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-1.5 sm:p-2 md:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
               aria-label="Previous testimonial"
             >
-              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </button>
             <button
               onClick={() => setCurrentTestimonialIndex((prev) => 
                 prev >= testimonialImages.length - testimonialsPerView ? 0 : prev + 1
               )}
-              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-2 sm:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
+              className="absolute right-1 sm:right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-[#005eb8] p-1.5 sm:p-2 md:p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
               aria-label="Next testimonial"
             >
-              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </button>
             
             {/* Dots Indicator */}
@@ -1424,49 +1424,51 @@ export default function XperienceProLandingPage() {
       </section>
 
       {/* Struggle/Positioning Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-8 md:space-y-12">
+      <section className="py-20 md:py-28 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="space-y-10 md:space-y-14">
             {/* First block */}
-            <div className="space-y-4 md:space-y-6">
-              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+            <div className="space-y-5 md:space-y-6">
+              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
                 {t.struggle.paragraphs[0]}
               </p>
-              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
                 {t.struggle.paragraphs[1]}
               </p>
-              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
                 {t.struggle.paragraphs[2]}
               </p>
-              <p className="text-xl md:text-2xl text-gray-900 leading-relaxed font-medium mt-6 md:mt-8">
-                {t.struggle.paragraphs[3]}
-              </p>
+              <div className="pt-4 md:pt-6">
+                <p className="text-lg md:text-xl text-gray-900 leading-relaxed">
+                  {t.struggle.paragraphs[3]}
+                </p>
+              </div>
             </div>
 
             {/* Divider */}
-            <div className="flex items-center justify-center py-4">
-              <div className="w-24 h-px bg-gray-300"></div>
+            <div className="flex items-center justify-center py-2">
+              <div className="w-16 h-px bg-gray-200"></div>
             </div>
 
             {/* Second block */}
-            <div className="space-y-4 md:space-y-6">
-              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+            <div className="space-y-5 md:space-y-6">
+              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
                 {t.struggle.paragraphs[5]}
               </p>
-              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
                 {t.struggle.paragraphs[6]}
               </p>
-              <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
+              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
                 {t.struggle.paragraphs[7]}
               </p>
-              <p className="text-lg md:text-xl text-gray-700 leading-relaxed italic">
+              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
                 {t.struggle.paragraphs[8]}
               </p>
             </div>
 
             {/* Conclusion */}
-            <div className="pt-6 md:pt-8 border-t border-gray-200">
-              <p className="text-2xl md:text-3xl text-gray-900 text-center leading-relaxed font-medium">
+            <div className="pt-8 md:pt-10 border-t border-gray-100">
+              <p className="text-xl md:text-2xl text-gray-900 text-center leading-relaxed">
                 {t.struggle.conclusion}
               </p>
             </div>
