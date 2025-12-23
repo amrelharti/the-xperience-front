@@ -1091,6 +1091,16 @@ export default function XperienceProLandingPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <style>{`
+        @keyframes pulseModerate {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.6;
+          }
+        }
+      `}</style>
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1449,6 +1459,7 @@ export default function XperienceProLandingPage() {
 
           {/* Bullet Points - Two Column Layout on Desktop */}
           <div className="grid md:grid-cols-2 gap-x-6 gap-y-3 mb-8 md:mb-10">
+            {/* 1. Vous postulez sans réponse. */}
             <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
               <div className="flex-shrink-0 mt-1.5 relative">
                 <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
@@ -1459,6 +1470,7 @@ export default function XperienceProLandingPage() {
               </p>
             </div>
             
+            {/* 5. Vous voyez d'autres avancer. */}
             <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
               <div className="flex-shrink-0 mt-1.5 relative">
                 <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
@@ -1469,6 +1481,7 @@ export default function XperienceProLandingPage() {
               </p>
             </div>
             
+            {/* 2. Vous passez parfois des entretiens, sans suite. */}
             <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
               <div className="flex-shrink-0 mt-1.5 relative">
                 <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
@@ -1479,6 +1492,7 @@ export default function XperienceProLandingPage() {
               </p>
             </div>
             
+            {/* 6. Parfois avec moins d'expérience. */}
             <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
               <div className="flex-shrink-0 mt-1.5 relative">
                 <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
@@ -1489,6 +1503,7 @@ export default function XperienceProLandingPage() {
               </p>
             </div>
             
+            {/* 3. Vous améliorez votre CV, sans impact réel. */}
             <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
               <div className="flex-shrink-0 mt-1.5 relative">
                 <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
@@ -1499,6 +1514,7 @@ export default function XperienceProLandingPage() {
               </p>
             </div>
             
+            {/* 7. Parfois avec un parcours similaire. */}
             <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200">
               <div className="flex-shrink-0 mt-1.5 relative">
                 <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
@@ -1509,6 +1525,18 @@ export default function XperienceProLandingPage() {
               </p>
             </div>
             
+            {/* 4. Le plus dur n'est pas le refus. C'est de ne pas savoir quoi corriger. */}
+            <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200 md:col-span-2">
+              <div className="flex-shrink-0 mt-1.5 relative">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-[#005eb8] opacity-0 group-hover:opacity-30 group-hover:scale-150 transition-all duration-300"></div>
+              </div>
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1 group-hover:text-gray-900 transition-colors duration-200">
+                {t.struggle.paragraphs[3].replace('👉 ', '')}
+              </p>
+            </div>
+            
+            {/* 8. Et vous vous demandez : "Pourquoi pas moi ?" */}
             <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200 md:col-span-2">
               <div className="flex-shrink-0 mt-1.5 relative">
                 <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
@@ -1518,29 +1546,28 @@ export default function XperienceProLandingPage() {
                 {t.struggle.paragraphs[8]}
               </p>
             </div>
-          </div>
-
-          {/* Key Insight - Highlighted */}
-          <div className="bg-gradient-to-r from-[#005eb8] via-[#0476D7] to-[#005eb8] p-6 md:p-7 rounded-2xl shadow-2xl text-white mb-5 transform hover:scale-[1.02] hover:shadow-3xl transition-all duration-300 relative overflow-hidden group">
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute inset-0" style={{
-                backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)'
-              }}></div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-            <div className="relative z-10 text-center">
-              <p className="text-base md:text-lg leading-relaxed font-semibold">
-                {t.struggle.paragraphs[3]}
+            
+            {/* 9. Ce n'est pas une question de compétence. */}
+            <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200 md:col-span-2">
+              <div className="flex-shrink-0 mt-1.5 relative">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-[#005eb8] opacity-0 group-hover:opacity-30 group-hover:scale-150 transition-all duration-300"></div>
+              </div>
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1 group-hover:text-gray-900 transition-colors duration-200">
+                {t.struggle.conclusion.split('.')[0]}.
               </p>
             </div>
-          </div>
-
-          {/* Conclusion - Call to Action */}
-          <div className="bg-gradient-to-br from-[#FFBC00] via-[#FFD700] to-[#FFBC00] p-6 md:p-7 rounded-2xl shadow-2xl transform hover:scale-[1.02] hover:shadow-3xl transition-all duration-300 text-center relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-            <p className="text-lg md:text-xl text-gray-900 font-bold leading-relaxed relative z-10">
-              {t.struggle.conclusion}
-            </p>
+            
+            {/* 10. C'est une question de positionnement. */}
+            <div className="flex items-start gap-3 group hover:translate-x-1 transition-all duration-200 md:col-span-2">
+              <div className="flex-shrink-0 mt-1.5 relative">
+                <div className="w-2 h-2 rounded-full bg-[#005eb8] group-hover:bg-[#0476D7] transition-all duration-200 shadow-sm group-hover:shadow-md"></div>
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-[#005eb8] opacity-0 group-hover:opacity-30 group-hover:scale-150 transition-all duration-300"></div>
+              </div>
+              <p className="text-base md:text-lg text-gray-800 leading-snug flex-1 group-hover:text-gray-900 transition-colors duration-200">
+                {t.struggle.conclusion.split('.').length > 1 ? t.struggle.conclusion.split('.')[1].trim() + '.' : t.struggle.conclusion}
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -1676,7 +1703,12 @@ export default function XperienceProLandingPage() {
               {t.modules.title}
             </h2>
             <div className="flex justify-center">
-              <div className="bg-red-500 text-white px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-lg flex items-center gap-2">
+              <div 
+                className="bg-red-500 text-white px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-lg flex items-center gap-2"
+                style={{
+                  animation: 'pulseModerate 2s ease-in-out infinite'
+                }}
+              >
                 <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>{language === "en" ? "Recorded capsules + live + follow-up" : "Capsules enregistrées + live + suivi"}</span>
               </div>
