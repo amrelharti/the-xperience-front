@@ -1293,8 +1293,12 @@ export default function XperienceProLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <p className="text-xl md:text-2xl mb-6 font-bold text-black-900 leading-relaxed text-center">
               {t.hero.subheading}
-              <br />
-              <span className="block mt-2">Et vous ne savez pas pourquoi.</span>
+              {language === "fr" && (
+                <>
+                  <br />
+                  <span className="block mt-2">Et vous ne savez pas pourquoi.</span>
+                </>
+              )}
             </p>
           <h2 className="text-2xl md:text-3xl text-center mb-8 text-gray-900">
             {t.socialProof.title}
