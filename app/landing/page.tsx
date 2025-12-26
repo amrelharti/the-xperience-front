@@ -2567,6 +2567,9 @@ function RouletteWheel({ language }: { language: Language }) {
           const currentTriesUsed = parseInt(localStorage.getItem(storageKey) || "0")
           const currentRemainingTries = Math.max(0, MAX_TRIES_PER_DAY - currentTriesUsed)
           
+          // Update remainingTries state to ensure it's in sync
+          setRemainingTries(currentRemainingTries)
+          
           // User can spin if: daily winners limit not reached AND user has remaining tries
           const hasDailyWinnersAvailable = (data.winnersToday || 0) < (data.maxWinners || 2)
           const hasTriesLeft = currentRemainingTries > 0
@@ -2675,11 +2678,19 @@ function RouletteWheel({ language }: { language: Language }) {
         if (isActualWin) {
           setWinnersToday(data.winnersToday || winnersToday + 1)
         }
+        
         // Update canSpin: check daily winners limit AND remaining tries
-        const hasDailyWinnersAvailable = (data.winnersToday || 0) < maxWinners
-        const currentTries = MAX_TRIES_PER_DAY - remainingTries + 1 // +1 because we just used one
-        const hasTriesLeft = currentTries < MAX_TRIES_PER_DAY
+        // Get current tries from localStorage to get the most up-to-date value
+        const storageKey = "roulette_tries"
+        const currentTriesUsed = parseInt(localStorage.getItem(storageKey) || "0")
+        const currentRemainingTries = Math.max(0, MAX_TRIES_PER_DAY - currentTriesUsed)
+        
+        const hasDailyWinnersAvailable = (data.winnersToday || 0) < (data.maxWinners || maxWinners)
+        const hasTriesLeft = currentRemainingTries > 0
         setCanSpin(hasDailyWinnersAvailable && hasTriesLeft && (data.canSpin !== false))
+        
+        // Update remainingTries state to match localStorage
+        setRemainingTries(currentRemainingTries)
         
         // Only process actual prizes (Free CV Correction and 20% OFF) - not "Try Again"
         console.log("Roulette result:", { 
@@ -2772,6 +2783,33 @@ function RouletteWheel({ language }: { language: Language }) {
         }
         
         // Try Again doesn't show alert
+        
+        // Refresh daily status after spin to ensure state is up to date
+        try {
+          const statusResponse = await fetch("/api/roulette/daily-status")
+          if (statusResponse.ok) {
+            const statusData = await statusResponse.json()
+            setWinnersToday(statusData.winnersToday || 0)
+            setMaxWinners(statusData.maxWinners || 2)
+            
+            // Get current tries from localStorage
+            const storageKey = "roulette_tries"
+            const currentTriesUsed = parseInt(localStorage.getItem(storageKey) || "0")
+            const currentRemainingTries = Math.max(0, MAX_TRIES_PER_DAY - currentTriesUsed)
+            setRemainingTries(currentRemainingTries)
+            
+            // Update canSpin based on latest data
+            const hasDailyWinnersAvailable = (statusData.winnersToday || 0) < (statusData.maxWinners || 2)
+            const hasTriesLeft = currentRemainingTries > 0
+            setCanSpin(hasDailyWinnersAvailable && hasTriesLeft && (statusData.canSpin !== false))
+            
+            if (statusData.timeUntilReset) {
+              setTimeUntilReset(statusData.timeUntilReset)
+            }
+          }
+        } catch (statusError) {
+          console.error("Error refreshing daily status after spin:", statusError)
+        }
       }, 4000)
     } catch (error) {
       console.error("Error spinning wheel:", error)
