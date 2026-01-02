@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import { useUser } from "../hooks/useUser"
 import { Upload, FileText, Loader2, CheckCircle2, XCircle, TrendingUp, FileCheck, Languages, Briefcase, FileSearch, ArrowRight, X } from "lucide-react"
@@ -103,9 +104,23 @@ export default function CvScorerPage() {
   const [showContactForm, setShowContactForm] = useState(false)
   const [formData, setFormData] = useState({ name: "", email: "", phone: "" })
   const [submittingForm, setSubmittingForm] = useState(false)
+  const [showPopup, setShowPopup] = useState(false)
   const { toast } = useToast()
   const { user, isLoading: userLoading } = useUser()
   const router = useRouter()
+
+  // Show popup 30 seconds after result is displayed
+  useEffect(() => {
+    if (result) {
+      const timer = setTimeout(() => {
+        setShowPopup(true)
+      }, 30000) // 30 seconds
+
+      return () => clearTimeout(timer)
+    } else {
+      setShowPopup(false)
+    }
+  }, [result])
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
     try {
@@ -1037,7 +1052,7 @@ export default function CvScorerPage() {
                   </p>
                   <Button
                     onClick={() => {
-                      router.push("/landing#price")
+                      window.open("https://the-xperience.com/", "_blank")
                     }}
                     size="lg"
                     className="w-full sm:w-auto px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] rounded-xl bg-gradient-to-r from-[#0476D7] to-[#0068A7] hover:from-[#0068A7] hover:to-[#005A8F]"
@@ -1143,6 +1158,46 @@ export default function CvScorerPage() {
           </Card>
         </div>
       )}
+
+      {/* Popup after 30 seconds */}
+      <Dialog open={showPopup} onOpenChange={setShowPopup}>
+        <DialogContent className="sm:max-w-lg rounded-2xl border-2 shadow-2xl bg-gradient-to-br from-white to-primary/5">
+          <DialogHeader>
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#0476D7] to-[#0068A7] flex items-center justify-center shadow-lg">
+                <FileSearch className="h-8 w-8 text-white" />
+              </div>
+            </div>
+            <DialogTitle className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">
+              Want to improve your CV score?
+            </DialogTitle>
+            <DialogDescription className="text-center text-base sm:text-lg text-muted-foreground leading-relaxed pt-4">
+              Discover our comprehensive training program designed to help you create a winning CV that gets you interviews. Transform your job search with personalized coaching and proven strategies.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col sm:flex-row gap-3 pt-6">
+            <Button
+              onClick={() => {
+                window.open("https://the-xperience.com/", "_blank")
+                setShowPopup(false)
+              }}
+              size="lg"
+              className="flex-1 px-6 py-6 text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] rounded-xl bg-gradient-to-r from-[#0476D7] to-[#0068A7] hover:from-[#0068A7] hover:to-[#005A8F]"
+            >
+              Discover the Training Program
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button
+              onClick={() => setShowPopup(false)}
+              variant="outline"
+              size="lg"
+              className="flex-1 px-6 py-6 text-base border-2 rounded-xl"
+            >
+              Maybe Later
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
