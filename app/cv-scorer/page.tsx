@@ -109,12 +109,12 @@ export default function CvScorerPage() {
   const { user, isLoading: userLoading } = useUser()
   const router = useRouter()
 
-  // Show popup 30 seconds after result is displayed
+  // Show popup 1 minute after result is displayed
   useEffect(() => {
     if (result) {
       const timer = setTimeout(() => {
         setShowPopup(true)
-      }, 30000) // 30 seconds
+      }, 60000) // 1 minute
 
       return () => clearTimeout(timer)
     } else {
@@ -1159,42 +1159,64 @@ export default function CvScorerPage() {
         </div>
       )}
 
-      {/* Popup after 30 seconds */}
+      {/* Popup after 1 minute */}
       <Dialog open={showPopup} onOpenChange={setShowPopup}>
-        <DialogContent className="sm:max-w-lg rounded-2xl border-2 shadow-2xl bg-gradient-to-br from-white to-primary/5">
-          <DialogHeader>
-            <div className="flex items-center justify-center mb-4">
-              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#0476D7] to-[#0068A7] flex items-center justify-center shadow-lg">
-                <FileSearch className="h-8 w-8 text-white" />
+        <DialogContent className="sm:max-w-2xl rounded-3xl border-2 border-primary/20 shadow-2xl overflow-hidden p-0 bg-gradient-to-br from-white via-primary/5 to-primary/10">
+          {/* Header with gradient background */}
+          <div className="relative bg-gradient-to-br from-[#0476D7] via-[#0068A7] to-[#005A8F] p-8 sm:p-10 text-white">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent_50%)]" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-center mb-6">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-white/20 rounded-full blur-xl animate-pulse"></div>
+                  <div className="relative h-20 w-20 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-2xl border-2 border-white/30">
+                    <TrendingUp className="h-10 w-10 text-white" />
+                  </div>
+                </div>
+              </div>
+              <DialogTitle className="text-3xl sm:text-4xl font-bold text-center mb-3 leading-tight">
+                Ignoré par les recruteurs ?
+              </DialogTitle>
+              <DialogDescription className="text-center text-lg sm:text-xl text-white/95 font-medium leading-relaxed">
+                Mettez fin aux candidatures sans réponses
+              </DialogDescription>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-6 sm:p-8 space-y-6">
+            <div className="text-center space-y-4">
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+                Découvrez notre programme de formation complet conçu pour vous aider à créer un CV gagnant qui vous mène aux entretiens. Transformez votre recherche d'emploi avec un accompagnement personnalisé et des stratégies éprouvées.
+              </p>
+              <div className="flex items-center justify-center gap-2 text-primary font-semibold">
+                <CheckCircle2 className="h-5 w-5" />
+                <span className="text-sm sm:text-base">+6000 candidats accompagnés</span>
               </div>
             </div>
-            <DialogTitle className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-[#0476D7] to-[#0068A7] bg-clip-text text-transparent">
-              Want to improve your CV score?
-            </DialogTitle>
-            <DialogDescription className="text-center text-base sm:text-lg text-muted-foreground leading-relaxed pt-4">
-              Discover our comprehensive training program designed to help you create a winning CV that gets you interviews. Transform your job search with personalized coaching and proven strategies.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col sm:flex-row gap-3 pt-6">
-            <Button
-              onClick={() => {
-                window.open("https://the-xperience.com/", "_blank")
-                setShowPopup(false)
-              }}
-              size="lg"
-              className="flex-1 px-6 py-6 text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] rounded-xl bg-gradient-to-r from-[#0476D7] to-[#0068A7] hover:from-[#0068A7] hover:to-[#005A8F]"
-            >
-              Discover the Training Program
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button
-              onClick={() => setShowPopup(false)}
-              variant="outline"
-              size="lg"
-              className="flex-1 px-6 py-6 text-base border-2 rounded-xl"
-            >
-              Maybe Later
-            </Button>
+
+            {/* Action buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                onClick={() => {
+                  window.open("https://the-xperience.com/", "_blank")
+                  setShowPopup(false)
+                }}
+                size="lg"
+                className="flex-1 px-8 py-7 text-base sm:text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] rounded-xl bg-gradient-to-r from-[#0476D7] to-[#0068A7] hover:from-[#0068A7] hover:to-[#005A8F] text-white"
+              >
+                Découvrir le programme
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button
+                onClick={() => setShowPopup(false)}
+                variant="outline"
+                size="lg"
+                className="flex-1 px-8 py-7 text-base sm:text-lg font-medium border-2 rounded-xl hover:bg-muted/50 transition-all duration-300"
+              >
+                Plus tard
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
