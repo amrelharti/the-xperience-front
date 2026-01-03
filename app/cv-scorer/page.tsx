@@ -1187,7 +1187,7 @@ export default function CvScorerPage() {
           <div className="p-6 sm:p-8 space-y-6">
             <div className="text-center space-y-4">
               <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-                Découvrez notre programme de formation complet conçu pour vous aider à créer un CV gagnant qui vous mène aux entretiens. Transformez votre recherche d'emploi avec un accompagnement personnalisé et des stratégies éprouvées.
+                Découvrez notre programme de formation complet conçu pour vous aider à créer un CV gagnant qui vous mène aux entretiens. Augmentez votre présence sur LinkedIn et transformez votre recherche d'emploi avec un accompagnement personnalisé et des stratégies éprouvées.
               </p>
               <div className="flex items-center justify-center gap-2 text-primary font-semibold">
                 <CheckCircle2 className="h-5 w-5" />
