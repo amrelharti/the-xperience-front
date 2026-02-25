@@ -2109,43 +2109,32 @@ export default function XperienceProLandingPage() {
         </div>
       </section>
 
-      {/* AFCON 2025 Roulette Section - Before Footer */}
-      <section className="py-12 md:py-16 bg-gradient-to-br from-red-600 via-red-700 to-red-800 relative overflow-hidden">
-        {/* Decorative background elements */}
+      {/* Roulette Section - Xperience theme */}
+      <section className="py-12 md:py-16 bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-[#FFC72C]/30 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#007A33]/30 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-[#FFBC00]/30 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-white/20 rounded-full blur-3xl"></div>
         </div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-8">
-            <div className="inline-block mb-4">
-              <span className="text-white text-xl md:text-2xl drop-shadow-lg">
-                🎉 AFCON 2025 🎉
-              </span>
-            </div>
             <h2 className="text-2xl md:text-3xl lg:text-4xl text-white mb-3 drop-shadow-lg font-normal">
-              {language === "en" 
-                ? "Only 2 winners per day! Spin now and win amazing prizes!" 
-                : "Seulement 2 gagnants par jour ! Tournez maintenant et gagnez des prix incroyables !"}
+              {language === "en"
+                ? "Spin the wheel and win 20% OFF Xperience Pro!"
+                : "Tournez la roue et gagnez 20% de réduction sur Xperience Pro !"}
             </h2>
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm md:text-base mb-6">
-              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#FFC72C]">
-                <span className="w-5 h-5 rounded-full bg-[#FFC72C] shadow-lg"></span>
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#005eb8]">
+                <span className="w-5 h-5 rounded-full bg-[#005eb8] shadow-lg"></span>
                 <span className="text-gray-900">20% OFF Xperience Pro</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#007A33]">
-                <span className="w-5 h-5 rounded-full bg-[#007A33] shadow-lg"></span>
-                <span className="text-gray-900">{language === "en" ? "Free CV Correction" : "Correction CV Gratuite"}</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-[#C8102E]">
-                <span className="w-5 h-5 rounded-full bg-[#C8102E] shadow-lg"></span>
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-slate-400">
+                <span className="w-5 h-5 rounded-full bg-slate-400 shadow-lg"></span>
                 <span className="text-gray-900">{language === "en" ? "Try Again" : "Réessayer"}</span>
               </div>
             </div>
           </div>
-          
-          {/* Roulette Wheel - Centered */}
+
           <div className="flex justify-center">
             <RouletteWheel language={language} />
           </div>
@@ -2383,14 +2372,13 @@ function RouletteWheel({ language }: { language: Language }) {
   const [result, setResult] = useState<string | null>(null)
   const [canSpin, setCanSpin] = useState(true)
   const [winnersToday, setWinnersToday] = useState(0)
-  const [maxWinners, setMaxWinners] = useState(2)
   const [timeUntilReset, setTimeUntilReset] = useState("")
   const wheelRef = useRef<HTMLDivElement>(null)
   const [rotation, setRotation] = useState(0)
   const [showWinnerModal, setShowWinnerModal] = useState(false)
   const [winnerData, setWinnerData] = useState<{name: string, prize: string, verificationCode: string} | null>(null)
   const [remainingTries, setRemainingTries] = useState(3)
-  
+
   const ADMIN_WHATSAPP_NUMBER = "212773213060"
   const MAX_TRIES_PER_DAY = 3
   
@@ -2497,24 +2485,20 @@ function RouletteWheel({ language }: { language: Language }) {
     }
   }
 
-  // Prize wheel configuration - 12 segments
-  // Color mapping (must match backend indices) - AFCON Colors:
-  // - Yellow/Orange (#FFC72C) = "20% OFF Xperience Pro" (indices 0, 3, 6, 9)
-  // - Green (#007A33) = "Free CV Correction" (indices 1, 4, 7, 10)
-  // - Red (#C8102E) = "Try Again" (indices 2, 5, 8, 11)
+  // Prize wheel - 12 segments, Xperience colors. Backend: 0,2,4,6,8,10 = 20% OFF; 1,3,5,7,9,11 = Try Again
   const prizes = [
-    { id: 1, label: "OFF Xperience Pro", color: "#FFC72C", weight: 1 }, // Index 0 - 20% OFF
-    { id: 2, label: "Free CV Correction", color: "#007A33", weight: 2 }, // Index 1 - Free CV
-    { id: 3, label: "Try Again", color: "#C8102E", weight: 3 }, // Index 2 - Try Again
-    { id: 4, label: "OFF Xperience Pro", color: "#FFC72C", weight: 1 }, // Index 3 - 20% OFF
-    { id: 5, label: "Free CV Correction", color: "#007A33", weight: 2 }, // Index 4 - Free CV
-    { id: 6, label: "Try Again", color: "#C8102E", weight: 3 }, // Index 5 - Try Again
-    { id: 7, label: "OFF Xperience Pro", color: "#FFC72C", weight: 1 }, // Index 6 - 20% OFF
-    { id: 8, label: "Free CV Correction", color: "#007A33", weight: 2 }, // Index 7 - Free CV
-    { id: 9, label: "Try Again", color: "#C8102E", weight: 3 }, // Index 8 - Try Again
-    { id: 10, label: "OFF Xperience Pro", color: "#FFC72C", weight: 1 }, // Index 9 - 20% OFF
-    { id: 11, label: "Free CV Correction", color: "#007A33", weight: 2 }, // Index 10 - Free CV
-    { id: 12, label: "Try Again", color: "#C8102E", weight: 3 }, // Index 11 - Try Again
+    { id: 1, label: "OFF Xperience Pro", color: "#005eb8" },   // 0
+    { id: 2, label: "Try Again", color: "#64748b" },          // 1 slate
+    { id: 3, label: "OFF Xperience Pro", color: "#0476D7" },  // 2
+    { id: 4, label: "Try Again", color: "#64748b" },          // 3
+    { id: 5, label: "OFF Xperience Pro", color: "#005eb8" },  // 4
+    { id: 6, label: "Try Again", color: "#64748b" },          // 5
+    { id: 7, label: "OFF Xperience Pro", color: "#0476D7" },  // 6
+    { id: 8, label: "Try Again", color: "#64748b" },           // 7
+    { id: 9, label: "OFF Xperience Pro", color: "#005eb8" },  // 8
+    { id: 10, label: "Try Again", color: "#64748b" },        // 9
+    { id: 11, label: "OFF Xperience Pro", color: "#0476D7" }, // 10
+    { id: 12, label: "Try Again", color: "#64748b" },          // 11
   ]
 
   // Initialize and track user tries from localStorage
@@ -2561,19 +2545,11 @@ function RouletteWheel({ language }: { language: Language }) {
         if (response.ok) {
           const data = await response.json()
           setWinnersToday(data.winnersToday || 0)
-          setMaxWinners(data.maxWinners || 2)
-          
-          // Get current tries (may have been reset above)
+
           const currentTriesUsed = parseInt(localStorage.getItem(storageKey) || "0")
           const currentRemainingTries = Math.max(0, MAX_TRIES_PER_DAY - currentTriesUsed)
-          
-          // Update remainingTries state to ensure it's in sync
           setRemainingTries(currentRemainingTries)
-          
-          // User can spin if: daily winners limit not reached AND user has remaining tries
-          const hasDailyWinnersAvailable = (data.winnersToday || 0) < (data.maxWinners || 2)
-          const hasTriesLeft = currentRemainingTries > 0
-          setCanSpin(hasDailyWinnersAvailable && hasTriesLeft && (data.canSpin !== false))
+          setCanSpin(currentRemainingTries > 0 && (data.canSpin !== false))
           if (data.timeUntilReset) {
             setTimeUntilReset(data.timeUntilReset)
           }
@@ -2679,15 +2655,10 @@ function RouletteWheel({ language }: { language: Language }) {
           setWinnersToday(data.winnersToday || winnersToday + 1)
         }
         
-        // Update canSpin: check daily winners limit AND remaining tries
-        // Get current tries from localStorage to get the most up-to-date value
         const storageKey = "roulette_tries"
         const currentTriesUsed = parseInt(localStorage.getItem(storageKey) || "0")
         const currentRemainingTries = Math.max(0, MAX_TRIES_PER_DAY - currentTriesUsed)
-        
-        const hasDailyWinnersAvailable = (data.winnersToday || 0) < (data.maxWinners || maxWinners)
-        const hasTriesLeft = currentRemainingTries > 0
-        setCanSpin(hasDailyWinnersAvailable && hasTriesLeft && (data.canSpin !== false))
+        setCanSpin(currentRemainingTries > 0 && (data.canSpin !== false))
         
         // Update remainingTries state to match localStorage
         setRemainingTries(currentRemainingTries)
@@ -2700,11 +2671,8 @@ function RouletteWheel({ language }: { language: Language }) {
           isActualWin: isActualWin
         })
         
-        // Double check: must have verification code AND prize must not be "Try Again" AND selected prize must not be "Try Again"
-        // Also check the color - red (#C8102E) means "Try Again" and should never be processed as a win
-        const isRedSegment = selectedPrize.color === "#C8102E"
-        
-        if (data.verificationCode && data.prize && data.prize !== "Try Again" && selectedPrize.label !== "Try Again" && !isRedSegment) {
+        const isTryAgainSegment = selectedPrize.label === "Try Again"
+        if (data.verificationCode && data.prize && data.prize !== "Try Again" && !isTryAgainSegment) {
           console.log("Processing winner with prize:", data.prize)
           
           // Prompt for name first
@@ -2773,13 +2741,7 @@ function RouletteWheel({ language }: { language: Language }) {
             )
           }
         } else {
-          // This is "Try Again" - no win, no action needed
-          console.log("No prize won - Try Again result", { 
-            backendPrize: data.prize, 
-            selectedPrizeLabel: selectedPrize.label,
-            isRedSegment: selectedPrize.color === "#C8102E"
-          })
-          // Don't show any alert for "Try Again" - just let the wheel show the result
+          console.log("No prize won - Try Again result", { backendPrize: data.prize, selectedPrizeLabel: selectedPrize.label })
         }
         
         // Try Again doesn't show alert
@@ -2790,22 +2752,11 @@ function RouletteWheel({ language }: { language: Language }) {
           if (statusResponse.ok) {
             const statusData = await statusResponse.json()
             setWinnersToday(statusData.winnersToday || 0)
-            setMaxWinners(statusData.maxWinners || 2)
-            
-            // Get current tries from localStorage
             const storageKey = "roulette_tries"
             const currentTriesUsed = parseInt(localStorage.getItem(storageKey) || "0")
-            const currentRemainingTries = Math.max(0, MAX_TRIES_PER_DAY - currentTriesUsed)
-            setRemainingTries(currentRemainingTries)
-            
-            // Update canSpin based on latest data
-            const hasDailyWinnersAvailable = (statusData.winnersToday || 0) < (statusData.maxWinners || 2)
-            const hasTriesLeft = currentRemainingTries > 0
-            setCanSpin(hasDailyWinnersAvailable && hasTriesLeft && (statusData.canSpin !== false))
-            
-            if (statusData.timeUntilReset) {
-              setTimeUntilReset(statusData.timeUntilReset)
-            }
+            setRemainingTries(Math.max(0, MAX_TRIES_PER_DAY - currentTriesUsed))
+            setCanSpin(Math.max(0, MAX_TRIES_PER_DAY - currentTriesUsed) > 0 && (statusData.canSpin !== false))
+            if (statusData.timeUntilReset) setTimeUntilReset(statusData.timeUntilReset)
           }
         } catch (statusError) {
           console.error("Error refreshing daily status after spin:", statusError)
@@ -2824,15 +2775,12 @@ function RouletteWheel({ language }: { language: Language }) {
     <div className="flex flex-col items-center gap-8">
       {/* Modern Roulette Wheel Container */}
       <div className="relative">
-        {/* Premium Pointer Design - Modern & Clean */}
+        {/* Pointer - Xperience blue */}
         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-30">
           <div className="relative">
-            {/* Subtle glow */}
-            <div className="absolute inset-0 bg-[#FFC72C] blur-md opacity-40 animate-pulse"></div>
-            {/* Clean pointer triangle */}
+            <div className="absolute inset-0 bg-[#005eb8] blur-md opacity-40 animate-pulse"></div>
             <div className="relative">
-              <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[32px] border-l-transparent border-r-transparent border-t-[#FFC72C] drop-shadow-lg padding-top-5"></div>
-              {/* Inner highlight for depth */}
+              <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[32px] border-l-transparent border-r-transparent border-t-[#FFBC00] drop-shadow-lg"></div>
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-r-[10px] border-t-[16px] border-l-transparent border-r-transparent border-t-white/30"></div>
             </div>
           </div>
@@ -2840,8 +2788,7 @@ function RouletteWheel({ language }: { language: Language }) {
 
         {/* Modern Wheel Container */}
         <div className="relative w-[300px] h-[300px] md:w-[360px] md:h-[360px]">
-          {/* Subtle outer glow - more refined */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FFC72C]/10 via-[#007A33]/10 to-[#C8102E]/10 blur-xl"></div>
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#005eb8]/20 via-[#FFBC00]/10 to-[#0476D7]/20 blur-xl"></div>
           
           {/* Main wheel - Clean modern design */}
           <div className="relative w-full h-full">
@@ -2869,11 +2816,8 @@ function RouletteWheel({ language }: { language: Language }) {
                 const x = 50 + radius * Math.cos((angle * Math.PI) / 180)
                 const y = 50 + radius * Math.sin((angle * Math.PI) / 180)
 
-                // Get label text
-                const labelText = prize.label === "OFF Xperience Pro" 
-                  ? (language === "en" ? "20% OFF Xperience Pro" : "20% OFF Xperience Pro")
-                  : prize.label === "Free CV Correction"
-                  ? (language === "en" ? "Free CV Correction" : "Correction CV Gratuite")
+                const labelText = prize.label === "OFF Xperience Pro"
+                  ? (language === "en" ? "20% OFF" : "20% OFF")
                   : (language === "en" ? "Try Again" : "Réessayer")
 
                 return (
@@ -2904,15 +2848,15 @@ function RouletteWheel({ language }: { language: Language }) {
                 )
               })}
 
-              {/* Modern Center Button */}
+              {/* Center button - Xperience */}
               <button
                 onClick={spinWheel}
                 disabled={isSpinning || !canSpin}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-full border-4 border-white shadow-xl flex items-center justify-center z-10 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#005eb8] to-[#0476D7] rounded-full border-4 border-white shadow-xl flex items-center justify-center z-10 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 <div className="text-center">
-                  <div className="text-xl md:text-2xl">🦁</div>
-                  <div className="text-[9px] md:text-[10px] text-white tracking-wider">SPIN</div>
+                  <div className="text-xl md:text-2xl">🎰</div>
+                  <div className="text-[9px] md:text-[10px] text-white tracking-wider font-semibold">SPIN</div>
                 </div>
               </button>
             </div>
@@ -2920,7 +2864,7 @@ function RouletteWheel({ language }: { language: Language }) {
         </div>
       </div>
 
-      {/* Modern Spin Button */}
+      {/* Spin Button - Xperience */}
       <button
         onClick={spinWheel}
         disabled={isSpinning || !canSpin}
@@ -2929,7 +2873,7 @@ function RouletteWheel({ language }: { language: Language }) {
           transform transition-all duration-200 overflow-hidden min-w-[200px]
           ${isSpinning || !canSpin
             ? "bg-gray-500/80 cursor-not-allowed text-white/70"
-            : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-500 hover:scale-105 active:scale-95 text-white shadow-[0_4px_20px_rgba(220,38,38,0.3)]"
+            : "bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] hover:scale-105 active:scale-95 text-white shadow-[0_4px_20px_rgba(0,94,184,0.3)]"
           }
         `}
       >
@@ -2946,9 +2890,7 @@ function RouletteWheel({ language }: { language: Language }) {
               </>
             )
             : !canSpin
-            ? (winnersToday >= maxWinners 
-                ? (language === "en" ? "Max Winners Reached" : "Max Gagnants Atteint")
-                : remainingTries <= 0
+            ? (remainingTries <= 0
                 ? (language === "en" ? "No More Tries" : "Plus de Tentatives")
                 : (language === "en" ? "Can't Spin" : "Impossible de Tourner"))
             : (
@@ -2963,40 +2905,26 @@ function RouletteWheel({ language }: { language: Language }) {
 
       {/* Modern Status Info - Clean & Minimal */}
       <div className="text-center space-y-4 w-full max-w-2xl">
-        {/* Win Result Banner */}
         {result && result !== "Try Again" && (
-          <div className="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-2xl text-base md:text-lg shadow-lg animate-pulse">
+          <div className="bg-gradient-to-r from-[#0476D7] to-[#005eb8] text-white px-6 py-3 rounded-2xl text-base md:text-lg shadow-lg animate-pulse">
             {language === "en" ? `🎉 You won: ${result}!` : `🎉 Vous avez gagné : ${result} !`}
           </div>
         )}
-        
-        {/* Daily Winners Limit Message */}
-        {winnersToday >= maxWinners && (
-          <div className="bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-4 rounded-2xl text-sm md:text-base shadow-lg">
-            {language === "en" 
-              ? `🎊 We've reached ${maxWinners} winners today! Come back tomorrow for another chance! 🎊`
-              : `🎊 Nous avons atteint ${maxWinners} gagnants aujourd'hui ! Revenez demain pour une autre chance ! 🎊`}
+
+        {remainingTries <= 0 && (
+          <div className="bg-white/20 backdrop-blur-sm text-white px-6 py-4 rounded-2xl text-sm md:text-base shadow-lg border border-white/30">
+            {language === "en"
+              ? `⏰ You've used all ${MAX_TRIES_PER_DAY} tries for today! Come back tomorrow.`
+              : `⏰ Vous avez utilisé toutes vos ${MAX_TRIES_PER_DAY} tentatives aujourd'hui ! Revenez demain.`}
           </div>
         )}
-        
-        {/* Out of Tries Message */}
-        {remainingTries <= 0 && winnersToday < maxWinners && (
-          <div className="bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-4 rounded-2xl text-sm md:text-base shadow-lg">
-            {language === "en" 
-              ? `⏰ You've used all ${MAX_TRIES_PER_DAY} tries for today! Come back tomorrow! ⏰`
-              : `⏰ Vous avez utilisé toutes vos ${MAX_TRIES_PER_DAY} tentatives aujourd'hui ! Revenez demain ! ⏰`}
-          </div>
-        )}
-        
-        {/* Status Cards - Modern Grid Layout */}
+
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           <div className="bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl shadow-md border border-white/20">
             <div className="text-xs md:text-sm text-white/80 mb-1">
               {language === "en" ? "Winners Today" : "Gagnants Aujourd'hui"}
             </div>
-            <div className="text-lg md:text-xl text-white">
-              {winnersToday}/{maxWinners}
-            </div>
+            <div className="text-lg md:text-xl text-white">{winnersToday}</div>
           </div>
           <div className="bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl shadow-md border border-white/20">
             <div className="text-xs md:text-sm text-white/80 mb-1">
@@ -3009,7 +2937,7 @@ function RouletteWheel({ language }: { language: Language }) {
           {timeUntilReset && (
             <div className="bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl shadow-md border border-white/20 col-span-2 md:col-span-1">
               <div className="text-xs md:text-sm text-white/80 mb-1">
-                {language === "en" ? "You can spin in" : "Vous pouvez tourner dans: "}
+                {language === "en" ? "Resets in" : "Réinitialisation dans"}
               </div>
               <div className="text-lg md:text-xl text-white">
                 {formatTimeUntilReset(timeUntilReset)}
@@ -3026,7 +2954,7 @@ function RouletteWheel({ language }: { language: Language }) {
           onClick={() => setShowWinnerModal(false)}
         >
           <div 
-            className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 rounded-3xl shadow-2xl max-w-md w-full p-8 relative animate-scale-in"
+            className="bg-gradient-to-br from-[#005eb8] via-[#0476D7] to-[#0068A7] rounded-3xl shadow-2xl max-w-md w-full p-8 relative animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
@@ -3068,7 +2996,7 @@ function RouletteWheel({ language }: { language: Language }) {
                 <p className="text-sm font-semibold text-gray-600 mb-1">
                   {language === "en" ? "You won:" : "Vous avez gagné :"}
                 </p>
-                <p className="text-xl md:text-2xl text-red-600">
+                <p className="text-xl md:text-2xl text-[#005eb8] font-bold">
                   {winnerData.prize}
                 </p>
               </div>
