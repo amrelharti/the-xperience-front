@@ -2128,8 +2128,8 @@ export default function XperienceProLandingPage() {
                 <span className="w-5 h-5 rounded-full bg-[#005eb8] shadow-lg"></span>
                 <span className="text-gray-900">20% OFF Xperience Pro</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-slate-400">
-                <span className="w-5 h-5 rounded-full bg-slate-400 shadow-lg"></span>
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-full shadow-xl border-2 border-slate-200">
+                <span className="w-5 h-5 rounded-full bg-white border border-slate-200 shadow-inner"></span>
                 <span className="text-gray-900">{language === "en" ? "Try Again" : "Réessayer"}</span>
               </div>
             </div>
@@ -2485,20 +2485,16 @@ function RouletteWheel({ language }: { language: Language }) {
     }
   }
 
-  // Prize wheel - 12 segments, Xperience colors. Backend: 0,2,4,6,8,10 = 20% OFF; 1,3,5,7,9,11 = Try Again
+  // 8 segments: blue = 20% OFF, white = Try Again. Backend: 0,2,4,6 = 20% OFF; 1,3,5,7 = Try Again
   const prizes = [
-    { id: 1, label: "OFF Xperience Pro", color: "#005eb8" },   // 0
-    { id: 2, label: "Try Again", color: "#64748b" },          // 1 slate
-    { id: 3, label: "OFF Xperience Pro", color: "#0476D7" },  // 2
-    { id: 4, label: "Try Again", color: "#64748b" },          // 3
+    { id: 1, label: "OFF Xperience Pro", color: "#005eb8" },  // 0
+    { id: 2, label: "Try Again", color: "#ffffff" },          // 1
+    { id: 3, label: "OFF Xperience Pro", color: "#005eb8" },  // 2
+    { id: 4, label: "Try Again", color: "#ffffff" },          // 3
     { id: 5, label: "OFF Xperience Pro", color: "#005eb8" },  // 4
-    { id: 6, label: "Try Again", color: "#64748b" },          // 5
-    { id: 7, label: "OFF Xperience Pro", color: "#0476D7" },  // 6
-    { id: 8, label: "Try Again", color: "#64748b" },           // 7
-    { id: 9, label: "OFF Xperience Pro", color: "#005eb8" },  // 8
-    { id: 10, label: "Try Again", color: "#64748b" },        // 9
-    { id: 11, label: "OFF Xperience Pro", color: "#0476D7" }, // 10
-    { id: 12, label: "Try Again", color: "#64748b" },          // 11
+    { id: 6, label: "Try Again", color: "#ffffff" },          // 5
+    { id: 7, label: "OFF Xperience Pro", color: "#005eb8" },  // 6
+    { id: 8, label: "Try Again", color: "#ffffff" },           // 7
   ]
 
   // Initialize and track user tries from localStorage
@@ -2607,8 +2603,6 @@ function RouletteWheel({ language }: { language: Language }) {
       console.log("Spinning to prize index:", prizeIndex, "Prize:", selectedPrize.label, "Backend prize:", data.prize)
 
       // Calculate rotation to align segment center with top pointer
-      // Each segment spans 30 degrees (360 / 12)
-      // Segment center for index 'prizeIndex' is at: prizeIndex * 30 + 15 degrees
       // To align center with top (0deg), rotate wheel by: 360 - (prizeIndex * 30 + 15)
       const fullSpins = 5
       const segmentAngle = 360 / prizes.length
@@ -2820,6 +2814,7 @@ function RouletteWheel({ language }: { language: Language }) {
                   ? (language === "en" ? "20% OFF" : "20% OFF")
                   : (language === "en" ? "Try Again" : "Réessayer")
 
+                const isWhiteSegment = prize.color === "#ffffff"
                 return (
                   <div
                     key={prize.id}
@@ -2834,11 +2829,10 @@ function RouletteWheel({ language }: { language: Language }) {
                   >
                     <div className="text-center">
                       <div 
-                        className="text-[10px] md:text-xs text-white leading-tight whitespace-nowrap"
-                        style={{
-                          textShadow: "2px 2px 4px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.6), 1px 1px 2px rgba(0,0,0,0.6)",
-                          WebkitTextStroke: "0.6px rgba(0,0,0,0.9)",
-                          filter: "drop-shadow(0 0 3px rgba(0,0,0,0.9))",
+                        className={`text-[10px] md:text-xs leading-tight whitespace-nowrap ${isWhiteSegment ? "text-[#005eb8] font-semibold" : "text-white"}`}
+                        style={isWhiteSegment ? { textShadow: "0 1px 2px rgba(255,255,255,0.8)" } : {
+                          textShadow: "2px 2px 4px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.7)",
+                          filter: "drop-shadow(0 0 2px rgba(0,0,0,0.8))",
                         }}
                       >
                         {labelText}
