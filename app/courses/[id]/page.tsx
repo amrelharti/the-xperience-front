@@ -285,7 +285,6 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
       })
       setTraining(trainingData)
 
-      // Check if user is enrolled in ACTIVE classes only (only if authenticated)
       let enrolled = false
       let availableClasses = []
       if (user && user.id) {
@@ -293,17 +292,17 @@ export default function TrainingDetailPage({ params }: ModuleDetailPageProps) {
           const enrollmentsResponse = await fetch("/api/classes/my-classes")
           if (enrollmentsResponse.ok) {
             const enrollments = await enrollmentsResponse.json()
-            // Filter for this training and only active classes
             const trainingEnrollments = enrollments.filter((enrollment: any) => 
               enrollment.moduleId === params.id // moduleId is actually trainingId in backend
             )
             
-            // Check if user has any active enrollments for this training
+            // Prefer active classes when multiple exist, but consider archived classes as valid enrollment too
             const activeEnrollments = trainingEnrollments.filter((enrollment: any) => 
               enrollment.isActive && !enrollment.isArchived
             )
             
-            enrolled = activeEnrollments.length > 0
+            // A student is considered enrolled if they have at least one class (active or archived)
+            enrolled = trainingEnrollments.length > 0
             availableClasses = trainingEnrollments // Store all enrollments for class selection
             setIsEnrolled(enrolled)
             setAvailableClasses(availableClasses)
