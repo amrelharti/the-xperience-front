@@ -719,6 +719,15 @@ export default function XperienceProLandingPage() {
   const [remainingSpots, setRemainingSpots] = useState(12) // Limited spots counter - fetched from backend
   const [showPremiumMessage, setShowPremiumMessage] = useState(false)
   const [couponFeedback, setCouponFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null)
+  const [showCouponWaModal, setShowCouponWaModal] = useState(false)
+  const [couponWaData, setCouponWaData] = useState({
+    fullName: "",
+    phone: "",
+    lookingFor: "",
+    offer: "",
+  })
+  const formDataRef = useRef(formData)
+  const showFormRef = useRef(showForm)
   const premiumCardRef = useRef<HTMLDivElement | null>(null)
   const premiumTimerRef = useRef<NodeJS.Timeout | null>(null)
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
@@ -915,6 +924,37 @@ export default function XperienceProLandingPage() {
   }, [showExitIntent])
 
   useEffect(() => {
+    formDataRef.current = formData
+  }, [formData])
+
+  useEffect(() => {
+    showFormRef.current = showForm
+  }, [showForm])
+
+  const COUPON_WA_POPUP_SESSION_KEY = "xperience_coupon_whatsapp_popup_v1"
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try {
+        if (sessionStorage.getItem(COUPON_WA_POPUP_SESSION_KEY)) return
+        if (showFormRef.current) return
+        sessionStorage.setItem(COUPON_WA_POPUP_SESSION_KEY, "1")
+        const fd = formDataRef.current
+        setCouponWaData({
+          fullName: fd.fullName,
+          phone: fd.phone,
+          lookingFor: fd.lookingFor,
+          offer: fd.offer,
+        })
+        setShowCouponWaModal(true)
+      } catch {
+        /* ignore */
+      }
+    }, 22000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
     const observers: IntersectionObserver[] = []
 
     Object.keys(sectionRefs.current).forEach((key) => {
@@ -997,6 +1037,68 @@ export default function XperienceProLandingPage() {
     }
     // Otherwise, assume it's a local number and add country code
     return "212" + cleaned
+  }
+
+  const getLookingForLabelForCoupon = (value: string, lang: Language) => {
+    const tc = content[lang]
+    if (value === "stagePFE") return tc.form.lookingForOptions.stagePFE
+    if (value === "premierEmploi") return tc.form.lookingForOptions.premierEmploi
+    if (value === "progresserCarriere") return tc.form.lookingForOptions.progresserCarriere
+    if (value === "reconversion") return tc.form.lookingForOptions.reconversion
+    return lang === "en" ? "Not specified" : "Non précisé"
+  }
+
+  const openAdminWhatsAppWithText = (message: string) => {
+    let cleanedNumber = cleanPhoneNumber(ADMIN_WHATSAPP_NUMBER)
+    if (cleanedNumber.startsWith("00212")) cleanedNumber = cleanedNumber.replace("00212", "212")
+    if (cleanedNumber.startsWith("+212")) cleanedNumber = cleanedNumber.replace("+212", "212")
+    if (cleanedNumber.startsWith("0") && !cleanedNumber.startsWith("212")) {
+      cleanedNumber = "212" + cleanedNumber.substring(1)
+    }
+    if (!cleanedNumber.startsWith("212")) cleanedNumber = "212" + cleanedNumber
+    if (cleanedNumber.length < 10 || cleanedNumber.length > 15) {
+      alert(
+        language === "en"
+          ? "Invalid WhatsApp configuration. Please contact support."
+          : "Configuration WhatsApp invalide. Veuillez contacter le support."
+      )
+      return
+    }
+    const encodedMessage = encodeURIComponent(message)
+    const whatsappUrl1 = `https://wa.me/${cleanedNumber}?text=${encodedMessage}`
+    const whatsappUrl2 = `https://api.whatsapp.com/send?phone=${cleanedNumber}&text=${encodedMessage}`
+    try {
+      const win = window.open(whatsappUrl1, "_blank", "noopener,noreferrer")
+      if (!win || win.closed || typeof win.closed === "undefined") {
+        setTimeout(() => window.open(whatsappUrl2, "_blank", "noopener,noreferrer"), 100)
+      }
+    } catch {
+      window.open(whatsappUrl2, "_blank", "noopener,noreferrer")
+    }
+  }
+
+  const handleCouponWaSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const fullName = couponWaData.fullName.trim()
+    const phone = couponWaData.phone.trim()
+    if (!fullName || !phone) {
+      alert(
+        language === "en"
+          ? "Please enter your name and phone number."
+          : "Veuillez renseigner votre nom et votre numéro de téléphone."
+      )
+      return
+    }
+    const lookingForText = getLookingForLabelForCoupon(couponWaData.lookingFor, language)
+    const offerText =
+      couponWaData.offer.trim() ||
+      (language === "en" ? "Not selected yet" : "Pas encore choisie")
+    const message =
+      language === "en"
+        ? `Hello, I would like to receive a coupon for my registration.\n\nName: ${fullName}\nPhone: ${phone}\nGoal: ${lookingForText}\nOffer I'm interested in: ${offerText}`
+        : `Bonjour, je souhaite recevoir un coupon pour mon inscription.\n\nNom : ${fullName}\nTéléphone : ${phone}\nObjectif : ${lookingForText}\nOffre souhaitée : ${offerText}`
+    openAdminWhatsAppWithText(message)
+    setShowCouponWaModal(false)
   }
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -2341,6 +2443,116 @@ export default function XperienceProLandingPage() {
                   {language === "en" ? "Maybe Later" : "Peut-être plus tard"}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Coupon request via WhatsApp (timed, once per session) */}
+      {showCouponWaModal && (
+        <div
+          className="fixed inset-0 z-[55] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fade-in"
+          onClick={() => setShowCouponWaModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setShowCouponWaModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
+              aria-label="Close"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="p-6 pt-10 space-y-4">
+              <div className="text-center">
+                <MessageSquare className="w-12 h-12 text-[#25D366] mx-auto mb-3" />
+                <h3 className="text-xl font-bold text-gray-900">
+                  {language === "en" ? "Get your coupon on WhatsApp" : "Obtenir un coupon via WhatsApp"}
+                </h3>
+                <p className="text-sm text-gray-600 mt-2">
+                  {language === "en"
+                    ? "Send us a short message — we will reply with your personalized coupon."
+                    : "Envoyez-nous un court message — nous vous répondrons avec votre coupon personnalisé."}
+                </p>
+              </div>
+              <form onSubmit={handleCouponWaSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="couponWaFullName" className="block text-sm font-medium text-gray-700 mb-1">
+                    {t.form.fields.fullName} *
+                  </label>
+                  <input
+                    id="couponWaFullName"
+                    type="text"
+                    required
+                    value={couponWaData.fullName}
+                    onChange={(e) => setCouponWaData({ ...couponWaData, fullName: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] focus:border-transparent outline-none"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="couponWaPhone" className="block text-sm font-medium text-gray-700 mb-1">
+                    {t.form.fields.phone} *
+                  </label>
+                  <input
+                    id="couponWaPhone"
+                    type="tel"
+                    required
+                    value={couponWaData.phone}
+                    onChange={(e) => setCouponWaData({ ...couponWaData, phone: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] focus:border-transparent outline-none"
+                    placeholder="+212 6XX XXX XXX"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="couponWaLookingFor" className="block text-sm font-medium text-gray-700 mb-1">
+                    {t.form.fields.lookingFor}
+                  </label>
+                  <select
+                    id="couponWaLookingFor"
+                    value={couponWaData.lookingFor}
+                    onChange={(e) => setCouponWaData({ ...couponWaData, lookingFor: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] bg-white outline-none"
+                  >
+                    <option value="">{language === "en" ? "Optional" : "Optionnel"}</option>
+                    <option value="stagePFE">{t.form.lookingForOptions.stagePFE}</option>
+                    <option value="premierEmploi">{t.form.lookingForOptions.premierEmploi}</option>
+                    <option value="progresserCarriere">{t.form.lookingForOptions.progresserCarriere}</option>
+                    <option value="reconversion">{t.form.lookingForOptions.reconversion}</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="couponWaOffer" className="block text-sm font-medium text-gray-700 mb-1">
+                    {t.form.fields.offer}
+                  </label>
+                  <select
+                    id="couponWaOffer"
+                    value={couponWaData.offer}
+                    onChange={(e) => setCouponWaData({ ...couponWaData, offer: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] bg-white outline-none"
+                  >
+                    <option value="">{language === "en" ? "Optional" : "Optionnel"}</option>
+                    <option value={t.form.offerOptions.xperience}>{t.form.offerOptions.xperience}</option>
+                    <option value={t.form.offerOptions.xperiencePro}>{t.form.offerOptions.xperiencePro}</option>
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  {language === "en" ? "Open WhatsApp" : "Ouvrir WhatsApp"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCouponWaModal(false)}
+                  className="w-full text-gray-600 text-sm font-medium py-2 hover:text-gray-900"
+                >
+                  {language === "en" ? "Maybe later" : "Peut-être plus tard"}
+                </button>
+              </form>
             </div>
           </div>
         </div>
