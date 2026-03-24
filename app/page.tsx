@@ -1011,6 +1011,24 @@ export default function XperienceProLandingPage() {
       ? t.form.lookingForOptions.progresserCarriere
       : t.form.lookingForOptions.reconversion
 
+    const extractOfferPrice = (offerText: string): number | null => {
+      const match = offerText.match(/(\d+(?:[.,]\d+)?)\s*DH/i)
+      if (!match) return null
+      const value = Number(match[1].replace(",", "."))
+      return Number.isFinite(value) ? value : null
+    }
+
+    const extractDiscountPercent = (discountLabel: string): number | null => {
+      const match = discountLabel.match(/(\d+(?:[.,]\d+)?)\s*%/)
+      if (!match) return null
+      const value = Number(match[1].replace(",", "."))
+      return Number.isFinite(value) ? value : null
+    }
+
+    const formatPrice = (value: number): string => {
+      return new Intl.NumberFormat("fr-MA", { maximumFractionDigits: 2 }).format(value)
+    }
+
     let couponLine = ""
     let validatedCouponCode = ""
 
@@ -1029,14 +1047,25 @@ export default function XperienceProLandingPage() {
         const couponData = await couponRes.json()
         if (couponRes.ok && couponData?.valid) {
           validatedCouponCode = couponData.code || formData.couponCode.trim().toUpperCase()
-          couponLine = language === "en"
-            ? ` Coupon applied: ${validatedCouponCode} (${couponData.discountLabel}).`
-            : ` Coupon applique: ${validatedCouponCode} (${couponData.discountLabel}).`
+          const discountLabel = String(couponData.discountLabel || "")
+          const originalPrice = extractOfferPrice(formData.offer)
+          const discountPercent = extractDiscountPercent(discountLabel)
+
+          if (originalPrice != null && discountPercent != null) {
+            const reducedPrice = Math.max(0, originalPrice * (1 - discountPercent / 100))
+            couponLine = language === "en"
+              ? ` Coupon applied: ${validatedCouponCode} (${discountLabel}). Price: ${formatPrice(originalPrice)} DH -> ${formatPrice(reducedPrice)} DH.`
+              : ` Coupon applique: ${validatedCouponCode} (${discountLabel}). Prix: ${formatPrice(originalPrice)} DH -> ${formatPrice(reducedPrice)} DH.`
+          } else {
+            couponLine = language === "en"
+              ? ` Coupon applied: ${validatedCouponCode} (${discountLabel}).`
+              : ` Coupon applique: ${validatedCouponCode} (${discountLabel}).`
+          }
           setCouponFeedback({
             type: "success",
             text: language === "en"
-              ? `Coupon valid: ${couponData.discountLabel}`
-              : `Coupon valide: ${couponData.discountLabel}`,
+              ? `Coupon valid: ${discountLabel}`
+              : `Coupon valide: ${discountLabel}`,
           })
         } else {
           setCouponFeedback({
