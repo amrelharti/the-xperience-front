@@ -9,7 +9,7 @@ import UserDropdown from "../../components/UserDropdown"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Menu, X, MessageSquare, ArrowLeft, Phone, User, Calendar, Briefcase, Tag, Trash2 } from "lucide-react"
+import { Menu, X, MessageSquare, ArrowLeft, Phone, User, Calendar, Briefcase, Tag, Trash2, BadgePercent } from "lucide-react"
 
 interface LandingPageLead {
   id: string
@@ -200,6 +200,12 @@ export default function LandingPageLeadsPage() {
                 </p>
               </div>
             </div>
+            <Link href="/admin/landing-coupons">
+              <Button variant="outline" className="border-[#005eb8] text-[#005eb8] hover:bg-blue-50">
+                <BadgePercent className="w-4 h-4 mr-2" />
+                Manage Coupons
+              </Button>
+            </Link>
           </div>
 
           {/* Stats Card */}
