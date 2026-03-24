@@ -707,6 +707,7 @@ export default function XperienceProLandingPage() {
     phone: "",
     lookingFor: "",
     offer: "",
+    couponCode: "",
   })
   const [showExitIntent, setShowExitIntent] = useState(false)
   const [animatedStats, setAnimatedStats] = useState<{ [key: number]: number }>({})
@@ -717,6 +718,7 @@ export default function XperienceProLandingPage() {
   const [showMicroReward, setShowMicroReward] = useState(false)
   const [remainingSpots, setRemainingSpots] = useState(12) // Limited spots counter - fetched from backend
   const [showPremiumMessage, setShowPremiumMessage] = useState(false)
+  const [couponFeedback, setCouponFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null)
   const premiumCardRef = useRef<HTMLDivElement | null>(null)
   const premiumTimerRef = useRef<NodeJS.Timeout | null>(null)
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
@@ -1009,9 +1011,57 @@ export default function XperienceProLandingPage() {
       ? t.form.lookingForOptions.progresserCarriere
       : t.form.lookingForOptions.reconversion
 
+    let couponLine = ""
+    let validatedCouponCode = ""
+
+    if (formData.couponCode.trim()) {
+      try {
+        const couponRes = await fetch("/api/landing-page/coupons/validate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            code: formData.couponCode.trim(),
+            offer: formData.offer,
+          }),
+        })
+        const couponData = await couponRes.json()
+        if (couponRes.ok && couponData?.valid) {
+          validatedCouponCode = couponData.code || formData.couponCode.trim().toUpperCase()
+          couponLine = language === "en"
+            ? ` Coupon applied: ${validatedCouponCode} (${couponData.discountLabel}).`
+            : ` Coupon applique: ${validatedCouponCode} (${couponData.discountLabel}).`
+          setCouponFeedback({
+            type: "success",
+            text: language === "en"
+              ? `Coupon valid: ${couponData.discountLabel}`
+              : `Coupon valide: ${couponData.discountLabel}`,
+          })
+        } else {
+          setCouponFeedback({
+            type: "error",
+            text: couponData?.error || (language === "en" ? "Invalid coupon code." : "Code coupon invalide."),
+          })
+          return
+        }
+      } catch (error) {
+        console.error("❌ Error validating coupon:", error)
+        setCouponFeedback({
+          type: "error",
+          text: language === "en"
+            ? "Could not validate coupon right now."
+            : "Impossible de valider le coupon pour le moment.",
+        })
+        return
+      }
+    } else {
+      setCouponFeedback(null)
+    }
+
     const message = language === "en"
-      ? `Hi, my name is ${formData.fullName} and I'm looking for ${lookingForText}. I chose this offer: ${formData.offer}. My phone number is ${formData.phone}.`
-      : `Bonjour, je m'appelle ${formData.fullName} et je recherche ${lookingForText}. J'ai choisi cette offre : ${formData.offer}. Mon numéro de téléphone est ${formData.phone}.`
+      ? `Hi, my name is ${formData.fullName} and I'm looking for ${lookingForText}. I chose this offer: ${formData.offer}. My phone number is ${formData.phone}.${couponLine}`
+      : `Bonjour, je m'appelle ${formData.fullName} et je recherche ${lookingForText}. J'ai choisi cette offre : ${formData.offer}. Mon numero de telephone est ${formData.phone}.${couponLine}`
 
     // Save to database first
     try {
@@ -1032,6 +1082,7 @@ export default function XperienceProLandingPage() {
           phone: formData.phone,
           lookingFor: formData.lookingFor,
           offer: formData.offer,
+          couponCode: validatedCouponCode || formData.couponCode.trim() || undefined,
         }),
       })
 
@@ -1112,7 +1163,9 @@ export default function XperienceProLandingPage() {
       phone: "",
       lookingFor: "",
       offer: "",
+      couponCode: "",
     })
+    setCouponFeedback(null)
     setShowForm(false)
   }
 
@@ -2273,7 +2326,8 @@ export default function XperienceProLandingPage() {
               <button
                 onClick={() => {
                   setShowForm(false)
-                  setFormData({ fullName: "", phone: "", lookingFor: "", offer: "" })
+                  setFormData({ fullName: "", phone: "", lookingFor: "", offer: "", couponCode: "" })
+                  setCouponFeedback(null)
                 }}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
                 aria-label="Close"
@@ -2348,6 +2402,25 @@ export default function XperienceProLandingPage() {
                   <option value={t.form.offerOptions.xperience}>{t.form.offerOptions.xperience}</option>
                   <option value={t.form.offerOptions.xperiencePro}>{t.form.offerOptions.xperiencePro}</option>
                 </select>
+              </div>
+
+              <div>
+                <label htmlFor="couponCode" className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === "en" ? "Coupon Code" : "Code coupon"} ({language === "en" ? "optional" : "optionnel"})
+                </label>
+                <input
+                  type="text"
+                  id="couponCode"
+                  value={formData.couponCode}
+                  onChange={(e) => setFormData({ ...formData, couponCode: e.target.value.toUpperCase() })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] focus:border-transparent outline-none transition-all"
+                  placeholder={language === "en" ? "Enter coupon code" : "Entrez le code coupon"}
+                />
+                {couponFeedback && (
+                  <p className={`mt-2 text-sm ${couponFeedback.type === "success" ? "text-green-600" : "text-red-600"}`}>
+                    {couponFeedback.text}
+                  </p>
+                )}
               </div>
 
               <button

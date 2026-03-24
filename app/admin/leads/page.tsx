@@ -17,6 +17,8 @@ interface LandingPageLead {
   phone: string
   lookingFor: string
   offer: string
+  couponCode?: string
+  couponDiscountLabel?: string
   createdAt: string
 }
 
@@ -244,7 +246,7 @@ export default function LandingPageLeadsPage() {
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <CardContent className="pt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                       {/* Full Name */}
                       <div className="flex items-start gap-3">
                         <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
@@ -293,6 +295,21 @@ export default function LandingPageLeadsPage() {
                         <div>
                           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Offer</p>
                           <p className="text-base font-semibold text-slate-900 mt-1">{lead.offer}</p>
+                        </div>
+                      </div>
+
+                      {/* Coupon */}
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
+                          <Tag className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Coupon</p>
+                          <p className="text-base font-semibold text-slate-900 mt-1">
+                            {lead.couponCode
+                              ? `${lead.couponCode}${lead.couponDiscountLabel ? ` (${lead.couponDiscountLabel})` : ""}`
+                              : "None"}
+                          </p>
                         </div>
                       </div>
                     </div>
