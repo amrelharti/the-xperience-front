@@ -311,7 +311,7 @@ const content: Record<Language, Content> = {
         premium: {
           name: "COACHING PREMIUM",
           originalPrice: "1800 DH",
-          currentPrice: "1199 DH",
+          currentPrice: "1200 DH",
           specialOffer: "RECOMMENDED",
           description: "Will help you correct all the key points that influence the recruiter's decision.",
           features: [
@@ -416,7 +416,7 @@ const content: Record<Language, Content> = {
         reconversion: "Reconversion Professionnelle",
       },
       offerOptions: {
-        xperiencePro: "COACHING PREMIUM - 1199 DH",
+        xperiencePro: "COACHING PREMIUM - 1200 DH",
         xperience: "COACHING BASIC - 800 DH",
       },
     },
@@ -581,7 +581,7 @@ const content: Record<Language, Content> = {
         premium: {
           name: "COACHING PREMIUM",
           originalPrice: "1800 DH",
-          currentPrice: "1199 DH",
+          currentPrice: "1200 DH",
           specialOffer: "RECOMMANDÉ",
           description: "Conçu pour corriger l’ensemble des points clés qui influencent la décision du recruteur.(Programme sur 4 semaines)",
           features: [
@@ -686,7 +686,7 @@ const content: Record<Language, Content> = {
         reconversion: "Reconversion Professionnelle",
       },
       offerOptions: {
-        xperiencePro: "COACHING PREMIUM - 1199 DH",
+        xperiencePro: "COACHING PREMIUM - 1200 DH",
         xperience: "COACHING BASIC - 800 DH",
       },
     },
