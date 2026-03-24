@@ -52,6 +52,11 @@ const initialForm: CouponFormState = {
   expiresAt: "",
 }
 
+const OFFER_OPTIONS = [
+  "COACHING BASIC - 800 DH",
+  "COACHING PREMIUM - 1199 DH",
+]
+
 export default function LandingCouponsPage() {
   const { user } = useUser()
   const { toast } = useToast()
@@ -324,11 +329,18 @@ export default function LandingCouponsPage() {
                   value={form.discountLabel}
                   onChange={(e) => setForm((prev) => ({ ...prev, discountLabel: e.target.value }))}
                 />
-                <Input
-                  placeholder="Applicable offer (exact text)"
+                <select
                   value={form.applicableOffer}
                   onChange={(e) => setForm((prev) => ({ ...prev, applicableOffer: e.target.value }))}
-                />
+                  className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="">Select applicable offer</option>
+                  {OFFER_OPTIONS.map((offer) => (
+                    <option key={offer} value={offer}>
+                      {offer}
+                    </option>
+                  ))}
+                </select>
                 <Input
                   type="number"
                   min="0"
