@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { CheckCircle2, ArrowRight, ArrowDown, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles, Menu, X, Star, Quote, FileCheck, ChevronLeft, ChevronRight } from "lucide-react"
+import { CheckCircle2, ArrowRight, ArrowDown, PlayCircle, Users, Target, FileText, Linkedin, MessageSquare, Calendar, ChevronDown, Instagram, Award, TrendingUp, Clock, Sparkles, Menu, X, Star, Quote, FileCheck, ChevronLeft, ChevronRight, Percent } from "lucide-react"
 
 type Language = "en" | "fr"
 
@@ -1285,10 +1285,10 @@ export default function XperienceProLandingPage() {
           })
           setShowCouponWaModal(true)
         }}
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-1.5 rounded-l-2xl bg-[#25D366] text-white shadow-lg px-2.5 py-4 hover:bg-[#20bd5a] transition-colors border-y border-l border-white/25 max-md:py-3"
+        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-1 rounded-l-2xl bg-[#25D366] text-white shadow-lg px-2.5 py-4 hover:bg-[#20bd5a] transition-colors border-y border-l border-white/25 max-md:py-3"
         aria-label={language === "en" ? "Get coupon on WhatsApp" : "Obtenir un coupon sur WhatsApp"}
       >
-        <MessageSquare className="w-5 h-5 shrink-0" />
+        <Percent className="w-5 h-5 shrink-0 opacity-95" strokeWidth={2.5} aria-hidden />
         <span className="text-[11px] font-bold leading-tight text-center px-0.5 max-w-[4.5rem]">
           {language === "en" ? "Coupon" : "Coupon"}
         </span>
