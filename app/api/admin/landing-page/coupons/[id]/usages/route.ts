@@ -30,12 +30,12 @@ function buildAuthHeaders(cookieHeader: string) {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ code: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { code } = await params
+    const { id } = await params
     const cookieHeader = request.headers.get("cookie") || ""
-    const response = await fetch(`${BACKEND_URL}/api/admin/landing-page/coupons/${encodeURIComponent(code)}/usages`, {
+    const response = await fetch(`${BACKEND_URL}/api/admin/landing-page/coupons/${encodeURIComponent(id)}/usages`, {
       method: "GET",
       headers: buildAuthHeaders(cookieHeader),
       credentials: "include",
