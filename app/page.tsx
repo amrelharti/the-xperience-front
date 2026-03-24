@@ -724,10 +724,7 @@ export default function XperienceProLandingPage() {
     fullName: "",
     phone: "",
     lookingFor: "",
-    offer: "",
   })
-  const formDataRef = useRef(formData)
-  const showFormRef = useRef(showForm)
   const premiumCardRef = useRef<HTMLDivElement | null>(null)
   const premiumTimerRef = useRef<NodeJS.Timeout | null>(null)
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({})
@@ -924,37 +921,6 @@ export default function XperienceProLandingPage() {
   }, [showExitIntent])
 
   useEffect(() => {
-    formDataRef.current = formData
-  }, [formData])
-
-  useEffect(() => {
-    showFormRef.current = showForm
-  }, [showForm])
-
-  const COUPON_WA_POPUP_SESSION_KEY = "xperience_coupon_whatsapp_popup_v1"
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      try {
-        if (sessionStorage.getItem(COUPON_WA_POPUP_SESSION_KEY)) return
-        if (showFormRef.current) return
-        sessionStorage.setItem(COUPON_WA_POPUP_SESSION_KEY, "1")
-        const fd = formDataRef.current
-        setCouponWaData({
-          fullName: fd.fullName,
-          phone: fd.phone,
-          lookingFor: fd.lookingFor,
-          offer: fd.offer,
-        })
-        setShowCouponWaModal(true)
-      } catch {
-        /* ignore */
-      }
-    }, 22000)
-    return () => clearTimeout(timer)
-  }, [])
-
-  useEffect(() => {
     const observers: IntersectionObserver[] = []
 
     Object.keys(sectionRefs.current).forEach((key) => {
@@ -1090,13 +1056,10 @@ export default function XperienceProLandingPage() {
       return
     }
     const lookingForText = getLookingForLabelForCoupon(couponWaData.lookingFor, language)
-    const offerText =
-      couponWaData.offer.trim() ||
-      (language === "en" ? "Not selected yet" : "Pas encore choisie")
     const message =
       language === "en"
-        ? `Hello, I would like to receive a coupon for my registration.\n\nName: ${fullName}\nPhone: ${phone}\nGoal: ${lookingForText}\nOffer I'm interested in: ${offerText}`
-        : `Bonjour, je souhaite recevoir un coupon pour mon inscription.\n\nNom : ${fullName}\nTéléphone : ${phone}\nObjectif : ${lookingForText}\nOffre souhaitée : ${offerText}`
+        ? `Hello, I would like to receive a coupon for my registration.\n\nName: ${fullName}\nPhone: ${phone}\nGoal: ${lookingForText}`
+        : `Bonjour, je souhaite recevoir un coupon pour mon inscription.\n\nNom : ${fullName}\nTéléphone : ${phone}\nObjectif : ${lookingForText}`
     openAdminWhatsAppWithText(message)
     setShowCouponWaModal(false)
   }
@@ -1312,6 +1275,24 @@ export default function XperienceProLandingPage() {
           }
         }
       `}</style>
+      <button
+        type="button"
+        onClick={() => {
+          setCouponWaData({
+            fullName: formData.fullName,
+            phone: formData.phone,
+            lookingFor: formData.lookingFor,
+          })
+          setShowCouponWaModal(true)
+        }}
+        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-1.5 rounded-l-2xl bg-[#25D366] text-white shadow-lg px-2.5 py-4 hover:bg-[#20bd5a] transition-colors border-y border-l border-white/25 max-md:py-3"
+        aria-label={language === "en" ? "Get coupon on WhatsApp" : "Obtenir un coupon sur WhatsApp"}
+      >
+        <MessageSquare className="w-5 h-5 shrink-0" />
+        <span className="text-[11px] font-bold leading-tight text-center px-0.5 max-w-[4.5rem]">
+          {language === "en" ? "Coupon" : "Coupon"}
+        </span>
+      </button>
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -2521,21 +2502,6 @@ export default function XperienceProLandingPage() {
                     <option value="premierEmploi">{t.form.lookingForOptions.premierEmploi}</option>
                     <option value="progresserCarriere">{t.form.lookingForOptions.progresserCarriere}</option>
                     <option value="reconversion">{t.form.lookingForOptions.reconversion}</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="couponWaOffer" className="block text-sm font-medium text-gray-700 mb-1">
-                    {t.form.fields.offer}
-                  </label>
-                  <select
-                    id="couponWaOffer"
-                    value={couponWaData.offer}
-                    onChange={(e) => setCouponWaData({ ...couponWaData, offer: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#005eb8] bg-white outline-none"
-                  >
-                    <option value="">{language === "en" ? "Optional" : "Optionnel"}</option>
-                    <option value={t.form.offerOptions.xperience}>{t.form.offerOptions.xperience}</option>
-                    <option value={t.form.offerOptions.xperiencePro}>{t.form.offerOptions.xperiencePro}</option>
                   </select>
                 </div>
                 <button
