@@ -54,7 +54,7 @@ const initialForm: CouponFormState = {
 
 const OFFER_OPTIONS = [
   "COACHING BASIC - 800 DH",
-  "COACHING PREMIUM - 1199 DH",
+  "COACHING PREMIUM - 1200 DH",
 ]
 
 export default function LandingCouponsPage() {
