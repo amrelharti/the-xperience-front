@@ -299,13 +299,11 @@ const content: Record<Language, Content> = {
         basic: {
           name: "COACHING BASIC",
           originalPrice: "1000 DH",
-          currentPrice: "800 DH",
+          currentPrice: "500 DH",
           description: "A first step to test our program",
           features: [
-            "The Basic Coaching gives access to one module of the program, your choice:",
-            "Professional CV",
-            "Interview techniques",
-            "Personal branding and LinkedIn",
+            "The Basic Coaching gives access to the entire program but only through recorded capsules, without live sessions or personalized support",
+            
           ],
         },
         premium: {
@@ -417,7 +415,7 @@ const content: Record<Language, Content> = {
       },
       offerOptions: {
         xperiencePro: "COACHING PREMIUM - 1200 DH",
-        xperience: "COACHING BASIC - 800 DH",
+        xperience: "COACHING BASIC - 500 DH",
       },
     },
   },
@@ -569,13 +567,11 @@ const content: Record<Language, Content> = {
         basic: {
           name: "COACHING BASIC",
           originalPrice: "1000 DH",
-          currentPrice: "800 DH",
+          currentPrice: "500 DH",
           description: "Une première étape pour tester notre programme",
           features: [
-            "Le Coaching Basic donne accès à un seul module du programme, au choix :",
-            "CV professionnel",
-            "Techniques d'entretien",
-            "Personal branding et LinkedIn",
+            "Le Coaching Basic donne accès l'ensemble des modules mais seulement à travers les capsules enregistrées, sans live ou accompagnement personnalisé",
+            
           ],
         },
         premium: {
@@ -687,7 +683,7 @@ const content: Record<Language, Content> = {
       },
       offerOptions: {
         xperiencePro: "COACHING PREMIUM - 1200 DH",
-        xperience: "COACHING BASIC - 800 DH",
+        xperience: "COACHING BASIC - 500 DH",
       },
     },
   },
