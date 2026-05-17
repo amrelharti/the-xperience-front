@@ -5,26 +5,21 @@ export const runtime = 'nodejs'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'
 
+function getSessionToken(cookieHeader: string): string | null {
+  let token: string | null = null
+  for (const cookie of cookieHeader.split(';')) {
+    const [name, ...valueParts] = cookie.trim().split('=')
+    if (name === 'SESSION' && valueParts.length > 0) {
+      token = decodeURIComponent(valueParts.join('='))
+    }
+  }
+  return token
+}
+
 export async function GET(request: NextRequest) {
   try {
     const cookieHeader = request.headers.get('cookie') || '';
-
-    
-    // Extract JWT token from SESSION cookie
-    let jwtToken = null;
-    if (cookieHeader) {
-      const cookies = cookieHeader.split(';');
-
-      for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=');
-
-        if (name === 'SESSION' && value) {
-          jwtToken = value;
-
-          break;
-        }
-      }
-    }
+    const jwtToken = getSessionToken(cookieHeader);
     
     const headers: Record<string, string> = {};
     if (jwtToken) {
@@ -40,10 +35,9 @@ export async function GET(request: NextRequest) {
     const response = await fetch(`${BACKEND_URL}/api/me`, {
       method: 'GET',
       headers,
+      cache: 'no-store',
     })
-    
 
-    
     if (!response.ok) {
       const errorText = await response.text()
 
@@ -52,7 +46,12 @@ export async function GET(request: NextRequest) {
     
     const data = await response.json()
 
-    return NextResponse.json(data, { status: response.status })
+    return NextResponse.json(data, {
+      status: response.status,
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
+    })
   } catch (error) {
     console.error('Error fetching user data:', error)
     return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
@@ -65,19 +64,7 @@ export async function PUT(request: NextRequest) {
     console.log('[API Route] PUT /api/me - Request body:', body)
     
     const cookieHeader = request.headers.get('cookie') || '';
-    
-    // Extract JWT token from SESSION cookie
-    let jwtToken = null;
-    if (cookieHeader) {
-      const cookies = cookieHeader.split(';');
-      for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=');
-        if (name === 'SESSION' && value) {
-          jwtToken = value;
-          break;
-        }
-      }
-    }
+    const jwtToken = getSessionToken(cookieHeader);
 
     if (!jwtToken) {
       console.log('[API Route] PUT /api/me - No JWT token found')
@@ -95,6 +82,7 @@ export async function PUT(request: NextRequest) {
       method: 'PUT',
       headers,
       body: JSON.stringify(body),
+      cache: 'no-store',
     })
     
     console.log('[API Route] PUT /api/me - Backend response status:', response.status)

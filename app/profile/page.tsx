@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { PlayCircle, User, Mail, Calendar, Edit, Save, X, Upload, Instagram, Linkedin, Briefcase, Camera, Users } from "lucide-react"
-import { useUser } from "../hooks/useUser"
+import { useUser, normalizeUser } from "../hooks/useUser"
 import UserDropdown from "../components/UserDropdown"
 import RequireAuth from "../components/RequireAuth"
 import Navbar from "../components/Navbar"
@@ -142,28 +142,29 @@ export default function ProfilePage() {
         const updatedData = await res.json()
         console.log("Profile updated successfully:", updatedData)
 
-        const mergedUser = {
-          ...user!,
+        const mergedUser = normalizeUser({
+          ...user,
           ...updatedData,
           authenticated: true,
-        }
-        setUser(mergedUser)
-        setEditForm({
-          name: mergedUser.name,
-          email: mergedUser.email,
-          imageUrl: mergedUser.imageUrl || "",
-          title: mergedUser.title || "",
-          instagram: mergedUser.instagram || "",
-          linkedin: mergedUser.linkedin || "",
         })
+
+        if (mergedUser) {
+          setUser(mergedUser)
+          setEditForm({
+            name: mergedUser.name,
+            email: mergedUser.email,
+            imageUrl: mergedUser.imageUrl || "",
+            title: mergedUser.title,
+            instagram: mergedUser.instagram,
+            linkedin: mergedUser.linkedin,
+          })
+        }
 
         toast({
           title: "Success",
           description: "Profile updated successfully",
         })
         setIsEditing(false)
-
-        refreshUser(true)
       } else {
         const errorData = await res.json().catch(() => ({}))
         console.error("Profile update failed:", errorData)
@@ -224,6 +225,15 @@ export default function ProfilePage() {
         </div>
       </RequireAuth>
     )
+  }
+
+  const display = {
+    name: user.name || editForm.name,
+    email: user.email || editForm.email,
+    title: (user.title || editForm.title || "").trim(),
+    instagram: (user.instagram || editForm.instagram || "").trim(),
+    linkedin: (user.linkedin || editForm.linkedin || "").trim(),
+    imageUrl: user.imageUrl || editForm.imageUrl,
   }
 
   return (
@@ -351,8 +361,8 @@ export default function ProfilePage() {
                     />
                     <div className="mt-4 text-center">
                       <h3 className="text-2xl font-bold text-gray-900">{user.name}</h3>
-                      {user.title && (
-                        <p className="text-sm text-gray-600 mt-1">{user.title}</p>
+                      {display.title && (
+                        <p className="text-sm text-gray-600 mt-1">{display.title}</p>
                       )}
                       <p className="text-gray-500 mt-1">{user.email}</p>
                       <Badge className="mt-3 bg-gradient-to-r from-[#FFBC00]/20 to-[#FFBC00]/10 text-yellow-700 border-yellow-300">
@@ -414,7 +424,7 @@ export default function ProfilePage() {
                           />
                         ) : (
                           <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-800">
-                            {user.title || "Not set"}
+                            {display.title || "Not set"}
                           </div>
                         )}
                       </div>
@@ -434,7 +444,7 @@ export default function ProfilePage() {
                           />
                         ) : (
                           <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-800">
-                            {user.instagram || "Not set"}
+                            {display.instagram || "Not set"}
                           </div>
                         )}
                       </div>
@@ -454,7 +464,7 @@ export default function ProfilePage() {
                           />
                         ) : (
                           <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-800">
-                            {user.linkedin || "Not set"}
+                            {display.linkedin || "Not set"}
                           </div>
                         )}
                       </div>

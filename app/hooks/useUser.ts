@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 
-interface User {
+export interface User {
   id: string
   name: string
   email: string
@@ -16,91 +16,120 @@ interface User {
 
 // Cache user data to avoid excessive API calls
 let userCache: { user: User | null; timestamp: number } | null = null
-const CACHE_DURATION = 300000 // 5 minutes cache (increased for better performance)
+const CACHE_DURATION = 300000 // 5 minutes
+
+function getSessionTokenFromCookies(): string | null {
+  if (typeof document === "undefined") return null
+  let token: string | null = null
+  for (const cookie of document.cookie.split(";")) {
+    const [name, ...valueParts] = cookie.trim().split("=")
+    if (name === "SESSION" && valueParts.length > 0) {
+      token = decodeURIComponent(valueParts.join("="))
+    }
+  }
+  return token
+}
+
+export function normalizeUser(data: Record<string, unknown>): User | null {
+  if (!data?.id) return null
+  return {
+    id: String(data.id),
+    name: String(data.name ?? ""),
+    email: String(data.email ?? ""),
+    role: String(data.role ?? "STUDENT"),
+    imageUrl: String(data.imageUrl ?? ""),
+    title: String(data.title ?? ""),
+    instagram: String(data.instagram ?? ""),
+    linkedin: String(data.linkedin ?? ""),
+    authenticated: data.authenticated !== false,
+  }
+}
+
+function writeUserCache(user: User | null) {
+  userCache = { user, timestamp: Date.now() }
+}
 
 export function useUser() {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUserState] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  const fetchUser = useCallback(async () => {
-    // Check cache first
-    if (userCache && Date.now() - userCache.timestamp < CACHE_DURATION) {
-      setUser(userCache.user)
+  const applyUser = useCallback((next: User | null) => {
+    setUserState(next)
+    writeUserCache(next)
+  }, [])
+
+  const fetchUser = useCallback(async (bypassCache = false) => {
+    if (!bypassCache && userCache && Date.now() - userCache.timestamp < CACHE_DURATION) {
+      setUserState(userCache.user)
       setIsLoading(false)
       return
     }
-    
 
     try {
-      // First try the frontend API route
-      const res = await fetch(`/api/me`, {
+      const res = await fetch(`/api/me?t=${Date.now()}`, {
         credentials: "include",
+        cache: "no-store",
       })
-      
+
       if (res.ok) {
         const userData = await res.json()
-        if (userData.authenticated && userData.id) {
-          setUser(userData)
-          // Update cache
-          userCache = { user: userData, timestamp: Date.now() }
+        const normalized = normalizeUser(userData)
+        if (normalized?.authenticated) {
+          applyUser(normalized)
         } else {
-          setUser(null)
-          userCache = { user: null, timestamp: Date.now() }
+          applyUser(null)
         }
       } else {
-        
-        // Fallback: try direct backend call with Bearer token
-        const cookies = document.cookie.split(';');
-        let jwtToken = null;
-        for (const cookie of cookies) {
-          const [name, value] = cookie.trim().split('=');
-          if (name === 'SESSION' && value) {
-            jwtToken = value;
-            break;
-          }
-        }
-        
+        const jwtToken = getSessionTokenFromCookies()
         if (jwtToken) {
-          const backendRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'}/api/me`, {
-            headers: {
-              'Authorization': `Bearer ${jwtToken}`
+          const backendRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"}/api/me`,
+            {
+              headers: { Authorization: `Bearer ${jwtToken}` },
+              cache: "no-store",
             }
-          })
-          
+          )
+
           if (backendRes.ok) {
             const userData = await backendRes.json()
-            if (userData.authenticated && userData.id) {
-              setUser(userData)
+            const normalized = normalizeUser(userData)
+            if (normalized?.authenticated) {
+              applyUser(normalized)
             } else {
-              setUser(null)
+              applyUser(null)
             }
           } else {
-            setUser(null)
+            applyUser(null)
           }
         } else {
-          setUser(null)
+          applyUser(null)
         }
       }
     } catch (error) {
       console.error("Error fetching user:", error)
-      setUser(null)
+      applyUser(null)
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [applyUser])
 
   useEffect(() => {
     fetchUser()
   }, [fetchUser])
 
-  // Refresh user data; silent=true avoids full-page loading state (e.g. after profile save)
   const refreshUser = (silent = false) => {
-    userCache = null
     if (!silent) {
       setIsLoading(true)
     }
-    fetchUser()
+    fetchUser(true)
   }
+
+  const setUser = useCallback(
+    (next: User | null) => {
+      applyUser(next)
+    },
+    [applyUser]
+  )
 
   return { user, isLoading, refreshUser, setUser }
 }
