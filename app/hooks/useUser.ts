@@ -8,6 +8,9 @@ interface User {
   email: string
   role: string
   imageUrl?: string
+  title?: string
+  instagram?: string
+  linkedin?: string
   authenticated?: boolean
 }
 
@@ -90,13 +93,14 @@ export function useUser() {
     fetchUser()
   }, [fetchUser])
 
-  // Add refresh function for manual refresh
-  const refreshUser = () => {
-    // Clear cache on manual refresh
+  // Refresh user data; silent=true avoids full-page loading state (e.g. after profile save)
+  const refreshUser = (silent = false) => {
     userCache = null
-    setIsLoading(true)
+    if (!silent) {
+      setIsLoading(true)
+    }
     fetchUser()
   }
 
-  return { user, isLoading, refreshUser }
+  return { user, isLoading, refreshUser, setUser }
 }

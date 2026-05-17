@@ -16,8 +16,21 @@ import Navbar from "../components/Navbar"
 import { useToast } from "@/hooks/use-toast"
 import { ImageCropper } from "@/components/ui/image-cropper"
 
+function parseApiError(error: unknown): string {
+  if (!error || typeof error !== "object") return "Failed to update profile"
+  const raw = (error as { error?: string }).error
+  if (!raw) return "Failed to update profile"
+  try {
+    const parsed = JSON.parse(raw)
+    if (parsed?.error) return parsed.error
+  } catch {
+    // use raw string
+  }
+  return raw
+}
+
 export default function ProfilePage() {
-  const { user, isLoading, refreshUser } = useUser()
+  const { user, isLoading, refreshUser, setUser } = useUser()
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({
     name: "",
@@ -39,9 +52,9 @@ export default function ProfilePage() {
         name: user.name,
         email: user.email,
         imageUrl: user.imageUrl || "",
-        title: (user as any).title || "",
-        instagram: (user as any).instagram || "",
-        linkedin: (user as any).linkedin || ""
+        title: user.title || "",
+        instagram: user.instagram || "",
+        linkedin: user.linkedin || ""
       })
     }
   }, [user])
@@ -57,9 +70,9 @@ export default function ProfilePage() {
         name: user.name,
         email: user.email,
         imageUrl: user.imageUrl || "",
-        title: (user as any).title || "",
-        instagram: (user as any).instagram || "",
-        linkedin: (user as any).linkedin || ""
+        title: user.title || "",
+        instagram: user.instagram || "",
+        linkedin: user.linkedin || ""
       })
     }
   }
@@ -128,22 +141,36 @@ export default function ProfilePage() {
       if (res.ok) {
         const updatedData = await res.json()
         console.log("Profile updated successfully:", updatedData)
-        
+
+        const mergedUser = {
+          ...user!,
+          ...updatedData,
+          authenticated: true,
+        }
+        setUser(mergedUser)
+        setEditForm({
+          name: mergedUser.name,
+          email: mergedUser.email,
+          imageUrl: mergedUser.imageUrl || "",
+          title: mergedUser.title || "",
+          instagram: mergedUser.instagram || "",
+          linkedin: mergedUser.linkedin || "",
+        })
+
         toast({
           title: "Success",
           description: "Profile updated successfully",
         })
         setIsEditing(false)
-        
-        // Refresh user data by clearing cache and refetching
-        refreshUser()
+
+        refreshUser(true)
       } else {
-        const errorData = await res.json()
+        const errorData = await res.json().catch(() => ({}))
         console.error("Profile update failed:", errorData)
-        
+
         toast({
           title: "Error",
-          description: errorData.error || "Failed to update profile",
+          description: parseApiError(errorData),
           variant: "destructive",
         })
       }
@@ -324,8 +351,8 @@ export default function ProfilePage() {
                     />
                     <div className="mt-4 text-center">
                       <h3 className="text-2xl font-bold text-gray-900">{user.name}</h3>
-                      {(user as any).title && (
-                        <p className="text-sm text-gray-600 mt-1">{(user as any).title}</p>
+                      {user.title && (
+                        <p className="text-sm text-gray-600 mt-1">{user.title}</p>
                       )}
                       <p className="text-gray-500 mt-1">{user.email}</p>
                       <Badge className="mt-3 bg-gradient-to-r from-[#FFBC00]/20 to-[#FFBC00]/10 text-yellow-700 border-yellow-300">
@@ -387,7 +414,7 @@ export default function ProfilePage() {
                           />
                         ) : (
                           <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-800">
-                            {(user as any).title || "Not set"}
+                            {user.title || "Not set"}
                           </div>
                         )}
                       </div>
@@ -407,7 +434,7 @@ export default function ProfilePage() {
                           />
                         ) : (
                           <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-800">
-                            {(user as any).instagram || "Not set"}
+                            {user.instagram || "Not set"}
                           </div>
                         )}
                       </div>
@@ -427,7 +454,7 @@ export default function ProfilePage() {
                           />
                         ) : (
                           <div className="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-800">
-                            {(user as any).linkedin || "Not set"}
+                            {user.linkedin || "Not set"}
                           </div>
                         )}
                       </div>

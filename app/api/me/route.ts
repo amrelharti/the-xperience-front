@@ -102,8 +102,15 @@ export async function PUT(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text()
       console.log('[API Route] PUT /api/me - Backend error:', errorText)
+      let errorMessage = errorText || 'Failed to update profile'
+      try {
+        const parsed = JSON.parse(errorText)
+        if (parsed.error) errorMessage = parsed.error
+      } catch {
+        // use raw text
+      }
       return NextResponse.json(
-        { error: errorText || 'Failed to update profile' },
+        { error: errorMessage },
         { status: response.status }
       )
     }
