@@ -9,10 +9,27 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, Edit, Trash2, ArrowLeft, Users, Mail, Calendar, Shield, Menu, X, Filter } from "lucide-react"
+import { Plus, Search, Edit, Trash2, ArrowLeft, Users, Mail, Calendar, Shield, Menu, X, Filter, Upload, FileSpreadsheet, Loader2 } from "lucide-react"
 import Navbar from "../../components/Navbar"
 import UserDropdown from "../../components/UserDropdown"
 import { useUser } from "../../hooks/useUser"
+import { parseUserImportFile, type ParsedUserRow } from "@/lib/parseUserImportFile"
+
+type DuplicateStrategy = "SKIP" | "FAIL" | "UPDATE"
+
+interface BulkUserResult {
+  rowNumber: number
+  name: string
+  email: string
+  reason: string
+}
+
+interface BulkImportResponse {
+  created: User[]
+  skipped: BulkUserResult[]
+  failed: BulkUserResult[]
+  updated: User[]
+}
 
 interface User {
   id: string
@@ -47,7 +64,14 @@ export default function UserManagementPage() {
   const [classes, setClasses] = useState<Class[]>([])
   const [userEnrollments, setUserEnrollments] = useState<Record<string, Array<{ classId: string; className: string }>>>({})
   const [showCreateUser, setShowCreateUser] = useState(false)
+  const [showImportUsers, setShowImportUsers] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [importFile, setImportFile] = useState<File | null>(null)
+  const [parsedRows, setParsedRows] = useState<ParsedUserRow[]>([])
+  const [parseError, setParseError] = useState<string | null>(null)
+  const [duplicateStrategy, setDuplicateStrategy] = useState<DuplicateStrategy>("SKIP")
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState<BulkImportResponse | null>(null)
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
@@ -194,6 +218,82 @@ export default function UserManagementPage() {
     } catch (error) {
       console.error("Error creating user:", error)
       alert("Error creating user")
+    }
+  }
+
+  const resetImportState = () => {
+    setImportFile(null)
+    setParsedRows([])
+    setParseError(null)
+    setImportResult(null)
+    setDuplicateStrategy("SKIP")
+  }
+
+  const handleImportDialogChange = (open: boolean) => {
+    setShowImportUsers(open)
+    if (!open) {
+      resetImportState()
+    }
+  }
+
+  const handleImportFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ""
+    if (!file) return
+
+    setImportFile(file)
+    setParseError(null)
+    setImportResult(null)
+
+    try {
+      const rows = await parseUserImportFile(file)
+      if (rows.length === 0) {
+        setParsedRows([])
+        setParseError("No valid rows found. Each row needs a name and email.")
+        return
+      }
+      setParsedRows(rows)
+    } catch (error) {
+      setParsedRows([])
+      setParseError(error instanceof Error ? error.message : "Failed to read file")
+    }
+  }
+
+  const handleBulkImport = async () => {
+    if (parsedRows.length === 0) {
+      setParseError("Upload a valid file with Name and Email columns first.")
+      return
+    }
+
+    setImporting(true)
+    setImportResult(null)
+
+    try {
+      const res = await fetch("/api/admin/users/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          users: parsedRows,
+          duplicateStrategy,
+          role: "STUDENT",
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setParseError(data.error || data.reason || "Import failed")
+        return
+      }
+
+      setImportResult(data)
+      loadUsers()
+    } catch (error) {
+      console.error("Error importing users:", error)
+      setParseError("Error importing users")
+    } finally {
+      setImporting(false)
     }
   }
 
@@ -385,6 +485,125 @@ export default function UserManagementPage() {
               Back
             </Button>
           </div>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+          <Dialog open={showImportUsers} onOpenChange={handleImportDialogChange}>
+            <DialogTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base w-full sm:w-auto border-2 border-[#005eb8]/30 hover:border-[#005eb8] hover:bg-[#005eb8]/5"
+              >
+                <Upload className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
+                Import Users
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Import Users from File</DialogTitle>
+                <DialogDescription>
+                  Upload a CSV or Excel file with columns <strong>Name</strong> and <strong>Email</strong>. All imported users will be created as students.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="import-file">File (.csv, .xlsx)</Label>
+                  <Input
+                    id="import-file"
+                    type="file"
+                    accept=".csv,.xlsx,.xls,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
+                    onChange={handleImportFileChange}
+                    className="mt-1.5"
+                  />
+                  {importFile && (
+                    <p className="text-xs text-slate-500 mt-1.5 flex items-center gap-1">
+                      <FileSpreadsheet className="h-3.5 w-3.5" />
+                      {importFile.name}
+                      {parsedRows.length > 0 && ` — ${parsedRows.length} row(s) ready`}
+                    </p>
+                  )}
+                </div>
+                {parseError && (
+                  <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{parseError}</p>
+                )}
+                <div>
+                  <Label htmlFor="duplicate-strategy">If email already exists</Label>
+                  <Select
+                    value={duplicateStrategy}
+                    onValueChange={(value) => setDuplicateStrategy(value as DuplicateStrategy)}
+                  >
+                    <SelectTrigger id="duplicate-strategy" className="mt-1.5">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SKIP">Skip and report (recommended)</SelectItem>
+                      <SelectItem value="FAIL">Mark as failed</SelectItem>
+                      <SelectItem value="UPDATE">Update existing user&apos;s name</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {importResult && (
+                  <div className="space-y-2 text-sm rounded-lg border border-slate-200 bg-slate-50 p-3">
+                    <p className="font-medium text-slate-800">Import complete</p>
+                    <p className="text-green-700">Created: {importResult.created?.length ?? 0}</p>
+                    {(importResult.updated?.length ?? 0) > 0 && (
+                      <p className="text-blue-700">Updated: {importResult.updated.length}</p>
+                    )}
+                    {(importResult.skipped?.length ?? 0) > 0 && (
+                      <div>
+                        <p className="text-amber-700">Skipped: {importResult.skipped.length}</p>
+                        <ul className="mt-1 max-h-24 overflow-y-auto text-xs text-amber-800 space-y-0.5">
+                          {importResult.skipped.slice(0, 20).map((row) => (
+                            <li key={`skip-${row.rowNumber}-${row.email}`}>
+                              Row {row.rowNumber}: {row.email} — {row.reason}
+                            </li>
+                          ))}
+                          {importResult.skipped.length > 20 && (
+                            <li>…and {importResult.skipped.length - 20} more</li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                    {(importResult.failed?.length ?? 0) > 0 && (
+                      <div>
+                        <p className="text-red-700">Failed: {importResult.failed.length}</p>
+                        <ul className="mt-1 max-h-24 overflow-y-auto text-xs text-red-800 space-y-0.5">
+                          {importResult.failed.slice(0, 20).map((row) => (
+                            <li key={`fail-${row.rowNumber}-${row.email}`}>
+                              Row {row.rowNumber}: {row.email || row.name || "—"} — {row.reason}
+                            </li>
+                          ))}
+                          {importResult.failed.length > 20 && (
+                            <li>…and {importResult.failed.length - 20} more</li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => handleImportDialogChange(false)}>
+                  {importResult ? "Close" : "Cancel"}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleBulkImport}
+                  disabled={importing || parsedRows.length === 0}
+                  className="bg-gradient-to-r from-[#005eb8] to-[#0476D7]"
+                >
+                  {importing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Importing…
+                    </>
+                  ) : (
+                    `Import ${parsedRows.length > 0 ? parsedRows.length : ""} user${parsedRows.length === 1 ? "" : "s"}`
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           <Dialog open={showCreateUser} onOpenChange={setShowCreateUser}>
             <DialogTrigger asChild>
               <Button type="button" size="sm" className="bg-gradient-to-r from-[#005eb8] to-[#0476D7] hover:from-[#0476D7] hover:to-[#005eb8] text-white font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 text-sm sm:text-base w-full sm:w-auto">
@@ -438,6 +657,7 @@ export default function UserManagementPage() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {/* Search and Stats */}
