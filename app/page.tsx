@@ -417,7 +417,7 @@ const content: Record<Language, Content> = {
       },
       offerOptions: {
         xperiencePro: "COACHING PREMIUM - 1200 DH",
-        xperience: "COACHING BASIC - 800 DH",
+        xperience: "COACHING BASIC - 500 DH",
       },
     },
   },
@@ -687,7 +687,7 @@ const content: Record<Language, Content> = {
       },
       offerOptions: {
         xperiencePro: "COACHING PREMIUM - 1200 DH",
-        xperience: "COACHING BASIC - 800 DH",
+        xperience: "COACHING BASIC - 500 DH",
       },
     },
   },

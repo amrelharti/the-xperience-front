@@ -53,7 +53,7 @@ const initialForm: CouponFormState = {
 }
 
 const OFFER_OPTIONS = [
-  "COACHING BASIC - 800 DH",
+  "COACHING BASIC - 500 DH",
   "COACHING PREMIUM - 1200 DH",
 ]
 

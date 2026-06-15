@@ -299,7 +299,7 @@ const content: Record<Language, Content> = {
         basic: {
           name: "COACHING BASIC",
           originalPrice: "1000 DH",
-          currentPrice: "800 DH",
+          currentPrice: "500 DH",
           description: "A first step to test our program",
           features: [
             "The Basic Coaching gives access to one module of the program, your choice:",
@@ -417,7 +417,7 @@ const content: Record<Language, Content> = {
       },
       offerOptions: {
         xperiencePro: "COACHING PREMIUM - 1200 DH",
-        xperience: "COACHING BASIC - 800 DH",
+        xperience: "COACHING BASIC - 500 DH",
       },
     },
   },
@@ -569,7 +569,7 @@ const content: Record<Language, Content> = {
         basic: {
           name: "COACHING BASIC",
           originalPrice: "1000 DH",
-          currentPrice: "800 DH",
+          currentPrice: "500 DH",
           description: "Une première étape pour tester notre programme",
           features: [
             "Le Coaching Basic donne accès à un seul module du programme, au choix :",
@@ -687,7 +687,7 @@ const content: Record<Language, Content> = {
       },
       offerOptions: {
         xperiencePro: "COACHING PREMIUM - 1200 DH",
-        xperience: "COACHING BASIC - 800 DH",
+        xperience: "COACHING BASIC - 500 DH",
       },
     },
   },
